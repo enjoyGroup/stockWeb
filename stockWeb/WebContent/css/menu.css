@@ -1,0 +1,30 @@
+@CHARSET "UTF-8";
+
+.potato-menu-item {
+        width:160px;
+        font-size:13px;
+        background:#333;
+        background:rgba(0,0,0,0.9);
+    }
+    .potato-menu-group {
+        z-index:1000;
+    }
+    .potato-menu-item a {
+        padding:5px 20px 5px 12px;
+        color: #fff;
+    }
+    .potato-menu-hover {
+        background-color: #666;
+    }
+    .potato-menu-has-vertical > a {
+        /*background: transparent url(/images/icons/fammini/arrow_down.gif) right no-repeat;*/
+        background: transparent url(/stockWeb/images/download.png) right no-repeat;
+    }
+    .potato-menu-has-horizontal > a {
+        /*background: transparent url(/images/icons/fammini/arrow_right.gif) right no-repeat;*/
+        background: url(/stockWeb/images/right.png) right no-repeat;
+    }
+    .potato-menu-item ul {
+        border-top:1px solid #444;
+        border-left:1px solid #444;
+    }

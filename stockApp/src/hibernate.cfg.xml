@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+	<session-factory>
+		<!-- Database connection settings -->
+        <property name="connection.driver_class">com.mysql.jdbc.Driver</property>
+        <property name="connection.url">jdbc:mysql://localhost:3306/stock?characterEncoding=UTF-8</property>
+        <property name="connection.username">root</property>
+        <property name="connection.password"></property>
+        
+        <!-- SQL dialect -->
+        <property name="dialect">org.hibernate.dialect.MySQL5InnoDBDialect</property>
+        
+        <!-- Enable Hibernate's automatic session context management -->
+        <!--  <property name="current_session_context_class">thread</property> -->
+        
+        <property name="hibernate.connection.isolation">2</property>
+        
+        <!-- Disable the second-level cache  -->
+        <property name="cache.provider_class">org.hibernate.cache.NoCacheProvider</property>
+        
+        <!-- Echo all executed SQL to stdout -->
+		<property name="show_sql">true</property>
+		
+		<property name="hbm2ddl.auto">validate</property>
+		
+		<!-- Begin Entity zone -->
+		<mapping class="th.go.stock.app.enjoy.model.Company" />
+		<mapping class="th.go.stock.app.enjoy.model.Customer" />
+		<mapping class="th.go.stock.app.enjoy.model.District" />
+		<mapping class="th.go.stock.app.enjoy.model.Productgroup" />
+		<mapping class="th.go.stock.app.enjoy.model.ProductgroupPK" />
+		<mapping class="th.go.stock.app.enjoy.model.Producttype" />
+		<mapping class="th.go.stock.app.enjoy.model.Province" />
+		<mapping class="th.go.stock.app.enjoy.model.Refcompanystatus" />
+		<mapping class="th.go.stock.app.enjoy.model.Refcustomerstatus" />
+		<mapping class="th.go.stock.app.enjoy.model.Refpagedetail" />
+		<mapping class="th.go.stock.app.enjoy.model.Refuserstatus" />
+		<mapping class="th.go.stock.app.enjoy.model.Relationuserncompany" />
+		<mapping class="th.go.stock.app.enjoy.model.Subdistrict" />
+		<mapping class="th.go.stock.app.enjoy.model.Unittype" />
+		<mapping class="th.go.stock.app.enjoy.model.Userdetail" />
+		<mapping class="th.go.stock.app.enjoy.model.Userprivilege" />
+		<!-- End Entity zone -->
+	</session-factory>
+</hibernate-configuration>

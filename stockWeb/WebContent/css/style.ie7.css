@@ -1,0 +1,101 @@
+/* Created by Artisteer v4.0.0.58475 */
+
+.clearfix {
+   zoom: expression(this.runtimeStyle.zoom="1", this.appendChild(document.createElement("br")).className="cleared");
+}
+
+.cnfc-textblock > div {
+   display: block;
+   line-height: normal;
+   zoom: 1;
+}
+
+.cnfc-header
+{
+   z-index: 1;
+}
+
+.cnfc-hmenu>li, .cnfc-hmenu>li>a
+{
+   display: inline !important;
+   zoom: 1;
+   float: none !important;
+   vertical-align: top;
+}
+ul.cnfc-hmenu, ul.cnfc-hmenu ul {
+   zoom: expression(this.runtimeStyle.zoom="1", this.appendChild(document.createElement("br")).className="cleared");
+}
+ul.cnfc-hmenu>li:first-child {
+   padding-right:6px;
+}
+
+ul.cnfc-hmenu ul{
+   background-color: #F9A4C3 !important;
+}
+
+.cnfc-content-layout, .cnfc-content-layout-row, .cnfc-layout-cell 
+{
+   display: block;
+   zoom: 1;
+}
+.cnfc-layout-cell
+{
+   position:relative;
+   float: left;
+   clear: right;
+}
+
+input[type="text"]
+{
+   margin:0 0 0 -3px;
+   zoom:expression(runtimeStyle.zoom = 1, parentNode.insertBefore(document.createElement('div'), this).appendChild(this));
+}
+
+* html input[type="text"]
+{
+   margin :0;
+}
+
+form.cnfc-search>input[type="text"]
+{
+   margin:0 0 0 -3px;
+   zoom:expression(runtimeStyle.zoom = 1, parentNode.insertBefore(document.createElement('div'), this).appendChild(this));
+}
+
+form.cnfc-search div>input[type="text"]
+{
+   width: 100%;
+}
+
+* html form.cnfc-search>input[type="text"] 
+{
+   margin :0;
+}
+
+.cnfc-postmetadataheader{
+   zoom:1;
+}
+
+.cnfc-postheadericons span{
+   zoom: 1;
+}
+.cnfc-postcontent {
+   height: 1%;
+}
+
+.cnfc-postfootericons span{
+   zoom: 1;
+}
+.close-alt, .arrow-right-alt, .arrow-left-alt {
+   display: block !important;
+}
+.cw, .ccw {
+   display: none !important;
+}
+
+.cnfc-content 
+{
+   width: auto;
+   float:none;
+}
+

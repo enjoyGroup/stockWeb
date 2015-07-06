@@ -1,0 +1,434 @@
+@charset "utf-8";
+/* CSS Document */
+/*.trace , .trace *{ outline: 1px solid red;}*/
+body{
+	font-family:Tahoma, Geneva, sans-serif;
+	font-size:14px;
+	background:#f5f5f5;
+}
+.text_pink{color:#c94a70;}
+.text_red{color:#C00;}
+.text_white{color:#ffffff;}
+
+
+.font12{font-size:12px;}
+.font13{font-size:13px;}
+.font14{font-size:14px;}
+.font16{font-size:16px;}
+.font20{font-size:20px;}
+.font22{font-size:22px;}
+
+.nomarginL{margin-left:0px !important;}
+
+
+.headwrap{
+	background:url(../img/bg-header.jpg) repeat-x #FFF;
+	height:100px;
+	padding-top:12px;
+	
+}
+
+.user{
+	float:right; 
+	margin-left:0px; 
+	text-align:right; 
+	padding-top:5px; 
+	font-size:14; 
+	font-weight:bold;
+}
+
+.headwrap ul{
+	float:right; 
+	list-style-type:none;
+	margin:5px 0 0 0;
+}
+
+.headwrap ul li{
+	float:right; 
+	margin-left:10px; 
+	text-align:center;
+}
+
+.headwrap ul li.date{ 
+	background-color:#f6cad7; 
+	height:22px; 
+	width:250px; 
+	padding-top:3px;
+}
+
+.headwrap ul li a.logout{ 
+	background-color:#dcdcdc; 
+	height:22px; 
+	width:80px; 
+	padding-top:3px; 
+	display:block; 
+	color:#646464; 
+	text-decoration:none;
+}
+
+.headwrap ul li a:hover.logout{
+	background-color:#f6cad7;
+	color:#c94a70;
+}
+
+.wrapper{margin-top:20px;}
+
+
+.bloc-content{
+	display: block;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+	min-height:500px;
+	border: 1px solid #e3e3e3;
+	background-color:#fff;
+	width:678px;
+	padding:10px;
+	font-size:13px;
+}
+
+.title{font-size:16px; font-weight:bold;margin: 80px 0 0 30px;}
+
+
+
+
+
+
+div.menu3
+{
+	/*width:500px;margin:0 auto;*//*Uncomment this line to make the menu center-aligned.*/
+	text-align:center;
+	font-size:0;
+	height: 25px;    
+	*position:relative;*top:1px;/*Hacks for IE6 & IE7 */    
+}
+
+div.menu3 a
+{
+	display: inline-block;
+	padding: 0 20px;
+	margin-right:1px; /* It specifies the distance between each tab */
+	background:#F7F7F7;
+	color:black;
+	text-decoration:none;
+	font: normal 12px Arial;
+	line-height: 30px;
+	border:1px solid #CAD0DB;
+	border-bottom:0;
+	color:#666;
+	vertical-align:top;/*ChangeSet#2*/
+	text-decoration:none;
+
+
+}
+
+div.menu3 a:hover, div.menu3 a.current
+{
+	background:#E9ECF0;
+	line-height: 25px;
+	color:#000;
+}
+
+div.menu3sub
+{
+	height:30px;
+	border:1px solid #CAD0DB;
+	background:#E9ECF0;
+}
+
+.sim-planel{ background: white; border:1px solid #eee; margin:4px 0px; padding:4px 12px; margin-bottom:24px;}
+.round{-webkit-border-radius: 4px;-moz-border-radius: 4px;border-radius: 4px;}
+.sub-menu li{float: left; list-style-type: none; border-left:1px dotted #ccc; min-height: 30px; padding-top:6px;min-width: 110px;text-align: center;cursor: pointer; }
+.sub-menu li:hover{background: #ccc}
+.sub-menu li a{min-width: 110px; text-decoration:none;color:#777;}
+.line{ outline:1px solid #ccc;}
+.table {margin-top: 8px; cursor: pointer;}
+.table tr td{border:1px solid #ccc}
+
+.side-panel{ margin:0px !important;padding:0px !important; }
+ul.side-panel li{ list-style-type: none; line-height: 30px; border-bottom: 1px solid #eee;padding-left:24px;}
+ul.side-panel li:hover,ul.side-panel li.active{cursor:pointer; background: #ccc;}
+
+.sim-panel-search {width:100%;padding:4px 12px;margin-bottom: -20px}
+.sim-panel-search input {margin:4px 0px 0px 0px;}
+.sim-panel-search input[type='text']{width: 80%}
+.sim-panel-result {min-height: 200px}
+
+.sim-panel-result-table th{ font-weight: bold;font-style: 1.2em; border:1px solid #ccc; text-align: center; background: #eee};
+/*.sim-panel-result-table tr td{vertical-align: center; text-align: center; border:none !important; }
+.sim-panel-result-table .btn{max-width: 24px !important; max-height: 24px !important; padding:0px 8px 8px 8px !important;}*/
+
+/* ead add 3/6/2015 */
+
+.filterable {
+    margin-top: 15px;
+}
+.filterable .panel-heading .pull-right {
+    margin-top: -20px;
+}
+.filterable .filters input[disabled] {
+    background-color: transparent;
+    border: none;
+    cursor: auto;
+    box-shadow: none;
+    padding: 0;
+    height: auto;
+}
+.filterable .filters input[disabled]::-webkit-input-placeholder {
+    color: #333;
+}
+.filterable .filters input[disabled]::-moz-placeholder {
+    color: #333;
+}
+.filterable .filters input[disabled]:-ms-input-placeholder {
+    color: #333;
+}
+
+.error-notice {
+  margin: 5px 5px; /* Making sure to keep some distance from all side */
+}
+
+.oaerror {
+  width: 90%; /* Configure it fit in your design  */
+  margin: 0 auto; /* Centering Stuff */
+  background-color: #FFFFFF; /* Default background */
+  padding: 20px;
+  border: 1px solid #eee;
+  /*border-left-width: 5px;*/
+  border-radius: 3px;
+  margin: 0 auto;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 16px;
+}
+
+.danger {
+  border-left-color: #d9534f; /* Left side border color */
+  background-color: rgba(217, 83, 79, 0.1); /* Same color as the left border with reduced alpha to 0.1 */
+}
+
+.success {
+  border-left-color: #2b542c;
+  background-color: rgba(43, 84, 44, 0.1);
+}
+
+/* ead */
+.datagrid table {
+    border-collapse: collapse;
+    text-align: left;
+    width: 100%;
+	border:1px solid #ccc;
+}
+.datagrid,.datagrid table {
+    font: normal 12px/150% Arial, Helvetica, sans-serif;
+    background: #fff;
+    overflow: hidden;
+    /*border: 6px solid #646566;*/
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+}
+.datagrid table td,
+.datagrid table th {
+    padding: 5px 10px;
+    font-size:1.05em !important;
+}
+.datagrid table thead th {
+    background: -webkit-gradient( linear, left top, left bottom, color-stop(0.05, #6B6B6B), color-stop(1, #171717));
+    background: -moz-linear-gradient( center top, #6B6B6B 5%, #171717 100%);
+    filter: progid: DXImageTransform.Microsoft.gradient(startColorstr='#6B6B6B', endColorstr='#171717');
+    background-color: #6B6B6B;
+    color: #FFFFFF;
+    font-size: 15px;
+    font-weight: bold;
+    border-left: 1px solid #A3A3A3;
+}
+.datagrid table thead th:first-child {
+    border: none;
+}
+.datagrid table tbody td {
+    color: #000;
+    border-left: 1px solid #DBDBDB;
+    font-size: 12px;
+    font-weight: normal;
+}
+.datagrid table tbody .alt td {
+    background: #EBEBEB;
+    color: #7D7D7D;
+}
+.datagrid table tbody td:first-child {
+    border-left: none;
+}
+.datagrid table tbody tr:last-child td {
+    border-bottom: none;
+}
+.datagrid table tfoot td div {
+    border-top: 1px solid #646566;
+    background: #EBEBEB;
+}
+
+.datagrid table tfoot td {
+    padding: 1;
+    font-size: 12px
+}
+.datagrid table tfoot td div {
+    padding: 2px;
+}
+.datagrid table tfoot td ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    text-align: right;
+}
+.datagrid table tfoot li {
+    display: inline;
+}
+.datagrid table tfoot li a {
+    text-decoration: none;
+    display: inline-block;
+    padding: 2px 8px;
+    margin: 1px;
+    color: black;
+    border: 1px solid #8C8C8C;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    background: -webkit-gradient( linear, left top, left bottom, color-stop(0.05, #8C8C8C), color-stop(1, #7D7D7D));
+    background: -moz-linear-gradient( center top, #8C8C8C 5%, #7D7D7D 100%);
+    filter: progid: DXImageTransform.Microsoft.gradient(startColorstr='#8C8C8C', endColorstr='#7D7D7D');
+    background-color: #8C8C8C;
+}
+.datagrid table tfoot ul.active,
+.datagrid table tfoot ul a:hover {
+    text-decoration: none;
+    border-color: #7D7D7D;
+    color: black;
+    background: none;
+    background-color: #8C8C8C;
+}
+
+.datagrid{ padding:0 !important; margin:0 !important; border:none !important}
+
+
+
+
+
+
+.searchbox input[type="text"] {
+  margin: 2px 4px;
+}
+
+.searchbox select {
+  max-width: 180px;
+  margin-left: 4px;
+}
+
+.trace,.trace *{outline:1px solid red}
+.main-container{height:auto; background:white; padding-bottom:40px; /*padding-left:0px !important; padding-right:0px !important*/}
+
+.round-sm{-webkit-border-radius: 4px;
+-moz-border-radius: 4px;
+border-radius: 4px;}
+
+.round-md{-webkit-border-radius: 8px;
+-moz-border-radius: 8px;
+border-radius: 8px;}
+
+.round-lg{-webkit-border-radius: 12px;
+-moz-border-radius: 12px;
+border-radius: 12px;}
+
+.padding-sm{padding:4px;}
+.padding-md{padding:8px;}
+.padding-lg{padding:12px;}
+.padding-xl{padding:24px;}
+
+.padding-no{padding:0px !important;}
+.margin-no{margin:0px !important;}
+
+
+.padding-sm-h{padding:4px 0px;}
+.padding-md-h{padding:8px 0px;}
+.padding-lg-h{padding:12px 0px;}
+.padding-xl-h{padding:24px 0px;}
+
+
+.padding-sm-w{padding:0px 4px}
+.padding-md-w{padding:0px 8px}
+.padding-lg-w{padding:0px 12px}
+.padding-xl-w{padding:0px 24px}
+
+.col6-1st.line-right ,.line-right{border-right:1px dotted gray !important;}
+.col6-1st.line-left ,.line-left{border-left:1px dotted gray !important;}
+
+.col6-2nd.line-right{border-right:1px dotted gray !important;}
+.col6-2nd.line-left{border-left:1px dotted gray !important;}
+
+.col6-1st,.col6-2nd{overflow:hidden}
+
+
+
+
+
+/*CSS Menu mod*/
+
+/*.cssmenu-mod ul ul {
+  display: none;
+  background: #fff;
+  border-right: 1px solid #a2a194;
+  border-left: 1px solid #a2a194;
+}*/
+
+.cssmenu-mod table tr {
+  padding: 0;
+  border-bottom: 1px solid #d4d4d4;
+  border-top: none;
+  background: #f7f7f7;
+  background: -moz-linear-gradient(#f7f7f7 0%, #ececec 100%);
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #f7f7f7), color-stop(100%, #ececec));
+  background: -webkit-linear-gradient(#f7f7f7 0%, #ececec 100%);
+  background: linear-gradient(#f7f7f7 0%, #ececec 100%);
+}
+.cssmenu-mod table tr:last-child {
+  border-bottom: none;
+}
+.cssmenu-mod table tr td {
+  /*padding: 10px 10px 10px 25px;*/
+  display: block;
+  color: #676767;
+  font-size: 12px;
+  font-weight: normal;
+  text-align:left !important;
+}
+.cssmenu-mod table tr td:before {
+  content: "»";
+  position: absolute;
+  /*left: 10px;*/
+  color: #e94f31;
+}
+
+.cssmenu-mod table tr td span{
+	padding-left:20px !important;
+}
+.cssmenu-mod table tr td:hover {
+  color: #e94f31;
+}
+
+.season-title-head{
+	background:#3366cc;color:white;
+}
+
+
+
+
+
+.user-register-table tr td{
+	border:none !important; padding:4px !important;  
+}
+
+.user-search-table input[type="text"],.user-search-table select{min-width:300px}
+.zone-assign-table input[type="text"]{max-width:140px !important}
+.zone-assign-table textarea{max-width:80%}
+
+.zone-assign-table tr {padding-bottom:12px; border-bottom:1px dotted #eee;}
+.zone-assign-table tr td{ min-height:24px;}
+.zone-assign-table tr td span{ font-weight:bold;padding-top:12px;}
