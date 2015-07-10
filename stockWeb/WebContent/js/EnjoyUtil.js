@@ -1,3 +1,45 @@
+$.datepicker.regional['th'] ={
+    changeMonth: true,
+    changeYear: true,
+    //defaultDate: GetFxupdateDate(FxRateDateAndUpdate.d[0].Day),
+    yearOffSet: 543,
+    //showOn: "button",
+    //buttonImage: 'images/calendar.gif',
+    //buttonImageOnly: true,
+    dateFormat: 'dd/mm/yy',
+    dayNames: ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'],
+    dayNamesMin: ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส'],
+    monthNames: ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'],
+    monthNamesShort: ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'],
+    constrainInput: true,
+   
+    prevText: 'ก่อนหน้า',
+    nextText: 'ถัดไป',
+    yearRange: '-20:+20',
+    //buttonText: 'เลือก',
+  
+};
+
+$.datepicker.regional['birthDateTH'] ={
+    changeMonth: true,
+    changeYear: true,
+    yearOffSet: 543,
+    dateFormat: 'dd/mm/yy',
+    dayNames: ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'],
+    dayNamesMin: ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส'],
+    monthNames: ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'],
+    monthNamesShort: ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'],
+    constrainInput: true,
+   
+    prevText: 'ก่อนหน้า',
+    nextText: 'ถัดไป',
+    yearRange: '-100:+0',
+    //buttonText: 'เลือก',
+  
+};
+
+$.datepicker.setDefaults($.datepicker.regional['th']);
+
 function isBlank(objValue){
     if(objValue != null && objValue != undefined && objValue != ''){
         return false;
@@ -26,6 +68,22 @@ $(document).ready(function(){
 	    $(".moneyOnly").keyup(function(event){
 	        return onKeyUpMoney(event);
 	    });
+	    
+	    $(".telOnly").keypress(function(event){
+	        return onKeyPressTel(event);
+	    });
+	    $(".telOnly").keydown(function(event){
+	        return onKeyDownTel(event);
+	    });
+	    $(".telOnly").keyup(function(event){
+	        return onKeyUpTel(event);
+	    });
+	    
+	    $( ".dateFormat" ).datepicker( $.datepicker.regional["th"] );
+	    $( ".dateFormat" ).datepicker( "option", "defaultDate", +0 );
+	    
+	    $( ".birthDateFormat" ).datepicker( $.datepicker.regional["birthDateTH"] );
+	    
 });
 
 //Example gp_replaceComma(78,500.00);
@@ -251,7 +309,7 @@ function gp_toDate(av_val){
     
     try{
         dateArray   = av_val.split("/");
-        d           = new Date(dateArray[2], dateArray[1], dateArray[0], 0, 0, 0, 0);
+        d           = new Date(dateArray[2], parseInt(dateArray[1])-1, dateArray[0], 0, 0, 0, 0);
     }catch(e){
         d = null;
     }
@@ -301,7 +359,7 @@ function gp_progressBarOff(){
 
 function gp_checkDate(ao_obj){
     var allowBlank 	= true;
-    var minYear 	= 2500;
+    var minYear 	= 2015;
     //var maxYear 	= (new Date()).getFullYear();
     var errorMsg 	= "";
     var field 		= gp_trim(ao_obj.value);
@@ -504,6 +562,51 @@ function onKeyUpMoney(evt){
     return checkAllowKey(keyCode, '0123456789.,');
 }
 
+function onKeyPressTel(evt){
+    var keyCode = evt.keyCode ? evt.keyCode : evt.which;
+
+    /** CHECK SPECIAL CHARACTER **/
+    /*
+     * SPECIAL CHARACTER (KEY CODE & CHAR CODE)
+     *  33=!       34="    35=#        36=$
+     *  37=%       38=&    39='        40=(
+     *  41=)       42=*    45=-        47=/
+     *  58=:       59=;    60=<        62=<
+     *  63=?       64=@    91=[        93=]
+     *  94=^       95=_    123={       125=}
+     */
+
+    if(keyCode == 33 || keyCode == 34 || keyCode == 35 || keyCode == 36 || keyCode == 37 || keyCode == 38 || keyCode == 39 || keyCode == 40 ||
+        keyCode == 41 || keyCode == 42 || keyCode == 46 || keyCode == 47 || keyCode == 58 || keyCode == 59 || keyCode == 60 || keyCode == 62 ||
+        keyCode == 63 || keyCode == 64 || keyCode == 91 || keyCode == 93 || keyCode == 123 || keyCode == 125){
+        return false;
+    }
+    return checkAllowKey(keyCode, '0123456789-,');
+}
+
+function onKeyDownTel(evt){
+    var keyCode = evt.keyCode ? evt.keyCode : evt.which;
+
+    /*key 17 = Ctrl, key 86 = v, key 67 = c */
+    if(keyCode == 17 || keyCode == 86 || keyCode == 67 || keyCode == 8 || keyCode == 9 || keyCode == 35 || keyCode == 36 || keyCode == 37 || keyCode == 38 || keyCode == 39 || keyCode == 40 || keyCode == 46 || keyCode == 144 || keyCode == 109){
+        return true;
+    }
+    if ( (keyCode > 95 && keyCode < 106) || keyCode == 44 || keyCode == 188 || keyCode == 190 ) {
+        return true;
+    } else {
+        return checkAllowKey(keyCode, '0123456789-,');
+    }
+}
+
+function onKeyUpTel(evt){
+    var keyCode = evt.keyCode ? evt.keyCode : evt.which;
+
+    if(keyCode == 8 || keyCode == 9 || keyCode == 35 || keyCode == 36 || keyCode == 37 || keyCode == 38 || keyCode == 39 || keyCode == 40 || keyCode == 45 || keyCode == 144 || keyCode == 110){
+        return true;
+    }
+    return checkAllowKey(keyCode, '0123456789-,');
+}
+
 function formatNumber(obj) {
     var val = obj.value;
     val = $.trim(val);
@@ -575,3 +678,72 @@ function gp_validateTime(ao_obj){
 		return false;
 	}
   }
+
+//สำหรับ Validate format E-mail
+function gp_checkemail(av_val){
+   var Email = null;
+   
+   try{
+	   
+	   Email=/^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+	   if(av_val!=""){
+		   if(!av_val.match(Email)){
+		     alert('รูปแบบ Email ไม่ถูกต้อง');
+		     return false;
+		   }else{
+			 return true;
+		   }
+	   }
+	   
+	   return true;
+	   
+   }catch(e){
+	   alert("gp_checkemail :: " + e);
+	   return false;
+   }
+}
+
+// Verify PIN
+function gp_validatePin(av_pin){
+	/*
+		1. Get the first digit multiples with 13 and the next digit multiples with 12 .. and go on .. the twelve digit will minus with 2
+		2. Sum the result from (1)
+		3. Get the result from (2) MOD with 11
+		4. Get the result from (3) (after modulus) minus with 11
+		5. The result from (4) is checked digit for compare with the last digit of PIN.
+		**ps.- if the remainder of mod is 0 -- digi =1
+		          - if the remainder of mod is 1-- digi =0
+	*/
+	var sum_unit_pin = 0;
+	var tempMod = 0;
+	var check_digit = "";
+	var unit_pin = new Array(av_pin.length);
+	var multiple_pin = new Array(13,12,11,10,9,8,7,6,5,4,3,2);
+
+	for (var i=0;i<av_pin.length;i++){
+		unit_pin[i] = av_pin.substring(i,i+1);
+		if(i != (av_pin.length-1)){
+			unit_pin[i] = unit_pin[i] * multiple_pin[i];
+			sum_unit_pin = sum_unit_pin+unit_pin[i];
+		}
+	}
+	tempMod = sum_unit_pin % 11 ;
+
+	switch(tempMod){
+		case 0	:	check_digit = 1;
+							break;
+		case 1	:	check_digit = 0;
+							break;
+ 	    default	:	check_digit = 11- tempMod ;
+							break;
+	}
+
+	if(check_digit == unit_pin[av_pin.length-1]){
+		return true;
+	}else{
+		return false;
+	}
+}
+
+
+

@@ -12,7 +12,7 @@ final String pagesURL		= Constants.PAGE_URL;
 
 <!-- Begin css -->
 <link rel="stylesheet" href="<%=cssURL%>/jquery-ui.css" media="screen">
-<link rel="stylesheet" href="<%=cssURL%>/jquery-ui-1.8.10.custom.css" media="screen">
+<link rel="stylesheet" href="<%=cssURL%>/jquery-ui-1.10.3.custom.css" media="screen">
 <!--[if lt IE 9]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
 <link rel="stylesheet" href="<%=cssURL%>/style.css" media="screen">
 
@@ -44,7 +44,6 @@ final String pagesURL		= Constants.PAGE_URL;
 
 <!-- Begin JS -->
 <script src="<%=jsURL%>/jquery-1.7.1.min.js"></script>
-<script src="<%=jsURL%>/jquery-ui-1.8.10.offset.datepicker.min.js" type="text/javascript"></script>
 <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Coming+Soon&amp;subset=latin">
 <script src="<%=jsURL%>/script.js"></script>
 <script src="<%=jsURL%>/script.responsive.js"></script>
@@ -65,7 +64,8 @@ final String pagesURL		= Constants.PAGE_URL;
 <script src="<%=themeURL%>/js/bootstrap.js" type="text/javascript"></script> 
 <!-- End JS -->
 
-<script src="<%=jsURL%>/jquery-ui.js" type="text/javascript"></script>
+<script src="<%=jsURL%>/jquery-ui-1.10.3.custom.js" type="text/javascript"></script>
+<%--<script src="<%=jsURL%>/jquery-ui.js" type="text/javascript"></script> --%>
 <script src="<%=jsURL%>/EnjoyUtil.js" type="text/javascript"></script>
 <script src="<%=jsURL%>/jquery.tablesorter.js" type="text/javascript"></script>
 <script type="text/javascript" src="<%=jsURL%>/jquery.fixedheadertable.js"></script>

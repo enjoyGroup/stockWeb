@@ -100,8 +100,8 @@ public class EnjoyUtils {
             }else{
                 dt      = new SimpleDateFormat(av_currFormat); 
                 date    = dt.parse(av_date); 
-//                dt1     = new SimpleDateFormat(av_toFormat,Locale.US);// เน€เธ�๏ฟฝ.เน€เธ�เธ�.
-                dt1     = new SimpleDateFormat(av_toFormat, new Locale("th", "TH"));//เน€เธ�๏ฟฝ.เน€เธ�เธ�.
+//                dt1     = new SimpleDateFormat(av_toFormat,Locale.US);// ค.ศ.
+                dt1     = new SimpleDateFormat(av_toFormat, new Locale("th", "TH"));//พ.ศ.
                 
                 dateFormat = dt1.format(date);
             }
@@ -216,8 +216,8 @@ public class EnjoyUtils {
         String st_ch;
         int idx,Digit;
 
-        String[] GetNum   = { "เน€เธ�เธ�เน€เธ�๏ฟฝเน€เธ�เธ–เน€เธ�๏ฟฝเน€เธ�๏ฟฝ","เน€เธ�เธ�เน€เธ�เธ�เน€เธ�๏ฟฝ","เน€เธ�เธ�เน€เธ�เธ’เน€เธ�เธ�","เน€เธ�เธ�เน€เธ�เธ•เน€เธ�๏ฟฝ","เน€เธ�เธ�เน€เธ�๏ฟฝเน€เธ�เธ’","เน€เธ�เธ�เน€เธ�๏ฟฝ","เน€เธ�โ�ฌเน€เธ�๏ฟฝเน€เธ�๏ฟฝเน€เธ�โ€�","เน€เธ�๏ฟฝเน€เธ�๏ฟฝเน€เธ�โ€�","เน€เธ�โ�ฌเน€เธ�๏ฟฝเน€เธ�๏ฟฝเน€เธ�เธ’","เน€เธ�เธ�เน€เธ�เธ•เน€เธ�๏ฟฝ","เน€เธ�โ�ฌเน€เธ�เธ�เน€เธ�๏ฟฝเน€เธ�โ€�" };
-        String[] GetDigit = { "","เน€เธ�เธ�เน€เธ�เธ”เน€เธ�๏ฟฝ","เน€เธ�เธ�เน€เธ�๏ฟฝเน€เธ�เธ�เน€เธ�เธ�","เน€เธ�๏ฟฝเน€เธ�เธ‘เน€เธ�๏ฟฝ","เน€เธ�เธ�เน€เธ�เธ�เน€เธ�เธ—เน€เธ�๏ฟฝเน€เธ�๏ฟฝ","เน€เธ�๏ฟฝเน€เธ�เธ�เน€เธ�๏ฟฝ","เน€เธ�เธ…เน€เธ�๏ฟฝเน€เธ�เธ’เน€เธ�๏ฟฝ"};
+        String[] GetNum   = { "หนึ่ง","สอง","สาม","สี่","ห้า","หก","เจ็ด","แปด","เก้า","ยี่","เอ็ด" };
+        String[] GetDigit = { "","สิบ","ร้อย","พัน","หมื่น","แสน","ล้าน"};
 
         CurText = amt;
         Digit = 0;
@@ -225,14 +225,14 @@ public class EnjoyUtils {
         {
            if ( Digit == 6 ){
               Digit = 0;
-              Thai_CurText = "เน€เธ�เธ…เน€เธ�๏ฟฝเน€เธ�เธ’เน€เธ�๏ฟฝ" + Thai_CurText;
+              Thai_CurText = "ล้าน" + Thai_CurText;
            }
 
            ch      = CurText.substring(idx-1,idx).toCharArray()[0];
            st_ch   = CurText.substring(idx-1,idx);
            switch (ch){
               case '.' :  Digit = 0;
-                          Thai_CurText = "เน€เธ�๏ฟฝเน€เธ�เธ’เน€เธ�โ€”" + Thai_CurText;
+                          Thai_CurText = "บาท" + Thai_CurText;
                           break;
               case ',' :  break;
 
@@ -281,12 +281,12 @@ public class EnjoyUtils {
         int pos_dot = CurText.indexOf(".");
         if (Integer.parseInt(CurText.substring(pos_dot+1,CurText.length())) == 0 ){
         	if(amt.equals("0.00")){
-        		Thai_CurText = "เน€เธ�เธ�เน€เธ�เธ�เน€เธ�๏ฟฝเน€เธ�เธ�เน€เธ�๏ฟฝ" + Thai_CurText + "เน€เธ�โ€“เน€เธ�๏ฟฝเน€เธ�เธ�เน€เธ�๏ฟฝ";
+        		Thai_CurText = "ศูนย์" + Thai_CurText + "ถ้วน";
         	}else{
-        		Thai_CurText = Thai_CurText + "เน€เธ�โ€“เน€เธ�๏ฟฝเน€เธ�เธ�เน€เธ�๏ฟฝ";
+        		Thai_CurText = Thai_CurText + "ถ้วน";
         	}
         }else{
-        	Thai_CurText = Thai_CurText + "เน€เธ�เธ�เน€เธ�โ€ขเน€เธ�เธ’เน€เธ�๏ฟฝเน€เธ�๏ฟฝเน€เธ�๏ฟฝ";
+        	Thai_CurText = Thai_CurText + "สตางค์";
         }
         return Thai_CurText;
     }
@@ -300,23 +300,23 @@ public class EnjoyUtils {
         try {
         	if (!dateThai.equals(""))
 			{	
-	            tblMonth.put("1", "เน€เธ�เธ�เน€เธ�๏ฟฝเน€เธ�เธ�เน€เธ�เธ’เน€เธ�๏ฟฝเน€เธ�เธ�");
-	            tblMonth.put("2", "เน€เธ�๏ฟฝเน€เธ�เธ�เน€เธ�เธ�เน€เธ�ย เน€เธ�เธ’เน€เธ�๏ฟฝเน€เธ�เธ‘เน€เธ�๏ฟฝเน€เธ�๏ฟฝเน€เธ�๏ฟฝ");
-	            tblMonth.put("3", "เน€เธ�เธ�เน€เธ�เธ•เน€เธ�๏ฟฝเน€เธ�เธ’เน€เธ�๏ฟฝเน€เธ�เธ�");
-	            tblMonth.put("4", "เน€เธ�โ�ฌเน€เธ�เธ�เน€เธ�เธ�เน€เธ�เธ’เน€เธ�เธ�เน€เธ�๏ฟฝ");
-	            tblMonth.put("5", "เน€เธ�๏ฟฝเน€เธ�เธ�เน€เธ�เธ�เน€เธ�ย เน€เธ�เธ’เน€เธ�๏ฟฝเน€เธ�เธ�");
-	            tblMonth.put("6", "เน€เธ�เธ�เน€เธ�เธ”เน€เธ�โ€“เน€เธ�เธ�เน€เธ�๏ฟฝเน€เธ�เธ’เน€เธ�เธ�เน€เธ�๏ฟฝ");
-	            tblMonth.put("7", "เน€เธ�๏ฟฝเน€เธ�เธ�เน€เธ�๏ฟฝเน€เธ�๏ฟฝเน€เธ�เธ’เน€เธ�๏ฟฝเน€เธ�เธ�");
-	            tblMonth.put("8", "เน€เธ�เธ�เน€เธ�เธ”เน€เธ�๏ฟฝเน€เธ�เธ�เน€เธ�เธ’เน€เธ�๏ฟฝเน€เธ�เธ�");
-	            tblMonth.put("9", "เน€เธ�๏ฟฝเน€เธ�เธ‘เน€เธ�๏ฟฝเน€เธ�เธ�เน€เธ�เธ’เน€เธ�เธ�เน€เธ�๏ฟฝ");
-	            tblMonth.put("10","เน€เธ�โ€ขเน€เธ�เธ�เน€เธ�เธ…เน€เธ�เธ’เน€เธ�๏ฟฝเน€เธ�เธ�");
-	            tblMonth.put("11","เน€เธ�๏ฟฝเน€เธ�เธ�เน€เธ�เธ�เน€เธ�๏ฟฝเน€เธ�เธ”เน€เธ�๏ฟฝเน€เธ�เธ’เน€เธ�เธ�เน€เธ�๏ฟฝ");
-	            tblMonth.put("12","เน€เธ�๏ฟฝเน€เธ�เธ‘เน€เธ�๏ฟฝเน€เธ�เธ�เน€เธ�เธ’เน€เธ�๏ฟฝเน€เธ�เธ�");
+	            tblMonth.put("1", "มกราคม");
+	            tblMonth.put("2", "กุมภาพันธ์");
+	            tblMonth.put("3", "มีนาคม");
+	            tblMonth.put("4", "เมษายน");
+	            tblMonth.put("5", "พฤษภาคม");
+	            tblMonth.put("6", "มิถุนายน");
+	            tblMonth.put("7", "กรกฏาคม");
+	            tblMonth.put("8", "สิงหาคม");
+	            tblMonth.put("9", "กันยายน");
+	            tblMonth.put("10","ตุลาคม");
+	            tblMonth.put("11","พฤศจิกายน");
+	            tblMonth.put("12","ธันวาคม");
 	
 	            day    = dateThai.substring(6, 8);
 				month  = Integer.parseInt(dateThai.substring(4, 6));
 		        year   = Integer.parseInt(dateThai.substring(0, 4));
-		        dateDisplay = day + " " + tblMonth.get(String.valueOf(month)).toString() +" เน€เธ�๏ฟฝ.เน€เธ�เธ�. " + year;
+		        dateDisplay = day + " " + tblMonth.get(String.valueOf(month)).toString() +" พ.ศ. " + year;
 			} else {
 				dateDisplay = "";			
 			}
@@ -407,7 +407,7 @@ public class EnjoyUtils {
 		 String        lv_value   = null;
 		   try {
 	        	if(dataDelete != null && dataDelete != ""){	
-	        		returnList = new ArrayList();
+	        		returnList = new ArrayList<String>();
 	        		lv_value = dataDelete.replaceAll("\\s", ""); 
 	        		String[] parts = lv_value.split(",");
 	        		for(String s : parts){
@@ -447,7 +447,7 @@ public class EnjoyUtils {
 		
 	}
 	
-	//เน€เธ�๏ฟฝเน€เธ�๏ฟฝเน€เธ�เธ…เน€เธ�๏ฟฝเน€เธ�เธ�เน€เธ�เธ�เน€เธ�๏ฟฝเน€เธ�๏ฟฝเน€เธ�๏ฟฝเน€เธ�๏ฟฝเน€เธ�โ�ฌเน€เธ�เธ�เน€เธ�เธ…เน€เธ�เธ’ Ex av_time = "1725"
+	//ใช้สำหรับบแปลงเวลารูปแบบ 24 hr Ex av_time = "1725"
 	public static String formatTime(String av_time) throws Exception{
 		
 		String t_formay		= "00:00";

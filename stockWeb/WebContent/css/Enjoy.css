@@ -56,6 +56,11 @@
    z-index: 99999;
 }
 
-
+textarea {
+    white-space: normal;
+    text-align: justify;
+    -moz-text-align-last: left; /* Firefox 12+ */
+    text-align-last: left;
+}
 
 

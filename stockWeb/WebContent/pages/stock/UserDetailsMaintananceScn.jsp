@@ -1,6 +1,6 @@
 <%@ include file="/pages/include/checkLogin.jsp"%>
 <%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
-<%@ page import="th.go.stock.app.enjoy.bean.UserDetailsBean,th.go.stock.app.enjoy.bean.RefuserstatusBean,th.go.stock.app.enjoy.model.Userprivilege"%>
+<%@ page import="th.go.stock.app.enjoy.bean.UserDetailsBean,th.go.stock.app.enjoy.bean.ComboBean,th.go.stock.app.enjoy.model.Userprivilege"%>
 <%@ page import="java.util.*"%>
 <jsp:useBean id="userDetailsMaintananceForm" class="th.go.stock.app.enjoy.form.UserDetailsMaintananceForm" scope="session"/>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -8,7 +8,7 @@
 <%
 	String 					pageMode 			= userDetailsMaintananceForm.getPageMode();
 	UserDetailsBean 		userDetailsBean 	= userDetailsMaintananceForm.getUserDetailsBean();
-	List<RefuserstatusBean> refuserstatusCombo 	= userDetailsMaintananceForm.getRefuserstatusCombo();
+	List<ComboBean> 		refuserstatusCombo 	= userDetailsMaintananceForm.getStatusCombo();
 	List<Userprivilege> 	userprivilegeList	= userDetailsMaintananceForm.getUserprivilegeList();
 	int 					couChkRow			= 0;
 
@@ -36,80 +36,6 @@
 				lp_setModeEdit();
 			}
 			
-			/*
-			$('#btnSave').on('click',function(){
-				
-				var la_chkUserPrivilege = null;
-				var lv_userPrivilege	= "";
-				
-				try{
-					
-					la_chkUserPrivilege = document.getElementsByName("chkUserPrivilege");
-					
-					for(var i=0;i<la_chkUserPrivilege.length;i++){
-						
-						if(la_chkUserPrivilege[i].checked==true){
-							
-							if(lv_userPrivilege==""){
-								lv_userPrivilege = la_chkUserPrivilege[i].value;
-							}else{
-								lv_userPrivilege = lv_userPrivilege + "," + la_chkUserPrivilege[i].value;
-							}
-							
-						}
-						
-					}
-					
-					$("#hidUserPrivilege").val(lv_userPrivilege);
-					
-					
-					if(!lp_validate()){
-						return;
-					}
-					
-					if(!confirm("Password จะถูกส่งไปที่ E-mail ที่คุณกรอก คุณกรอก E-mail ถูกต้องแล้วใช่หรือไม่ ?")){
-						$('#userEmail').focus();
-						return;
-					}
-				}catch(e){
-					alert("btnSave :: " + e);
-				}
-				
-				$.ajax({
-					async:false,
-		            type: "POST",
-		            url: gv_url,
-		            data: "pageAction=save&" + $('#frm').serialize(),
-		            beforeSend: gp_progressBarOn(),
-		            success: function(data){
-		            	var jsonObj 			= null;
-		            	var status				= null;
-		            	var userUniqueId		= 0;
-		            	
-		            	try{
-		            		gp_progressBarOff();
-		            		
-		            		jsonObj = JSON.parse(data);
-		            		status	= jsonObj.status;
-		            		
-		            		if(status=="SUCCESS"){
-		            			userUniqueId = jsonObj.userUniqueId;
-		            			
-		            			//alert("บันทึกเรียบร้อย " + userUniqueId);
-		            			//location.reload();
-		            			//window.location = gv_url + "?service=servlet.UserDetailsMaintananceServlet&pageAction=getUserDetail&userUniqueId=" + userUniqueId;
-		            		}else{
-		            			alert(jsonObj.errMsg);
-		            			
-		            		}
-		            	}catch(e){
-		            		alert("in btnSave :: " + e);
-		            	}
-		            }
-		        });
-				
-			});
-			*/
 			gp_progressBarOff();
 			
 		});
@@ -119,9 +45,6 @@
 		    var la_msg               	= new Array("ชื่อ"	  , "นามสกุล"	 , "User ID", "E-mail");
 		    
 			try{
-				
-				lo_flagAddSales 		= document.getElementById("flagAddSales");
-				lo_commTotalAmount 		= document.getElementById("commTotalAmount");
 				
 				for(var i=0;i<la_idName.length;i++){
 		            lo_obj          = eval('$("#' + la_idName[i] + '")');
@@ -455,8 +378,8 @@
 							        			</td>
 							        			<td align="left">
 							        				<select id="userStatus" name="userStatus" style="width: 250px;">
-							        					<% for(RefuserstatusBean beanStatus:refuserstatusCombo){ %>
-							        					<option value="<%=beanStatus.getUserStatusCode()%>" <%if(userDetailsBean.getUserStatus().equals(beanStatus.getUserStatusCode())){ %> selected <%} %> ><%=beanStatus.getUserStatusName()%></option>
+							        					<% for(ComboBean comboBean:refuserstatusCombo){ %>
+							        					<option value="<%=comboBean.getCode()%>" <%if(userDetailsBean.getUserStatus().equals(comboBean.getCode())){ %> selected <%} %> ><%=comboBean.getDesc()%></option>
 							        					<%} %>
 							        				</select>
 							        			</td>
@@ -467,6 +390,14 @@
 							        			</td>
 							        			<td align="left">
 							        				ต้องการเปลี่ยนรหัสผ่านเมื่อ Login ครั้งแรก
+							        			</td>
+								        	</tr>
+								        	<tr>
+							        			<td align="right">
+							        				<input type="checkbox" id="flagAlertStock" name="flagAlertStock" value="Y" <%if(userDetailsBean.getFlagAlertStock().equals("Y")){ %> checked="checked" <%} %> /> :&nbsp;
+							        			</td>
+							        			<td align="left">
+							        				ต้องการรับ E-mail แจ้งเตือนเมื่อสินค้าลดเหลือถึงกำหนด
 							        			</td>
 								        	</tr>
 								        </table>

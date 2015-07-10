@@ -12,6 +12,7 @@ public class UserDetailsBean {
 	private String 							userLevel 	  		  = null;
 	private String 							userStatus 	 		  = null;
 	private String 							flagChangePassword 	  = null;
+	private String 							flagAlertStock 	  	  = null;
 	private ArrayList<UserPrivilegeBean> 	userPrivilegeList	  = null;
 	private String 							pwd 	 		  	  = null;
 	private String  						currentDate			  = null;
@@ -27,6 +28,7 @@ public class UserDetailsBean {
 		this.userLevel			= "";
 		this.userStatus			= "";
 		this.flagChangePassword	= "";
+		this.flagAlertStock		= "";
 		this.userPrivilegeList	= new ArrayList<UserPrivilegeBean>();
 		this.pwd				= "";
 		this.currentDate		= "";
@@ -136,5 +138,13 @@ public class UserDetailsBean {
 
 	public void setErrMsg(String errMsg) {
 		this.errMsg = errMsg;
+	}
+
+	public String getFlagAlertStock() {
+		return flagAlertStock;
+	}
+
+	public void setFlagAlertStock(String flagAlertStock) {
+		this.flagAlertStock = flagAlertStock;
 	}
 }

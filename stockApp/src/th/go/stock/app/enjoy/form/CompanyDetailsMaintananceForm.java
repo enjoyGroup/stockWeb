@@ -5,39 +5,37 @@ import java.util.HashMap;
 import java.util.List;
 
 import th.go.stock.app.enjoy.bean.ComboBean;
+import th.go.stock.app.enjoy.bean.CompanyDetailsBean;
+import th.go.stock.app.enjoy.bean.RefuserstatusBean;
 import th.go.stock.app.enjoy.bean.UserDetailsBean;
 import th.go.stock.app.enjoy.model.Userprivilege;
 
-public class UserDetailsMaintananceForm {
+public class CompanyDetailsMaintananceForm {
 	
 	public static final String NEW 	= "NEW";
 	public static final String EDIT = "EDIT";
 	
 	
-	private UserDetailsBean 		userDetailsBean;
+	private CompanyDetailsBean 		companyDetailsBean;
 	private List<ComboBean> 		statusCombo;
-	private List<Userprivilege> 	userprivilegeList;
-	private List<UserDetailsBean> 	userDetailsBeanList;
 	private String					errMsg;
 	private String					pageMode;
 	private String					titlePage;
 	
-	public UserDetailsMaintananceForm(){
-		this.userDetailsBean 		= new UserDetailsBean();
+	public CompanyDetailsMaintananceForm(){
+		this.companyDetailsBean 	= new CompanyDetailsBean();
 		this.statusCombo			= new ArrayList<ComboBean>();
-		this.userprivilegeList		= new ArrayList<Userprivilege>();
-		this.userDetailsBeanList	= new ArrayList<UserDetailsBean>();
 		this.errMsg					= "";
 		this.pageMode				= NEW;
 		this.titlePage				= "";
 	}
 
-	public UserDetailsBean getUserDetailsBean() {
-		return userDetailsBean;
+	public CompanyDetailsBean getCompanyDetailsBean() {
+		return companyDetailsBean;
 	}
 
-	public void setUserDetailsBean(UserDetailsBean userDetailsBean) {
-		this.userDetailsBean = userDetailsBean;
+	public void setCompanyDetailsBean(CompanyDetailsBean companyDetailsBean) {
+		this.companyDetailsBean = companyDetailsBean;
 	}
 
 	public List<ComboBean> getStatusCombo() {
@@ -46,22 +44,6 @@ public class UserDetailsMaintananceForm {
 
 	public void setStatusCombo(List<ComboBean> statusCombo) {
 		this.statusCombo = statusCombo;
-	}
-
-	public List<Userprivilege> getUserprivilegeList() {
-		return userprivilegeList;
-	}
-
-	public void setUserprivilegeList(List<Userprivilege> userprivilegeList) {
-		this.userprivilegeList = userprivilegeList;
-	}
-
-	public List<UserDetailsBean> getUserDetailsBeanList() {
-		return userDetailsBeanList;
-	}
-
-	public void setUserDetailsBeanList(List<UserDetailsBean> userDetailsBeanList) {
-		this.userDetailsBeanList = userDetailsBeanList;
 	}
 
 	public String getErrMsg() {

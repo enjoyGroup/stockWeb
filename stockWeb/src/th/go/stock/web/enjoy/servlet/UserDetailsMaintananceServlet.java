@@ -123,7 +123,7 @@ public class UserDetailsMaintananceServlet extends EnjoyStandardSvc {
 			sessionFactory 	= HibernateUtil.getSessionFactory();
 			session 		= sessionFactory.openSession();
 			
-			this.form.setRefuserstatusCombo(this.dao.getRefuserstatusCombo(session));
+			this.form.setStatusCombo(this.dao.getRefuserstatusCombo(session));
 			this.form.setUserprivilegeList(this.dao.getUserprivilege(session));
 			
 			
@@ -143,12 +143,9 @@ public class UserDetailsMaintananceServlet extends EnjoyStandardSvc {
 	private void onGetUserDetail(int userUniqueId) throws EnjoyException{
 		logger.info("[onGetUserDetail][Begin]");
 		
-//		int 				userUniqueId 	= 0;
-//		Userdetail 			userdetailDb	= null;
 		UserDetailsBean 	userdetailDb	= null;
 		SessionFactory 		sessionFactory	= null;
 		Session 			session			= null;
-//		UserDetailsBean		userDetailsBean	= null;
 		
 		try{
 			sessionFactory 				= HibernateUtil.getSessionFactory();
@@ -163,7 +160,6 @@ public class UserDetailsMaintananceServlet extends EnjoyStandardSvc {
 			logger.info("[onGetUserDetail] userUniqueId :: " + userUniqueId);
 			
 			userdetailDb				= this.dao.getUserdetail(session, userUniqueId);
-//			userDetailsBean				= this.form.getUserDetailsBean();
 			
 			this.form.setTitlePage("แก้ไขผู้ใช้งานระบบ");
 			this.form.setPageMode(UserDetailsMaintananceForm.EDIT);
@@ -171,19 +167,7 @@ public class UserDetailsMaintananceServlet extends EnjoyStandardSvc {
 			logger.info("[onGetUserDetail] userdetailDb :: " + userdetailDb);
 			
 			if(userdetailDb!=null){
-				
 				this.form.setUserDetailsBean(userdetailDb);
-				
-//				userDetailsBean.setUserUniqueId			(userdetailDb.getUserUniqueId());
-//				userDetailsBean.setUserId				(userdetailDb.getUserId());
-//				userDetailsBean.setUserName				(userdetailDb.getUserName());
-//				userDetailsBean.setUserSurname			(userdetailDb.getUserSurname());
-//				userDetailsBean.setUserPrivilege		(userdetailDb.getUserPrivilege());
-//				userDetailsBean.setUserLevel			(userdetailDb.getUserLevel());
-//				userDetailsBean.setUserStatus			(userdetailDb.getUserStatus());
-//				userDetailsBean.setFlagChangePassword	(userdetailDb.getFlagChangePassword());
-//				userDetailsBean.setUserEmail			(userdetailDb.getUserEmail());
-				
 			}else{
 				throw new EnjoyException("เกิดข้อผิดพลาดในการดึงข้อมูลผู้ใช้งาน");
 			}
@@ -267,6 +251,7 @@ public class UserDetailsMaintananceServlet extends EnjoyStandardSvc {
 		String				userEmail			= null;
 		String				userStatus			= null;
 		String				flagChangePassword 	= null;
+		String				flagAlertStock 		= null;
 		String				userPrivilege		= null;
 		String				pwd					= null;
 		String				pwdEncypt			= null;
@@ -286,6 +271,7 @@ public class UserDetailsMaintananceServlet extends EnjoyStandardSvc {
 			userEmail 					= EnjoyUtil.nullToStr(request.getParameter("userEmail"));
 			userStatus 					= EnjoyUtil.nullToStr(request.getParameter("userStatus"));
 			flagChangePassword 			= EnjoyUtil.chkBoxtoDb(request.getParameter("flagChangePassword"));
+			flagAlertStock 				= EnjoyUtil.chkBoxtoDb(request.getParameter("flagAlertStock"));
 			userPrivilege 				= EnjoyUtil.nullToStr(request.getParameter("hidUserPrivilege"));
 			userUniqueId 				= EnjoyUtil.parseInt(request.getParameter("userUniqueId"));
 			userLevel					= userPrivilege.indexOf("R01") > -1?"9":"1";
@@ -302,6 +288,7 @@ public class UserDetailsMaintananceServlet extends EnjoyStandardSvc {
 			logger.info("[onSave] userEmail 			:: " + userEmail);
 			logger.info("[onSave] userStatus 			:: " + userStatus);
 			logger.info("[onSave] flagChangePassword 	:: " + flagChangePassword);
+			logger.info("[onSave] flagAlertStock 		:: " + flagAlertStock);
 			logger.info("[onSave] userPrivilege 		:: " + userPrivilege);
 			logger.info("[onSave] userUniqueId 			:: " + userUniqueId);
 			logger.info("[onSave] pwd 					:: " + pwd);
@@ -314,6 +301,7 @@ public class UserDetailsMaintananceServlet extends EnjoyStandardSvc {
 			userDetailsBean.setUserEmail(userEmail);
 			userDetailsBean.setUserStatus(userStatus);
 			userDetailsBean.setFlagChangePassword(flagChangePassword);
+			userDetailsBean.setFlagAlertStock(flagAlertStock);
 			userDetailsBean.setUserPrivilege(userPrivilege);
 			userDetailsBean.setUserUniqueId(userUniqueId);
 			userDetailsBean.setUserLevel(userLevel);

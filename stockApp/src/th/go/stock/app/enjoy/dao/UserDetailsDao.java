@@ -5,7 +5,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -16,11 +15,10 @@ import org.hibernate.SessionFactory;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 
-import th.go.stock.app.enjoy.bean.RefuserstatusBean;
+import th.go.stock.app.enjoy.bean.ComboBean;
 import th.go.stock.app.enjoy.bean.UserDetailsBean;
 import th.go.stock.app.enjoy.exception.EnjoyException;
 import th.go.stock.app.enjoy.form.UserDetailsMaintananceForm;
-import th.go.stock.app.enjoy.model.Refuserstatus;
 import th.go.stock.app.enjoy.model.Userdetail;
 import th.go.stock.app.enjoy.model.Userprivilege;
 import th.go.stock.app.enjoy.utils.EnjoyEncryptDecrypt;
@@ -31,105 +29,6 @@ import th.go.stock.app.enjoy.utils.HibernateUtil;
 public class UserDetailsDao {
 	
 	private static final EnjoyLogger logger = EnjoyLogger.getLogger(UserDetailsDao.class);
-	
-//	public static void main(String[] args) {
-//		
-//		SessionFactory 		sessionFactory	= null;
-//		Session 			session			= null;
-//		UserDetailsBean		userDetailsBean = null;
-//		
-//		try {
-//			EnjoyLogger.initial(false);
-//			sessionFactory 				= HibernateUtil.getSessionFactory();
-//			session 					= sessionFactory.openSession();
-//			userDetailsBean				= new UserDetailsBean();
-//			
-//			session.beginTransaction();
-//			
-//			updateUserDetail(session, userDetailsBean);
-//			
-//			session.getTransaction().commit();
-//			
-//			session.flush();
-//			
-//		} catch (EnjoyException e) {
-//			// TODO Auto-generated catch block
-//			session.getTransaction().rollback();
-//			e.printStackTrace();
-//		}finally{
-//			session.close();
-//		}
-//	}
-	
-//	public UserDetailsBean userSelect(String userId, String pass){
-//		logger.info("[UserDetailsDao][userSelect][Begin]");
-//		
-//		UserDetailsBean 	userDetailsBean = null;
-//		SessionFactory 		sessionFactory	= null;
-//		Session 			session			= null;
-//		List<Userdetail> 	userdetailList	= null;
-//		Userdetail 			userdetail		= null;
-//		String				hql				= null;
-//        String				passWord		= null;
-//		int					maxRecord		= 0;
-//		DateFormat 			dateFormat		= null;
-//        Date 				date			= null;
-//		
-//		
-//		try{
-//		    passWord		= EnjoyEncryptDecrypt.enCryption(userId, pass);
-//logger.info("pass ==> " + passWord);
-//		    sessionFactory 	= HibernateUtil.getSessionFactory();
-//			session 		= sessionFactory.openSession();
-//			hql				= "from Userdetail where userId = '" + userId + "'";
-////			hql				= "from Userdetail where userId = '" + userId + "' and userPassword = '" + passWord + "'";
-//			userdetailList 	= session.createQuery(hql).list();
-//			maxRecord       = userdetailList.size();
-//			dateFormat 		= new SimpleDateFormat("dd/MM/yyyy");
-//		    date 	   		= new Date();
-//			
-//			for(int i=0;i<maxRecord;i++){
-//				userdetail 		= userdetailList.get(i);
-//				userDetailsBean	= new UserDetailsBean();
-//				
-//				logger.debug("[UserDetailsDao][userSelect] userdetail.getUserUniqueId() 		:: " + userdetail.getUserUniqueId());
-//				logger.debug("[UserDetailsDao][userSelect] userdetail.getUserId() 				:: " + userdetail.getUserId());
-//				logger.debug("[UserDetailsDao][userSelect] userdetail.getUserName() 			:: " + userdetail.getUserName());
-//				logger.debug("[UserDetailsDao][userSelect] userdetail.getUserSurname() 			:: " + userdetail.getUserSurname());
-//				logger.debug("[UserDetailsDao][userSelect] userdetail.getUserPrivilege() 		:: " + userdetail.getUserPrivilege());
-//				logger.debug("[UserDetailsDao][userSelect] userdetail.getUserLevel() 			:: " + userdetail.getUserLevel());
-//				logger.debug("[UserDetailsDao][userSelect] userdetail.getUserStatus() 			:: " + userdetail.getUserStatus());
-//				logger.debug("[UserDetailsDao][userSelect] userdetail.getFlagChangePassword() 	:: " + userdetail.getFlagChangePassword());
-//				logger.debug("[UserDetailsDao][userSelect] userdetail.getUserEmail() 			:: " + userdetail.getUserEmail());
-//				
-//				userDetailsBean.setUserUniqueId			(userdetail.getUserUniqueId());
-//				userDetailsBean.setUserId				(userdetail.getUserId());
-//				userDetailsBean.setPwd					(userdetail.getUserPassword());
-//				userDetailsBean.setUserName				(userdetail.getUserName());
-//				userDetailsBean.setUserSurname			(userdetail.getUserSurname());
-//				userDetailsBean.setUserPrivilege		(userdetail.getUserPrivilege());
-//				userDetailsBean.setUserLevel			(userdetail.getUserLevel());
-//				userDetailsBean.setUserStatus			(userdetail.getUserStatus());
-//				userDetailsBean.setFlagChangePassword	(userdetail.getFlagChangePassword());
-//				userDetailsBean.setCurrentDate			(dateFormat.format(date));
-//				userDetailsBean.setUserEmail			(userdetail.getUserEmail());
-//			}
-//			
-//		}catch(Exception e){
-//			e.printStackTrace();
-//		}finally{
-//			session.close();
-//			sessionFactory	= null;
-//			session			= null;
-//			userdetailList	= null;
-//			userdetail		= null;
-//			hql				= null;
-//	        passWord		= null;
-//			logger.info("[UserDetailsDao][userSelect][End]");
-//		}
-//		
-//		return userDetailsBean;
-//	}
 	
 	public UserDetailsBean userSelect(String userId, String pass){
 		logger.info("[userSelect][Begin]");
@@ -164,6 +63,7 @@ public class UserDetailsDao {
 		    query.addScalar("userLevel"				, new StringType());
 		    query.addScalar("userStatus"			, new StringType());
 		    query.addScalar("flagChangePassword"	, new StringType());
+		    query.addScalar("flagAlertStock"		, new StringType());
 		    
 		    list		 	= query.list();
 		    
@@ -184,6 +84,7 @@ public class UserDetailsDao {
 				logger.info("[userSelect] userLevel 			:: " + row[6]);
 				logger.info("[userSelect] userStatus 			:: " + row[7]);
 				logger.info("[userSelect] flagChangePassword 	:: " + row[8]);
+				logger.info("[userSelect] flagAlertStock 		:: " + row[9]);
 				
 				userDetailsBean.setUserUniqueId			(Integer.parseInt(row[0].toString()));
 				userDetailsBean.setUserId				(EnjoyUtils.nullToStr(row[1].toString()));
@@ -194,8 +95,9 @@ public class UserDetailsDao {
 				userDetailsBean.setUserPrivilege		(EnjoyUtils.nullToStr(row[5].toString()));
 				userDetailsBean.setUserLevel			(EnjoyUtils.nullToStr(row[6].toString()));
 				userDetailsBean.setUserStatus			(EnjoyUtils.nullToStr(row[7].toString()));
-				userDetailsBean.setFlagChangePassword	(EnjoyUtils.nullToStr(row[8].toString()));
+				userDetailsBean.setFlagChangePassword	(EnjoyUtils.chkBoxtoDb(row[8].toString()));
 				userDetailsBean.setCurrentDate			(dateFormat.format(date));
+				userDetailsBean.setFlagAlertStock		(EnjoyUtils.chkBoxtoDb(row[9].toString()));
 			}
 			
 			
@@ -214,27 +116,35 @@ public class UserDetailsDao {
 	}
 	
 	/*ดึงสถานะมาอยู่ใน Combo*/
-	public List<RefuserstatusBean> getRefuserstatusCombo(Session session) throws EnjoyException{
+	public List<ComboBean> getRefuserstatusCombo(Session session) throws EnjoyException{
 		logger.info("[getRefuserstatusCombo][Begin]");
 		
-		List<Refuserstatus> 		refuserstatusList		= null;
 		String						hql						= null;
-		RefuserstatusBean			bean					= null;
-		List<RefuserstatusBean> 	refuserstatusBeanList	= null;
+		SQLQuery 					query 					= null;
+		List<Object[]>				list					= null;
+		ComboBean					comboBean				= null;
+		List<ComboBean> 			comboList				= new ArrayList<ComboBean>();
 		
 		try{
 			
-			hql						= "from Refuserstatus";
-			refuserstatusList 		= session.createQuery(hql).list();
-			refuserstatusBeanList	= new ArrayList<RefuserstatusBean>();
+			hql						= "select * from refuserstatus";
+			query			= session.createSQLQuery(hql);
+			query.addScalar("userStatusCode"		, new StringType());
+			query.addScalar("userStatusName"		, new StringType());
 			
-			for(Refuserstatus refuserstatus:refuserstatusList){
-				bean = new RefuserstatusBean();
+			list		 	= query.list();
+			
+			comboList.add(new ComboBean("", "กรุณาระบุ"));
+			for(Object[] row:list){
+				comboBean = new ComboBean();
 				
-				bean.setUserStatusCode(String.valueOf(refuserstatus.getUserStatusCode()));
-				bean.setUserStatusName(refuserstatus.getUserStatusName());
+				logger.info("[getRefuserstatusCombo] userStatusCode :: " + row[0].toString());
+				logger.info("[getRefuserstatusCombo] userStatusName :: " + row[1].toString());
 				
-				refuserstatusBeanList.add(bean);
+				comboBean.setCode(row[0].toString());
+				comboBean.setDesc(row[1].toString());
+				
+				comboList.add(comboBean);
 			}
 			
 			
@@ -246,7 +156,7 @@ public class UserDetailsDao {
 			logger.info("[getRefuserstatusCombo][End]");
 		}
 		
-		return refuserstatusBeanList;
+		return comboList;
 		
 	}
 	
@@ -283,13 +193,11 @@ public class UserDetailsDao {
 		logger.info("[getListUserdetail][Begin]");
 		
 		String					hql						= null;
-		Userdetail				userdetail				= null;
 		SQLQuery 				query 					= null;
 		List<Object[]>			list					= null;
 		UserDetailsBean			userDetailsBean			= null;
 		Object[] 				row 					= null;
 		List<UserDetailsBean> 	listUserDetailsBean 	= new ArrayList<UserDetailsBean>();
-		HashMap					hashTable				= new HashMap();
 		String[]				arrPrivilegeCode		= null;			
 		String					privilegeName			= "";
 		
@@ -303,6 +211,7 @@ public class UserDetailsDao {
 										+ ", a.userLevel"
 										+ ", a.userStatus"
 										+ ", a.flagChangePassword"
+										+ ", a.flagAlertStock"
 										+ ", b.userStatusName"
 								+ "	from userdetails a, refuserstatus b "
 								+ "	where a.userStatus = b.userStatusCode "
@@ -328,6 +237,7 @@ public class UserDetailsDao {
 			query.addScalar("userLevel"				, new StringType());
 			query.addScalar("userStatus"			, new StringType());
 			query.addScalar("flagChangePassword"	, new StringType());
+			query.addScalar("flagAlertStock"		, new StringType());
 			query.addScalar("userStatusName"		, new StringType());
 			
 			list		 	= query.list();
@@ -352,7 +262,8 @@ public class UserDetailsDao {
 					logger.info("[getListUserdetail] userLevel 			:: " + row[6]);
 					logger.info("[getListUserdetail] userStatus 		:: " + row[7]);
 					logger.info("[getListUserdetail] flagChangePassword :: " + row[8]);
-					logger.info("[getListUserdetail] userStatusName 	:: " + row[9]);
+					logger.info("[getListUserdetail] flagAlertStock 	:: " + row[9]);
+					logger.info("[getListUserdetail] userStatusName 	:: " + row[10]);
 					
 					arrPrivilegeCode	= EnjoyUtils.nullToStr(row[5].toString()).split("\\,");
 					for(int j=0;j<arrPrivilegeCode.length;j++){
@@ -366,8 +277,9 @@ public class UserDetailsDao {
 					userDetailsBean.setUserEmail			(EnjoyUtils.nullToStr(row[4].toString()));
 					userDetailsBean.setUserPrivilege		(privilegeName);
 					userDetailsBean.setUserLevel			(EnjoyUtils.nullToStr(row[6].toString()));
-					userDetailsBean.setFlagChangePassword	(EnjoyUtils.nullToStr(row[8].toString()));
-					userDetailsBean.setUserStatus			(EnjoyUtils.nullToStr(row[9].toString()));
+					userDetailsBean.setFlagChangePassword	(EnjoyUtils.chkBoxtoDb(row[8].toString()));
+					userDetailsBean.setFlagAlertStock		(EnjoyUtils.chkBoxtoDb(row[9].toString()));
+					userDetailsBean.setUserStatus			(EnjoyUtils.nullToStr(row[10].toString()));
 					
 					listUserDetailsBean.add(userDetailsBean);
 				}	
@@ -391,7 +303,6 @@ public class UserDetailsDao {
 		logger.info("[getUserdetail][Begin]");
 		
 		String				hql						= null;
-		Userdetail			userdetail				= null;
 		SQLQuery 			query 					= null;
 		List<Object[]>		list					= null;
 		UserDetailsBean		userDetailsBean			= null;
@@ -408,6 +319,7 @@ public class UserDetailsDao {
 										+ ", userLevel"
 										+ ", userStatus"
 										+ ", flagChangePassword"
+										+ ", flagAlertStock"
 								+ "	from userdetails where userUniqueId = " + userUniqueId;
 			query			= session.createSQLQuery(hql);
 			
@@ -420,6 +332,7 @@ public class UserDetailsDao {
 			query.addScalar("userLevel"				, new StringType());
 			query.addScalar("userStatus"			, new StringType());
 			query.addScalar("flagChangePassword"	, new StringType());
+			query.addScalar("flagAlertStock"		, new StringType());
 			
 			list		 	= query.list();
 			
@@ -440,6 +353,7 @@ public class UserDetailsDao {
 				logger.info("[getUserdetail] userLevel 			:: " + row[6]);
 				logger.info("[getUserdetail] userStatus 		:: " + row[7]);
 				logger.info("[getUserdetail] flagChangePassword :: " + row[8]);
+				logger.info("[getUserdetail] flagAlertStock 	:: " + row[9]);
 				
 				userDetailsBean.setUserUniqueId			(Integer.parseInt(row[0].toString()));
 				userDetailsBean.setUserId				(row[1].toString());
@@ -450,6 +364,7 @@ public class UserDetailsDao {
 				userDetailsBean.setUserLevel			(row[6].toString());
 				userDetailsBean.setUserStatus			(row[7].toString());
 				userDetailsBean.setFlagChangePassword	(row[8].toString());
+				userDetailsBean.setFlagAlertStock		(row[9].toString());
 			}
 			
 		}catch(Exception e){
@@ -560,6 +475,7 @@ public class UserDetailsDao {
 			userdetailDb.setUserLevel(userDetailsBean.getUserLevel());
 			userdetailDb.setUserStatus(userDetailsBean.getUserStatus());
 			userdetailDb.setFlagChangePassword(userDetailsBean.getFlagChangePassword());
+			userdetailDb.setFlagAlertStock(userDetailsBean.getFlagAlertStock());
 			
 			
 			session.saveOrUpdate(userdetailDb);
@@ -592,6 +508,7 @@ public class UserDetailsDao {
 												+ ", userLevel			= :userLevel"
 												+ ", userStatus			= :userStatus"
 												+ ", flagChangePassword = :flagChangePassword"
+												+ ", flagAlertStock 	= :flagAlertStock"
 										+ " where userUniqueId = :userUniqueId";
 			
 			query = session.createQuery(hql);
@@ -603,6 +520,7 @@ public class UserDetailsDao {
 			query.setParameter("userLevel"			, userDetailsBean.getUserLevel());
 			query.setParameter("userStatus"			, userDetailsBean.getUserStatus());
 			query.setParameter("flagChangePassword"	, userDetailsBean.getFlagChangePassword());
+			query.setParameter("flagAlertStock"		, userDetailsBean.getFlagAlertStock());
 			query.setParameter("userUniqueId"		, userDetailsBean.getUserUniqueId());
 			
 			result = query.executeUpdate();
@@ -622,7 +540,6 @@ public class UserDetailsDao {
 	public int lastId(Session session) throws EnjoyException{
 		logger.info("[lastId][Begin]");
 		
-		List<String> 					returnList 							= null;
 		String							hql									= null;
 		List<Integer>			 		list								= null;
 		SQLQuery 						query 								= null;
@@ -630,7 +547,6 @@ public class UserDetailsDao {
 		
 		
 		try{
-			returnList		= new ArrayList<String>();
 			
 			hql				= "Select max(userUniqueId) lastId from userdetails";
 			query			= session.createSQLQuery(hql);
@@ -667,7 +583,6 @@ public class UserDetailsDao {
 		
 		String							hql									= null;
 		Query 							query 								= null;
-		int 							result								= 0;
 		
 		
 		try{
@@ -678,7 +593,7 @@ public class UserDetailsDao {
 			query.setParameter("userPassword"		, userDetailsBean.getPwd());
 			query.setParameter("userUniqueId"		, userDetailsBean.getUserUniqueId());
 			
-			result = query.executeUpdate();
+			query.executeUpdate();
 			
 		}catch(Exception e){
 			e.printStackTrace();

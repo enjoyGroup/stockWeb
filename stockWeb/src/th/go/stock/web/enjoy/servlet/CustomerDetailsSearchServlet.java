@@ -3,7 +3,6 @@ package th.go.stock.web.enjoy.servlet;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -14,32 +13,32 @@ import javax.servlet.http.HttpSession;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
+import th.go.stock.app.enjoy.bean.CustomerDetailsBean;
 import th.go.stock.app.enjoy.bean.UserDetailsBean;
-import th.go.stock.app.enjoy.dao.UserDetailsDao;
+import th.go.stock.app.enjoy.dao.CustomerDetailsDao;
 import th.go.stock.app.enjoy.exception.EnjoyException;
-import th.go.stock.app.enjoy.form.UserDetailsMaintananceForm;
+import th.go.stock.app.enjoy.form.CustomerDetailsSearchForm;
 import th.go.stock.app.enjoy.main.Constants;
-import th.go.stock.app.enjoy.model.Userprivilege;
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
 import th.go.stock.app.enjoy.utils.EnjoyUtils;
 import th.go.stock.app.enjoy.utils.HibernateUtil;
 import th.go.stock.web.enjoy.common.EnjoyStandardSvc;
 import th.go.stock.web.enjoy.utils.EnjoyUtil;
 
-public class SearchUserDetailsMaintananceServlet extends EnjoyStandardSvc {
+public class CustomerDetailsSearchServlet extends EnjoyStandardSvc {
 	 
 	static final long serialVersionUID = 1L;
-	private static final EnjoyLogger logger = EnjoyLogger.getLogger(SearchUserDetailsMaintananceServlet.class);
+	private static final EnjoyLogger logger = EnjoyLogger.getLogger(CustomerDetailsSearchServlet.class);
 	
-    private static final String FORM_NAME = "userDetailsMaintananceForm";
+    private static final String FORM_NAME = "customerDetailsSearchForm";
     
     private EnjoyUtil               	enjoyUtil                   = null;
     private HttpServletRequest          request                     = null;
     private HttpServletResponse         response                    = null;
     private HttpSession                 session                     = null;
     private UserDetailsBean             userBean                    = null;
-    private UserDetailsDao				dao							= null;
-    private UserDetailsMaintananceForm	form						= null;
+    private CustomerDetailsDao			dao							= null;
+    private CustomerDetailsSearchForm	form						= null;
     
 	@Override
 	public void execute(HttpServletRequest request, HttpServletResponse response)
@@ -60,18 +59,18 @@ public class SearchUserDetailsMaintananceServlet extends EnjoyStandardSvc {
              this.response           	= response;
              this.session            	= request.getSession(false);
              this.userBean           	= (UserDetailsBean) session.getAttribute("userBean");
-             this.form               	= (UserDetailsMaintananceForm) session.getAttribute(FORM_NAME);
-             this.dao					= new UserDetailsDao();
+             this.form               	= (CustomerDetailsSearchForm) session.getAttribute(FORM_NAME);
+             this.dao					= new CustomerDetailsDao();
  			
              logger.info("[execute] pageAction : " + pageAction );
              
- 			if(this.form == null || pageAction.equals("new") || pageAction.equals("getUserDetail")) this.form = new UserDetailsMaintananceForm();
+ 			if(this.form == null || pageAction.equals("new")) this.form = new CustomerDetailsSearchForm();
  			
  			if( pageAction.equals("") || pageAction.equals("new") ){
  				this.onLoad();
-				request.setAttribute("target", Constants.PAGE_URL +"/UserDetailsSearchScn.jsp");
- 			}else if(pageAction.equals("searchUserDetail")){
- 				this.onSearchUserDetail();
+				request.setAttribute("target", Constants.PAGE_URL +"/CustomerDetailsSearchScn.jsp");
+ 			}else if(pageAction.equals("search")){
+ 				this.onSearch();
  			}else if(pageAction.equals("getPage")){
 				this.lp_getPage();
 			}
@@ -92,7 +91,7 @@ public class SearchUserDetailsMaintananceServlet extends EnjoyStandardSvc {
 		
 		try{
 			this.setRefference();			
-			this.form.setTitlePage("เงื่อนไขค้นหาผู้ใช้งานระบบ");			
+			this.form.setTitlePage("เงื่อนไขค้นหารายละเอียดลูกค้า");			
 		}catch(EnjoyException e){
 			throw new EnjoyException(e.getMessage());
 		}catch(Exception e){
@@ -115,10 +114,13 @@ public class SearchUserDetailsMaintananceServlet extends EnjoyStandardSvc {
 			sessionFactory 	= HibernateUtil.getSessionFactory();
 			session 		= sessionFactory.openSession();
 			
-			this.form.setRefuserstatusCombo(this.dao.getRefuserstatusCombo(session));
+			this.form.setStatusCombo(this.dao.getStatusCombo(session));
+			
+			
 		}catch(EnjoyException e){
 			throw new EnjoyException(e.getMessage());
 		}catch(Exception e){
+			e.printStackTrace();
 			logger.info(e.getMessage());
 			throw new EnjoyException("setRefference is error");
 		}finally{
@@ -130,62 +132,44 @@ public class SearchUserDetailsMaintananceServlet extends EnjoyStandardSvc {
 	}
 	
 	
-	private void onSearchUserDetail() throws EnjoyException{
-		logger.info("[onSearchUserDetail][Begin]");
+	private void onSearch() throws EnjoyException{
+		logger.info("[onSearch][Begin]");
 		
-		UserDetailsBean 			userdetailForm		= null;
-		Userprivilege				userprivilege		= null;
+		CustomerDetailsBean 		customerDetailsBean	= null;
 		SessionFactory 				sessionFactory		= null;
 		Session 					session				= null;
-		List<UserDetailsBean> 		listUserDetailsBean = null;
-		List<Userprivilege> 		listUserprivilege   = null;
-		Hashtable<String, String> 	fUserprivilege		= null;
+		List<CustomerDetailsBean> 	dataList 			= null;
 		int							cou					= 0;
 		int							pageNum				= 1;
         int							totalPage			= 0;
         int							totalRs				= 0;
-        List<UserDetailsBean> 		list 				= new ArrayList<UserDetailsBean>();
-        List<UserDetailsBean> 		listTemp 			= new ArrayList<UserDetailsBean>();
+        List<CustomerDetailsBean> 	list 				= new ArrayList<CustomerDetailsBean>();
+        List<CustomerDetailsBean> 	listTemp 			= new ArrayList<CustomerDetailsBean>();
         HashMap						hashTable			= new HashMap();
 
 		try{
-			listUserDetailsBean 		= new ArrayList<UserDetailsBean>();
-			listUserprivilege   		= new ArrayList<Userprivilege>();
-			fUserprivilege				= new Hashtable<String, String>();
-
 			sessionFactory 				= HibernateUtil.getSessionFactory();
 			session 					= sessionFactory.openSession();			
 			session.beginTransaction();
 			
-			userdetailForm				= new UserDetailsBean();
+			customerDetailsBean				= new CustomerDetailsBean();
 			
-			userdetailForm.setUserName	(EnjoyUtils.nullToStr(this.request.getParameter("userName")));
-			userdetailForm.setUserId	(EnjoyUtils.nullToStr(this.request.getParameter("userId")));
-			userdetailForm.setUserStatus(EnjoyUtils.nullToStr(this.request.getParameter("userStatus")));
+			customerDetailsBean.setCusCode			(EnjoyUtils.nullToStr(this.request.getParameter("cusCode")));
+			customerDetailsBean.setFullName			(EnjoyUtils.nullToStr(this.request.getParameter("fullName")));
+			customerDetailsBean.setCusStatus		(EnjoyUtils.nullToStr(this.request.getParameter("cusStatus")));
+			customerDetailsBean.setIdNumber			(EnjoyUtils.nullToStr(this.request.getParameter("idNumber")));
 			
-			this.form.setUserDetailsBean(userdetailForm);
+			this.form.setCustomerDetailsBean(customerDetailsBean);
 			
-			logger.info("[onSearchUserDetail] userdetailForm.getUserName() 	 :: " + userdetailForm.getUserName());
-			logger.info("[onSearchUserDetail] userdetailForm.getUserId() 	 :: " + userdetailForm.getUserId());
-			logger.info("[onSearchUserDetail] userdetailForm.getUserStatus() :: " + userdetailForm.getUserStatus());
+			dataList	 		= this.dao.searchByCriteria(session, customerDetailsBean);
 			
-			listUserprivilege 			= this.dao.getUserprivilege(session);
-			for(int i=0;i<listUserprivilege.size();i++){
-				userprivilege			= listUserprivilege.get(i);
-				fUserprivilege.put(userprivilege.getPrivilegeCode() , userprivilege.getPrivilegeName());
-			}	
-			listUserDetailsBean	 		= this.dao.getListUserdetail(session, userdetailForm, fUserprivilege);
-
-			//logger.info("[onSearchUserDetail] listUserDetailsBean.size :: " + listUserDetailsBean.size());
-			logger.info("[onSearchUserDetail] listUserDetailsBean :: " + listUserDetailsBean.size());
-			if(listUserDetailsBean.size() > 0){				
-				//this.form.setUserDetailsBeanList(listUserDetailsBean);		
+			if(dataList.size() > 0){				
 				
 				hashTable.put(pageNum, list);
-				for(UserDetailsBean bean:listUserDetailsBean){
+				for(CustomerDetailsBean bean:dataList){
 					if(cou==10){
 			    		cou 		= 0;
-			    		list 		= new ArrayList<UserDetailsBean>();
+			    		list 		= new ArrayList<CustomerDetailsBean>();
 			    		pageNum++;
 			    	}
 					
@@ -198,18 +182,18 @@ public class SearchUserDetailsMaintananceServlet extends EnjoyStandardSvc {
 				
 				totalPage = hashTable.size();
 				
-				logger.info("[onSearchUserDetail] totalPage :: " + totalPage);
+				logger.info("[onSearch] totalPage :: " + totalPage);
 				
 			    this.form.setTotalPage(totalPage);
 			    this.form.setTotalRecord(EnjoyUtils.convertFloatToDisplay(String.valueOf(totalRs) , 0));
 			    this.form.setHashTable(hashTable);
 			    this.form.setPageNum(1);
 				
-			    listTemp = (List<UserDetailsBean>) this.form.getHashTable().get(this.form.getPageNum());
+			    listTemp = (List<CustomerDetailsBean>) this.form.getHashTable().get(this.form.getPageNum());
 			    
-			    logger.info("[onSearchUserDetail] listTemp :: " + listTemp.size());
+			    logger.info("[onSearch] listTemp :: " + listTemp.size());
 			    
-			    this.form.setUserDetailsBeanList(listTemp);
+			    this.form.setDataList(listTemp);
 				
 				
 			}else{
@@ -217,21 +201,21 @@ public class SearchUserDetailsMaintananceServlet extends EnjoyStandardSvc {
 			    this.form.setTotalRecord(EnjoyUtils.convertFloatToDisplay("0" , 0));
 			    this.form.setHashTable(hashTable);
 			    this.form.setPageNum(1);
-				this.form.setUserDetailsBeanList(listUserDetailsBean);
+				this.form.setDataList(dataList);
 				throw new EnjoyException("ไม่พบรายการตามเงื่อนไขที่ระบุ");
 			}			
 		}catch(EnjoyException e){
 			throw new EnjoyException(e.getMessage());
 		}catch(Exception e){
 			logger.info(e.getMessage());
-			throw new EnjoyException("onSearchUserDetail is error");
+			throw new EnjoyException("onSearch is error");
 		}finally{
 			session.close();
 			sessionFactory	= null;
 			session			= null;
 			
 			this.setRefference();
-			logger.info("[onSearchUserDetail][End]");
+			logger.info("[onSearch][End]");
 		}
 		
 	}
@@ -241,15 +225,15 @@ public class SearchUserDetailsMaintananceServlet extends EnjoyStandardSvc {
 		   logger.info("[lp_getPage][Begin]");
 		   
 		   int								pageNum				= 1;
-		   List<UserDetailsBean> 			list 				= new ArrayList<UserDetailsBean>();
+		   List<CustomerDetailsBean> 		dataList 			= new ArrayList<CustomerDetailsBean>();
 		   
 		   try{
 			   pageNum					= Integer.parseInt(this.request.getParameter("pageNum"));
 			   
 			   this.form.setPageNum(pageNum);
 			   
-			   list = (List<UserDetailsBean>) this.form.getHashTable().get(pageNum);
-			   this.form.setUserDetailsBeanList(list);
+			   dataList = (List<CustomerDetailsBean>) this.form.getHashTable().get(pageNum);
+			   this.form.setDataList(dataList);
 			   
 		   }catch(Exception e){
 			   e.printStackTrace();
