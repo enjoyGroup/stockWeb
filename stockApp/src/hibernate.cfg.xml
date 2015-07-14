@@ -27,13 +27,19 @@
 		<property name="hbm2ddl.auto">validate</property>
 		
 		<!-- Begin Entity zone -->
+		<mapping class="th.go.stock.app.enjoy.model.Adjusthistory" />
 		<mapping class="th.go.stock.app.enjoy.model.Company" />
 		<mapping class="th.go.stock.app.enjoy.model.Customer" />
 		<mapping class="th.go.stock.app.enjoy.model.District" />
+		<mapping class="th.go.stock.app.enjoy.model.Product" />
+		<mapping class="th.go.stock.app.enjoy.model.Productdiscount" />
+		<mapping class="th.go.stock.app.enjoy.model.ProductdiscountPK" />
 		<mapping class="th.go.stock.app.enjoy.model.Productgroup" />
 		<mapping class="th.go.stock.app.enjoy.model.ProductgroupPK" />
-		<mapping class="th.go.stock.app.enjoy.model.Producttype" />
+		<mapping class="th.go.stock.app.enjoy.model.Productype" />
 		<mapping class="th.go.stock.app.enjoy.model.Province" />
+		<mapping class="th.go.stock.app.enjoy.model.Reciveorder" />
+		<mapping class="th.go.stock.app.enjoy.model.ReciveorderPK" />
 		<mapping class="th.go.stock.app.enjoy.model.Refcompanystatus" />
 		<mapping class="th.go.stock.app.enjoy.model.Refcustomerstatus" />
 		<mapping class="th.go.stock.app.enjoy.model.Refpagedetail" />
