@@ -11,6 +11,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 
+import th.go.stock.app.enjoy.bean.ComboBean;
 import th.go.stock.app.enjoy.bean.ManageProductGroupBean;
 import th.go.stock.app.enjoy.exception.EnjoyException;
 import th.go.stock.app.enjoy.model.Productgroup;
@@ -191,41 +192,8 @@ public class ManageProductGroupDao {
 		return result;
 	}
 	
-	public List<String> productTypeNameList(String productTypeName){
-		logger.info("[productTypeNameList][Begin]");
-		
-		String 						hql			 		= null;
-        SessionFactory 				sessionFactory		= null;
-		Session 					session				= null;
-		SQLQuery 					query 				= null;
-		List<String>			 	list				= null;
-		
-		try{
-			sessionFactory 		= HibernateUtil.getSessionFactory();
-			session 			= sessionFactory.openSession();
-			hql 				= " select productTypeName from productype where productTypeName like ('"+productTypeName+"%') and productTypeStatus = 'A' order by productTypeName asc limit 10 ";
-			
-			logger.info("[productTypeNameList] hql :: " + hql);
-			
-			query			= session.createSQLQuery(hql);
-			query.addScalar("productTypeName"			, new StringType());
-			
-			list		 	= query.list();
-			
-		}catch(Exception e){
-			e.printStackTrace();
-		}finally{
-			session.close();
-			sessionFactory	= null;
-			session			= null;
-			logger.info("[productTypeNameList][End]");
-		}
-		
-		return list;
-	}
-	
-	public String getProductTypeCode(String productTypeName){
-		logger.info("[getProductTypeCode][Begin]");
+	public List<ComboBean> productGroupNameList(String productTypeName, String productGroupName, boolean flag){
+		logger.info("[productGroupNameList][Begin]");
 		
 		String 						hql			 		= null;
         SessionFactory 				sessionFactory		= null;
@@ -233,21 +201,112 @@ public class ManageProductGroupDao {
 		SQLQuery 					query 				= null;
 		List<String>			 	list				= null;
         String						productTypeCode		= null;
+        List<Object[]>				listTemp			= null;
+		List<ComboBean>				comboList 			= null;
+		ComboBean					comboBean			= null;
 		
 		try{
+			
 			sessionFactory 		= HibernateUtil.getSessionFactory();
 			session 			= sessionFactory.openSession();
-			hql 		= " select productTypeCode from productype where productTypeStatus = 'A' and productTypeName = '" + productTypeName + "'";
+			comboList			=  new ArrayList<ComboBean>();
 			
-			logger.info("[getProductTypeCode] hql :: " + hql);
+			/*Begin check ProductType section*/
+			hql 				= " select productTypeCode from productype where productTypeName = '"+productTypeName+"' and productTypeStatus = 'A'";
+			
+			logger.info("[productGroupNameList] Check ProductType hql :: " + hql);
 			
 			query			= session.createSQLQuery(hql);
 			query.addScalar("productTypeCode"			, new StringType());
 			
 			list		 	= query.list();
 			
-			if(list!=null && list.size() > 0){
+			if(list!=null && list.size()==1){
 				productTypeCode = list.get(0);
+			}
+		    /*End check ProductType section*/
+		    
+			hql = "";
+		    if(productTypeCode!=null){
+		    	hql = " select productGroupCode, productGroupName"
+		    			+ " from productgroup"
+		    			+ " where productTypeCode = '"+productTypeCode+"'"
+		    					+ " and productGroupName like ('"+productGroupName+"%') "
+		    					+ " and productGroupStatus = 'A'"
+		    			+ " order by productGroupName asc limit 10 ";
+		    }else{
+		    	if(flag==true){
+		    		hql = " select productGroupCode, productGroupName"
+			    			+ " from productgroup"
+			    			+ " where"
+			    					+ " productGroupName like ('"+productGroupName+"%') "
+			    					+ " and productGroupStatus = 'A'"
+			    			+ " order by productGroupName asc limit 10 ";
+		    	}
+		    }
+		    
+		    logger.info("[productGroupNameList] hql :: " + hql);
+		    
+		    if(!hql.equals("")){
+		    	query			= session.createSQLQuery(hql);
+				query.addScalar("productGroupCode"			, new StringType());
+				query.addScalar("productGroupName"			, new StringType());
+				
+				listTemp = query.list();
+				
+				for(Object[] row:listTemp){
+					comboBean 	= new ComboBean();
+					
+					logger.info("productGroupCode 		:: " + row[0].toString());
+					logger.info("productGroupName 		:: " + row[1].toString());
+					
+					comboBean.setCode				(row[0].toString());
+					comboBean.setDesc				(row[1].toString());
+					
+					comboList.add(comboBean);
+				}
+		    }
+			
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally{
+			session.close();
+			sessionFactory	= null;
+			session			= null;
+			logger.info("[productGroupNameList][End]");
+		}
+		
+		return comboList;
+	}
+	
+	public String getProductGroupCode(String productTypeCode, String productGroupName){
+		logger.info("[getProductGroupCode][Begin]");
+		
+		String 						hql			 		= null;
+        SessionFactory 				sessionFactory		= null;
+		Session 					session				= null;
+		SQLQuery 					query 				= null;
+		List<String>			 	list				= null;
+		String						productGroupCode	= null;
+		
+		try{
+			sessionFactory 		= HibernateUtil.getSessionFactory();
+			session 			= sessionFactory.openSession();
+			hql 		= " select productGroupCode"
+							+ "	from productgroup"
+							+ " where productGroupStatus 		= 'A' "
+								+ " and productGroupName 		= '" + productGroupName + "' "
+										+ "and productTypeCode 	= '" + productTypeCode + "'";
+			
+			logger.info("[getProductGroupCode] hql :: " + hql);
+			
+			query			= session.createSQLQuery(hql);
+			query.addScalar("productGroupCode"			, new StringType());
+			
+			list		 	= query.list();
+			
+			if(list!=null && list.size() > 0){
+				productGroupCode = list.get(0);
 			}
 			
 		}catch(Exception e){
@@ -256,10 +315,12 @@ public class ManageProductGroupDao {
 			session.close();
 			sessionFactory	= null;
 			session			= null;
-			logger.info("[getProductTypeCode][End]");
+			logger.info("[getProductGroupCode][End]");
 		}
 		
-		return productTypeCode;
+		return productGroupCode;
 	}
+
+
 	
 }

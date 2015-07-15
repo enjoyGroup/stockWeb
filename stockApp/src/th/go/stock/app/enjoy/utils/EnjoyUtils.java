@@ -1,5 +1,6 @@
 package th.go.stock.app.enjoy.utils;
 
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -379,6 +380,20 @@ public class EnjoyUtils {
         try {
         	if (av_val!=null&&!av_val.equals("")){	
         		lv_ret = Double.parseDouble(av_val);
+			} 
+        } catch (Exception e) {
+        	e.printStackTrace();
+        } 
+        return lv_ret;
+	}
+	
+	public static BigDecimal parseBigDecimal(String av_val) {
+		
+		BigDecimal lv_ret = new BigDecimal("0");
+		
+        try {
+        	if (av_val!=null&&!av_val.equals("")){	
+        		lv_ret = new BigDecimal(av_val.replaceAll(",", ""));
 			} 
         } catch (Exception e) {
         	e.printStackTrace();

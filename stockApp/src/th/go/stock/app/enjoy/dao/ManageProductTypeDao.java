@@ -7,13 +7,16 @@ import java.util.List;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 
+import th.go.stock.app.enjoy.bean.ComboBean;
 import th.go.stock.app.enjoy.bean.ManageProductTypeBean;
 import th.go.stock.app.enjoy.exception.EnjoyException;
 import th.go.stock.app.enjoy.model.Productype;
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
+import th.go.stock.app.enjoy.utils.HibernateUtil;
 
 public class ManageProductTypeDao {
 	
@@ -170,6 +173,135 @@ public class ManageProductTypeDao {
 		}
 		
 		return result;
+	}
+	
+	public int checkDupProductTypeName(Session session, String productTypeName) throws EnjoyException{
+		logger.info("[checkDupProductTypeCode][Begin]");
+		
+		String							hql									= null;
+		List<Integer>			 		list								= null;
+		SQLQuery 						query 								= null;
+		int 							result								= 0;
+		
+		
+		try{
+			hql				= "Select count(*) cou from productype where productTypeName = '" + productTypeName + "' and productTypeStatus = 'A'";
+			
+			query			= session.createSQLQuery(hql);
+			
+			query.addScalar("cou"			, new IntegerType());
+			
+			list		 	= query.list();
+			
+			if(list!=null && list.size() > 0){
+				result = list.get(0);
+			}
+			
+			logger.info("[checkDupProductTypeCode] result 			:: " + result);
+			
+			
+			
+		}catch(Exception e){
+			logger.info(e.getMessage());
+			throw new EnjoyException(e.getMessage());
+		}finally{
+			
+			hql									= null;
+			list								= null;
+			query 								= null;
+			logger.info("[checkDupProductTypeCode][End]");
+		}
+		
+		return result;
+	}
+	
+	public List<ComboBean> productTypeNameList(String productTypeName){
+		logger.info("[productTypeNameList][Begin]");
+		
+		String 						hql			 		= null;
+        SessionFactory 				sessionFactory		= null;
+		Session 					session				= null;
+		SQLQuery 					query 				= null;
+		List<Object[]>				list				= null;
+		List<ComboBean>				comboList 			= null;
+		ComboBean					comboBean			= null;
+		
+		try{
+			sessionFactory 		= HibernateUtil.getSessionFactory();
+			session 			= sessionFactory.openSession();
+			comboList			=  new ArrayList<ComboBean>();
+			hql 				= " select productTypeCode, productTypeName from productype where productTypeName like ('"+productTypeName+"%') and productTypeStatus = 'A' order by productTypeName asc limit 10 ";
+			
+			logger.info("[productTypeNameList] hql :: " + hql);
+			
+			query			= session.createSQLQuery(hql);
+			query.addScalar("productTypeCode"			, new StringType());
+			query.addScalar("productTypeName"			, new StringType());
+			
+			list		 	= query.list();
+			
+			logger.info("[getProductTypeList] list.size() :: " + list.size());
+			
+			for(Object[] row:list){
+				comboBean 	= new ComboBean();
+				
+				logger.info("productTypeCode 		:: " + row[0].toString());
+				logger.info("productTypeName 		:: " + row[1].toString());
+				
+				comboBean.setCode				(row[0].toString());
+				comboBean.setDesc				(row[1].toString());
+				
+				comboList.add(comboBean);
+			}	
+			
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally{
+			session.close();
+			sessionFactory	= null;
+			session			= null;
+			logger.info("[productTypeNameList][End]");
+		}
+		
+		return comboList;
+	}
+	
+	public String getProductTypeCode(String productTypeName){
+		logger.info("[getProductTypeCode][Begin]");
+		
+		String 						hql			 		= null;
+        SessionFactory 				sessionFactory		= null;
+		Session 					session				= null;
+		SQLQuery 					query 				= null;
+		List<String>			 	list				= null;
+        String						productTypeCode		= null;
+		
+		try{
+			sessionFactory 		= HibernateUtil.getSessionFactory();
+			session 			= sessionFactory.openSession();
+			hql 		= " select productTypeCode from productype where productTypeStatus = 'A' and productTypeName = '" + productTypeName + "'";
+			
+			logger.info("[getProductTypeCode] hql :: " + hql);
+			
+			query			= session.createSQLQuery(hql);
+			query.addScalar("productTypeCode"			, new StringType());
+			
+			list		 	= query.list();
+			
+			if(list!=null && list.size() > 0){
+				productTypeCode = list.get(0);
+			}
+			
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally{
+			session.close();
+			sessionFactory	= null;
+			session			= null;
+			logger.info("[getProductTypeCode][End]");
+		}
+		
+		return productTypeCode;
 	}
 	
 }

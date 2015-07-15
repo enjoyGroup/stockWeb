@@ -33,6 +33,7 @@
 		function lp_validate(){
 		    var la_productTypeCode		= null;
 		    var la_productTypeName		= null;
+		    var lv_return				= true;
 		    
 			try{
 				
@@ -55,12 +56,42 @@
 		            }
 				}
 				
-				return true;
+				$.ajax({
+					async:false,
+		            type: "POST",
+		            url: gv_url,
+		            data: gv_service + "&pageAction=validate&" + $('#frm').serialize(),
+		            beforeSend: "",
+		            success: function(data){
+		            	var jsonObj 			= null;
+		            	var status				= null;
+		            	var errMsg				= null;
+		            	
+		            	try{
+		            		jsonObj = JSON.parse(data);
+		            		status	= jsonObj.status;
+		            		
+		            		if(status=="SUCCESS"){
+		            			lv_return = true;
+		            		}else{
+		            			errMsg 	= jsonObj.errMsg;
+		            			
+		            			alert(errMsg);
+	            				lv_return = false;
+		            		}
+		            	}catch(e){
+		            		alert("in lp_validate :: " + e);
+		            		lv_return = false;
+		            	}
+		            }
+		        });
 				
 			}catch(e){
 				alert("lp_validate :: " + e);
 				return false;
 			}
+			
+			return lv_return;
 		}
 		
 		function lp_newRecord(ao_obj){

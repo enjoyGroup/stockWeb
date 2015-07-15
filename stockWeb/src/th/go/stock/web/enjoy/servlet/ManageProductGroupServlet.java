@@ -1,7 +1,6 @@
 package th.go.stock.web.enjoy.servlet;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -11,11 +10,14 @@ import javax.servlet.http.HttpSession;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import th.go.stock.app.enjoy.bean.ComboBean;
 import th.go.stock.app.enjoy.bean.ManageProductGroupBean;
 import th.go.stock.app.enjoy.bean.UserDetailsBean;
 import th.go.stock.app.enjoy.dao.ManageProductGroupDao;
+import th.go.stock.app.enjoy.dao.ManageProductTypeDao;
 import th.go.stock.app.enjoy.exception.EnjoyException;
 import th.go.stock.app.enjoy.form.ManageProductGroupForm;
 import th.go.stock.app.enjoy.main.Constants;
@@ -38,6 +40,7 @@ public class ManageProductGroupServlet extends EnjoyStandardSvc {
     private HttpSession                 	session                     = null;
     private UserDetailsBean             	userBean                    = null;
     private ManageProductGroupDao			dao							= null;
+    private ManageProductTypeDao			productTypeDao				= null;
     private ManageProductGroupForm			form						= null;
     
 	@Override
@@ -61,6 +64,7 @@ public class ManageProductGroupServlet extends EnjoyStandardSvc {
              this.userBean           	= (UserDetailsBean)session.getAttribute("userBean");
              this.form               	= (ManageProductGroupForm)session.getAttribute(FORM_NAME);
              this.dao					= new ManageProductGroupDao();
+             this.productTypeDao		= new ManageProductTypeDao();
  			
              logger.info("[execute] pageAction : " + pageAction );
              
@@ -80,6 +84,8 @@ public class ManageProductGroupServlet extends EnjoyStandardSvc {
  				this.onSearch();
  			}else if(pageAction.equals("getProductType")){
 				this.getProductType();
+			}else if(pageAction.equals("validate")){
+				this.lp_validate();
 			}
  			
  			session.setAttribute(FORM_NAME, this.form);
@@ -226,6 +232,61 @@ public class ManageProductGroupServlet extends EnjoyStandardSvc {
 		}
 	}
 	
+	private void lp_validate(){
+	   logger.info("[lp_validate][Begin]");
+	   
+	   JSONObject 					obj 						= new JSONObject();
+	   List<ManageProductGroupBean> productGroupList			= null;
+	   ManageProductGroupBean		bean						= null;
+	   ManageProductGroupBean		beanTemp					= null;
+	   SessionFactory 				sessionFactory				= null;
+	   Session 						session						= null;
+	   
+	   try{
+		   sessionFactory 		= HibernateUtil.getSessionFactory();
+		   session 				= sessionFactory.openSession();
+		   productGroupList		= this.form.getProductGroupList();
+		   
+		   for(int i=0;i<productGroupList.size();i++){
+				bean = productGroupList.get(i);
+				if(!bean.getRowStatus().equals(ManageProductGroupForm.DEL)){
+					for(int j=(i+1);j<productGroupList.size();j++){
+						beanTemp = productGroupList.get(j);
+						
+						if(!beanTemp.getRowStatus().equals(ManageProductGroupForm.DEL) && bean.getProductGroupCode().equals(beanTemp.getProductGroupCode())){
+							throw new EnjoyException("รหัสหมู่สินค้าห้ามซ้ำ");
+						}
+						
+						if(!beanTemp.getRowStatus().equals(ManageProductGroupForm.DEL) && bean.getProductGroupName().equals(beanTemp.getProductGroupName())){
+							throw new EnjoyException("ชื่อหมู่สินค้าห้ามซ้ำ");
+						}
+						
+					}
+				}
+		   }
+		   
+		   obj.put(STATUS				, SUCCESS);
+		   
+	   }catch(EnjoyException e){
+		   obj.put(STATUS, 				ERROR);
+		   obj.put(ERR_MSG, 			e.getMessage());
+	   }catch(Exception e){
+			obj.put(STATUS, 			ERROR);
+			obj.put(ERR_MSG, 			"เกิดข้อผิดพลาดในการตรวจสอบข้อมูล");
+			logger.info(e.getMessage());
+			e.printStackTrace();
+	   }finally{
+		   session.flush();
+		   session.clear();
+		   session.close();
+			
+		   sessionFactory	= null;
+		   session			= null;
+		   this.enjoyUtil.writeMSG(obj.toString());
+		   logger.info("[lp_validate][End]");
+	   }
+	}
+	
 	private void onSave() throws EnjoyException{
 		logger.info("[onSave][Begin]");
 		
@@ -233,10 +294,7 @@ public class ManageProductGroupServlet extends EnjoyStandardSvc {
 		Session 						session					= null;
 		JSONObject 						obj 					= null;
 		List<ManageProductGroupBean> 	productGroupList		= null;
-		int								chk						= 0;
 		ManageProductGroupBean 			bean					= null;
-		ManageProductGroupBean 			beanTemp				= null;
-		ManageProductGroupBean			manageProductGroupBean	= null;
 		
 		try{
 			sessionFactory 				= HibernateUtil.getSessionFactory();
@@ -249,26 +307,6 @@ public class ManageProductGroupServlet extends EnjoyStandardSvc {
 			for(int i=0;i<productGroupList.size();i++){
 				bean = productGroupList.get(i);
 				if(bean.getRowStatus().equals(ManageProductGroupForm.NEW)){
-					
-					for(int j=(i+1);j<productGroupList.size();j++){
-						beanTemp = productGroupList.get(j);
-						if(beanTemp.getRowStatus().equals(ManageProductGroupForm.NEW) && bean.getProductGroupCode().equals(beanTemp.getProductGroupCode())){
-							throw new EnjoyException("รหัสหมู่สินค้าห้ามซ้ำ");
-						}
-					}
-					
-					manageProductGroupBean = new ManageProductGroupBean();
-					manageProductGroupBean.setProductTypeCode(bean.getProductTypeCode());
-					manageProductGroupBean.setProductGroupCode(bean.getProductGroupCode());
-					
-					chk = this.dao.checkDupProductGroupCode(session, manageProductGroupBean);
-					
-					logger.info("[onSave] " + bean.getProductTypeCode() + " chk :: " + chk);
-					
-					if(chk > 0){
-						throw new EnjoyException("รหัสหมู่สินค้าห้ามซ้ำ");
-					}
-					
 					this.dao.insertProducGroup(session, bean);
 				}else if(bean.getRowStatus().equals(ManageProductGroupForm.UPD) || bean.getRowStatus().equals(ManageProductGroupForm.DEL)){
 					this.dao.updateProductgroup(session, bean);
@@ -321,7 +359,7 @@ public class ManageProductGroupServlet extends EnjoyStandardSvc {
 			session 					= sessionFactory.openSession();			
 			obj 						= new JSONObject();
 			productTypeName				= EnjoyUtils.nullToStr(this.request.getParameter("productTypeName"));
-			productTypeCode				= this.dao.getProductTypeCode(productTypeName);
+			productTypeCode				= this.productTypeDao.getProductTypeCode(productTypeName);
 			
 			logger.info("[onSearch] productTypeCode :: " + productTypeCode);
 			logger.info("[onSearch] productTypeName :: " + productTypeName);
@@ -369,19 +407,28 @@ public class ManageProductGroupServlet extends EnjoyStandardSvc {
 	   logger.info("[getProductType][Begin]");
 	   
 	   String							productTypeName			= null;
-       List<String> 					list 					= new ArrayList<String>();
-       String[]							strArray				= null;
+	   List<ComboBean> 					list 					= null;
+       JSONArray 						jSONArray 				= null;
+       JSONObject 						objDetail 				= null;
        
 	   try{
 		   productTypeName			= EnjoyUtils.nullToStr(this.request.getParameter("productTypeName"));
+		   jSONArray 				= new JSONArray();
 		   
 		   logger.info("[getProductType] productTypeName 			:: " + productTypeName);
 		   
-		   list 		= this.dao.productTypeNameList(productTypeName);
-		   strArray 	= new String[list.size()];
-		   strArray 	= list.toArray(strArray); 
+		   list 		= this.productTypeDao.productTypeNameList(productTypeName);
 		   
-		   this.enjoyUtil.writeJsonMSG((String[]) strArray);
+		   for(ComboBean bean:list){
+			   objDetail 		= new JSONObject();
+			   
+			   objDetail.put("id"			,bean.getCode());
+			   objDetail.put("value"		,bean.getDesc());
+			   
+			   jSONArray.add(objDetail);
+		   }
+		   
+		   this.enjoyUtil.writeMSG(jSONArray.toString());
 		   
 	   }catch(Exception e){
 		   e.printStackTrace();

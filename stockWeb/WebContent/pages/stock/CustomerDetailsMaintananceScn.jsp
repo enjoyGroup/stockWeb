@@ -64,6 +64,7 @@
 			      },
 			      select: function( event, ui ) {
 			    	//เมื่อเลือก Data แล้ว
+			    	//alert(ui.item.id);
 			      }
 			});
 			

@@ -27,6 +27,8 @@ public class Product implements Serializable {
 
 	private String productName;
 
+	private String productStatus;
+
 	private String productType;
 
 	private BigDecimal quantity;
@@ -86,6 +88,14 @@ public class Product implements Serializable {
 
 	public void setProductName(String productName) {
 		this.productName = productName;
+	}
+
+	public String getProductStatus() {
+		return this.productStatus;
+	}
+
+	public void setProductStatus(String productStatus) {
+		this.productStatus = productStatus;
 	}
 
 	public String getProductType() {

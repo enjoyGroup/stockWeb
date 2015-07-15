@@ -317,7 +317,7 @@ function gp_toDate(av_val){
     return d;
 }
 
-function gp_checkAmtOnly(ao_obj){
+function gp_checkAmtOnly(ao_obj, av_num){
 	try{
 		if(gp_trim(ao_obj.value)==""){
 			ao_obj.value = "0.00";
@@ -331,8 +331,8 @@ function gp_checkAmtOnly(ao_obj){
 			return false;
 		}
 		
-		if(gp_replaceComma(ao_obj.value).length > 15){
-			alert("ระบุได้สูงสุด 14 ตัวอักษร");
+		if(gp_replaceComma(ao_obj.value).length > av_num){
+			alert("ระบุได้สูงสุด " + av_num-1 + " ตัวอักษร");
 			//ao_obj.select();
 			eval("$('#" + ao_obj.id + "').focus().select();");
 			return false;

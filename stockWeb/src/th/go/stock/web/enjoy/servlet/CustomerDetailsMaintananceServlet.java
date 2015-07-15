@@ -11,6 +11,7 @@ import javax.servlet.http.HttpSession;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import th.go.stock.app.enjoy.bean.AddressBean;
@@ -457,28 +458,69 @@ public class CustomerDetailsMaintananceServlet extends EnjoyStandardSvc {
 			logger.info("[onSave][End]");
 		}
 	}	
+//	
+//	private void lp_province(){
+//	   logger.info("[lp_province][Begin]");
+//	   
+//	   String							provinceName			= null;
+//       List<String> 					list 					= new ArrayList<String>();
+//       String[]							strArray				= null;
+//       CustomerDetailsBean 				customerDetailsBean		= null;
+//       
+//	   try{
+//		   provinceName				= EnjoyUtils.nullToStr(this.request.getParameter("provinceName"));
+//		   customerDetailsBean		= this.form.getCustomerDetailsBean();
+//		   
+//		   logger.info("[lp_province] provinceName 			:: " + provinceName);
+//		   
+//		   customerDetailsBean.setProvinceName(provinceName);
+//		   
+//		   list 		= this.addressDao.provinceList(provinceName);
+//		   strArray 	= new String[list.size()];
+//		   strArray 	= list.toArray(strArray); 
+//		   
+//		   this.enjoyUtil.writeJsonMSG((String[]) strArray);
+//		   
+//	   }catch(Exception e){
+//		   e.printStackTrace();
+//		   logger.info("[lp_province] " + e.getMessage());
+//	   }finally{
+//		   logger.info("[lp_province][End]");
+//	   }
+//   }
 	
 	private void lp_province(){
-	   logger.info("[lp_search][Begin]");
+	   logger.info("[lp_province][Begin]");
 	   
 	   String							provinceName			= null;
        List<String> 					list 					= new ArrayList<String>();
-       String[]							strArray				= null;
        CustomerDetailsBean 				customerDetailsBean		= null;
+       JSONArray 						jSONArray 				= null;
+       JSONObject 						objDetail 				= null;
+       int								id						= 0;
        
 	   try{
 		   provinceName				= EnjoyUtils.nullToStr(this.request.getParameter("provinceName"));
 		   customerDetailsBean		= this.form.getCustomerDetailsBean();
+		   jSONArray 			= new JSONArray();
 		   
 		   logger.info("[lp_province] provinceName 			:: " + provinceName);
 		   
 		   customerDetailsBean.setProvinceName(provinceName);
 		   
 		   list 		= this.addressDao.provinceList(provinceName);
-		   strArray 	= new String[list.size()];
-		   strArray 	= list.toArray(strArray); 
 		   
-		   this.enjoyUtil.writeJsonMSG((String[]) strArray);
+		   for(String province:list){
+			   objDetail 		= new JSONObject();
+			   
+			   objDetail.put("id"			,id);
+			   objDetail.put("value"		,province);
+			   
+			   jSONArray.add(objDetail);
+			   id++;
+		   }
+		   
+		   this.enjoyUtil.writeMSG(jSONArray.toString());
 		   
 	   }catch(Exception e){
 		   e.printStackTrace();

@@ -13,12 +13,15 @@ import org.hibernate.SessionFactory;
 import org.json.simple.JSONObject;
 
 import th.go.stock.app.enjoy.bean.ManageProductTypeBean;
+import th.go.stock.app.enjoy.bean.ProductDiscountBean;
 import th.go.stock.app.enjoy.bean.UserDetailsBean;
 import th.go.stock.app.enjoy.dao.ManageProductTypeDao;
 import th.go.stock.app.enjoy.exception.EnjoyException;
 import th.go.stock.app.enjoy.form.ManageProductTypeForm;
+import th.go.stock.app.enjoy.form.ProductDetailsMaintananceForm;
 import th.go.stock.app.enjoy.main.Constants;
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
+import th.go.stock.app.enjoy.utils.EnjoyUtils;
 import th.go.stock.app.enjoy.utils.HibernateUtil;
 import th.go.stock.web.enjoy.common.EnjoyStandardSvc;
 import th.go.stock.web.enjoy.utils.EnjoyUtil;
@@ -67,8 +70,6 @@ public class ManageProductTypeServlet extends EnjoyStandardSvc {
  			if( pageAction.equals("") || pageAction.equals("new") ){
  				this.onLoad();
  				request.setAttribute("target", Constants.PAGE_URL +"/ManageProductTypeScn.jsp");
- 			}else if(pageAction.equals("checkDupProductTypeCode")){
- 				this.checkDupProductTypeCode();
  			}else if(pageAction.equals("save")){
 				this.onSave();
 			}else if(pageAction.equals("newRecord")){
@@ -77,6 +78,8 @@ public class ManageProductTypeServlet extends EnjoyStandardSvc {
 				this.updateRecord();
 			}else if(pageAction.equals("deleteRecord")){
 				this.deleteRecord();
+			}else if(pageAction.equals("validate")){
+				this.lp_validate();
 			}
  			
  			session.setAttribute(FORM_NAME, this.form);
@@ -129,49 +132,6 @@ public class ManageProductTypeServlet extends EnjoyStandardSvc {
 		
 	}
 	
-	private void checkDupProductTypeCode() throws EnjoyException{
-		logger.info("[checkDupProductTypeCode][Begin]");
-		
-		int 				cou					= 0;
-		SessionFactory 		sessionFactory		= null;
-		Session 			session				= null;
-		JSONObject 			obj 				= null;
-		String				productTypeCode		= null;
-		
-		try{
-			sessionFactory 				= HibernateUtil.getSessionFactory();
-			session 					= sessionFactory.openSession();
-			productTypeCode 			= EnjoyUtil.nullToStr(request.getParameter("productTypeCode"));
-			
-			logger.info("[checkDupProductTypeCode] productTypeCode 		:: " + productTypeCode);
-			
-			cou							= this.dao.checkDupProductTypeCode(session, productTypeCode);
-			obj 						= new JSONObject();
-			
-			obj.put(STATUS, 		SUCCESS);
-			obj.put("COU", 			cou);
-			
-			
-		}catch(EnjoyException e){
-			obj.put(STATUS, 		ERROR);
-			obj.put(ERR_MSG, 		e.getMessage());
-		}catch(Exception e){
-			logger.info(e.getMessage());
-			
-			obj.put(STATUS, 		ERROR);
-			obj.put(ERR_MSG, 		"checkDupProductTypeCode is error");
-		}finally{
-			session.close();
-			sessionFactory	= null;
-			session			= null;
-			
-			this.enjoyUtil.writeMSG(obj.toString());
-			
-			logger.info("[checkDupProductTypeCode][End]");
-		}
-		
-	}
-
 	private void newRecord() throws EnjoyException{
 		logger.info("[newRecord][Begin]");
 		
@@ -299,6 +259,62 @@ public class ManageProductTypeServlet extends EnjoyStandardSvc {
 		}
 	}
 	
+	private void lp_validate(){
+	   logger.info("[lp_validate][Begin]");
+	   
+	   JSONObject 					obj 						= new JSONObject();
+	   List<ManageProductTypeBean> 	productTypeList				= null;
+	   ManageProductTypeBean		bean						= null;
+	   ManageProductTypeBean		beanTemp					= null;
+	   SessionFactory 				sessionFactory				= null;
+	   Session 						session						= null;
+	   
+	   try{
+		   sessionFactory 		= HibernateUtil.getSessionFactory();
+		   session 				= sessionFactory.openSession();
+		   productTypeList	= this.form.getProductTypeList();
+		   
+		   for(int i=0;i<productTypeList.size();i++){
+				bean = productTypeList.get(i);
+				if(!bean.getRowStatus().equals(ManageProductTypeForm.DEL)){
+					for(int j=(i+1);j<productTypeList.size();j++){
+						beanTemp = productTypeList.get(j);
+						
+						if(!beanTemp.getRowStatus().equals(ManageProductTypeForm.DEL) && bean.getProductTypeCode().equals(beanTemp.getProductTypeCode())){
+							throw new EnjoyException("รหัสหมวดสินค้าห้ามซ้ำ");
+						}
+						
+						if(!beanTemp.getRowStatus().equals(ManageProductTypeForm.DEL) && bean.getProductTypeName().equals(beanTemp.getProductTypeName())){
+							throw new EnjoyException("ชื่อหมวดสินค้าห้ามซ้ำ");
+						}
+						
+					}
+				}
+		   }
+		   
+		   obj.put(STATUS				, SUCCESS);
+		   
+	   }catch(EnjoyException e){
+		   obj.put(STATUS, 				ERROR);
+		   obj.put(ERR_MSG, 			e.getMessage());
+	   }catch(Exception e){
+			obj.put(STATUS, 			ERROR);
+			obj.put(ERR_MSG, 			"เกิดข้อผิดพลาดในการตรวจสอบข้อมูล");
+			logger.info(e.getMessage());
+			e.printStackTrace();
+	   }finally{
+		   session.flush();
+		   session.clear();
+		   session.close();
+			
+		   sessionFactory	= null;
+		   session			= null;
+		   this.enjoyUtil.writeMSG(obj.toString());
+		   logger.info("[lp_validate][End]");
+	   }
+	}
+
+	
 	private void onSave() throws EnjoyException{
 		logger.info("[onSave][Begin]");
 		
@@ -306,9 +322,7 @@ public class ManageProductTypeServlet extends EnjoyStandardSvc {
 		Session 						session					= null;
 		JSONObject 						obj 					= null;
 		List<ManageProductTypeBean> 	productTypeList			= null;
-		int								chk						= 0;
 		ManageProductTypeBean 			bean					= null;
-		ManageProductTypeBean 			beanTemp				= null;
 		
 		try{
 			sessionFactory 				= HibernateUtil.getSessionFactory();
@@ -321,42 +335,11 @@ public class ManageProductTypeServlet extends EnjoyStandardSvc {
 			for(int i=0;i<productTypeList.size();i++){
 				bean = productTypeList.get(i);
 				if(bean.getRowStatus().equals(ManageProductTypeForm.NEW)){
-					
-					for(int j=(i+1);j<productTypeList.size();j++){
-						beanTemp = productTypeList.get(j);
-						if(beanTemp.getRowStatus().equals(ManageProductTypeForm.NEW) && bean.getProductTypeCode().equals(beanTemp.getProductTypeCode())){
-							throw new EnjoyException("รหัสหมวดสินค้าห้ามซ้ำ");
-						}
-					}
-					
-					chk = this.dao.checkDupProductTypeCode(session, bean.getProductTypeCode());
-					
-					logger.info("[onSave] " + bean.getProductTypeCode() + " chk :: " + chk);
-					
-					if(chk > 0){
-						throw new EnjoyException("รหัสหมวดสินค้าห้ามซ้ำ");
-					}
-					
 					this.dao.insertProductype(session, bean);
 				}else if(bean.getRowStatus().equals(ManageProductTypeForm.UPD) || bean.getRowStatus().equals(ManageProductTypeForm.DEL)){
 					this.dao.updateProductype(session, bean);
 				}
 			}
-			
-//			for(ManageProductTypeBean bean:productTypeList){
-//				if(bean.getRowStatus().equals(ManageProductTypeForm.NEW)){
-//					
-//					chk = this.dao.checkDupProductTypeCode(session, bean.getProductTypeCode());
-//					
-//					if(chk > 0){
-//						throw new EnjoyException("รหัสหมวดสินค้าห้ามซ้ำ");
-//					}
-//					
-//					this.dao.insertProductype(session, bean);
-//				}else{
-//					this.dao.updateProductype(session, bean);
-//				}
-//			}
 			
 			session.getTransaction().commit();
 			

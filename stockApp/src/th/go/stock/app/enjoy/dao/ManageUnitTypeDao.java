@@ -7,13 +7,16 @@ import java.util.List;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 
+import th.go.stock.app.enjoy.bean.ComboBean;
 import th.go.stock.app.enjoy.bean.ManageUnitTypeBean;
 import th.go.stock.app.enjoy.exception.EnjoyException;
 import th.go.stock.app.enjoy.model.Unittype;
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
+import th.go.stock.app.enjoy.utils.HibernateUtil;
 
 public class ManageUnitTypeDao {
 	
@@ -173,6 +176,95 @@ public class ManageUnitTypeDao {
 		}
 		
 		return result;
+	}
+	
+	public List<ComboBean> unitNameList(String unitName){
+		logger.info("[unitNameList][Begin]");
+		
+		String 						hql			 		= null;
+        SessionFactory 				sessionFactory		= null;
+		Session 					session				= null;
+		SQLQuery 					query 				= null;
+		List<Object[]>				list				= null;
+		List<ComboBean>				comboList 			= null;
+		ComboBean					comboBean			= null;
+		
+		try{
+			sessionFactory 		= HibernateUtil.getSessionFactory();
+			session 			= sessionFactory.openSession();
+			comboList			= new ArrayList<ComboBean>();
+			hql 				= "select unitCode, unitName from unittype where unitName like ('"+unitName+"%') and unitStatus = 'A' order by unitName asc limit 10 ";
+			
+			logger.info("[productTypeNameList] hql :: " + hql);
+			
+			query			= session.createSQLQuery(hql);
+			query.addScalar("unitCode"			, new StringType());
+			query.addScalar("unitName"			, new StringType());
+			
+			list		 	= query.list();
+			
+			logger.info("[unitNameList] list.size() :: " + list.size());
+			
+			for(Object[] row:list){
+				comboBean 	= new ComboBean();
+				
+				logger.info("unitCode 		:: " + row[0].toString());
+				logger.info("unitName 		:: " + row[1].toString());
+				
+				comboBean.setCode				(row[0].toString());
+				comboBean.setDesc				(row[1].toString());
+				
+				comboList.add(comboBean);
+			}	
+			
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally{
+			session.close();
+			sessionFactory	= null;
+			session			= null;
+			logger.info("[unitNameList][End]");
+		}
+		
+		return comboList;
+	}
+	
+	public String getUnitCode(String unitName){
+		logger.info("[getUnitCode][Begin]");
+		
+		String 						hql			 		= null;
+        SessionFactory 				sessionFactory		= null;
+		Session 					session				= null;
+		SQLQuery 					query 				= null;
+		List<String>			 	list				= null;
+        String						unitCode			= null;
+		
+		try{
+			sessionFactory 		= HibernateUtil.getSessionFactory();
+			session 			= sessionFactory.openSession();
+			hql 		= " select unitCode from unittype where unitStatus = 'A' and unitName = '" + unitName + "'";
+			
+			logger.info("[getUnitCode] hql :: " + hql);
+			
+			query			= session.createSQLQuery(hql);
+			query.addScalar("unitCode"			, new StringType());
+			
+			list		 	= query.list();
+			
+			if(list!=null && list.size() > 0){
+				unitCode = list.get(0);
+			}
+			
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally{
+			session.close();
+			sessionFactory	= null;
+			session			= null;
+			logger.info("[getUnitCode][End]");
+		}
+		
+		return unitCode;
 	}
 
 }
