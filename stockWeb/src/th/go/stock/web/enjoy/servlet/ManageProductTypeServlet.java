@@ -266,12 +266,8 @@ public class ManageProductTypeServlet extends EnjoyStandardSvc {
 	   List<ManageProductTypeBean> 	productTypeList				= null;
 	   ManageProductTypeBean		bean						= null;
 	   ManageProductTypeBean		beanTemp					= null;
-	   SessionFactory 				sessionFactory				= null;
-	   Session 						session						= null;
 	   
 	   try{
-		   sessionFactory 		= HibernateUtil.getSessionFactory();
-		   session 				= sessionFactory.openSession();
 		   productTypeList	= this.form.getProductTypeList();
 		   
 		   for(int i=0;i<productTypeList.size();i++){
@@ -303,12 +299,6 @@ public class ManageProductTypeServlet extends EnjoyStandardSvc {
 			logger.info(e.getMessage());
 			e.printStackTrace();
 	   }finally{
-		   session.flush();
-		   session.clear();
-		   session.close();
-			
-		   sessionFactory	= null;
-		   session			= null;
 		   this.enjoyUtil.writeMSG(obj.toString());
 		   logger.info("[lp_validate][End]");
 	   }

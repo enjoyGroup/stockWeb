@@ -15,6 +15,7 @@ import org.json.simple.JSONObject;
 
 import th.go.stock.app.enjoy.bean.ComboBean;
 import th.go.stock.app.enjoy.bean.ManageProductGroupBean;
+import th.go.stock.app.enjoy.bean.ManageProductTypeBean;
 import th.go.stock.app.enjoy.bean.UserDetailsBean;
 import th.go.stock.app.enjoy.dao.ManageProductGroupDao;
 import th.go.stock.app.enjoy.dao.ManageProductTypeDao;
@@ -239,12 +240,8 @@ public class ManageProductGroupServlet extends EnjoyStandardSvc {
 	   List<ManageProductGroupBean> productGroupList			= null;
 	   ManageProductGroupBean		bean						= null;
 	   ManageProductGroupBean		beanTemp					= null;
-	   SessionFactory 				sessionFactory				= null;
-	   Session 						session						= null;
 	   
 	   try{
-		   sessionFactory 		= HibernateUtil.getSessionFactory();
-		   session 				= sessionFactory.openSession();
 		   productGroupList		= this.form.getProductGroupList();
 		   
 		   for(int i=0;i<productGroupList.size();i++){
@@ -276,12 +273,6 @@ public class ManageProductGroupServlet extends EnjoyStandardSvc {
 			logger.info(e.getMessage());
 			e.printStackTrace();
 	   }finally{
-		   session.flush();
-		   session.clear();
-		   session.close();
-			
-		   sessionFactory	= null;
-		   session			= null;
 		   this.enjoyUtil.writeMSG(obj.toString());
 		   logger.info("[lp_validate][End]");
 	   }
@@ -353,6 +344,7 @@ public class ManageProductGroupServlet extends EnjoyStandardSvc {
 		String							productTypeName			= null;
 		String							productTypeCode			= null;
 		JSONObject 						obj 					= null;
+		String							seqTemp					= null;
 
 		try{
 			sessionFactory 				= HibernateUtil.getSessionFactory();
@@ -379,7 +371,16 @@ public class ManageProductGroupServlet extends EnjoyStandardSvc {
 			
 			
 			productGroupList	 		= this.dao.getProductGroupList(session, manageProductGroupBean);
+			
+			for(ManageProductGroupBean bean:productGroupList){
+				seqTemp = bean.getSeq();
+			}
+			
 			this.form.setProductGroupList(productGroupList);
+			
+			if(seqTemp!=null){
+				this.form.setSeqTemp(seqTemp);
+			}
 			
 			obj.put(STATUS, 			SUCCESS);
 			

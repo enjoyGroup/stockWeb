@@ -260,6 +260,11 @@
 		            		
 		            		if(status=="SUCCESS"){
 		            			lo_table.deleteRow(gp_rowTableIndex(ao_obj)); 
+		            			
+		            			for(var i=1;i<(lo_table.rows.length - 1);i++){
+		                            lo_table.rows[i].cells[0].innerHTML = (i);
+		                        }
+		            			
 		            		}else{
 		            			alert(jsonObj.errMsg);
 		            			
