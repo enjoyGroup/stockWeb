@@ -224,7 +224,7 @@
 														<thead> 
 											               <tr height="26px;">
 																<th  style="text-align: center;" width="5%" ><B>ลำดับ</B></th>
-																<th  style="text-align: center;" width="15%"><B>ชื่อ-นามสกลุ</B></th>
+																<th  style="text-align: center;" width="15%"><B>ชื่อ-นามสกุล</B></th>
 																<th  style="text-align: center;" width="35%"><B>ที่อยู่</B></th>
 																<th  style="text-align: center;" width="15%"><B>เบอร์โทร</B></th> 
 																<th  style="text-align: center;" width="15%"><B>สถานะ</B></th>

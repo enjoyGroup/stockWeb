@@ -33,6 +33,7 @@ public class ProductDetailsDao {
 		List<Object[]>				list					= null;
 		ProductDetailsBean			bean					= null;
 		List<ProductDetailsBean> 	productDetailsList 		= new ArrayList<ProductDetailsBean>();
+		int							chkBoxSeq				= 0;
 		
 		try{	
 			hql					= "select a.*, b.productTypeName, c.productGroupName "
@@ -105,9 +106,10 @@ public class ProductDetailsDao {
 				bean.setProductStatus			(row[11].toString());
 				bean.setProductTypeName			(row[12].toString());
 				bean.setProductGroupName		(row[13].toString());
-				
+				bean.setChkBoxSeq				(String.valueOf(chkBoxSeq));
 				
 				productDetailsList.add(bean);
+				chkBoxSeq++;
 			}	
 			
 		}catch(Exception e){
@@ -447,12 +449,12 @@ public class ProductDetailsDao {
 		    			+ " from product"
 		    			+ " where productType 			= '" + productTypeCode + "'"
 		    					+ " and productGroup 	= '" + productGroupCode + "'"
-		    					+ " and productStatus = 'A'"
+//		    					+ " and productStatus = 'A'"
 		    			+ " order by productName asc limit 10";
 		    }else{
 		    	if(flag==true){
 		    		hql = " select productCode, productName"
-			    			+ " from product where productStatus = 'A'";
+			    			+ " from product where 1=1";
 		    		if(productTypeCode!=null) 	hql+= " and productType 	= '" + productTypeCode + "'";
 		    		if(productGroupCode!=null) 	hql+= " and productGroup 	= '" + productGroupCode + "'";
 		    		

@@ -76,7 +76,7 @@ public class ProductDetailsSearchServlet extends EnjoyStandardSvc {
  			if(this.form == null || pageAction.equals("new")) this.form = new ProductDetailsSearchForm();
  			
  			if( pageAction.equals("") || pageAction.equals("new") ){
- 				this.onLoad();
+// 				this.onLoad();
 				request.setAttribute("target", Constants.PAGE_URL +"/ProductDetailsSearchScn.jsp");
  			}else if(pageAction.equals("search")){
  				this.onSearch();
@@ -86,6 +86,12 @@ public class ProductDetailsSearchServlet extends EnjoyStandardSvc {
 				this.getProductTypeNameList();
 			}else if(pageAction.equals("getProductGroupNameList")){
 				this.getProductGroupNameList();
+			}else if(pageAction.equals("getProductNameList")){
+				this.getProductNameList();
+			}else if(pageAction.equals("setForPrint")){
+				this.setForPrint();
+			}else if(pageAction.equals("checkForPrint")){
+				this.checkForPrint();
 			}
  			
  			session.setAttribute(FORM_NAME, this.form);
@@ -99,62 +105,62 @@ public class ProductDetailsSearchServlet extends EnjoyStandardSvc {
  		}
 	}
 	
-	private void onLoad() throws EnjoyException{
-		logger.info("[onLoad][Begin]");
-		
-		try{
-			this.setRefference();			
-			this.form.setTitlePage("เงื่อนไขค้นหารายละเอียดสินค้า");			
-		}catch(EnjoyException e){
-			throw new EnjoyException(e.getMessage());
-		}catch(Exception e){
-			logger.info(e.getMessage());
-			throw new EnjoyException("onLoad is error");
-		}finally{			
-			logger.info("[onLoad][End]");
-		}
-		
-	}
-	
-	private void setRefference() throws EnjoyException{
-		
-		logger.info("[setRefference][Begin]");
-		
-		try{
-			this.setStatusCombo();
-		}catch(EnjoyException e){
-			throw new EnjoyException(e.getMessage());
-		}catch(Exception e){
-			e.printStackTrace();
-			logger.info(e.getMessage());
-		}finally{
-			logger.info("[setRefference][End]");
-		}
-	}
-	
-	private void setStatusCombo() throws EnjoyException{
-		
-		logger.info("[setStatusCombo][Begin]");
-		
-		List<ComboBean>			statusCombo = null;
-		
-		try{
-			
-			statusCombo = new ArrayList<ComboBean>();
-			
-			statusCombo.add(new ComboBean(""	, "กรุณาระบุ"));
-			statusCombo.add(new ComboBean("A"	, "ใช้งานได้อยู่"));
-			statusCombo.add(new ComboBean("C"	, "ยกเลิกการใช้งาน"));
-			
-			this.form.setStatusCombo(statusCombo);
-		}
-		catch(Exception e){
-			logger.info(e.getMessage());
-			throw new EnjoyException("setStatusCombo is error");
-		}finally{
-			logger.info("[setStatusCombo][End]");
-		}
-	}
+//	private void onLoad() throws EnjoyException{
+//		logger.info("[onLoad][Begin]");
+//		
+//		try{
+//			this.setRefference();			
+//			this.form.setTitlePage("เงื่อนไขค้นหารายละเอียดสินค้า");			
+//		}catch(EnjoyException e){
+//			throw new EnjoyException(e.getMessage());
+//		}catch(Exception e){
+//			logger.info(e.getMessage());
+//			throw new EnjoyException("onLoad is error");
+//		}finally{			
+//			logger.info("[onLoad][End]");
+//		}
+//		
+//	}
+//	
+//	private void setRefference() throws EnjoyException{
+//		
+//		logger.info("[setRefference][Begin]");
+//		
+//		try{
+//			this.setStatusCombo();
+//		}catch(EnjoyException e){
+//			throw new EnjoyException(e.getMessage());
+//		}catch(Exception e){
+//			e.printStackTrace();
+//			logger.info(e.getMessage());
+//		}finally{
+//			logger.info("[setRefference][End]");
+//		}
+//	}
+//	
+//	private void setStatusCombo() throws EnjoyException{
+//		
+//		logger.info("[setStatusCombo][Begin]");
+//		
+//		List<ComboBean>			statusCombo = null;
+//		
+//		try{
+//			
+//			statusCombo = new ArrayList<ComboBean>();
+//			
+//			statusCombo.add(new ComboBean(""	, "กรุณาระบุ"));
+//			statusCombo.add(new ComboBean("A"	, "ใช้งานได้อยู่"));
+//			statusCombo.add(new ComboBean("C"	, "ยกเลิกการใช้งาน"));
+//			
+//			this.form.setStatusCombo(statusCombo);
+//		}
+//		catch(Exception e){
+//			logger.info(e.getMessage());
+//			throw new EnjoyException("setStatusCombo is error");
+//		}finally{
+//			logger.info("[setStatusCombo][End]");
+//		}
+//	}
 		
 	
 	private void onSearch() throws EnjoyException{
@@ -184,7 +190,8 @@ public class ProductDetailsSearchServlet extends EnjoyStandardSvc {
 			productDetailsBean.setProductName			(EnjoyUtils.nullToStr(this.request.getParameter("productName")));
 			productDetailsBean.setProductStatus			(EnjoyUtils.nullToStr(this.request.getParameter("productStatus")));
 			
-			this.form.setProductDetailsBean(productDetailsBean);
+			this.form.setProductDetailsBean	(productDetailsBean);
+			this.form.setRadPrint			(EnjoyUtils.nullToStr(this.request.getParameter("radPrint")));
 			
 			dataList	 		= this.dao.searchByCriteria(session, productDetailsBean);
 			
@@ -239,7 +246,7 @@ public class ProductDetailsSearchServlet extends EnjoyStandardSvc {
 			sessionFactory	= null;
 			session			= null;
 			
-			this.setRefference();
+//			this.setRefference();
 			logger.info("[onSearch][End]");
 		}
 		
@@ -340,9 +347,137 @@ public class ProductDetailsSearchServlet extends EnjoyStandardSvc {
 	   }finally{
 		   logger.info("[getProductGroupNameList][End]");
 	   }
-}
-		
+	}
+	   
+	private void getProductNameList(){
+	   logger.info("[getProductNameList][Begin]");
+	   
+	   String							productName				= null;
+	   String							productTypeName			= null;
+	   String							productGroupName		= null;
+	   List<ComboBean> 					list 					= null;
+	   JSONArray 						jSONArray 				= null;
+	   JSONObject 						objDetail 				= null;
+ 
+	   try{
+		   jSONArray 				= new JSONArray();
+		   productName				= EnjoyUtils.nullToStr(this.request.getParameter("productName"));
+		   productTypeName			= EnjoyUtils.nullToStr(this.request.getParameter("productTypeName"));
+		   productGroupName			= EnjoyUtils.nullToStr(this.request.getParameter("productGroupName"));
+		   
+		   logger.info("[getProductNameList] productName 				:: " + productName);
+		   logger.info("[getProductNameList] productTypeName 			:: " + productTypeName);
+		   logger.info("[getProductNameList] productGroupName 			:: " + productGroupName);
+		   
+		   list 		= this.dao.productNameList(productName, productTypeName, productGroupName, true);
+		   
+		   for(ComboBean bean:list){
+			   objDetail 		= new JSONObject();
+			   
+			   objDetail.put("id"			,bean.getCode());
+			   objDetail.put("value"		,bean.getDesc());
+			   
+			   jSONArray.add(objDetail);
+		   }
+		   
+		   this.enjoyUtil.writeMSG(jSONArray.toString());
+		   
+	   }catch(Exception e){
+		   e.printStackTrace();
+		   logger.info("[getProductNameList] " + e.getMessage());
+	   }finally{
+		   logger.info("[getProductNameList][End]");
+	   }
+	}
 	
+	private void setForPrint(){
+		logger.info("[setForPrint][Begin]");
+		
+		JSONObject 						obj 				= null;
+		String 							chkBoxSeq			= null;
+		String 							chkBox				= null;
+		int								pageNum				= 1;
+		List<ProductDetailsBean> 		dataList 			= new ArrayList<ProductDetailsBean>();
+		
+		try{
+			
+			obj 					= new JSONObject();
+			chkBoxSeq 				= EnjoyUtil.nullToStr(request.getParameter("chkBoxSeq"));
+			pageNum 				= EnjoyUtil.parseInt(request.getParameter("pageNum"));
+			chkBox 					= EnjoyUtil.chkBoxtoDb(request.getParameter("chkBox"));
+			
+			logger.info("[setForPrint] chkBoxSeq 	:: " + chkBoxSeq);
+			logger.info("[setForPrint] pageNum 		:: " + pageNum);
+			logger.info("[setForPrint] chkBox 		:: " + chkBox);
+			
+			dataList 				= (List<ProductDetailsBean>) this.form.getHashTable().get(pageNum);
+			
+			for(ProductDetailsBean bean:dataList){
+				if(bean.getChkBoxSeq().equals(chkBoxSeq)){
+					bean.setChkBox(chkBox);
+					break;
+				}
+			}
+			
+			obj.put(STATUS, 		SUCCESS);
+			
+		}catch(Exception e){
+			logger.info(e.getMessage());
+			
+			obj.put(STATUS, 		ERROR);
+			obj.put(ERR_MSG, 		"setForPrint is error");
+		}finally{
+			
+			this.enjoyUtil.writeMSG(obj.toString());
+			logger.info("[setForPrint][End]");
+		}
+	}
+		
+	   
+	private void checkForPrint(){
+	   logger.info("[checkForPrint][Begin]");
+	   
+	   List<ComboBean> 				list 				= null;
+	   JSONObject 					obj 				= null;
+	   JSONArray 					detailJSONArray 	= null;
+	   JSONObject 					objDetail 			= null;
+	   List<ProductDetailsBean> 	dataList			= null;
+	   HashMap						hashTable			= null;
+ 
+	   try{
+		   obj 				= new JSONObject();
+		   detailJSONArray 	= new JSONArray();
+		   hashTable		= this.form.getHashTable();
+		   
+		   obj.put(STATUS, 			SUCCESS);
+		   
+		   for (Object key : hashTable.keySet()) {
+			   dataList = (List<ProductDetailsBean>) hashTable.get(key);
+			   
+			   for(ProductDetailsBean bean:dataList){
+				   if(bean.getChkBox().equals("Y")){
+					   objDetail 		= new JSONObject();
+					   objDetail.put("productCode"			,bean.getProductCode());
+					   
+					   detailJSONArray.add(objDetail);
+				   }
+			   }
+		   }
+		   
+		   obj.put("productCodeList", 			detailJSONArray);
+		   
+		   
+	   }catch(Exception e){
+		   obj.put(STATUS, 			ERROR);
+		   obj.put(ERR_MSG, 		"checkForPrint is Error");
+		   e.printStackTrace();
+		   logger.info("[checkForPrint] " + e.getMessage());
+	   }finally{
+		   this.enjoyUtil.writeMSG(obj.toString());
+		   logger.info("[checkForPrint][End]");
+	   }
+	}
+
 	
 	
 	

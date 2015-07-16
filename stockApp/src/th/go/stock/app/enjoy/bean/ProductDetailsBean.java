@@ -19,6 +19,10 @@ public class ProductDetailsBean {
 	private String expDate;
 	private String quantity;
 	private String productStatus;
+	/*Begin สำหรับหน้า Search*/
+	private String chkBox;
+	private String chkBoxSeq;
+	/*End สำหรับหน้า Search*/
 	
 	public ProductDetailsBean(){
 		this.productCode 		= "";
@@ -36,6 +40,8 @@ public class ProductDetailsBean {
 		this.expDate 			= "";
 		this.quantity 			= "0";
 		this.productStatus 		= "";
+		this.chkBox 			= "N";
+		this.chkBoxSeq 			= "0";
 	}
 
 	public String getProductCode() {
@@ -156,5 +162,21 @@ public class ProductDetailsBean {
 
 	public void setProductStatus(String productStatus) {
 		this.productStatus = productStatus;
+	}
+
+	public String getChkBox() {
+		return chkBox;
+	}
+
+	public void setChkBox(String chkBox) {
+		this.chkBox = chkBox;
+	}
+
+	public String getChkBoxSeq() {
+		return chkBoxSeq;
+	}
+
+	public void setChkBoxSeq(String chkBoxSeq) {
+		this.chkBoxSeq = chkBoxSeq;
 	}
 }

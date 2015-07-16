@@ -15,7 +15,6 @@ public class ProductDetailsSearchForm {
 	
 	
 	private ProductDetailsBean 			productDetailsBean;
-	private List<ComboBean> 			statusCombo;
 	private String						errMsg;
 	private String						pageMode;
 	private String						titlePage;
@@ -24,10 +23,10 @@ public class ProductDetailsSearchForm {
 	private String						totalRecord;
 	private List<ProductDetailsBean> 	dataList;
 	private HashMap						hashTable;
+	private String						radPrint;
 	
 	public ProductDetailsSearchForm(){
 		this.productDetailsBean 	= new ProductDetailsBean();
-		this.statusCombo			= new ArrayList<ComboBean>();
 		this.errMsg					= "";
 		this.pageMode				= NEW;
 		this.titlePage				= "";
@@ -36,6 +35,7 @@ public class ProductDetailsSearchForm {
 		this.totalRecord			= "";
 		this.dataList				= new ArrayList<ProductDetailsBean>();
 		this.hashTable				= new HashMap();
+		this.radPrint				= "";
 	}
 
 	public ProductDetailsBean getProductDetailsBean() {
@@ -44,14 +44,6 @@ public class ProductDetailsSearchForm {
 
 	public void setProductDetailsBean(ProductDetailsBean productDetailsBean) {
 		this.productDetailsBean = productDetailsBean;
-	}
-
-	public List<ComboBean> getStatusCombo() {
-		return statusCombo;
-	}
-
-	public void setStatusCombo(List<ComboBean> statusCombo) {
-		this.statusCombo = statusCombo;
 	}
 
 	public String getErrMsg() {
@@ -116,5 +108,13 @@ public class ProductDetailsSearchForm {
 
 	public void setHashTable(HashMap hashTable) {
 		this.hashTable = hashTable;
+	}
+
+	public String getRadPrint() {
+		return radPrint;
+	}
+
+	public void setRadPrint(String radPrint) {
+		this.radPrint = radPrint;
 	}
 }
