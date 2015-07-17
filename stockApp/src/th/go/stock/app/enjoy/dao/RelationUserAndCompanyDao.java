@@ -7,114 +7,70 @@ import java.util.List;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 
-import th.go.stock.app.enjoy.bean.ComboBean;
-import th.go.stock.app.enjoy.bean.CompanyDetailsBean;
+import th.go.stock.app.enjoy.bean.RelationUserAndCompanyBean;
 import th.go.stock.app.enjoy.exception.EnjoyException;
-import th.go.stock.app.enjoy.model.Company;
+import th.go.stock.app.enjoy.model.Relationuserncompany;
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
 import th.go.stock.app.enjoy.utils.EnjoyUtils;
+import th.go.stock.app.enjoy.utils.HibernateUtil;
 
 public class RelationUserAndCompanyDao {
 	
 	private static final EnjoyLogger logger = EnjoyLogger.getLogger(RelationUserAndCompanyDao.class);
 	
-	public List<CompanyDetailsBean> searchByCriteria(	Session 					session, 
-														CompanyDetailsBean 			companyDetailsBean) throws EnjoyException{
+	public List<RelationUserAndCompanyBean> searchByCriteria(	Session 					session, 
+																RelationUserAndCompanyBean 	relationUserAndCompanyBean) throws EnjoyException{
 		logger.info("[searchByCriteria][Begin]");
 		
-		String						hql						= null;
-		SQLQuery 					query 					= null;
-		List<Object[]>				list					= null;
-		CompanyDetailsBean			bean					= null;
-		List<CompanyDetailsBean> 	companyDetailsBeanList 	= new ArrayList<CompanyDetailsBean>();
-		AddressDao					addressDao				= null;
-		String						provinceCode			= null;
-		String						districtCode			= null;
-		String						subdistrictCode			= null;
-		String						provinceName			= null;
-		String						districtName			= null;
-		String						subdistrictName			= null;
+		String								hql							= null;
+		SQLQuery 							query 						= null;
+		List<Object[]>						list						= null;
+		RelationUserAndCompanyBean			bean						= null;
+		List<RelationUserAndCompanyBean> 	relationUserAndCompanyList 	= new ArrayList<RelationUserAndCompanyBean>();
+		int									seq							= 0;
 		
 		try{	
-			addressDao 			= new AddressDao();
-			hql					= "select a.*, b.companyStatusName "
-								+ "	from company a, refcompanystatus b"
-								+ "	where b.companyStatusCode = a.companyStatus ";
+			hql					= "select a.*, b.userId, CONCAT(b.userName, ' ', b.userSurname) userFullName, b.userStatus, c.userStatusName"
+								+ "	from relationuserncompany a, userdetails b, refuserstatus c"
+								+ "	where b.userUniqueId 		= a.userUniqueId"
+									+ " and c.userStatusCode	= b.userStatus"
+									+ " and a.tin 		= '" + relationUserAndCompanyBean.getTin() + "'";
 			
-			if(!companyDetailsBean.getCompanyName().equals("")){
-				hql += " and a.companyDetailsBean like ('" + companyDetailsBean.getCompanyName() + "%')";
-			}
-			if(!companyDetailsBean.getTin().equals("")){
-				hql += " and a.tin like ('" + companyDetailsBean.getTin() + "%')";
-			}
-			if(!companyDetailsBean.getCompanyStatus().equals("")){
-				hql += " and a.companyStatus = '" + companyDetailsBean.getCompanyStatus() + "'";
+			if(!relationUserAndCompanyBean.getUserFullName().equals("")){
+				hql += " and CONCAT(b.userName, ' ', b.userSurname) like ('" + relationUserAndCompanyBean.getUserFullName() + "%')";
 			}
 			
 			logger.info("[searchByCriteria] hql :: " + hql);
 
 			query			= session.createSQLQuery(hql);			
+			query.addScalar("userUniqueId"		, new StringType());
 			query.addScalar("tin"				, new StringType());
-			query.addScalar("companyName"		, new StringType());
-			query.addScalar("branchName"		, new StringType());
-			query.addScalar("buildingName"		, new StringType());
-			query.addScalar("houseNumber"		, new StringType());
-			query.addScalar("mooNumber"			, new StringType());
-			query.addScalar("soiName"			, new StringType());
-			query.addScalar("streetName"		, new StringType());
-			query.addScalar("provinceCode"		, new StringType());
-			query.addScalar("districtCode"		, new StringType());
-			query.addScalar("subdistrictCode"	, new StringType());
-			query.addScalar("postCode"			, new StringType());
-			query.addScalar("tel"				, new StringType());
-			query.addScalar("fax"				, new StringType());
-			query.addScalar("email"				, new StringType());
-			query.addScalar("remark"			, new StringType());
-			query.addScalar("companyStatus"		, new StringType());
-			query.addScalar("companyStatusName"	, new StringType());
+			query.addScalar("userId"			, new StringType());
+			query.addScalar("userFullName"		, new StringType());
+			query.addScalar("userStatus"		, new StringType());
+			query.addScalar("userStatusName"	, new StringType());
 			
 			list		 	= query.list();
 			
 			logger.info("[searchByCriteria] list.size() :: " + list.size());
 			
 			for(Object[] row:list){
-				bean 	= new CompanyDetailsBean();
+				bean 	= new RelationUserAndCompanyBean();
 				
-				bean.setTin					(row[0].toString());
-				bean.setCompanyName			(row[1].toString());
-				bean.setBranchName			(row[2].toString());
-				bean.setBuildingName		(row[3].toString());
-				bean.setHouseNumber			(row[4].toString());
-				bean.setMooNumber			(row[5].toString());
-				bean.setSoiName				(row[6].toString());
-				bean.setStreetName			(row[7].toString());
+				bean.setUserUniqueId	(row[0].toString());
+				bean.setTin				(row[1].toString());
+				bean.setUserId			(row[2].toString());
+				bean.setUserFullName	(row[3].toString());
+				bean.setUserStatus		(row[4].toString());
+				bean.setUserStatusName	(row[5].toString());
+				bean.setSeq				(String.valueOf(seq));
 				
-				provinceCode 		= EnjoyUtils.nullToStr(row[8].toString());
-				districtCode 		= EnjoyUtils.nullToStr(row[9].toString());
-				subdistrictCode 	= EnjoyUtils.nullToStr(row[10].toString());
-				provinceName		= addressDao.getProvinceName(provinceCode);
-				districtName		= addressDao.getDistrictName(districtCode);
-				subdistrictName		= addressDao.getSubdistrictName(subdistrictCode);
-				
-				
-				bean.setProvinceCode		(provinceCode);
-				bean.setDistrictCode		(districtCode);
-				bean.setSubdistrictCode		(subdistrictCode);
-				bean.setProvinceName		(provinceName);
-				bean.setDistrictName		(districtName);
-				bean.setSubdistrictName		(subdistrictName);
-				bean.setPostCode			(row[11].toString());
-				bean.setTel					(row[12].toString());
-				bean.setFax					(row[13].toString());
-				bean.setEmail				(row[14].toString());
-				bean.setRemark				(row[15].toString());
-				bean.setCompanyStatus		(row[16].toString());
-				bean.setCompanyStatusName	(row[17].toString());
-				
-				companyDetailsBeanList.add(bean);
+				relationUserAndCompanyList.add(bean);
+				seq++;
 			}	
 			
 		}catch(Exception e){
@@ -126,171 +82,27 @@ public class RelationUserAndCompanyDao {
 			logger.info("[searchByCriteria][End]");
 		}
 		
-		return companyDetailsBeanList;
-		
-	}
-
-	
-	public CompanyDetailsBean getCompanyDetail(	Session 					session, 
-												CompanyDetailsBean 			companyDetailsBean) throws EnjoyException{
-		logger.info("[getCompanyDetail][Begin]");
-		
-		String						hql						= null;
-		SQLQuery 					query 					= null;
-		List<Object[]>				list					= null;
-		CompanyDetailsBean			bean					= null;
-		AddressDao					addressDao				= null;
-		String						provinceCode			= null;
-		String						districtCode			= null;
-		String						subdistrictCode			= null;
-		String						provinceName			= null;
-		String						districtName			= null;
-		String						subdistrictName			= null;
-		
-		try{		
-			addressDao 			= new AddressDao();
-			hql					= "select * "
-								+ "	from company"
-								+ "	where tin = '" + companyDetailsBean.getTin() + "'";
-			
-			logger.info("[getCompanyDetail] hql :: " + hql);
-
-			query			= session.createSQLQuery(hql);			
-			query.addScalar("tin"				, new StringType());
-			query.addScalar("companyName"		, new StringType());
-			query.addScalar("branchName"		, new StringType());
-			query.addScalar("buildingName"		, new StringType());
-			query.addScalar("houseNumber"		, new StringType());
-			query.addScalar("mooNumber"			, new StringType());
-			query.addScalar("soiName"			, new StringType());
-			query.addScalar("streetName"		, new StringType());
-			query.addScalar("provinceCode"		, new StringType());
-			query.addScalar("districtCode"		, new StringType());
-			query.addScalar("subdistrictCode"	, new StringType());
-			query.addScalar("postCode"			, new StringType());
-			query.addScalar("tel"				, new StringType());
-			query.addScalar("fax"				, new StringType());
-			query.addScalar("email"				, new StringType());
-			query.addScalar("remark"			, new StringType());
-			query.addScalar("companyStatus"		, new StringType());
-			
-			list		 	= query.list();
-			
-			logger.info("[getCompanyDetail] list.size() :: " + list.size());
-			
-			if(list.size()==1){
-				for(Object[] row:list){
-					bean 	= new CompanyDetailsBean();
-					
-					bean.setTin					(row[0].toString());
-					bean.setCompanyName			(row[1].toString());
-					bean.setBranchName			(row[2].toString());
-					bean.setBuildingName		(row[3].toString());
-					bean.setHouseNumber			(row[4].toString());
-					bean.setMooNumber			(row[5].toString());
-					bean.setSoiName				(row[6].toString());
-					bean.setStreetName			(row[7].toString());
-					
-					provinceCode 		= EnjoyUtils.nullToStr(row[8].toString());
-					districtCode 		= EnjoyUtils.nullToStr(row[9].toString());
-					subdistrictCode 	= EnjoyUtils.nullToStr(row[10].toString());
-					provinceName		= addressDao.getProvinceName(provinceCode);
-					districtName		= addressDao.getDistrictName(districtCode);
-					subdistrictName		= addressDao.getSubdistrictName(subdistrictCode);
-					
-					
-					bean.setProvinceCode		(provinceCode);
-					bean.setDistrictCode		(districtCode);
-					bean.setSubdistrictCode		(subdistrictCode);
-					bean.setProvinceName		(provinceName);
-					bean.setDistrictName		(districtName);
-					bean.setSubdistrictName		(subdistrictName);
-					
-					bean.setPostCode			(row[11].toString());
-					bean.setTel					(row[12].toString());
-					bean.setFax					(row[13].toString());
-					bean.setEmail				(row[14].toString());
-					bean.setRemark				(row[15].toString());
-					bean.setCompanyStatus		(row[16].toString());
-					
-				}	
-			}
-			
-			
-			
-		}catch(Exception e){
-			logger.info("[getCompanyDetail] " + e.getMessage());
-			e.printStackTrace();
-			throw new EnjoyException("error getCompanyDetail");
-		}finally{
-			hql						= null;
-			logger.info("[getCompanyDetail][End]");
-		}
-		
-		return bean;
+		return relationUserAndCompanyList;
 		
 	}
 	
-	public List<ComboBean> getCompanystatusCombo(Session session) throws EnjoyException{
-		logger.info("[getCompanystatusCombo][Begin]");
+	public int checkDupUser(String 	userUniqueId, String notInUserUniqueId) throws EnjoyException{
+		logger.info("[checkDupUser][Begin]");
 		
-		String						hql						= null;
-		SQLQuery 					query 					= null;
-		List<Object[]>				list					= null;
-		ComboBean					comboBean				= null;
-		List<ComboBean> 			comboList				= new ArrayList<ComboBean>();
-		
-		try{
-			
-			hql	= "select * from refcompanystatus";
-
-			logger.info("[getCompanystatusCombo] hql :: " + hql);
-			
-			query			= session.createSQLQuery(hql);
-			query.addScalar("companyStatusCode"		, new StringType());
-			query.addScalar("companyStatusName"		, new StringType());
-			
-			list		 	= query.list();
-			
-			comboList.add(new ComboBean("", "กรุณาระบุ"));
-			for(Object[] row:list){
-				comboBean = new ComboBean();
-				
-				logger.info("[getCompanystatusCombo] companyStatusCode :: " + row[0].toString());
-				logger.info("[getCompanystatusCombo] companyStatusName :: " + row[1].toString());
-				
-				comboBean.setCode(row[0].toString());
-				comboBean.setDesc(row[1].toString());
-				
-				comboList.add(comboBean);
-			}
-			
-			
-		}catch(Exception e){
-			e.printStackTrace();
-			logger.info("[getCompanystatusCombo] " + e.getMessage());
-			throw new EnjoyException("Error getCompanystatusCombo");
-		}finally{
-			hql						= null;
-			logger.info("[getCompanystatusCombo][End]");
-		}
-		
-		return comboList;
-		
-	}
-	
-	
-	public int checkDupTin(Session session, String tin) throws EnjoyException{
-		logger.info("[checkDupTin][Begin]");
-		
-		String							hql									= null;
-		List<Integer>			 		list								= null;
-		SQLQuery 						query 								= null;
-		int 							result								= 0;
+		String						hql					= null;
+		List<Integer>			 	list				= null;
+		SQLQuery 					query 				= null;
+		int 						result				= 0;
+		SessionFactory 				sessionFactory		= null;
+		Session 					session				= null;
 		
 		
 		try{
-			hql				= "Select count(*) cou from company where tin = '" + tin + "'";
+			sessionFactory 				= HibernateUtil.getSessionFactory();
+			session 					= sessionFactory.openSession();			
+			
+			hql				= "select count(*) cou from relationuserncompany"
+								+ " where userUniqueId 	= " + userUniqueId + " and not in (" + notInUserUniqueId + ")";
 			
 			query			= session.createSQLQuery(hql);
 			
@@ -302,122 +114,73 @@ public class RelationUserAndCompanyDao {
 				result = list.get(0);
 			}
 			
-			logger.info("[checkDupTin] result 			:: " + result);
+			logger.info("[checkDupUser] result 			:: " + result);
 			
 			
 			
 		}catch(Exception e){
 			logger.info(e.getMessage());
-			throw new EnjoyException(e.getMessage());
+			e.printStackTrace();
 		}finally{
+			session.close();
 			
-			hql									= null;
-			list								= null;
-			query 								= null;
-			logger.info("[checkDupTin][End]");
+			sessionFactory	= null;
+			session			= null;
+			hql				= null;
+			list			= null;
+			query 			= null;
+			logger.info("[checkDupUser][End]");
 		}
 		
 		return result;
 	}
-
 	
-	public void insertCompanyDetail(Session session, CompanyDetailsBean companyDetailsBean) throws EnjoyException{
-		logger.info("[insertCompanyDetail][Begin]");
+	public void insertRelationUserAndCompany(Session session, RelationUserAndCompanyBean relationUserAndCompanyBean) throws EnjoyException{
+		logger.info("[insertRelationUserAndCompany][Begin]");
 		
-		Company						company						= null;
+		Relationuserncompany	relationuserncompany	= null;
 		
 		try{
 			
-			company = new Company();
+			relationuserncompany = new Relationuserncompany();
 			
-			company.setTin				(companyDetailsBean.getTin());
-			company.setCompanyName		(companyDetailsBean.getCompanyName());
-			company.setBranchName		(companyDetailsBean.getBranchName());
-			company.setBuildingName		(companyDetailsBean.getBuildingName());
-			company.setHouseNumber		(companyDetailsBean.getHouseNumber());
-			company.setMooNumber		(companyDetailsBean.getMooNumber());
-			company.setSoiName			(companyDetailsBean.getSoiName());
-			company.setStreetName		(companyDetailsBean.getStreetName());
-			company.setProvinceCode		(companyDetailsBean.getProvinceCode());
-			company.setDistrictCode		(companyDetailsBean.getDistrictCode());
-			company.setSubdistrictCode	(companyDetailsBean.getSubdistrictCode());
-			company.setPostCode			(companyDetailsBean.getPostCode());
-			company.setTel				(companyDetailsBean.getTel());
-			company.setFax				(companyDetailsBean.getFax());
-			company.setEmail			(companyDetailsBean.getEmail());
-			company.setRemark			(companyDetailsBean.getRemark());
-			company.setCompanyStatus	(companyDetailsBean.getCompanyStatus());
+			relationuserncompany.setTin				(relationUserAndCompanyBean.getTin());
+			relationuserncompany.setUserUniqueId	(EnjoyUtils.parseInt(relationUserAndCompanyBean.getUserUniqueId()));
 			
-			session.saveOrUpdate(company);
+			session.saveOrUpdate(relationuserncompany);
 			
 		}catch(Exception e){
 			e.printStackTrace();
 			logger.info(e.getMessage());
-			throw new EnjoyException("Error insertCompanyDetail");
+			throw new EnjoyException("Error insertRelationUserAndCompany");
 		}finally{
-			
-			company = null;
-			logger.info("[insertCompanyDetail][End]");
+			relationuserncompany = null;
+			logger.info("[insertRelationUserAndCompany][End]");
 		}
 	}
 	
-	public void updateCompanyDetail(Session session, CompanyDetailsBean companyDetailsBean) throws EnjoyException{
-		logger.info("[updateCompanyDetail][Begin]");
+	public void deleteRelationUserAndCompany(Session session, String tin) throws EnjoyException{
+		logger.info("[deleteRelationUserAndCompany][Begin]");
 		
 		String							hql									= null;
 		Query 							query 								= null;
-		int 							result								= 0;
-		
 		
 		try{
-			hql				= "update  Company set companyName 			= :companyName"
-												+ ", branchName			= :branchName"
-												+ ", buildingName		= :buildingName"
-												+ ", houseNumber		= :houseNumber"
-												+ ", mooNumber			= :mooNumber"
-												+ ", soiName			= :soiName"
-												+ ", streetName			= :streetName"
-												+ ", provinceCode 		= :provinceCode"
-												+ ", districtCode 		= :districtCode"
-												+ ", subdistrictCode 	= :subdistrictCode"
-												+ ", postCode 			= :postCode"
-												+ ", tel 				= :tel"
-												+ ", fax 				= :fax"
-												+ ", email 				= :email"
-												+ ", remark 			= :remark"
-												+ ", companyStatus 		= :companyStatus"
-										+ " where tin = :tin";
+			hql				= "delete Relationuserncompany t"
+							+ " where t.tin	 = '" + tin + "'";
 			
 			query = session.createQuery(hql);
-			query.setParameter("tin"				, companyDetailsBean.getTin());
-			query.setParameter("companyName"		, companyDetailsBean.getCompanyName());
-			query.setParameter("branchName"			, companyDetailsBean.getBranchName());
-			query.setParameter("buildingName"		, companyDetailsBean.getBuildingName());
-			query.setParameter("houseNumber"		, companyDetailsBean.getHouseNumber());
-			query.setParameter("mooNumber"			, companyDetailsBean.getMooNumber());
-			query.setParameter("soiName"			, companyDetailsBean.getSoiName());
-			query.setParameter("streetName"			, companyDetailsBean.getStreetName());
-			query.setParameter("provinceCode"		, companyDetailsBean.getProvinceCode());
-			query.setParameter("districtCode"		, companyDetailsBean.getDistrictCode());
-			query.setParameter("subdistrictCode"	, companyDetailsBean.getSubdistrictCode());
-			query.setParameter("postCode"			, companyDetailsBean.getPostCode());
-			query.setParameter("tel"				, companyDetailsBean.getTel());
-			query.setParameter("fax"				, companyDetailsBean.getFax());
-			query.setParameter("email"				, companyDetailsBean.getEmail());
-			query.setParameter("remark"				, companyDetailsBean.getRemark());
-			query.setParameter("companyStatus"		, companyDetailsBean.getCompanyStatus());
 			
-			result = query.executeUpdate();
-			
+			query.executeUpdate();			
 		}catch(Exception e){
 			e.printStackTrace();
 			logger.info(e.getMessage());
-			throw new EnjoyException("Error updateCompanyDetail");
+			throw new EnjoyException("เกิดข้อผิดพลาดในการลบข้อมูล");
 		}finally{
 			
 			hql									= null;
 			query 								= null;
-			logger.info("[updateCompanyDetail][End]");
+			logger.info("[deleteRelationUserAndCompany][End]");
 		}
 	}
 	

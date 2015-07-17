@@ -7,6 +7,7 @@ import java.util.List;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 
@@ -16,6 +17,7 @@ import th.go.stock.app.enjoy.exception.EnjoyException;
 import th.go.stock.app.enjoy.model.Company;
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
 import th.go.stock.app.enjoy.utils.EnjoyUtils;
+import th.go.stock.app.enjoy.utils.HibernateUtil;
 
 public class CompanyDetailsDao {
 	
@@ -45,7 +47,7 @@ public class CompanyDetailsDao {
 								+ "	where b.companyStatusCode = a.companyStatus ";
 			
 			if(!companyDetailsBean.getCompanyName().equals("")){
-				hql += " and a.companyDetailsBean like ('" + companyDetailsBean.getCompanyName() + "%')";
+				hql += " and a.companyName like ('" + companyDetailsBean.getCompanyName() + "%')";
 			}
 			if(!companyDetailsBean.getTin().equals("")){
 				hql += " and a.tin like ('" + companyDetailsBean.getTin() + "%')";
@@ -419,6 +421,95 @@ public class CompanyDetailsDao {
 			query 								= null;
 			logger.info("[updateCompanyDetail][End]");
 		}
+	}
+	
+	public List<ComboBean> companyNameList(String companyName){
+		logger.info("[companyNameList][Begin]");
+		
+		String 						hql			 		= null;
+        SessionFactory 				sessionFactory		= null;
+		Session 					session				= null;
+		SQLQuery 					query 				= null;
+		List<Object[]>				list				= null;
+		List<ComboBean>				comboList 			= null;
+		ComboBean					comboBean			= null;
+		
+		try{
+			sessionFactory 		= HibernateUtil.getSessionFactory();
+			session 			= sessionFactory.openSession();
+			comboList			=  new ArrayList<ComboBean>();
+			hql 				= " select tin, companyName from company where companyName like ('"+companyName+"%') and companyStatus = 'A' order by companyName asc limit 10 ";
+			
+			logger.info("[companyNameList] hql :: " + hql);
+			
+			query			= session.createSQLQuery(hql);
+			query.addScalar("tin"			, new StringType());
+			query.addScalar("companyName"			, new StringType());
+			
+			list		 	= query.list();
+			
+			logger.info("[getProductTypeList] list.size() :: " + list.size());
+			
+			for(Object[] row:list){
+				comboBean 	= new ComboBean();
+				
+				logger.info("tin 		:: " + row[0].toString());
+				logger.info("companyName 		:: " + row[1].toString());
+				
+				comboBean.setCode				(row[0].toString());
+				comboBean.setDesc				(row[1].toString());
+				
+				comboList.add(comboBean);
+			}	
+			
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally{
+			session.close();
+			sessionFactory	= null;
+			session			= null;
+			logger.info("[companyNameList][End]");
+		}
+		
+		return comboList;
+	}
+	
+	public String getTin(String companyName){
+		logger.info("[getTin][Begin]");
+		
+		String 						hql			 		= null;
+        SessionFactory 				sessionFactory		= null;
+		Session 					session				= null;
+		SQLQuery 					query 				= null;
+		List<String>			 	list				= null;
+        String						tin					= null;
+		
+		try{
+			sessionFactory 		= HibernateUtil.getSessionFactory();
+			session 			= sessionFactory.openSession();
+			hql 		= " select tin from company where companyStatus = 'A' and companyName = '" + companyName + "'";
+			
+			logger.info("[getTin] hql :: " + hql);
+			
+			query			= session.createSQLQuery(hql);
+			query.addScalar("tin"			, new StringType());
+			
+			list		 	= query.list();
+			
+			if(list!=null && list.size() > 0){
+				tin = list.get(0);
+			}
+			
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally{
+			session.close();
+			sessionFactory	= null;
+			session			= null;
+			logger.info("[getTin][End]");
+		}
+		
+		return tin;
 	}
 	
 }

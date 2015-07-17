@@ -18,6 +18,8 @@ public class UserDetailsBean {
 	private String  						currentDate			  = null;
 	private String							userEmail			  = null;
 	private String							errMsg				  = null;
+	private String							userFullName		  = null;
+	private String							userStatusName		  = null;
 	
 	public UserDetailsBean(){
 		this.userUniqueId		= 0;
@@ -34,6 +36,8 @@ public class UserDetailsBean {
 		this.currentDate		= "";
 		this.userEmail			= "";
 		this.errMsg			    = "";
+		this.userFullName		= "";
+		this.userStatusName		= "";
 	}
 
 	public int getUserUniqueId() {
@@ -146,5 +150,21 @@ public class UserDetailsBean {
 
 	public void setFlagAlertStock(String flagAlertStock) {
 		this.flagAlertStock = flagAlertStock;
+	}
+
+	public String getUserFullName() {
+		return userFullName;
+	}
+
+	public void setUserFullName(String userFullName) {
+		this.userFullName = userFullName;
+	}
+
+	public String getUserStatusName() {
+		return userStatusName;
+	}
+
+	public void setUserStatusName(String userStatusName) {
+		this.userStatusName = userStatusName;
 	}
 }

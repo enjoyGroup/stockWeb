@@ -18,6 +18,7 @@ import org.hibernate.type.StringType;
 import th.go.stock.app.enjoy.bean.ComboBean;
 import th.go.stock.app.enjoy.bean.UserDetailsBean;
 import th.go.stock.app.enjoy.exception.EnjoyException;
+import th.go.stock.app.enjoy.form.UserDetailsLookUpForm;
 import th.go.stock.app.enjoy.form.UserDetailsMaintananceForm;
 import th.go.stock.app.enjoy.model.Userdetail;
 import th.go.stock.app.enjoy.model.Userprivilege;
@@ -214,7 +215,7 @@ public class UserDetailsDao {
 										+ ", a.flagAlertStock"
 										+ ", b.userStatusName"
 								+ "	from userdetails a, refuserstatus b "
-								+ "	where a.userStatus = b.userStatusCode "
+								+ "	where b.userStatusCode = a.userStatus "
 								+ " 	and a.userId <> 'admin'";
 			
 			if(!userdetailForm.getUserName().equals("")){
@@ -605,6 +606,141 @@ public class UserDetailsDao {
 			query 								= null;
 			logger.info("[changePassword][End]");
 		}
+	}
+	
+	public List<ComboBean> userFullNameList(String userFullName){
+		logger.info("[companyNameList][Begin]");
+		
+		String 						hql			 		= null;
+        SessionFactory 				sessionFactory		= null;
+		Session 					session				= null;
+		SQLQuery 					query 				= null;
+		List<Object[]>				list				= null;
+		List<ComboBean>				comboList 			= null;
+		ComboBean					comboBean			= null;
+		
+		try{
+			sessionFactory 		= HibernateUtil.getSessionFactory();
+			session 			= sessionFactory.openSession();
+			comboList			=  new ArrayList<ComboBean>();
+			hql 				= " select userUniqueId, CONCAT(userName, ' ', userSurname) userFullName"
+									+ " from userdetails"
+									+ " where CONCAT(userName, ' ', userSurname) like ('"+userFullName+"%')"
+											+ " and userStatus = 'A'"
+									+ " order by CONCAT(userName, ' ', userSurname) asc limit 10 ";
+			
+			logger.info("[userFullNameList] hql :: " + hql);
+			
+			query			= session.createSQLQuery(hql);
+			query.addScalar("userUniqueId"			, new StringType());
+			query.addScalar("userFullName"			, new StringType());
+			
+			list		 	= query.list();
+			
+			logger.info("[userFullNameList] list.size() :: " + list.size());
+			
+			for(Object[] row:list){
+				comboBean 	= new ComboBean();
+				
+				logger.info("userUniqueId 		:: " + row[0].toString());
+				logger.info("userFullName 		:: " + row[1].toString());
+				
+				comboBean.setCode				(row[0].toString());
+				comboBean.setDesc				(row[1].toString());
+				
+				comboList.add(comboBean);
+			}	
+			
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally{
+			session.close();
+			sessionFactory	= null;
+			session			= null;
+			logger.info("[userFullNameList][End]");
+		}
+		
+		return comboList;
+	}
+	
+	public List<UserDetailsBean> getUserDetailsLookUpList(	Session 					session, 
+															UserDetailsLookUpForm 		form) throws EnjoyException{
+		logger.info("[getUserDetailsLookUpList][Begin]");
+		
+		String					hql						= null;
+		SQLQuery 				query 					= null;
+		List<Object[]>			list					= null;
+		UserDetailsBean 		userDetailsBean			= null;
+		List<UserDetailsBean> 	listData 				= new ArrayList<UserDetailsBean>();
+		String					find					= null;
+		
+		try{
+			find				= form.getFind();
+			hql					= "select * from (select a.*, CONCAT(a.userName, ' ', a.userSurname) userFullName, b.userStatusName"
+													+ "	from userdetails a, refuserstatus b "
+													+ "	where b.userStatusCode = a.userStatus"
+													+ " 	and a.userId <> 'admin') t where 1=1";
+			
+			if(find!=null && !find.equals("")){
+				hql += " and t." + form.getColumn();
+				
+				if(form.getLikeFlag().equals("Y")){
+					hql += " like ('" + find + "%')";
+				}else{
+					hql += " = '" + find + "'";
+				}
+				
+			}
+			
+			hql += " order by t." + form.getOrderBy() + " " + form.getSortBy();
+			
+			logger.info("[getUserDetailsLookUpList] hql :: " + hql);
+
+			query			= session.createSQLQuery(hql);			
+			query.addScalar("userUniqueId"			, new IntegerType());
+			query.addScalar("userId"				, new StringType());
+			query.addScalar("userFullName"			, new StringType());
+			query.addScalar("userStatus"			, new StringType());
+			query.addScalar("userStatusName"		, new StringType());
+			
+			list		 	= query.list();
+			
+			logger.info("[getUserDetailsLookUpList] list :: " + list);
+			
+			if(list!=null){
+				logger.info("[getUserDetailsLookUpList] list.size() :: " + list.size());
+				
+				for(Object[] row:list){
+					userDetailsBean 		= new UserDetailsBean();
+					
+					logger.info("[getUserDetailsLookUpList] userUniqueId 	:: " + row[0]);
+					logger.info("[getUserDetailsLookUpList] userId 			:: " + row[1]);
+					logger.info("[getUserDetailsLookUpList] userFullName 	:: " + row[2]);
+					logger.info("[getUserDetailsLookUpList] userStatus 		:: " + row[3]);
+					logger.info("[getUserDetailsLookUpList] userStatusName 	:: " + row[4]);
+					
+					
+					userDetailsBean.setUserUniqueId			(EnjoyUtils.parseInt(row[0].toString()));
+					userDetailsBean.setUserId				(EnjoyUtils.nullToStr(row[1].toString()));
+					userDetailsBean.setUserFullName			(EnjoyUtils.nullToStr(row[2].toString()));
+					userDetailsBean.setUserStatus			(EnjoyUtils.nullToStr(row[3].toString()));
+					userDetailsBean.setUserStatusName		(EnjoyUtils.nullToStr(row[4].toString()));
+					
+					listData.add(userDetailsBean);
+				}	
+			}
+			
+		}catch(Exception e){
+			logger.info("[getLookUpList] " + e.getMessage());
+			e.printStackTrace();
+			throw new EnjoyException("เกิดข้อผิดพลาดในการดึง LookUp");
+		}finally{
+			hql						= null;
+			logger.info("[getLookUpList][End]");
+		}
+		
+		return listData;
+		
 	}
 	
 	
