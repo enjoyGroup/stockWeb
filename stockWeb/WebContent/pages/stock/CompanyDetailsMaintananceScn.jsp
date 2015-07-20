@@ -132,8 +132,6 @@
 			      }
 			});
 			
-
-			
 			gp_progressBarOff();
 			
 		});
@@ -593,7 +591,7 @@
 																name="postCode"
 																maxlength="5"
 																placeholder="รหัสไปรษณ๊ย์"
-																onblur="lp_onBlurPostCode();"
+																onchange="lp_onBlurPostCode();"
 																value="<%=companyDetailsBean.getPostCode() %>"
 														/>
 													</td>

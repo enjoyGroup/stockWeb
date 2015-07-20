@@ -11,12 +11,10 @@ final String pagesURL		= Constants.PAGE_URL;
 %>
 
 <!-- Begin css -->
-<link rel="stylesheet" href="<%=cssURL%>/jquery-ui.css" media="screen">
+<%-- <link rel="stylesheet" href="<%=cssURL%>/jquery-ui.css" media="screen"> --%>
 <link rel="stylesheet" href="<%=cssURL%>/jquery-ui-1.10.3.custom.css" media="screen">
-<!--[if lt IE 9]><script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
 <link rel="stylesheet" href="<%=cssURL%>/style.css" media="screen">
 
-<!--[if lte IE 7]><link rel="stylesheet" href="style.ie7.css" media="screen" /><![endif]-->
 <link rel="stylesheet" href="<%=cssURL%>/style.responsive.css" media="all">
 
 <link  href="<%=themeURL%>/css/bootstrap.css" rel="stylesheet">
@@ -35,11 +33,10 @@ final String pagesURL		= Constants.PAGE_URL;
 
 <link href="<%=cssURL%>/bootstrap-datetimepicker.min.css" rel="stylesheet" />
 <link href="<%=cssURL%>/bootstrap-responsive.css" rel="stylesheet" />
-<link href="<%=cssURL%>/bootstrap-responsive.min.css" rel="stylesheet" />
+<%--<link href="<%=cssURL%>/bootstrap-responsive.min.css" rel="stylesheet" /> --%>
 <link href="<%=cssURL%>/menu-styles.css" rel="stylesheet" />
 <link href="<%=cssURL%>/Enjoy.css" rel="stylesheet" />
 <link href="<%=cssURL%>/defaultTheme.css" rel="stylesheet" />
-
 <!-- End css -->
 
 <!-- Begin JS -->
@@ -61,18 +58,18 @@ final String pagesURL		= Constants.PAGE_URL;
 <script src="<%=themeURL%>/js/wysiwyg/jquery.hotkeys.js"></script>
 <script src="<%=themeURL%>/js/wysiwyg/bootstrap-wysiwyg.js"></script>
 <script src="<%=themeURL%>/js/app.plugin.js"></script>
-<script src="<%=themeURL%>/js/bootstrap.js" type="text/javascript"></script> 
+<%--<script src="<%=themeURL%>/js/bootstrap.js" type="text/javascript"></script> --%>
 <!-- End JS -->
 
 <script src="<%=jsURL%>/jquery-ui-1.10.3.custom.js" type="text/javascript"></script>
+<script src="<%=jsURL%>/jquery.corner.js" type="text/javascript"></script>
 <%--<script src="<%=jsURL%>/jquery-ui.js" type="text/javascript"></script> --%>
 <script src="<%=jsURL%>/EnjoyUtil.js" type="text/javascript"></script>
 <script src="<%=jsURL%>/jquery.tablesorter.js" type="text/javascript"></script>
 <script type="text/javascript" src="<%=jsURL%>/jquery.fixedheadertable.js"></script>
 <script type="text/javascript" src="<%=jsURL%>/jquery.ui.potato.menu.js"></script>
 <link rel=stylesheet href="<%=cssURL%>/jquery.ui.potato.menu.css">
-<link rel=stylesheet href="<%=cssURL%>/menu.css">
-    
+<link rel=stylesheet href="<%=cssURL%>/menu.css">    
     
     
     

@@ -3,7 +3,7 @@
 <html>
 	<head>
 		<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
-		<title>Chainart FC</title>
+		<title>Stock</title>
 		<%@ include file="/pages/include/enjoyInclude.jsp"%>
 		<style type="text/css">
 			@import url(http://fonts.googleapis.com/css?family=Roboto:400);
@@ -16,6 +16,7 @@
 			.container {
 			    padding: 25px;
 			    position: fixed;
+			    width: 100%;
 			}
 			
 			.form-login {
@@ -28,6 +29,7 @@
 			    border-color:#d2d2d2;
 			    border-width: 5px;
 			    box-shadow:0 1px 0 #cfcfcf;
+			    width: 25%;
 			}
 			
 			h4 { 
@@ -35,10 +37,6 @@
 			 border-bottom-width:1px;
 			 padding-bottom:10px;
 			 text-align: center;
-			}
-			
-			.form-control {
-			    border-radius: 10px;
 			}
 			
 			.wrapper {
@@ -85,6 +83,7 @@
 		} 
 		
 		$(document).ready(function(){
+			$(".form-login").corner();
 			$('#username').focus();				
 			$('#btnLogin').click(function(){
 				var url 	= '<%=servURL%>/EnjoyGenericSrv?service=servlet.LoginServlet';
@@ -140,22 +139,32 @@
 		</script>	
 	</head>
 	<body>
-		<div class="container">
-		    <div class="row">
-		        <div class="col-md-offset-5 col-md-3">
-		            <div class="form-login">
-		           	<img src="<%=imgURL%>/CHN300_1.png">
-		            <input id="username"  name="username" type="text"  maxlength="20" class="form-control input-sm chat-input" placeholder="username"  onkeydown="lp_changeEnterToTab_forPWD();" style="margin:4px; margin-top:12px;" />
-		            </br>
-		            <input id="user_pwd"  name="user_pwd"  type="password"  maxlength="50" class="form-control input-sm chat-input" placeholder="password" onkeydown="lp_changeEnterToTab_forPWD();" style="margin:4px"  />
-		            </br>
+		<div class="container" align="center">
+		    <div class="row" align="center" style="width: 100%;">
+		        <div class="form-login">
+		           	<img src="<%=imgURL%>/CHN300_1.png"><br/><br/>
+		            <input id="username"  
+		            	   name="username" 
+		            	   type="text"  
+		            	   maxlength="20" 
+		            	   placeholder="username"  
+		            	   onkeydown="lp_changeEnterToTab_forPWD();" 
+		            	   style="width: 100%;" />
+		            <br/><br/>
+		            <input id="user_pwd"  
+		            	   name="user_pwd"  
+		            	   type="password"  
+		            	   maxlength="50" 
+		            	   placeholder="password" 
+		            	   onkeydown="lp_changeEnterToTab_forPWD();" 
+		            	   style="width: 100%;"  />
+		            <br/>
 		            <div class="wrapper">
-		            <span class="group-btn">     
-		                <button type="submit" href="javascript:void(0)" id="btnLogin" class="btn btn-primary btn-md">Login &nbsp;<i class="fa fa-sign-in"></i></button>
-		            </span>
+			            <span class="group-btn">     
+			                <button type="submit" href="javascript:void(0)" id="btnLogin" class="btn btn-primary btn-md">Login &nbsp;<i class="fa fa-sign-in"></i></button>
+			            </span>
 		            </div>
-		            </div>		        
-		        </div>
+	            </div>	
 		    </div>
 		</div>
 	</body>

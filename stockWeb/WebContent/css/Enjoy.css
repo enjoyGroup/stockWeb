@@ -10,11 +10,11 @@
    height: 100%;
    background-color: #666;
    z-index: 9999;
-   filter:alpha(opacity=50);/* IE 5-7 */
-   -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";/* IE 8 */
-   -khtml-opacity: 0.50;/* Safari 1.x */
-   -moz-opacity:0.50;/* Netscape */
    opacity: 0.50;/* Good browsers */
+	-ms-filter: “alpha(opacity=50)”; /* ie 8 */
+	filter: alpha(opacity=50); /* ie lt 7 */
+	-khtml-opacity: 0.50;/* Safari 1.x */
+	-moz-opacity:0.50;/* Netscape */
    padding-top: 20%;
 }
 
@@ -27,20 +27,20 @@
 .rowSelect:hover{
     background-color:#FFFF99;
     color:black;
-    filter:alpha(opacity=75);/* IE 5-7 */
-   -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=75)";/* IE 8 */
-   -khtml-opacity: 0.75;/* Safari 1.x */
-   -moz-opacity:0.75;/* Netscape */
-   opacity: 0.75;/* Good browsers */
+    opacity: 0.75;/* Good browsers */
+	-ms-filter: “alpha(opacity=75)”; /* ie 8 */
+	filter: alpha(opacity=75); /* ie lt 7 */
+	-khtml-opacity: 0.75;/* Safari 1.x */
+	-moz-opacity:0.75;/* Netscape */
     cursor: pointer;
 }
 
 .btn-unSelect{
-    filter:alpha(opacity=30);/* IE 5-7 */
-   -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=30)";/* IE 8 */
-   -khtml-opacity: 0.30;/* Safari 1.x */
-   -moz-opacity:0.30;/* Netscape */
-   opacity: 0.30;/* Good browsers */
+	opacity: 0.30;/* Good browsers */
+	-ms-filter: “alpha(opacity=30)”; /* ie 8 */
+	filter: alpha(opacity=75); /* ie lt 7 */
+	-khtml-opacity: 0.30;/* Safari 1.x */
+	-moz-opacity:0.30;/* Netscape */
 }
 
 .txt-unSelect{

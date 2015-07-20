@@ -1,9 +1,8 @@
 @CHARSET "UTF-8";
 
-.potato-menu-item {
-        width:160px;
+	.potato-menu-item {
         font-size:13px;
-        background:#333;
+        background:black;
         background:rgba(0,0,0,0.9);
     }
     .potato-menu-group {

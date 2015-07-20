@@ -29,7 +29,7 @@
 	list-style-position:outside;
 	display:inline;
 	margin:0;
-	float:left;
+	float:right;
 }
 .potato-menu .potato-menu-item a {
 	display:block;

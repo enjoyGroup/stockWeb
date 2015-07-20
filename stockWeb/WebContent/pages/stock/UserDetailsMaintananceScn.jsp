@@ -30,7 +30,8 @@
 			gp_progressBarOn();
 			
 			gv_service 		= "service=" + $('#service').val();
-			$('#menu1').ptMenu();
+			
+			$("#circlePic").corner("80px");
 			
 			if($("#pageMode").val()=="EDIT"){
 				lp_setModeEdit();
@@ -323,130 +324,134 @@
 			<h4 class="alert-heading">ผู้ดูแลระบบ/จัดการผู้ใช้งาน</h4>
 		</div>					          	
 		<div class="container main-container round-sm padding-xl-h">
-
 				<div class="col-sm-12 toppad" >
-					
-						
 						<div id="seasonTitle" class="padding-md round-sm season-title-head" style="">
 							<h6 class="panel-title" style="font-size:1.0em">เพิ่มผู้ใช้งานระบบ</h6>
 						</div>
-																	
-																	
            				<div class="panel-body">
-               					<div class="col-md-2 col-md-offset-2 padding-xl " align="center">
-									<img src="<%=imgURL%>/add_user.png" class="img-circle" width="100" style="border:4px solid #ccc">
-								</div>
-               						<div class=" col-md-8 line-left"> 
-										<table class="table user-register-table" style="border-bottom-color: white;">
-											<tr>
-								        		<td align="right" width="30px">
-													ชื่อ <span style="color: red;"><b>*</b></span> : &nbsp;
-												</td>
-							        			<td align="left" width="200px">
-							        				<input type='text' id="userName" name='userName' value="<%=userDetailsBean.getUserName() %>" maxlength="50" style="width: 250px;" />
-							        			</td>
-								        	</tr>
-								        	<tr>
-							        			<td align="right">
-							        				นามสกุล <span style="color: red;"><b>*</b></span> : &nbsp;
-							        			</td>
-							        			<td align="left">
-							        				<input type='text' id="userSurname" name='userSurname' value="<%=userDetailsBean.getUserSurname() %>" maxlength="100" style="width: 250px;" />
-							        			</td>
-							        		</tr>
-							        		<tr>
-							        			<td align="right">
-							        				User ID <span style="color: red;"><b>*</b></span> : &nbsp;
-							        			</td>
-							        			<td align="left">
-							        				<input type='text' id="userId" name='userId' value="<%=userDetailsBean.getUserId() %>" onchange="lp_checkDupUserId();" maxlength="20" style="width: 250px;" />
-							        				&nbsp;
-							        				<span id="inValidSpan"></span>
-							        			</td>
-							        		</tr>
-							        		<tr>
-							        			<td align="right">
-							        				E-mail <span style="color: red;"><b>*</b></span> : &nbsp;
-							        			</td>
-							        			<td align="left">
-							        				<input type="text" id="userEmail" name="userEmail" value="<%=userDetailsBean.getUserEmail()%>" maxlength="100" style="width: 250px;" />
-							        			</td>
-							        		</tr>
-							        		<tr>
-							        			<td align="right">
-							        				สถานะ :&nbsp;
-							        			</td>
-							        			<td align="left">
-							        				<select id="userStatus" name="userStatus" style="width: 250px;">
-							        					<% for(ComboBean comboBean:refuserstatusCombo){ %>
-							        					<option value="<%=comboBean.getCode()%>" <%if(userDetailsBean.getUserStatus().equals(comboBean.getCode())){ %> selected <%} %> ><%=comboBean.getDesc()%></option>
-							        					<%} %>
-							        				</select>
-							        			</td>
-							        		</tr>
-							        		<tr>
-							        			<td align="right">
-							        				<input type="checkbox" id="flagChangePassword" name="flagChangePassword" value="Y" <%if(userDetailsBean.getFlagChangePassword().equals("Y")){ %> checked="checked" <%} %> /> :&nbsp;
-							        			</td>
-							        			<td align="left">
-							        				ต้องการเปลี่ยนรหัสผ่านเมื่อ Login ครั้งแรก
-							        			</td>
-								        	</tr>
-								        	<tr>
-							        			<td align="right">
-							        				<input type="checkbox" id="flagAlertStock" name="flagAlertStock" value="Y" <%if(userDetailsBean.getFlagAlertStock().equals("Y")){ %> checked="checked" <%} %> /> :&nbsp;
-							        			</td>
-							        			<td align="left">
-							        				ต้องการรับ E-mail แจ้งเตือนเมื่อสินค้าลดเหลือถึงกำหนด
-							        			</td>
-								        	</tr>
-								        </table>
-								        <table class="user-register-table" style="margin-left:40px" width="80%" border="0" cellpadding="5" cellspacing="5">
-							        		<tr>
-							        			<td align="left" colspan="4">
-							        				สิทธิ์การใช้ระบบ
-							        			</td>
-							        		</tr>
-								        		
-								        		<%
-								        			for(Userprivilege beanUserprivilege:userprivilegeList){
-								        		%>
-								        		<%if(couChkRow==0){ %><tr><%} %>
+           					<table border="0" width="100%">
+           						<tr>
+           							<td align="center" width="30%" valign="top">
+           								<div style="width: 200px;height: 200px;border:4px solid #ccc;overflow: hidden;" id="circlePic">
+           									<img src="<%=imgURL%>/add_user.png" width="200px" height="200px" border="0" />
+           								</div>
+           							</td>
+           							<td align="left" width="70%">
+           								<div class=" col-md-8 line-left"> 
+											<table class="table user-register-table" style="border-bottom-color: white;">
+												<tr>
+									        		<td align="right" width="30px">
+														ชื่อ <span style="color: red;"><b>*</b></span> : &nbsp;
+													</td>
+								        			<td align="left" width="200px">
+								        				<input type='text' id="userName" name='userName' value="<%=userDetailsBean.getUserName() %>" maxlength="50" style="width: 250px;" />
+								        			</td>
+									        	</tr>
+									        	<tr>
 								        			<td align="right">
-								        				<input type="checkbox" id="chkUserPrivilege<%=beanUserprivilege.getPrivilegeCode() %>" name="chkUserPrivilege" value="<%=beanUserprivilege.getPrivilegeCode() %>" /> :&nbsp;
+								        				นามสกุล <span style="color: red;"><b>*</b></span> : &nbsp;
 								        			</td>
 								        			<td align="left">
-								        				<%=beanUserprivilege.getPrivilegeName() %>
+								        				<input type='text' id="userSurname" name='userSurname' value="<%=userDetailsBean.getUserSurname() %>" maxlength="100" style="width: 250px;" />
 								        			</td>
-								        		<%if(couChkRow==1){ %>
 								        		</tr>
-								        		<%}
-								        			if(couChkRow==1){
-								        				couChkRow=0;
-								        			}else{
-								        				couChkRow++;
-								        			}
-								        			
-								        		} %>
-										</table>	
-										<br/>              
-									</div>
-									<div>
-										<span class="pull-right">
-					        				<input type="button" id="btnSave" class="btn btn-sm btn-warning" value='บันทึก' onclick="lp_save();" />&nbsp;&nbsp;&nbsp;
-					        				
-					        				<%if(pageMode.equals(userDetailsMaintananceForm.EDIT)){%>
-					        				<input type="button" id="btnResetPass" class="btn btn-sm btn-warning" value='Reset Password' onclick="lp_resetPass();" />&nbsp;&nbsp;&nbsp;
-					        				<%}%>
-					        				
-	     									<input type="button" id="btnReset" onclick="lp_reset();" class="btn btn-sm btn-danger" value='เริ่มใหม่' />
-	     								</span>
-									</div>
-								</div>
-				            </div>          
+								        		<tr>
+								        			<td align="right">
+								        				User ID <span style="color: red;"><b>*</b></span> : &nbsp;
+								        			</td>
+								        			<td align="left">
+								        				<input type='text' id="userId" name='userId' value="<%=userDetailsBean.getUserId() %>" onchange="lp_checkDupUserId();" maxlength="20" style="width: 250px;" />
+								        				&nbsp;
+								        				<span id="inValidSpan"></span>
+								        			</td>
+								        		</tr>
+								        		<tr>
+								        			<td align="right">
+								        				E-mail <span style="color: red;"><b>*</b></span> : &nbsp;
+								        			</td>
+								        			<td align="left">
+								        				<input type="text" id="userEmail" name="userEmail" value="<%=userDetailsBean.getUserEmail()%>" maxlength="100" style="width: 250px;" />
+								        			</td>
+								        		</tr>
+								        		<tr>
+								        			<td align="right">
+								        				สถานะ :&nbsp;
+								        			</td>
+								        			<td align="left">
+								        				<select id="userStatus" name="userStatus" style="width: 250px;">
+								        					<% for(ComboBean comboBean:refuserstatusCombo){ %>
+								        					<option value="<%=comboBean.getCode()%>" <%if(userDetailsBean.getUserStatus().equals(comboBean.getCode())){ %> selected <%} %> ><%=comboBean.getDesc()%></option>
+								        					<%} %>
+								        				</select>
+								        			</td>
+								        		</tr>
+								        		<tr>
+								        			<td align="right">
+								        				<input type="checkbox" id="flagChangePassword" name="flagChangePassword" value="Y" <%if(userDetailsBean.getFlagChangePassword().equals("Y")){ %> checked="checked" <%} %> /> :&nbsp;
+								        			</td>
+								        			<td align="left">
+								        				ต้องการเปลี่ยนรหัสผ่านเมื่อ Login ครั้งแรก
+								        			</td>
+									        	</tr>
+									        	<tr>
+								        			<td align="right">
+								        				<input type="checkbox" id="flagAlertStock" name="flagAlertStock" value="Y" <%if(userDetailsBean.getFlagAlertStock().equals("Y")){ %> checked="checked" <%} %> /> :&nbsp;
+								        			</td>
+								        			<td align="left">
+								        				ต้องการรับ E-mail แจ้งเตือนเมื่อสินค้าลดเหลือถึงกำหนด
+								        			</td>
+									        	</tr>
+									        </table>
+									        <table class="user-register-table" style="margin-left:40px" width="80%" border="0" cellpadding="5" cellspacing="5">
+								        		<tr>
+								        			<td align="left" colspan="4">
+								        				สิทธิ์การใช้ระบบ
+								        			</td>
+								        		</tr>
+									        		
+									        		<%
+									        			for(Userprivilege beanUserprivilege:userprivilegeList){
+									        		%>
+									        		<%if(couChkRow==0){ %><tr><%} %>
+									        			<td align="right">
+									        				<input type="checkbox" id="chkUserPrivilege<%=beanUserprivilege.getPrivilegeCode() %>" name="chkUserPrivilege" value="<%=beanUserprivilege.getPrivilegeCode() %>" /> :&nbsp;
+									        			</td>
+									        			<td align="left">
+									        				<%=beanUserprivilege.getPrivilegeName() %>
+									        			</td>
+									        		<%if(couChkRow==1){ %>
+									        		</tr>
+									        		<%}
+									        			if(couChkRow==1){
+									        				couChkRow=0;
+									        			}else{
+									        				couChkRow++;
+									        			}
+									        			
+									        		} %>
+											</table>	
+											<br/>    
+											<div align="right" style="width: 100%;">
+												<span>
+							        				<input type="button" id="btnSave" class="btn btn-sm btn-warning" value='บันทึก' onclick="lp_save();" />&nbsp;&nbsp;&nbsp;
+							        				
+							        				<%if(pageMode.equals(userDetailsMaintananceForm.EDIT)){%>
+							        				<input type="button" id="btnResetPass" class="btn btn-sm btn-warning" value='Reset Password' onclick="lp_resetPass();" />&nbsp;&nbsp;&nbsp;
+							        				<%}%>
+							        				
+			     									<input type="button" id="btnReset" onclick="lp_reset();" class="btn btn-sm btn-danger" value='เริ่มใหม่' />
+			     								</span>
+											</div>          
+										</div>
+           							</td>
+           						</tr>
+           					</table>
+               						
 						</div>
+		            </div>          
+				</div>
 						    
-		</section>
+				</section>
 		</section>
 		</section>
 			<a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>

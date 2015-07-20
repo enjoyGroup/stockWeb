@@ -227,56 +227,54 @@
 			<div id="seasonTitle" class="padding-md round-sm season-title-head" style="">
 				<h6 class="panel-title" style="font-size:1.0em">ข้อมูล</h6>
 			</div>
-			<div class="datagrid">
-				<table class="table sim-panel-result-table" id="tbl_result" border="1" width="100%" style="margin-bottom:0px !important">
-					<thead> 
-		               <tr height="26px;">
-							<th  style="text-align: center;" width="15%"><B>ลำดับ</B></th>
-							<th  style="text-align: center;" width="40%"><B>ชื่อ-นามสกุล</B></th> 
-							<th  style="text-align: center;" width="20%"><B>รหัสผู้ใช้งาน</B></th>
-							<th  style="text-align: center;" width="25%"><B>สถานะ</B></th>
-						</tr> 
-					</thead>
-					<tfoot>
-						<tr height="26px;">
-							<td colspan="6" align="right">
-								<span style="top: -3px;">จำนวน&nbsp;</span>
-								<input type="text" id="i_txt_nvt_totalresult" name="i_txt_nvt_totalresult" style="top:0px;left:0px;width: 50px;"  readonly="readonly" value="<%=userDetailsLookUpForm.getTotalRecord()%>" >
-								<span style="top: -3px;">&nbsp;รายการ&nbsp;&nbsp;</span>
-								<img id="i_img_nvt_first" name="i_img_nvt_first" src="<%=imgURL%>/first.gif" style="cursor:hand;top:1px;" title="First" onclick="lp_first_page();">
-								<img id="i_img_nvt_prev"  name="i_img_nvt_prev"  src="<%=imgURL%>/prv.gif"   style="cursor:hand;top:1px;" title="Previous" onclick="lp_previous_page();">
-								<input type="text" id="selPage" name="selPage" style="top:0px;left:0px;width: 30px;text-align: right;" maxlength="3" readonly="readonly" value="<%=userDetailsLookUpForm.getPageNum()%>">
-			
-								<span class="c_field_label" style="top:-5px;">/</span>
-								<span id="i_txt_nvt_total" class="c_field_label" style="top:-5px;" name="i_txt_nvt_total"><%=userDetailsLookUpForm.getTotalPage()%></span>
-								<input type="hidden" id="txtMaxresult" name="txtMaxresult" value="<%=userDetailsLookUpForm.getTotalPage()%>" >
-								<img id="i_img_nvt_next"  name="i_img_nvt_next" src="<%=imgURL%>/next.gif" style="cursor:hand;top:1px;" title="Next" onclick="lp_next_page();">
-								<img id="i_img_nvt_last"  name="i_img_nvt_last" src="<%=imgURL%>/last.gif" style="cursor:hand;top:1px;" title="Last" onclick="lp_last_page();">
-							</td>
-						</tr>
-					</tfoot>
-					<tbody>
-						<%
-							int				 		seq			= 1;
-							List<UserDetailsBean> 	dataList 	= userDetailsLookUpForm.getDataList();
-											
-											if(dataList.size()>0){
-												for(UserDetailsBean bean:dataList){
-						%>
-									<tr class="rowSelect" onclick="lp_setData('<%=bean.getUserUniqueId()%>', '<%=bean.getUserFullName()%>', '<%=bean.getUserId()%>', '<%=bean.getUserStatus()%>', '<%=bean.getUserStatusName()%>')" >
-										<td align="center"><%=seq%></td>
-										<td><%=bean.getUserFullName()%></td>
-										<td><%=bean.getUserId()%></td>
-										<td><%=bean.getUserStatusName()%></td>
-									</tr>
-						<% 			seq++;
-								} 
-							} else{  %>
-								<tr height="26px;"><td colspan="4" align="center"><b>ไม่พบข้อมูลที่ระบุ</b></td></tr>
-						<%  } %>  
-					</tbody>
-				</table>
-			</div>	
+			<table class="table sim-panel-result-table" id="tbl_result" width="100%">
+				<thead> 
+	               <tr height="26px;">
+						<th  style="text-align: center;" width="15%"><B>ลำดับ</B></th>
+						<th  style="text-align: center;" width="40%"><B>ชื่อ-นามสกุล</B></th> 
+						<th  style="text-align: center;" width="20%"><B>รหัสผู้ใช้งาน</B></th>
+						<th  style="text-align: center;" width="25%"><B>สถานะ</B></th>
+					</tr> 
+				</thead>
+				<tfoot>
+					<tr height="26px;">
+						<td colspan="4" align="right">
+							<span style="top: -3px;">จำนวน&nbsp;</span>
+							<input type="text" id="i_txt_nvt_totalresult" name="i_txt_nvt_totalresult" style="top:0px;left:0px;width: 50px;"  readonly="readonly" value="<%=userDetailsLookUpForm.getTotalRecord()%>" >
+							<span style="top: -3px;">&nbsp;รายการ&nbsp;&nbsp;</span>
+							<img id="i_img_nvt_first" name="i_img_nvt_first" src="<%=imgURL%>/first.gif" style="cursor:hand;top:1px;" title="First" onclick="lp_first_page();">
+							<img id="i_img_nvt_prev"  name="i_img_nvt_prev"  src="<%=imgURL%>/prv.gif"   style="cursor:hand;top:1px;" title="Previous" onclick="lp_previous_page();">
+							<input type="text" id="selPage" name="selPage" style="top:0px;left:0px;width: 30px;text-align: right;" maxlength="3" readonly="readonly" value="<%=userDetailsLookUpForm.getPageNum()%>">
+		
+							<span class="c_field_label" style="top:-5px;">/</span>
+							<span id="i_txt_nvt_total" class="c_field_label" style="top:-5px;" name="i_txt_nvt_total"><%=userDetailsLookUpForm.getTotalPage()%></span>
+							<input type="hidden" id="txtMaxresult" name="txtMaxresult" value="<%=userDetailsLookUpForm.getTotalPage()%>" >
+							<img id="i_img_nvt_next"  name="i_img_nvt_next" src="<%=imgURL%>/next.gif" style="cursor:hand;top:1px;" title="Next" onclick="lp_next_page();">
+							<img id="i_img_nvt_last"  name="i_img_nvt_last" src="<%=imgURL%>/last.gif" style="cursor:hand;top:1px;" title="Last" onclick="lp_last_page();">
+						</td>
+					</tr>
+				</tfoot>
+				<tbody>
+					<%
+						int				 		seq			= 1;
+						List<UserDetailsBean> 	dataList 	= userDetailsLookUpForm.getDataList();
+										
+						if(dataList.size()>0){
+							for(UserDetailsBean bean:dataList){
+					%>
+								<tr class="rowSelect" onclick="lp_setData('<%=bean.getUserUniqueId()%>', '<%=bean.getUserFullName()%>', '<%=bean.getUserId()%>', '<%=bean.getUserStatus()%>', '<%=bean.getUserStatusName()%>');" >
+									<td align="center"><%=seq%></td>
+									<td><%=bean.getUserFullName()%></td>
+									<td><%=bean.getUserId()%></td>
+									<td><%=bean.getUserStatusName()%></td>
+								</tr>
+					<% 			seq++;
+							} 
+						} else{  %>
+							<tr height="26px;"><td colspan="4" align="center"><b>ไม่พบข้อมูลที่ระบุ</b></td></tr>
+					<%  } %>  
+				</tbody>
+			</table>
 		</div>
 		<div align="center" class="FreezeScreen" style="display:none;">
 	        <center>

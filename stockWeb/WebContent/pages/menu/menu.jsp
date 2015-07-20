@@ -24,7 +24,7 @@
 				
 				h = $(document).height();
 				
-		        if($(window).scrollTop() > 10){
+		        if(document.documentElement.scrollTop || jQuery(this).scrollTop() > 10){//alert("s " + h);
 		        	document.getElementById("m1").className 			= "fixs";
 		        	document.getElementById("headwrap").style.display 	= "none";
 		        }else{
@@ -63,16 +63,21 @@
         </div>
     </div><!-- container -->
 </div><!-- headwrap -->
-<div align="left" id="m1">
-  <ul id="menu1">
+<div id="m1">
+  <ul id="menu1" >
+  	<li style="width: 180px;"><a href="#" id="logOut" name="logOut" >ออกจากระบบ</a></li>
+	<%if(!userDeatil.getUserId().equals(Constants.ADMIN)){ %>
+	<li style="width: 180px;"><a href="<%=servURL1%>/EnjoyGenericSrv?service=servlet.ChangePasswordServlet&pageAction=new">เปลี่ยนรหัสผ่าน</a></li>
+ 	<%} %>
 	<%
 		UserPrivilegeBean 			userPrivilegeBean 		= null;
 		PagesDetailBean 			pagesDetailBean 		= null;
-		for(int i=0;i<userDeatil.getUserPrivilegeList().size();i++){		
+		int							s						= userDeatil.getUserPrivilegeList().size() -1;
+		for(int i=s;i >=0;i--){		
 			userPrivilegeBean = userDeatil.getUserPrivilegeList().get(i);
 	%>
-			<li style="width: 165px;"><a href="#"><%=userPrivilegeBean.getPrivilegeName()%></a>
-				<ul>
+			<li style="width: 180px;" ><a href="#"><%=userPrivilegeBean.getPrivilegeName()%></a>
+				<ul style="list-style-type: none;">
 					<%
 					for(int j=0;j<userPrivilegeBean.getPagesDetail().size();j++){
 						pagesDetailBean = userPrivilegeBean.getPagesDetail().get(j);
@@ -86,40 +91,6 @@
 	<%		
 		}
 	%>
-	<%if(!userDeatil.getUserId().equals(Constants.ADMIN)){ %>
- 	<li><a href="<%=servURL1%>/EnjoyGenericSrv?service=servlet.ChangePasswordServlet&pageAction=new">เปลี่ยนรหัสผ่าน</a></li>
- 	<%} %>
- 	<li><a href="#" id="logOut" name="logOut" >ออกจากระบบ</a></li>
-  	<!-- 
-	<li><a href="#">รายงาน</a>
-		<ul>
-			<li><a href="/stockWeb/EnjoyGenericSrv?service=servlet.SummaryRevenueOfYearServlet&pageAction=new">รายงานสรุปรายได้ประจำปี</a></li>
-			<li><a href="/stockWeb/EnjoyGenericSrv?service=servlet.DetailRevenueOfYearServlet&pageAction=new">รายงานแสดงรายละเอียดรายได้ประจำปี</a></li>
-			<li><a href="#">รายงานแสดงรายละเอียดต่างๆ ภายใน Match</a></li>
-		</ul></li>
-	<li><a href="#">Menu2</a></li>
-	<li><a href="#">Menu3</a>
-		<ul>
-			<li><a href="#">Menu3a</a></li>
-			<li><a href="#">Menu3b</a></li>
-		</ul></li>
-	<li><a href="#">Menu4</a>
-		<ul>
-			<li><a href="#Menu4a">Menu4a(go to anchor)</a></li>
-			<li><a href="#" onclick="alert('Menu4b');return false;">Menu4b(alert)</a></li>
-		</ul></li>
-	<li><a href="#">Menu5</a>
-		<ul>
-			<li><a href="#">Menu5a</a></li>
-			<li><a href="#">Menu5b</a>
-				<ul>
-					<li><a href="#">Menu5b-i</a></li>
-					<li><a href="#">Menu5b-ii</a></li>
-				</ul></li>
-			<li><a href="#">Menu5c</a></li>
-		</ul>
-	</li>
-	 -->	
 </ul>
 </div>
 
