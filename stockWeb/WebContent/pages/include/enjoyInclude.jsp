@@ -29,9 +29,9 @@ final String pagesURL		= Constants.PAGE_URL;
 <link  href="<%=themeURL%>/css/app.css" rel="stylesheet">
 <link href="<%=cssURL%>/bootstrap.css" rel="stylesheet">
 <link href="<%=cssURL%>/style.css" rel="stylesheet" />
-<link href="<%=cssURL%>/style_blue.css" rel="stylesheet" />
+<%--<link href="<%=cssURL%>/style_blue.css" rel="stylesheet" />--%>
 
-<link href="<%=cssURL%>/bootstrap-datetimepicker.min.css" rel="stylesheet" />
+<%--<link href="<%=cssURL%>/bootstrap-datetimepicker.min.css" rel="stylesheet" /> --%>
 <link href="<%=cssURL%>/bootstrap-responsive.css" rel="stylesheet" />
 <%--<link href="<%=cssURL%>/bootstrap-responsive.min.css" rel="stylesheet" /> --%>
 <link href="<%=cssURL%>/menu-styles.css" rel="stylesheet" />

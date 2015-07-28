@@ -13,11 +13,24 @@
 			background: black;
 			z-index: 9999;
 		}
+		
+		#xx {
+		    border-radius: 8px;
+		    background-color:white;
+		    width: 200px;
+		    height: 26px;
+		    vertical-align: middle;    
+		    border:1px solid black;
+		    padding-top: 2px;
+		}
+		
 	</style>
 	<script>
 		$(document).ready(function(){
 			
 			var h = $(document).height();
+			
+			//$("#xx").corner("round 8px");
 			
 			$('#menu1').ptMenu();
 			$(window).scroll(function(){//alert($(window).scrollTop());
@@ -49,17 +62,18 @@
 <div class="headwrap" id="headwrap">
 	<div class="row" style="position: relative;">
     	<div class="brand span4" style="padding-left: 15px;">
-        	<img src="<%=servURL1%>/images/logo2.png" />
+        	<img src="<%=servURL1%>/images/logo.png" />
         </div>
         
         <div class="span8 user"  style="position: absolute;margin-right: 0px;width: 95%;">
-        	<div class="font14"><img src="<%=servURL1%>/images/icon-user.jpg" alt="">ชื่อผู้ใช้งาน <span class="text_white"><%=userDeatil.getUserName() %>&nbsp;&nbsp;<%=userDeatil.getUserSurname() %></span></div>
-            <div class="font12"></div>
-            
-            <ul>
-            	<li class="date padding-md round-md" style="background:rgba(166, 19, 53, 0.37);border:1px solid rgb(194, 27, 27);">เข้าใช้ระบบ : <span class="text_white"><%=userDeatil.getCurrentDate() %></span> </li>
-            </ul>
-            
+        	<div class="font14"><img src="<%=servURL1%>/images/icon-user.png" alt="">ชื่อผู้ใช้งาน <span class="text_white"><%=userDeatil.getUserName() %>&nbsp;&nbsp;<%=userDeatil.getUserSurname() %></span></div>
+            <div style="height: 5px;"></div>
+            <div style="width: 100%;" align="right">
+	            <div id="xx" align="center">
+	            	<span>เข้าใช้ระบบ : <%=userDeatil.getCurrentDate() %></span>
+	            </div>
+            </div>
+            <div style="height: 2px;"></div>
         </div>
     </div><!-- container -->
 </div><!-- headwrap -->

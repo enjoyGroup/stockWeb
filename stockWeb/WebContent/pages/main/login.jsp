@@ -28,8 +28,9 @@
 			    border-radius: 15px;
 			    border-color:#d2d2d2;
 			    border-width: 5px;
-			    box-shadow:0 1px 0 #cfcfcf;
+			    box-shadow: 5px 5px 5px 5px #888888;
 			    width: 25%;
+			    
 			}
 			
 			h4 { 
@@ -144,7 +145,7 @@
 		<div class="container" align="center">
 		    <div class="row" align="center" style="width: 100%;">
 		        <div class="form-login">
-		           	<img src="<%=imgURL%>/CHN300_1.png"><br/><br/>
+		           	<img src="<%=imgURL%>/logo-login.png"><br/><br/>
 		            <input id="username"  
 		            	   name="username" 
 		            	   type="text"  

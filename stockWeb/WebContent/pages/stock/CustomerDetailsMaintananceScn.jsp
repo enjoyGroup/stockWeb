@@ -355,7 +355,7 @@
 			}
 			
 		}		
-		
+		/*
 		function lp_calendarItmClick(av_val){
 			
 			try{
@@ -363,7 +363,7 @@
 			}catch(e){
 				alert("btnAddDate :: " + e);
 			}
-		}
+		}*/
 		
 		
 		function lp_checkIdNumber(){
@@ -528,7 +528,7 @@
 								        					   onchange="gp_checkDate(this);"
 								        					   value="<%=customerDetailsBean.getBirthDate() %>" 
 								        					   style="width: 100px;" />
-								        				<i class="fa fa-fw fa-calendar" onclick="lp_calendarItmClick('birthDate');" style="cursor:pointer"></i>
+								        				<%--<i class="fa fa-fw fa-calendar" onclick="lp_calendarItmClick('birthDate');" style="cursor:pointer"></i> --%>
 								        			</td>
 								        			<td align="right">
 														ศาสนา :
@@ -733,7 +733,7 @@
 								        					   onchange="gp_checkDate(this);"
 								        					   value="<%=customerDetailsBean.getStartDate() %>" 
 								        					   style="width: 100px;" />
-								        				<i class="fa fa-fw fa-calendar" onclick="lp_calendarItmClick('startDate');" style="cursor:pointer"></i>
+								        				<%--<i class="fa fa-fw fa-calendar" onclick="lp_calendarItmClick('startDate');" style="cursor:pointer"></i> --%>
 								        			</td>
 								        			<td align="right">
 								        				วันที่หมดอายุ :
@@ -747,7 +747,7 @@
 								        					   onchange="gp_checkDate(this);"
 								        					   value="<%=customerDetailsBean.getExpDate() %>" 
 								        					   style="width: 100px;" />
-								        				<i class="fa fa-fw fa-calendar" onclick="lp_calendarItmClick('expDate');" style="cursor:pointer"></i>
+								        				<%--<i class="fa fa-fw fa-calendar" onclick="lp_calendarItmClick('expDate');" style="cursor:pointer"></i> --%>
 								        			</td>
 								        		</tr>
 								        		<tr>

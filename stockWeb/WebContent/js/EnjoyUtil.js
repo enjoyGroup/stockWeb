@@ -3,9 +3,9 @@ $.datepicker.regional['th'] ={
     changeYear: true,
     //defaultDate: GetFxupdateDate(FxRateDateAndUpdate.d[0].Day),
     yearOffSet: 543,
-    //showOn: "button",
-    //buttonImage: 'images/calendar.gif',
-    //buttonImageOnly: true,
+    showOn: "button",
+    buttonImage: '/stockWeb/images/Calendar.png',
+    buttonImageOnly: true,
     dateFormat: 'dd/mm/yy',
     dayNames: ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'],
     dayNamesMin: ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส'],
@@ -24,6 +24,9 @@ $.datepicker.regional['birthDateTH'] ={
     changeMonth: true,
     changeYear: true,
     yearOffSet: 543,
+    showOn: "button",
+    buttonImage: '/stockWeb/images/Calendar.png',
+    buttonImageOnly: true,
     dateFormat: 'dd/mm/yy',
     dayNames: ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'],
     dayNamesMin: ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส'],
@@ -79,18 +82,21 @@ $(document).ready(function(){
 	        return onKeyUpTel(event);
 	    });
 	    
+	    /*
 	    $(".dateFormat").live("focus", function(){
 		    $(this).datepicker( $.datepicker.regional["th"] );
 		    $(this).datepicker( "option", "defaultDate", +0 );
 		});
 	    
 	    $(".birthDateFormat").live("focus", function(){
-		    $(this).datepicker( $.datepicker.regional["birthDateTH"] );
-		});
+	    	$(this).datepicker( $.datepicker.regional["birthDateTH"] );
+		    $(this).datepicker( "option", "defaultDate", +0 );
+		});*/
 	    
-//	    $( ".dateFormat" ).datepicker( $.datepicker.regional["th"] );
-//	    $( ".dateFormat" ).datepicker( "option", "defaultDate", +0 );
-//	    $( ".birthDateFormat" ).datepicker( $.datepicker.regional["birthDateTH"] );
+	    $( ".dateFormat" ).datepicker( $.datepicker.regional["th"] );
+	    $( ".dateFormat" ).datepicker( "option", "defaultDate", +0 );
+	    $( ".birthDateFormat" ).datepicker( $.datepicker.regional["birthDateTH"] );
+	    $( ".birthDateFormat" ).datepicker( "option", "defaultDate", +0 );
 	    
 });
 
@@ -367,7 +373,7 @@ function gp_progressBarOff(){
 
 function gp_checkDate(ao_obj){
     var allowBlank 	= true;
-    var minYear 	= 2458;
+    var minYear 	= 2200;
     //var maxYear 	= (new Date()).getFullYear();
     var errorMsg 	= "";
     var field 		= gp_trim(ao_obj.value);
