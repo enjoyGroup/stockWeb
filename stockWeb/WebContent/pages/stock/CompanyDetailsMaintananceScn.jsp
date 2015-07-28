@@ -10,6 +10,7 @@
 	CompanyDetailsBean 		companyDetailsBean 	= companyDetailsMaintananceForm.getCompanyDetailsBean();
 	List<ComboBean> 		statusCombo 		= companyDetailsMaintananceForm.getStatusCombo();
 	String					titlePage			= companyDetailsMaintananceForm.getTitlePage();
+	UserDetailsBean         userBean			= (UserDetailsBean)session.getAttribute("userBean");
 
 
 %>
@@ -389,8 +390,13 @@
 		            		
 		            		if(status=="SUCCESS"){
 		            			alert("บันทึกเรียบร้อย");
-		            			//window.location = gv_url + "?service=servlet.UserDetailsMaintananceServlet&pageAction=getUserDetail&userUniqueId=" + userUniqueId;
-		            			lp_reset();
+		            			
+		            			if (jsonObj.flagChkCompany == "Y" && jsonObj.FlagChange == "Y"){
+		            				window.location.replace('<%=pagesURL%>/ChangePassScn.jsp');
+		            			} else {
+		            				lp_reset();
+		            			}
+		            			
 		            		}else{
 		            			alert(jsonObj.errMsg);
 		            			
@@ -424,11 +430,11 @@
 </head>
 <body>
 	<form id="frm">
-		<input type="hidden" id="service" 	name="service" value="servlet.CompanyDetailsMaintananceServlet" />
-		<input type="hidden" id="pageMode" 	name="pageMode" value="<%=pageMode%>" />
-		<input type="hidden" id="provinceCode" name="provinceCode" value="" />
-		<input type="hidden" id="districtCode" name="districtCode" value="" />
-		<input type="hidden" id="subdistrictCode" name="subdistrictCode" value="" />
+		<input type="hidden" id="service" 				name="service" 				value="servlet.CompanyDetailsMaintananceServlet" />
+		<input type="hidden" id="pageMode" 				name="pageMode" 			value="<%=pageMode%>" />
+		<input type="hidden" id="provinceCode" 			name="provinceCode" 		value="" />
+		<input type="hidden" id="districtCode" 			name="districtCode" 		value="" />
+		<input type="hidden" id="subdistrictCode" 		name="subdistrictCode" 		value="" />
 		<div id="menu" style="width: 100%;background: black;">
 			<%@ include file="/pages/menu/menu.jsp"%>
 		</div>
@@ -606,7 +612,6 @@
 								        						id="branchName" 
 								        						name='branchName' 
 								        						value="<%=companyDetailsBean.getBranchName() %>" 
-								        						onchange="lp_checkDupUserId();" 
 								        						maxlength="30" 
 								        						style="width: 250px;" />
 								        			</td>

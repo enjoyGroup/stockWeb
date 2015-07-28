@@ -621,7 +621,7 @@
 								        					   name='startDate' 
 								        					   placeholder="DD/MM/YYYY"
 								        					   class="dateFormat"
-								        					   onblur="gp_checkDate(this);"
+								        					   onchange="gp_checkDate(this);"
 								        					   value="<%=productDetailsBean.getStartDate() %>" 
 								        					   style="width: 100px;" />
 								        				<i class="fa fa-fw fa-calendar" onclick="lp_calendarItmClick('startDate');" style="cursor:pointer"></i>
@@ -631,7 +631,7 @@
 								        					   name='expDate' 
 								        					   placeholder="DD/MM/YYYY"
 								        					   class="dateFormat"
-								        					   onblur="gp_checkDate(this);"
+								        					   onchange="gp_checkDate(this);"
 								        					   value="<%=productDetailsBean.getExpDate() %>" 
 								        					   style="width: 100px;" />
 								        				<i class="fa fa-fw fa-calendar" onclick="lp_calendarItmClick('expDate');" style="cursor:pointer"></i>

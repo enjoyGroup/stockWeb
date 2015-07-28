@@ -424,14 +424,7 @@ public class CustomerDetailsMaintananceServlet extends EnjoyStandardSvc {
 			
 			session.getTransaction().commit();
 			
-//			if(pageMode.equals(CustomerDetailsMaintananceForm.NEW)){
-//				session = sessionFactory.openSession();
-//				cusCode = String.valueOf(this.dao.lastId(session));
-//			}
-//			
-//			logger.info("[onSave] After Save cusCode 			:: " + cusCode);
-			
-			obj.put(STATUS, 			SUCCESS);
+			obj.put(STATUS				, SUCCESS);
 			
 		}catch(EnjoyException e){
 			session.getTransaction().rollback();

@@ -436,70 +436,68 @@
 										<div id="seasonTitle" class="padding-md round-sm season-title-head" style="">
 											<h6 class="panel-title" style="font-size:1.0em">ข้อมูลรายละเอียดสินค้า</h6>
 										</div>
-										<div class="datagrid">
-											<table class="table sim-panel-result-table" id="tbl_result" border="1" width="100%" style="margin-bottom:0px !important">
-												<thead> 
-									               <tr height="26px;">
-									               		<th  style="text-align: center;" width="5%" ><B>เลือก</B></th>
-														<th  style="text-align: center;" width="5%" ><B>ลำดับ</B></th>
-														<th  style="text-align: center;" width="20%"><B>หมวดสินค้า</B></th>
-														<th  style="text-align: center;" width="15%"><B>หมู่สินค้า</B></th>
-														<th  style="text-align: center;" width="20%"><B>รหัสสินค้า</B></th> 
-														<th  style="text-align: center;" width="20%"><B>ชื่อสินค้า</B></th>
-														<th  style="text-align: center;" width="15%"><B>ราคาขายสินค้า</B></th>  
-													</tr> 
-												</thead>
-												<tfoot>
-													<tr height="26px;" style="border: 0">
-														<td colspan="7" align="right">
-															<span style="top: -3px;">จำนวน&nbsp;</span>
-															<input type="text" id="i_txt_nvt_totalresult" name="i_txt_nvt_totalresult" style="top:0px;left:0px;width: 50px;"  readonly="readonly" value="<%=productDetailsSearchForm.getTotalRecord()%>" >
-															<span style="top: -3px;">&nbsp;รายการ&nbsp;&nbsp;</span>
-															<img id="i_img_nvt_first" name="i_img_nvt_first" src="<%=imgURL%>/first.gif" style="cursor:hand;top:1px;" title="First" onclick="lp_first_page();">
-															<img id="i_img_nvt_prev"  name="i_img_nvt_prev"  src="<%=imgURL%>/prv.gif"   style="cursor:hand;top:1px;" title="Previous" onclick="lp_previous_page();">
-															<input type="text" id="selPage" name="selPage" style="top:0px;left:0px;width: 30px;text-align: right;" maxlength="3" readonly="readonly" value="<%=productDetailsSearchForm.getPageNum()%>">
-										
-															<span class="c_field_label" style="top:-5px;">/</span>
-															<span id="i_txt_nvt_total" class="c_field_label" style="top:-5px;" name="i_txt_nvt_total"><%=productDetailsSearchForm.getTotalPage()%></span>
-															<input type="hidden" id="txtMaxresult" name="txtMaxresult" value="<%=productDetailsSearchForm.getTotalPage()%>" >
-															<img id="i_img_nvt_next"  name="i_img_nvt_next" src="<%=imgURL%>/next.gif" style="cursor:hand;top:1px;" title="Next" onclick="lp_next_page();">
-															<img id="i_img_nvt_last"  name="i_img_nvt_last" src="<%=imgURL%>/last.gif" style="cursor:hand;top:1px;" title="Last" onclick="lp_last_page();">
-														</td>
-													</tr>
-												</tfoot>
-												<tbody>
-													<%
-													ProductDetailsBean 	bean 		= null;
-		    											int					  	seq		= 1;
-														
-														if(dataList.size()>0){
-															for(int i=0;i<dataList.size();i++){
-																bean = dataList.get(i);															
-													%>
-																<tr class="rowSelect" onclick="lp_sendEditPage('<%=bean.getProductCode()%>')" >
-																	<td style="text-align:center">
-																		<input type="checkbox" 
-																			   id="chkBox<%=bean.getChkBoxSeq()%>" 
-																			   name="chkBox" 
-																			   value="<%=bean.getChkBoxSeq()%>"
-																			   onclick="lp_setForPrint(this, <%=bean.getChkBoxSeq()%>);"
-																			   <%if(bean.getChkBox().equals("Y")){%>checked="checked"<%}%> />
-																	</td>
-																	<td align="center"><%=seq%></td>
-																	<td><%=bean.getProductTypeName()%></td>
-																	<td><%=bean.getProductGroupName()%></td>
-																	<td><%=bean.getProductCode()%></td>
-																	<td><%=bean.getProductName()%></td>
-																	<td><%=bean.getSalePrice()%></td>
-																</tr>
-													<% 			seq++;
-															} 
-														} else{  %>
-															<tr height="26px;"><td colspan="7" align="center"><b>ไม่พบข้อมูลที่ระบุ</b></td></tr>
-													<%  } %>  
-												</tbody>
-											</table>
-										</div>
+										<table class="table sim-panel-result-table" id="tbl_result" width="100%">
+											<thead> 
+								               <tr height="26px;">
+								               		<th  style="text-align: center;" width="5%" ><B>เลือก</B></th>
+													<th  style="text-align: center;" width="5%" ><B>ลำดับ</B></th>
+													<th  style="text-align: center;" width="20%"><B>หมวดสินค้า</B></th>
+													<th  style="text-align: center;" width="15%"><B>หมู่สินค้า</B></th>
+													<th  style="text-align: center;" width="20%"><B>รหัสสินค้า</B></th> 
+													<th  style="text-align: center;" width="20%"><B>ชื่อสินค้า</B></th>
+													<th  style="text-align: center;" width="15%"><B>ราคาขายสินค้า</B></th>  
+												</tr> 
+											</thead>
+											<tfoot>
+												<tr height="26px;">
+													<td colspan="7" align="right">
+														<span style="top: -3px;">จำนวน&nbsp;</span>
+														<input type="text" id="i_txt_nvt_totalresult" name="i_txt_nvt_totalresult" style="top:0px;left:0px;width: 50px;"  readonly="readonly" value="<%=productDetailsSearchForm.getTotalRecord()%>" />
+														<span style="top: -3px;">&nbsp;รายการ&nbsp;&nbsp;</span>
+														<img id="i_img_nvt_first" name="i_img_nvt_first" src="<%=imgURL%>/first.gif" style="cursor:hand;top:1px;" title="First" onclick="lp_first_page();" />
+														<img id="i_img_nvt_prev"  name="i_img_nvt_prev"  src="<%=imgURL%>/prv.gif"   style="cursor:hand;top:1px;" title="Previous" onclick="lp_previous_page();" />
+														<input type="text" id="selPage" name="selPage" style="top:0px;left:0px;width: 30px;text-align: right;" maxlength="3" readonly="readonly" value="<%=productDetailsSearchForm.getPageNum()%>" />
+									
+														<span class="c_field_label" style="top:-5px;">/</span>
+														<span id="i_txt_nvt_total" class="c_field_label" style="top:-5px;" name="i_txt_nvt_total"><%=productDetailsSearchForm.getTotalPage()%></span>
+														<input type="hidden" id="txtMaxresult" name="txtMaxresult" value="<%=productDetailsSearchForm.getTotalPage()%>" >
+														<img id="i_img_nvt_next"  name="i_img_nvt_next" src="<%=imgURL%>/next.gif" style="cursor:hand;top:1px;" title="Next" onclick="lp_next_page();" />
+														<img id="i_img_nvt_last"  name="i_img_nvt_last" src="<%=imgURL%>/last.gif" style="cursor:hand;top:1px;" title="Last" onclick="lp_last_page();" />
+													</td>
+												</tr>
+											</tfoot>
+											<tbody>
+												<%
+												ProductDetailsBean 	bean 		= null;
+	    											int					  	seq		= 1;
+													
+													if(dataList.size()>0){
+														for(int i=0;i<dataList.size();i++){
+															bean = dataList.get(i);															
+												%>
+															<tr class="rowSelect" onclick="lp_sendEditPage('<%=bean.getProductCode()%>')" >
+																<td style="text-align:center;">
+																	<input type="checkbox" 
+																		   id="chkBox<%=bean.getChkBoxSeq()%>" 
+																		   name="chkBox" 
+																		   value="<%=bean.getChkBoxSeq()%>"
+																		   onclick="lp_setForPrint(this, <%=bean.getChkBoxSeq()%>);"
+																		   <%if(bean.getChkBox().equals("Y")){%>checked="checked"<%}%> />
+																</td>
+																<td style="text-align:center;"><%=seq%></td>
+																<td style="text-align:left;"><%=bean.getProductTypeName()%></td>
+																<td style="text-align:left;"><%=bean.getProductGroupName()%></td>
+																<td style="text-align:left;"><%=bean.getProductCode()%></td>
+																<td style="text-align:left;"><%=bean.getProductName()%></td>
+																<td style="text-align:left;"><%=bean.getSalePrice()%></td>
+															</tr>
+												<% 			seq++;
+														} 
+													} else{  %>
+														<tr height="26px;"><td colspan="7" align="center"><b>ไม่พบข้อมูลที่ระบุ</b></td></tr>
+												<%  } %>  
+											</tbody>
+										</table>
 										<br/>
 										<table border="0" width="100%">
 											<tr>

@@ -64,7 +64,7 @@
     </div><!-- container -->
 </div><!-- headwrap -->
 <div id="m1">
-  <ul id="menu1" >
+  <ul id="menu1" <%if(userDeatil.getFlagChkCompany().equals("Y")){ %> style="visibility: hidden;"<%}%> >
   	<li style="width: 180px;"><a href="#" id="logOut" name="logOut" >ออกจากระบบ</a></li>
 	<%if(!userDeatil.getUserId().equals(Constants.ADMIN)){ %>
 	<li style="width: 180px;"><a href="<%=servURL1%>/EnjoyGenericSrv?service=servlet.ChangePasswordServlet&pageAction=new">เปลี่ยนรหัสผ่าน</a></li>
@@ -76,7 +76,7 @@
 		for(int i=s;i >=0;i--){		
 			userPrivilegeBean = userDeatil.getUserPrivilegeList().get(i);
 	%>
-			<li style="width: 180px;" ><a href="#"><%=userPrivilegeBean.getPrivilegeName()%></a>
+			<li style="text-align: right;" ><a href="#"><%=userPrivilegeBean.getPrivilegeName()%></a>
 				<ul style="list-style-type: none;">
 					<%
 					for(int j=0;j<userPrivilegeBean.getPagesDetail().size();j++){

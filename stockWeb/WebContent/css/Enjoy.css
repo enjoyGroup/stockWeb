@@ -59,9 +59,10 @@
 
 textarea {
     white-space: normal;
-    text-align: justify;
+    text-align: left;
     -moz-text-align-last: left; /* Firefox 12+ */
     text-align-last: left;
+    float:left;
 }
 
 

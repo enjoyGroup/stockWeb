@@ -15,7 +15,7 @@ $.datepicker.regional['th'] ={
    
     prevText: 'ก่อนหน้า',
     nextText: 'ถัดไป',
-    yearRange: '-20:+20',
+    yearRange: '-20:+20'
     //buttonText: 'เลือก',
   
 };
@@ -33,7 +33,7 @@ $.datepicker.regional['birthDateTH'] ={
    
     prevText: 'ก่อนหน้า',
     nextText: 'ถัดไป',
-    yearRange: '-100:+0',
+    yearRange: '-100:+0'
     //buttonText: 'เลือก',
   
 };
@@ -79,10 +79,18 @@ $(document).ready(function(){
 	        return onKeyUpTel(event);
 	    });
 	    
-	    $( ".dateFormat" ).datepicker( $.datepicker.regional["th"] );
-	    $( ".dateFormat" ).datepicker( "option", "defaultDate", +0 );
+	    $(".dateFormat").live("focus", function(){
+		    $(this).datepicker( $.datepicker.regional["th"] );
+		    $(this).datepicker( "option", "defaultDate", +0 );
+		});
 	    
-	    $( ".birthDateFormat" ).datepicker( $.datepicker.regional["birthDateTH"] );
+	    $(".birthDateFormat").live("focus", function(){
+		    $(this).datepicker( $.datepicker.regional["birthDateTH"] );
+		});
+	    
+//	    $( ".dateFormat" ).datepicker( $.datepicker.regional["th"] );
+//	    $( ".dateFormat" ).datepicker( "option", "defaultDate", +0 );
+//	    $( ".birthDateFormat" ).datepicker( $.datepicker.regional["birthDateTH"] );
 	    
 });
 
@@ -359,7 +367,7 @@ function gp_progressBarOff(){
 
 function gp_checkDate(ao_obj){
     var allowBlank 	= true;
-    var minYear 	= 2015;
+    var minYear 	= 2458;
     //var maxYear 	= (new Date()).getFullYear();
     var errorMsg 	= "";
     var field 		= gp_trim(ao_obj.value);

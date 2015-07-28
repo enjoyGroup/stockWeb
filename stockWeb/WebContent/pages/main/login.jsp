@@ -120,7 +120,9 @@
 		            		
 		            		if(status=="SUCCESS"){
 		            			
-		            			if (jsonObj.FlagChange == "Y"){
+		            			if (jsonObj.flagChkCompany == "Y"){
+		            				window.location.replace('<%=servURL%>/EnjoyGenericSrv?service=servlet.CompanyDetailsMaintananceServlet&pageAction=new');
+		            			}else if (jsonObj.FlagChange == "Y"){
 		            				window.location.replace('<%=pagesURL%>/ChangePassScn.jsp');
 		            			} else {
 		            				window.location.replace('<%=servURL%>/pages/menu/index.jsp');

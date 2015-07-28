@@ -5,21 +5,22 @@ import java.util.ArrayList;
 public class UserDetailsBean {
 	
 	private int 							userUniqueId;
-	private String 							userId 	 			  = null;
-	private String 							userName 	 		  = null;
-	private String 							userSurname 	 	  = null;
-	private String 							userPrivilege 	 	  = null;
-	private String 							userLevel 	  		  = null;
-	private String 							userStatus 	 		  = null;
-	private String 							flagChangePassword 	  = null;
-	private String 							flagAlertStock 	  	  = null;
-	private ArrayList<UserPrivilegeBean> 	userPrivilegeList	  = null;
-	private String 							pwd 	 		  	  = null;
-	private String  						currentDate			  = null;
-	private String							userEmail			  = null;
-	private String							errMsg				  = null;
-	private String							userFullName		  = null;
-	private String							userStatusName		  = null;
+	private String 							userId;
+	private String 							userName;
+	private String 							userSurname;
+	private String 							userPrivilege;
+	private String 							userLevel;
+	private String 							userStatus;
+	private String 							flagChangePassword;
+	private String 							flagAlertStock;
+	private ArrayList<UserPrivilegeBean> 	userPrivilegeList;
+	private String 							pwd;
+	private String  						currentDate;
+	private String							userEmail;
+	private String							errMsg;
+	private String							userFullName;
+	private String							userStatusName;
+	private	String							flagChkCompany;
 	
 	public UserDetailsBean(){
 		this.userUniqueId		= 0;
@@ -38,6 +39,7 @@ public class UserDetailsBean {
 		this.errMsg			    = "";
 		this.userFullName		= "";
 		this.userStatusName		= "";
+		this.flagChkCompany		= "";
 	}
 
 	public int getUserUniqueId() {
@@ -166,5 +168,13 @@ public class UserDetailsBean {
 
 	public void setUserStatusName(String userStatusName) {
 		this.userStatusName = userStatusName;
+	}
+
+	public String getFlagChkCompany() {
+		return flagChkCompany;
+	}
+
+	public void setFlagChkCompany(String flagChkCompany) {
+		this.flagChkCompany = flagChkCompany;
 	}
 }

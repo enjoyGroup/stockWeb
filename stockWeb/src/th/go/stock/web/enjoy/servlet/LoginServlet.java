@@ -61,13 +61,12 @@ import th.go.stock.web.enjoy.utils.EnjoyUtil;
         	if(userBean==null){
     			obj.put(STATUS, 		ERROR);
     			obj.put(ERR_MSG, 		"ไม่สามารถเข้าสู่ระบบได้ กรุณาตรวจสอบ user/password ใหม่อีกครั้ง");
-        		//easUtil.writeMSG("ไม่สามารถเข้าสู่ระบบได้ กรุณาตรวจสอบ user/password ใหม่อีกครั้ง");
         	}else{      		
         		userBean.setUserPrivilegeList((ArrayList<UserPrivilegeBean>) userPrivilegeDao.userPrivilegeListSelect(userBean.getUserPrivilege()));
         		session.setAttribute("userBean", userBean);
-        		//easUtil.writeMSG("OK");
-    			obj.put(STATUS, 		SUCCESS);
-    			obj.put("FlagChange", 	userBean.getFlagChangePassword());
+    			obj.put(STATUS				, SUCCESS);
+    			obj.put("flagChkCompany"	, userBean.getFlagChkCompany());
+    			obj.put("FlagChange"		, userBean.getFlagChangePassword());
         	}       	
         }catch(EnjoyException e){
         	e.printStackTrace();

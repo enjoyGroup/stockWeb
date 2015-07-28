@@ -14,6 +14,7 @@ import org.hibernate.type.StringType;
 import th.go.stock.app.enjoy.bean.ComboBean;
 import th.go.stock.app.enjoy.bean.ProductDetailsBean;
 import th.go.stock.app.enjoy.exception.EnjoyException;
+import th.go.stock.app.enjoy.form.ProductDetailsLookUpForm;
 import th.go.stock.app.enjoy.form.ProductDetailsMaintananceForm;
 import th.go.stock.app.enjoy.model.Product;
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
@@ -494,6 +495,113 @@ public class ProductDetailsDao {
 		}
 		
 		return comboList;
+	}
+	
+	public List<ProductDetailsBean> getProductDetailsLookUpList(	Session 					session, 
+																	ProductDetailsLookUpForm 	form) throws EnjoyException{
+		logger.info("[getProductDetailsLookUpList][Begin]");
+		
+		String						hql						= null;
+		SQLQuery 					query 					= null;
+		List<Object[]>				list					= null;
+		ProductDetailsBean 			bean					= null;
+		List<ProductDetailsBean> 	listData 				= new ArrayList<ProductDetailsBean>();
+		String						find					= null;
+		
+		try{
+			find				= form.getFind();
+			hql					= "select * from (select a.*, b.productTypeName, c.productGroupName "
+													+ "	from product a, productype b, productgroup c"
+													+ "	where b.productTypeCode = a.productType"
+														+ " and c.productTypeCode = a.productType"
+														+ " and c.productGroupCode = a.productGroup) t";
+			
+			if(find!=null && !find.equals("")){
+				hql += " and t." + form.getColumn();
+				
+				if(form.getLikeFlag().equals("Y")){
+					hql += " like ('" + find + "%')";
+				}else{
+					hql += " = '" + find + "'";
+				}
+				
+			}
+			
+			hql += " order by t." + form.getOrderBy() + " " + form.getSortBy();
+			
+			logger.info("[getProductDetailsLookUpList] hql :: " + hql);
+
+			query			= session.createSQLQuery(hql);			
+			query.addScalar("productCode"		, new StringType());
+			query.addScalar("productType"		, new StringType());
+			query.addScalar("productGroup"		, new StringType());
+			query.addScalar("productName"		, new StringType());
+			query.addScalar("unitCode"			, new StringType());
+			query.addScalar("minQuan"			, new StringType());
+			query.addScalar("costPrice"			, new StringType());
+			query.addScalar("salePrice"			, new StringType());
+			query.addScalar("startDate"			, new StringType());
+			query.addScalar("expDate"			, new StringType());
+			query.addScalar("quantity"			, new StringType());
+			query.addScalar("productStatus"		, new StringType());
+			query.addScalar("productTypeName"	, new StringType());
+			query.addScalar("productGroupName"	, new StringType());
+			
+			list		 	= query.list();
+			
+			logger.info("[getProductDetailsLookUpList] list :: " + list);
+			
+			if(list!=null){
+				logger.info("[getProductDetailsLookUpList] list.size() :: " + list.size());
+				
+				for(Object[] row:list){
+					bean 		= new ProductDetailsBean();
+					
+					logger.info("productCode 			:: " + row[0].toString());
+					logger.info("productType 			:: " + row[1].toString());
+					logger.info("productGroup 			:: " + row[2].toString());
+					logger.info("productName 			:: " + row[3].toString());
+					logger.info("unitCode 				:: " + row[4].toString());
+					logger.info("minQuan 				:: " + row[5].toString());
+					logger.info("costPrice 				:: " + row[6].toString());
+					logger.info("salePrice 				:: " + row[7].toString());
+					logger.info("startDate 				:: " + row[8].toString());
+					logger.info("expDate 				:: " + row[9].toString());
+					logger.info("quantity 				:: " + row[10].toString());
+					logger.info("productStatus 			:: " + row[11].toString());
+					logger.info("productTypeName 		:: " + row[12].toString());
+					logger.info("productGroupName 		:: " + row[13].toString());
+					
+					bean.setProductCode				(row[0].toString());
+					bean.setProductTypeCode			(row[1].toString());
+					bean.setProductGroupCode		(row[2].toString());
+					bean.setProductName				(row[3].toString());
+					bean.setUnitCode				(row[4].toString());
+					bean.setMinQuan					(EnjoyUtils.convertFloatToDisplay(row[5].toString(), 2));
+					bean.setCostPrice				(EnjoyUtils.convertFloatToDisplay(row[6].toString(), 2));
+					bean.setSalePrice				(EnjoyUtils.convertFloatToDisplay(row[7].toString(), 2));
+					bean.setStartDate				(EnjoyUtils.dateFormat(row[8].toString(), "yyyyMMdd", "dd/MM/yyyy"));
+					bean.setExpDate					(EnjoyUtils.dateFormat(row[9].toString(), "yyyyMMdd", "dd/MM/yyyy"));
+					bean.setQuantity				(EnjoyUtils.convertFloatToDisplay(row[10].toString(), 2));
+					bean.setProductStatus			(row[11].toString());
+					bean.setProductTypeName			(row[12].toString());
+					bean.setProductGroupName		(row[13].toString());
+					
+					listData.add(bean);
+				}	
+			}
+			
+		}catch(Exception e){
+			logger.info("[getLookUpList] " + e.getMessage());
+			e.printStackTrace();
+			throw new EnjoyException("เกิดข้อผิดพลาดในการดึง LookUp");
+		}finally{
+			hql						= null;
+			logger.info("[getProductDetailsLookUpList][End]");
+		}
+		
+		return listData;
+		
 	}
 	
 }

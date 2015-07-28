@@ -44,6 +44,7 @@ public class UserDetailsDao {
         SQLQuery 			query 			= null;
         List<Object[]>		list			= null;
         Object[] 			row 			= null;
+        String				flagChkCompany	= null;
 		
 		try{
 		    passWord		= EnjoyEncryptDecrypt.enCryption(userId, pass);
@@ -75,6 +76,7 @@ public class UserDetailsDao {
 				
 		    	row 				= list.get(0);
 				userDetailsBean 	= new UserDetailsBean();
+				flagChkCompany		= this.flagChkCompany(session);
 				
 				logger.info("[userSelect] userUniqueId 			:: " + row[0]);
 				logger.info("[userSelect] userId 				:: " + row[1]);
@@ -86,6 +88,7 @@ public class UserDetailsDao {
 				logger.info("[userSelect] userStatus 			:: " + row[7]);
 				logger.info("[userSelect] flagChangePassword 	:: " + row[8]);
 				logger.info("[userSelect] flagAlertStock 		:: " + row[9]);
+				logger.info("[userSelect] flagChkCompany 		:: " + flagChkCompany);
 				
 				userDetailsBean.setUserUniqueId			(Integer.parseInt(row[0].toString()));
 				userDetailsBean.setUserId				(EnjoyUtils.nullToStr(row[1].toString()));
@@ -99,6 +102,7 @@ public class UserDetailsDao {
 				userDetailsBean.setFlagChangePassword	(EnjoyUtils.chkBoxtoDb(row[8].toString()));
 				userDetailsBean.setCurrentDate			(dateFormat.format(date));
 				userDetailsBean.setFlagAlertStock		(EnjoyUtils.chkBoxtoDb(row[9].toString()));
+				userDetailsBean.setFlagChkCompany		(flagChkCompany);
 			}
 			
 			
@@ -741,6 +745,46 @@ public class UserDetailsDao {
 		
 		return listData;
 		
+	}
+	
+	public String flagChkCompany(Session session) throws EnjoyException{
+		logger.info("[flagChkCompany][Begin]");
+		
+		String							hql									= null;
+		List<Integer>			 		list								= null;
+		SQLQuery 						query 								= null;
+		int 							result								= 0;
+		String							flagChkCompany						= "Y";
+		
+		try{
+			
+			hql				= "select count(*) cou FROM company";
+			query			= session.createSQLQuery(hql);
+			
+			query.addScalar("cou"			, new IntegerType());
+			
+			list		 	= query.list();
+			
+			if(list!=null && list.size() > 0){
+				result = list.get(0);
+				if(result > 0)flagChkCompany	= "N";
+			}
+			
+			logger.info("[flagChkCompany] flagChkCompany :: " + flagChkCompany);
+			
+		}catch(Exception e){
+			e.printStackTrace();
+			logger.info(e.getMessage());
+			throw new EnjoyException(e.getMessage());
+		}finally{
+			
+			hql									= null;
+			list								= null;
+			query 								= null;
+			logger.info("[flagChkCompany][End]");
+		}
+		
+		return flagChkCompany;
 	}
 	
 	

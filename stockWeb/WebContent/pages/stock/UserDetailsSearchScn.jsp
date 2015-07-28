@@ -167,64 +167,60 @@
 									<div class="alert alert-block alert-error fade in container">
 						            	<h4 class="alert-heading"><%=userDetailsSearchForm.getTitlePage() %></h4>
 						            </div>
-										<div class="container main-container round-sm padding-no" >
-												<div class="panel-body" align="center">
-										        	<table class="user-register-table user-search-table" width="100%" border="0" cellpadding="5" cellspacing="5">
-										        		<tr>
-										        			<td align="right" width="150px;">
-										        				ชื่อ-นามสกุล  : &nbsp;
-										        			</td>
-										        			<td align="left" width="350px;">
-										        				<input type='text' id="userName" name='userName' maxlength="50" value="<%=userDetailsBean.getUserName() %>" />
-										        			</td>
-										        			<td align="right">
-										        				User ID : &nbsp;
-										        			</td>
-										        			<td align="left">
-										        				<input type='text' id="userId" name='userId' maxlength="20" value="<%=userDetailsBean.getUserId() %>" />
-										        				&nbsp;
-										        				<span id="inValidSpan"></span>
-										        			</td>
-										        		</tr>
-										        		<tr>
-										        			<td align="right">
-										        				สถานะ :&nbsp;
-										        			</td>
-										        			<td align="left" colspan="3">
-										        				<select id="userStatus" name="userStatus">
-										        					<% for(ComboBean comboBean:refuserstatusCombo){ %>
-										        					<option value="<%=comboBean.getCode()%>" <%if(userDetailsBean.getUserStatus().equals(comboBean.getCode())){ %> selected <%} %> ><%=comboBean.getDesc()%></option>
-										        					<%} %>
-										        				</select>
-										        				
-										        				<input type="button" id="btnSearch" class='btn btn-primary pull-right padding-sm' style="margin-right:12px; padding-right:24px; padding-left:24px;" value='ค้นหา'/>
-										        				<input type="button" id="btnReset" class='btn pull-right padding-sm'  style="margin-right:12px" value='เริ่มใหม่' />
-										        			</td>
-										        		</tr>
-										        	</table>
-									        	</div>
-											</div>
-										</div>
-										<div style="clear:both"></div><br>
-									
+									<div class="container main-container round-sm padding-no" >
+										<div class="panel-body" align="center">
+								        	<table class="user-register-table user-search-table" width="100%" border="0" cellpadding="5" cellspacing="5">
+								        		<tr>
+								        			<td align="right" width="150px;">
+								        				ชื่อ-นามสกุล  : &nbsp;
+								        			</td>
+								        			<td align="left" width="350px;">
+								        				<input type='text' id="userName" name='userName' maxlength="50" value="<%=userDetailsBean.getUserName() %>" />
+								        			</td>
+								        			<td align="right">
+								        				User ID : &nbsp;
+								        			</td>
+								        			<td align="left">
+								        				<input type='text' id="userId" name='userId' maxlength="20" value="<%=userDetailsBean.getUserId() %>" />
+								        				&nbsp;
+								        				<span id="inValidSpan"></span>
+								        			</td>
+								        		</tr>
+								        		<tr>
+								        			<td align="right">
+								        				สถานะ :&nbsp;
+								        			</td>
+								        			<td align="left" colspan="3">
+								        				<select id="userStatus" name="userStatus">
+								        					<% for(ComboBean comboBean:refuserstatusCombo){ %>
+								        					<option value="<%=comboBean.getCode()%>" <%if(userDetailsBean.getUserStatus().equals(comboBean.getCode())){ %> selected <%} %> ><%=comboBean.getDesc()%></option>
+								        					<%} %>
+								        				</select>
+								        				
+								        				<input type="button" id="btnSearch" class='btn btn-primary pull-right padding-sm' style="margin-right:12px; padding-right:24px; padding-left:24px;" value='ค้นหา'/>
+								        				<input type="button" id="btnReset" class='btn pull-right padding-sm'  style="margin-right:12px" value='เริ่มใหม่' />
+								        			</td>
+								        		</tr>
+								        	</table>
+							        	</div>
+									</div>
+								</div>
+								<div style="clear:both"></div><br>
 							</section>
-							
 							<section class="scrollable padder">
-							
-							
 									<div class="container main-container round-sm padding-no" >
 									<div id="seasonTitle" class="padding-md round-sm season-title-head" style="">
 										<h6 class="panel-title" style="font-size:1.0em">ข้อมูลผู้ใช้งานระบบ</h6>
 									</div>
-										<table class="table sim-panel-result-table" id="tbl_result" border="1" width="100%" style="margin-bottom:0px !important">
+										<table class="table sim-panel-result-table" id="tbl_result" width="100%">
 											<thead> 
-								               <tr height="26px;">
-													<th  style="text-align: center;" width="5%" ><B>ลำดับ</B></th>
-													<th  style="text-align: center;" width="20%"><B>ชื่อ-นามสกุล</B></th>
-													<th  style="text-align: center;" width="15%"><B>User Id</B></th> 
-													<th  style="text-align: center;" width="20%"><B>E-mail</B></th>
-													<th  style="text-align: center;" width="20%"><B>สถานะ</B></th> 
-													<th  style="text-align: center;" width="20%"><B>สิทธิ์การใช้งาน</B></th>
+								               <tr>
+													<th width="5%" >ลำดับ</th>
+													<th width="20%">ชื่อ-นามสกุล</th>
+													<th width="15%">User Id</th> 
+													<th width="20%">E-mail</th>
+													<th width="20%">สถานะ</th> 
+													<th width="20%">สิทธิ์การใช้งาน</th>
 												</tr> 
 											</thead>
 											<tfoot>

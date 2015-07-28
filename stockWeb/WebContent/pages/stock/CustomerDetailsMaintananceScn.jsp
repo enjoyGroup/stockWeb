@@ -482,7 +482,7 @@
 									        	<tr>
 									        		<td></td>
 								        			<td align="left" colspan="5" valign="middle">
-								        				<label class="col-sm-2 control-label" style="text-align:right">
+								        				<span>
 									        				<input  type="radio" 
 																	id="idType1" 
 																	name="idType" 
@@ -490,8 +490,8 @@
 																	<%if(customerDetailsBean.getIdType().equals("1")){%> checked="checked" <%} %> 
 															/>
 															บุคคลธรรมดา
-														</label>
-														<label class="col-sm-2 control-label" style="text-align:right">
+														</span>
+														<span style="margin-left: 5px;">
 															<input  type="radio" 
 																	id="idType2" 
 																	name="idType" 
@@ -499,18 +499,20 @@
 																	<%if(customerDetailsBean.getIdType().equals("2")){%> checked="checked" <%} %> 
 															/>
 															นิติบุคคล
-														</label>
-														เลขที่บัตร<span style="color: red;"><b>*</b></span> :
-														<input  type="text" 
-								        						id="idNumber" 
-								        						name="idNumber" 
-								        						class="numberOnly"
-								        						style="width: 200px;"
-								        						onblur="lp_checkIdNumber();"
-								        						value="<%=customerDetailsBean.getIdNumber()%>" 
-								        						maxlength="13"  />
-								        				&nbsp;
-								        				<span id="inValidSpan"></span>
+														</span>
+														<span style="margin-left: 50px;">
+															เลขที่บัตร<span style="color: red;"><b>*</b></span> :
+															<input  type="text" 
+									        						id="idNumber" 
+									        						name="idNumber" 
+									        						class="numberOnly"
+									        						style="width: 200px;"
+									        						onblur="lp_checkIdNumber();"
+									        						value="<%=customerDetailsBean.getIdNumber()%>" 
+									        						maxlength="13"  />
+									        				&nbsp;
+									        				<span id="inValidSpan"></span>
+								        				</span>
 								        			</td>
 								        		</tr>
 								        		<tr>
@@ -523,7 +525,7 @@
 								        					   name='birthDate' 
 								        					   placeholder="DD/MM/YYYY"
 								        					   class="birthDateFormat"
-								        					   onblur="gp_checkDate(this);"
+								        					   onchange="gp_checkDate(this);"
 								        					   value="<%=customerDetailsBean.getBirthDate() %>" 
 								        					   style="width: 100px;" />
 								        				<i class="fa fa-fw fa-calendar" onclick="lp_calendarItmClick('birthDate');" style="cursor:pointer"></i>
@@ -664,7 +666,7 @@
 																name="postCode"
 																maxlength="5"
 																placeholder="รหัสไปรษณ๊ย์"
-																onblur="lp_onBlurPostCode();"
+																onchange="lp_onBlurPostCode();"
 																value="<%=customerDetailsBean.getPostCode() %>"
 														/>
 													</td>
@@ -728,7 +730,7 @@
 								        					   name='startDate' 
 								        					   placeholder="DD/MM/YYYY"
 								        					   class="dateFormat"
-								        					   onblur="gp_checkDate(this);"
+								        					   onchange="gp_checkDate(this);"
 								        					   value="<%=customerDetailsBean.getStartDate() %>" 
 								        					   style="width: 100px;" />
 								        				<i class="fa fa-fw fa-calendar" onclick="lp_calendarItmClick('startDate');" style="cursor:pointer"></i>
@@ -742,7 +744,7 @@
 								        					   name='expDate' 
 								        					   placeholder="DD/MM/YYYY"
 								        					   class="dateFormat"
-								        					   onblur="gp_checkDate(this);"
+								        					   onchange="gp_checkDate(this);"
 								        					   value="<%=customerDetailsBean.getExpDate() %>" 
 								        					   style="width: 100px;" />
 								        				<i class="fa fa-fw fa-calendar" onclick="lp_calendarItmClick('expDate');" style="cursor:pointer"></i>
@@ -767,7 +769,7 @@
 								        				หมายเหต :
 								        			</td>
 								        			<td align="left" colspan="5">
-								        				<textarea rows="4" style="width: 500px;" id="remark" name="remark" style="float:right;" >
+								        				<textarea rows="4" style="width: 500px;" id="remark" name="remark" >
 								        					<%=customerDetailsBean.getRemark()%>
 								        				</textarea>
 								        			</td>

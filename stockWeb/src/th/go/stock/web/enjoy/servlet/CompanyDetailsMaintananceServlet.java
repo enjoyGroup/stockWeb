@@ -337,6 +337,7 @@ public class CompanyDetailsMaintananceServlet extends EnjoyStandardSvc {
 		Session 			session					= null;
 		JSONObject 			obj 					= null;
 		CompanyDetailsBean 	companyDetailsBean		= null;
+		String				flagChkCompany			= null;
 		
 		try{
 			pageMode 					= EnjoyUtil.nullToStr(request.getParameter("pageMode"));
@@ -408,9 +409,16 @@ public class CompanyDetailsMaintananceServlet extends EnjoyStandardSvc {
 				this.dao.updateCompanyDetail(session, companyDetailsBean);
 			}
 			
-			session.getTransaction().commit();
+			flagChkCompany = userBean.getFlagChkCompany();
+			if(flagChkCompany.equals("Y") && this.userBean.getFlagChangePassword().equals("N")){
+				userBean.setFlagChkCompany("N");
+			}
 			
-			obj.put(STATUS, 			SUCCESS);
+			obj.put(STATUS				, SUCCESS);
+			obj.put("flagChkCompany"	, flagChkCompany);
+			obj.put("FlagChange"		, this.userBean.getFlagChangePassword());
+			
+			session.getTransaction().commit();
 			
 		}catch(EnjoyException e){
 			session.getTransaction().rollback();
