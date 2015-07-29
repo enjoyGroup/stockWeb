@@ -15,8 +15,8 @@ $.datepicker.regional['th'] ={
    
     prevText: 'ก่อนหน้า',
     nextText: 'ถัดไป',
-    yearRange: '-20:+20'
-    //buttonText: 'เลือก',
+    yearRange: '-20:+20',
+    buttonText: 'เลือก',
   
 };
 
@@ -36,8 +36,8 @@ $.datepicker.regional['birthDateTH'] ={
    
     prevText: 'ก่อนหน้า',
     nextText: 'ถัดไป',
-    yearRange: '-100:+0'
-    //buttonText: 'เลือก',
+    yearRange: '-100:+0',
+    buttonText: 'เลือก',
   
 };
 

@@ -810,8 +810,10 @@ body .ui-tooltip {
 	color: #333333;
 }
 .ui-widget-header {
-	border: 1px solid #e78f08;
-	background: #f6a828 url(/stockWeb/images/ui-bg_gloss-wave_35_f6a828_500x100.png) 50% 50% repeat-x;
+	border: 0px solid #e78f08;
+	/*Edit By Pound for blue theme*/
+	/*background: #f6a828 url(/ticketWeb/images/ui-bg_gloss-wave_35_f6a828_500x100.png) 50% 50% repeat-x;*/
+	background: url(/stockWeb/images/ui-bg_gloss-wave_35_f6a828_500x100_x.png) 50% 50% repeat-x;
 	color: #ffffff;
 	font-weight: bold;
 }
@@ -841,7 +843,9 @@ body .ui-tooltip {
 .ui-state-focus,
 .ui-widget-content .ui-state-focus,
 .ui-widget-header .ui-state-focus {
-	border: 1px solid #fbcb09;
+	/*Edit By Pound for blue theme*/
+	/*border: 1px solid #fbcb09;*/
+	border: 1px solid #3366FF;
 	/*background: #fdf5ce url(/stockWeb/images/ui-bg_glass_100_fdf5ce_1x400.png) 50% 50% repeat-x;*/
 	/*font-weight: bold;*/
 	color: #c77405;
@@ -938,14 +942,20 @@ body .ui-tooltip {
 	background-image: url(/stockWeb/images/ui-icons_ffffff_256x240.png);
 }
 .ui-state-default .ui-icon {
-	background-image: url(/stockWeb/images/ui-icons_ef8c08_256x240.png);
+	/*Edit By Pound for blue theme*/
+	/*background-image: url(/stockWeb/images/ui-icons_ef8c08_256x240.png);*/
+	background-image: url(/stockWeb/images/ui-icons_228ef1_256x240.png);
 }
 .ui-state-hover .ui-icon,
 .ui-state-focus .ui-icon {
-	background-image: url(/stockWeb/images/ui-icons_ef8c08_256x240.png);
+	/*Edit By Pound for blue theme*/
+	/*background-image: url(/stockWeb/images/ui-icons_ef8c08_256x240.png);*/
+	background-image: url(/stockWeb/images/ui-icons_228ef1_256x240.png);
 }
 .ui-state-active .ui-icon {
-	background-image: url(/stockWeb/images/ui-icons_ef8c08_256x240.png);
+	/*Edit By Pound for blue theme*/
+	/*background-image: url(/stockWeb/images/ui-icons_ef8c08_256x240.png);*/
+	background-image: url(/stockWeb/images/ui-icons_228ef1_256x240.png);
 }
 .ui-state-highlight .ui-icon {
 	background-image: url(/stockWeb/images/ui-icons_228ef1_256x240.png);

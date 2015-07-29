@@ -66,17 +66,18 @@
 			}
 		</style>
 		<script language="JavaScript" type="text/JavaScript">
+		/*
 		function lp_changeEnterToTab(e)
 		{
 			var keycode =(window.event) ? event.keyCode : e.keyCode;
 			if(keycode == 13) {
 				event.keyCode = 9;
 			}
-		} 
+		} */
 		
 		function lp_changeEnterToTab_forPWD(e)
 		{
-			var keycode =(window.event) ? event.keyCode : e.keyCode;
+			var keycode =(window.event) ? event.keyCode : e.keyCode;//alert(keycode);
 			if(keycode == 13) {
 				//lp_submit_login();
 				$('#btnLogin').click();
@@ -139,36 +140,45 @@
 				
 			});
 		});
+		
 		</script>	
 	</head>
 	<body>
-		<div class="container" align="center">
-		    <div class="row" align="center" style="width: 100%;">
-		        <div class="form-login">
-		           	<img src="<%=imgURL%>/logo-login.png"><br/><br/>
-		            <input id="username"  
-		            	   name="username" 
-		            	   type="text"  
-		            	   maxlength="20" 
-		            	   placeholder="username"  
-		            	   onkeydown="lp_changeEnterToTab_forPWD();" 
-		            	   style="width: 100%;" />
-		            <br/><br/>
-		            <input id="user_pwd"  
-		            	   name="user_pwd"  
-		            	   type="password"  
-		            	   maxlength="50" 
-		            	   placeholder="password" 
-		            	   onkeydown="lp_changeEnterToTab_forPWD();" 
-		            	   style="width: 100%;"  />
-		            <br/>
-		            <div class="wrapper">
-			            <span class="group-btn">     
-			                <button type="submit" href="javascript:void(0)" id="btnLogin" class="btn btn-primary btn-md">Login &nbsp;<i class="fa fa-sign-in"></i></button>
-			            </span>
-		            </div>
-	            </div>	
-		    </div>
-		</div>
+		<form id="frm" onsubmit="return true;" >
+			<div class="container" align="center">
+			    <div class="row" align="center" style="width: 100%;">
+			        <div class="form-login">
+			           	<img src="<%=imgURL%>/logo-login.png"><br/><br/>
+			            <input id="username"  
+			            	   name="username" 
+			            	   type="text"  
+			            	   maxlength="20" 
+			            	   placeholder="username"  
+			            	   onkeypress="return lp_changeEnterToTab_forPWD(event);" 
+			            	   style="width: 100%;" />
+			            <br/><br/>
+			            <input id="user_pwd"  
+			            	   name="user_pwd"  
+			            	   type="password"  
+			            	   maxlength="50" 
+			            	   placeholder="password" 
+			            	   onkeypress="return lp_changeEnterToTab_forPWD(event);" 
+			            	   style="width: 100%;"  />
+			            <br/>
+			            <div class="wrapper">
+				            <span class="group-btn">     
+				                <button type="button" href="javascript:void(0);" id="btnLogin" class="btn btn-primary btn-md">Login &nbsp;<i class="fa fa-sign-in"></i></button>
+				            </span>
+			            </div>
+		            </div>	
+			    </div>
+			</div>
+			<div align="center" class="FreezeScreen" style="display:none;">
+	        	<center>
+	        		<img id="imgProgress" valign="center" src="<%=imgURL%>/loading36.gif" alt="" />
+	        		<span style="font-weight: bold;font-size: large;color: black;">Loading...</span>
+	        	</center>
+	    	</div>
+    	</form>
 	</body>
 </html>
