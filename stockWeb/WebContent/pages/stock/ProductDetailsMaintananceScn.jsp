@@ -177,7 +177,7 @@
 	                }
 				}
 				
-				for(var i=0;i<la_quanDiscount.length;i66){
+				for(var i=0;i<la_quanDiscount.length;i++){
 					if(gp_trim(la_quanDiscount[i].value)==""){
 		            	alert("กรุณาระบุปริมาณที่ซื้อ");
 		            	la_quanDiscount[i].focus();
@@ -307,14 +307,14 @@
 			
 		}		
 		
-		function lp_calendarItmClick(av_val){
+		/*function lp_calendarItmClick(av_val){
 			
 			try{
 				$('#'+av_val).focus();
 			}catch(e){
 				alert("btnAddDate :: " + e);
 			}
-		}
+		}*/
 		
 
 		function lp_newRecord(ao_obj){
@@ -624,7 +624,6 @@
 								        					   onchange="gp_checkDate(this);"
 								        					   value="<%=productDetailsBean.getStartDate() %>" 
 								        					   style="width: 100px;" />
-								        				<i class="fa fa-fw fa-calendar" onclick="lp_calendarItmClick('startDate');" style="cursor:pointer"></i>
 								        				&nbsp;-&nbsp;
 								        				<input type='text' 
 								        					   id="expDate" 
@@ -634,7 +633,6 @@
 								        					   onchange="gp_checkDate(this);"
 								        					   value="<%=productDetailsBean.getExpDate() %>" 
 								        					   style="width: 100px;" />
-								        				<i class="fa fa-fw fa-calendar" onclick="lp_calendarItmClick('expDate');" style="cursor:pointer"></i>
 								        			</td>
 									        	</tr>
 									        	<tr>
