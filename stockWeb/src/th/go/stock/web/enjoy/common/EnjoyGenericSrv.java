@@ -14,6 +14,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
+import th.go.stock.app.enjoy.exception.EnjoyException;
 import th.go.stock.app.enjoy.main.Constants;
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
 
@@ -70,7 +71,12 @@ public class EnjoyGenericSrv extends HttpServlet {
             enjoyStandardSvc 	= (EnjoyStandardSvc)cls.newInstance();
             service 			= enjoyStandardSvc;
             
-            logger.info("[service]: service: " + serviceName);
+            logger.info("[service]service	:: " + serviceName);
+            logger.info("[service]userBean	:: " + session.getAttribute("userBean"));
+            
+            if(!serviceName.equalsIgnoreCase("servlet.LoginServlet") && (session == null || session.getAttribute("userBean") == null)){ 
+            	throw new EnjoyException("");
+            }
             
             if (request != null && ServletFileUpload.isMultipartContent(request)) {
 	            factory 	= new DiskFileItemFactory();
@@ -89,7 +95,9 @@ public class EnjoyGenericSrv extends HttpServlet {
             if(target != null){
                 redirect(response, target);
             }
-        } catch (Exception ex) {
+        }catch(EnjoyException e){
+        	redirect(response, Constants.LOGIN_FAIL_URL);
+ 		} catch (Exception ex) {
             ex.printStackTrace();
             redirect(response, Constants.ERR_PAGE_URL);
         }finally{
