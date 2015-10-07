@@ -46,11 +46,19 @@ public class CompanyDetailsDao {
 								+ "	from company a, refcompanystatus b"
 								+ "	where b.companyStatusCode = a.companyStatus ";
 			
-			if(!companyDetailsBean.getCompanyName().equals("")){
-				hql += " and a.companyName like ('" + companyDetailsBean.getCompanyName() + "%')";
+			if(!companyDetailsBean.getCompanyName().equals("***")){
+				if(companyDetailsBean.getCompanyName().equals("")){
+					hql += " and (a.companyName is null or a.companyName = '')";
+				}else{
+					hql += " and a.companyName like ('" + companyDetailsBean.getCompanyName() + "%')";
+				}
 			}
-			if(!companyDetailsBean.getTin().equals("")){
-				hql += " and a.tin like ('" + companyDetailsBean.getTin() + "%')";
+			if(!companyDetailsBean.getTin().equals("***")){
+				if(companyDetailsBean.getTin().equals("")){
+					hql += " and (a.tin is null or a.tin = '')";
+				}else{
+					hql += " and a.tin like ('" + companyDetailsBean.getTin() + "%')";
+				}
 			}
 			if(!companyDetailsBean.getCompanyStatus().equals("")){
 				hql += " and a.companyStatus = '" + companyDetailsBean.getCompanyStatus() + "'";
@@ -97,9 +105,16 @@ public class CompanyDetailsDao {
 				provinceCode 		= EnjoyUtils.nullToStr(row[8].toString());
 				districtCode 		= EnjoyUtils.nullToStr(row[9].toString());
 				subdistrictCode 	= EnjoyUtils.nullToStr(row[10].toString());
-				provinceName		= addressDao.getProvinceName(provinceCode);
-				districtName		= addressDao.getDistrictName(districtCode);
-				subdistrictName		= addressDao.getSubdistrictName(subdistrictCode);
+				
+				if(!provinceCode.equals("") && !districtCode.equals("") && !subdistrictCode .equals("")){
+					provinceName		= EnjoyUtils.nullToStr(addressDao.getProvinceName(provinceCode));
+					districtName		= EnjoyUtils.nullToStr(addressDao.getDistrictName(districtCode));
+					subdistrictName		= EnjoyUtils.nullToStr(addressDao.getSubdistrictName(subdistrictCode));
+				}else{
+					provinceName		= "";
+					districtName		= "";
+					subdistrictName		= "";
+				}
 				
 				
 				bean.setProvinceCode		(provinceCode);
@@ -196,9 +211,16 @@ public class CompanyDetailsDao {
 					provinceCode 		= EnjoyUtils.nullToStr(row[8].toString());
 					districtCode 		= EnjoyUtils.nullToStr(row[9].toString());
 					subdistrictCode 	= EnjoyUtils.nullToStr(row[10].toString());
-					provinceName		= addressDao.getProvinceName(provinceCode);
-					districtName		= addressDao.getDistrictName(districtCode);
-					subdistrictName		= addressDao.getSubdistrictName(subdistrictCode);
+					
+					if(!provinceCode.equals("") && !districtCode.equals("") && !subdistrictCode .equals("")){
+						provinceName		= EnjoyUtils.nullToStr(addressDao.getProvinceName(provinceCode));
+						districtName		= EnjoyUtils.nullToStr(addressDao.getDistrictName(districtCode));
+						subdistrictName		= EnjoyUtils.nullToStr(addressDao.getSubdistrictName(subdistrictCode));
+					}else{
+						provinceName		= "";
+						districtName		= "";
+						subdistrictName		= "";
+					}
 					
 					
 					bean.setProvinceCode		(provinceCode);
@@ -510,6 +532,54 @@ public class CompanyDetailsDao {
 		}
 		
 		return tin;
+	}
+	
+	public List<ComboBean> getCompanyCombo(Session session) throws EnjoyException{
+		logger.info("[getCompanyCombo][Begin]");
+		
+		String						hql						= null;
+		SQLQuery 					query 					= null;
+		List<Object[]>				list					= null;
+		ComboBean					comboBean				= null;
+		List<ComboBean> 			comboList				= new ArrayList<ComboBean>();
+		
+		try{
+			
+			hql	= "select tin,companyName from company where companyStatus = 'A'";
+
+			logger.info("[getCompanyCombo] hql :: " + hql);
+			
+			query			= session.createSQLQuery(hql);
+			query.addScalar("tin"		, new StringType());
+			query.addScalar("companyName"		, new StringType());
+			
+			list		 	= query.list();
+			
+			comboList.add(new ComboBean("", "กรุณาระบุ"));
+			for(Object[] row:list){
+				comboBean = new ComboBean();
+				
+				logger.info("[getCompanyCombo] tin :: " + row[0].toString());
+				logger.info("[getCompanyCombo] companyName :: " + row[1].toString());
+				
+				comboBean.setCode(row[0].toString());
+				comboBean.setDesc(row[1].toString());
+				
+				comboList.add(comboBean);
+			}
+			
+			
+		}catch(Exception e){
+			e.printStackTrace();
+			logger.info("[getCompanyCombo] " + e.getMessage());
+			throw new EnjoyException("Error getCompanyCombo");
+		}finally{
+			hql						= null;
+			logger.info("[getCompanyCombo][End]");
+		}
+		
+		return comboList;
+		
 	}
 	
 }

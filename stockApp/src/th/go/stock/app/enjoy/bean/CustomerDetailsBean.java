@@ -7,6 +7,7 @@ public class CustomerDetailsBean {
 	private String cusCode;
 	private String cusName;
 	private String cusSurname;
+	private String branchName;
 	private String sex;
 	private String idType;
 	private String idNumber;
@@ -40,6 +41,7 @@ public class CustomerDetailsBean {
 		this.cusCode 			= "";
 		this.cusName 			= "";
 		this.cusSurname 		= "";
+		this.branchName			= "";
 		this.sex 				= "";
 		this.idType 			= "";
 		this.idNumber 			= "";
@@ -373,6 +375,14 @@ public class CustomerDetailsBean {
 		}
 		
 		return address;
+	}
+
+	public String getBranchName() {
+		return branchName;
+	}
+
+	public void setBranchName(String branchName) {
+		this.branchName = branchName;
 	}
 
 	

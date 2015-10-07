@@ -10,6 +10,7 @@
 	UserDetailsBean 		userDetailsBean 	= userDetailsMaintananceForm.getUserDetailsBean();
 	List<ComboBean> 		refuserstatusCombo 	= userDetailsMaintananceForm.getStatusCombo();
 	List<Userprivilege> 	userprivilegeList	= userDetailsMaintananceForm.getUserprivilegeList();
+	List<ComboBean> 		companyCombo 		= userDetailsMaintananceForm.getCompanyCombo();
 	int 					couChkRow			= 0;
 
 
@@ -37,15 +38,22 @@
 				lp_setModeEdit();
 			}
 			
+			lp_ctrlCommission();
+			
 			gp_progressBarOff();
 			
 		});
 		
 		function lp_validate(){
-			var la_idName               = new Array("userName", "userSurname", "userId", "userEmail");
-		    var la_msg               	= new Array("ชื่อ"	  , "นามสกุล"	 , "User ID", "E-mail");
+			var la_idName               = new Array("userName", "userSurname", "userId", "userEmail", "userStatus", "tinCompany");
+		    var la_msg               	= new Array("ชื่อ"	  , "นามสกุล"	 , "User ID", "E-mail", "สถานะ", "บริษัท");
+		    var lo_flagSalesman 		= null;
+			var lo_commission 			= null;
 		    
 			try{
+				
+				lo_flagSalesman 	= document.getElementById("flagSalesman");
+				lo_commission 		= document.getElementById("commission");
 				
 				for(var i=0;i<la_idName.length;i++){
 		            lo_obj          = eval('$("#' + la_idName[i] + '")');
@@ -60,6 +68,11 @@
 				if(gv_checkDupUserId==false){
 					alert("มี userid นี้ในระบบแล้ว");
 					$("#userId").focus();
+					return false;
+				}
+				
+				if(lo_flagSalesman.checked==true && lo_commission.value.trim()==""){
+					alert("กรุณาระบุค่าคอม");
 					return false;
 				}
 				
@@ -303,6 +316,29 @@
 			}
 		}
 		
+		function lp_ctrlCommission(){
+			
+			var lo_flagSalesman 	= null;
+			var lo_commission 		= null;
+			
+			try{
+				lo_flagSalesman 	= document.getElementById("flagSalesman");
+				lo_commission 		= document.getElementById("commission");
+				
+				if(lo_flagSalesman.checked==true){
+					lo_commission.readOnly 		= false;
+					lo_commission.className 	= "";
+				}else{
+					lo_commission.value			= "";
+					lo_commission.readOnly 		= true;
+					lo_commission.className 	= "input-disabled";
+				}
+				
+			}catch(e){
+				alert("lp_ctrlCommission :: " + e);
+			}
+		}
+		
 	</script>
 </head>
 <body>
@@ -375,7 +411,7 @@
 								        		</tr>
 								        		<tr>
 								        			<td align="right">
-								        				สถานะ :&nbsp;
+								        				สถานะ <span style="color: red;"><b>*</b></span> :&nbsp;
 								        			</td>
 								        			<td align="left">
 								        				<select id="userStatus" name="userStatus" style="width: 250px;">
@@ -385,6 +421,46 @@
 								        				</select>
 								        			</td>
 								        		</tr>
+								        		<tr>
+								        			<td align="right">
+								        				บริษัท <span style="color: red;"><b>*</b></span> :&nbsp;
+								        			</td>
+								        			<td align="left">
+								        				<select id="tinCompany" name="tinCompany" style="width: 250px;">
+								        					<% for(ComboBean comboBean:companyCombo){ %>
+								        					<option value="<%=comboBean.getCode()%>" <%if(userDetailsBean.getTinCompany().equals(comboBean.getCode())){ %> selected <%} %> ><%=comboBean.getDesc()%></option>
+								        					<%} %>
+								        				</select>
+								        			</td>
+								        		</tr>
+								        		<tr>
+								        			<td align="right">
+								        				หมายเหตุ :&nbsp;
+								        			</td>
+								        			<td align="left">
+								        				<textarea rows="3" style="width: 100%;" id="remark" name="remark">
+								        				<%=userDetailsBean.getRemark() %>
+								        				</textarea>
+								        			</td>
+								        		</tr>
+								        		<tr>
+								        			<td align="right">
+								        				<input type="checkbox" id="flagSalesman" name="flagSalesman" onclick="lp_ctrlCommission();" value="Y" <%if(userDetailsBean.getFlagSalesman().equals("Y")){ %> checked="checked" <%} %> /> :&nbsp;
+								        			</td>
+								        			<td align="left" valign="middle">
+								        				<span>
+								        					เป็นพนักงานขาย &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ค่าคอม&nbsp;:&nbsp;
+								        					<input  type="text" 
+									        						id="commission" 
+									        						name="commission" 
+									        						class="moneyOnly"
+									        						style="width: 80px;"
+									        						value="<%=userDetailsBean.getCommission()%>" />
+									        				&nbsp;%
+								        				</span>
+								        				
+								        			</td>
+									        	</tr>
 								        		<tr>
 								        			<td align="right">
 								        				<input type="checkbox" id="flagChangePassword" name="flagChangePassword" value="Y" <%if(userDetailsBean.getFlagChangePassword().equals("Y")){ %> checked="checked" <%} %> /> :&nbsp;

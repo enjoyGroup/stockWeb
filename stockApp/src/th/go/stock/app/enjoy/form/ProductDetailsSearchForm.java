@@ -6,7 +6,7 @@ import java.util.List;
 
 import th.go.stock.app.enjoy.bean.ComboBean;
 import th.go.stock.app.enjoy.bean.CustomerDetailsBean;
-import th.go.stock.app.enjoy.bean.ProductDetailsBean;
+import th.go.stock.app.enjoy.bean.ProductmasterBean;
 
 public class ProductDetailsSearchForm {
 	
@@ -14,36 +14,36 @@ public class ProductDetailsSearchForm {
 	public static final String EDIT = "EDIT";
 	
 	
-	private ProductDetailsBean 			productDetailsBean;
+	private ProductmasterBean 			productmasterBean;
 	private String						errMsg;
 	private String						pageMode;
 	private String						titlePage;
 	private int							pageNum;
 	private int							totalPage;
 	private String						totalRecord;
-	private List<ProductDetailsBean> 	dataList;
+	private List<ProductmasterBean> 	dataList;
 	private HashMap						hashTable;
 	private String						radPrint;
 	
 	public ProductDetailsSearchForm(){
-		this.productDetailsBean 	= new ProductDetailsBean();
+		this.productmasterBean 	= new ProductmasterBean();
 		this.errMsg					= "";
 		this.pageMode				= NEW;
 		this.titlePage				= "";
 		this.pageNum				= 1;
 		this.totalPage				= 1;
 		this.totalRecord			= "";
-		this.dataList				= new ArrayList<ProductDetailsBean>();
+		this.dataList				= new ArrayList<ProductmasterBean>();
 		this.hashTable				= new HashMap();
 		this.radPrint				= "";
 	}
 
-	public ProductDetailsBean getProductDetailsBean() {
-		return productDetailsBean;
+	public ProductmasterBean getProductmasterBean() {
+		return productmasterBean;
 	}
 
-	public void setProductDetailsBean(ProductDetailsBean productDetailsBean) {
-		this.productDetailsBean = productDetailsBean;
+	public void setProductmasterBean(ProductmasterBean productmasterBean) {
+		this.productmasterBean = productmasterBean;
 	}
 
 	public String getErrMsg() {
@@ -94,11 +94,11 @@ public class ProductDetailsSearchForm {
 		this.totalRecord = totalRecord;
 	}
 
-	public List<ProductDetailsBean> getDataList() {
+	public List<ProductmasterBean> getDataList() {
 		return dataList;
 	}
 
-	public void setDataList(List<ProductDetailsBean> dataList) {
+	public void setDataList(List<ProductmasterBean> dataList) {
 		this.dataList = dataList;
 	}
 
@@ -117,4 +117,5 @@ public class ProductDetailsSearchForm {
 	public void setRadPrint(String radPrint) {
 		this.radPrint = radPrint;
 	}
+
 }

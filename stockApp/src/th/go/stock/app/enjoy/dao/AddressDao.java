@@ -299,7 +299,7 @@ public class AddressDao {
 		try{
 			sessionFactory 		= HibernateUtil.getSessionFactory();
 			session 			= sessionFactory.openSession();
-			hql 		= " select provinceName from province where provinceId <> 00 and provinceId = " + provinceId;
+			hql 		= " select provinceName from province where provinceId <> 00 and provinceId = '" + provinceId + "'";
 			
 			logger.info("[getProvinceName] hql :: " + hql);
 			
@@ -337,7 +337,7 @@ public class AddressDao {
 		try{
 			sessionFactory 		= HibernateUtil.getSessionFactory();
 			session 			= sessionFactory.openSession();
-			hql 				= " select subdistrictName from subdistrict where subdistrictId <> 00 and subdistrictId = " + subdistrictId;
+			hql 				= " select subdistrictName from subdistrict where subdistrictId <> 00 and subdistrictId = '" + subdistrictId + "'";
 			
 			logger.info("[getSubdistrictName] hql :: " + hql);
 			
@@ -376,7 +376,7 @@ public class AddressDao {
 		try{
 			sessionFactory 		= HibernateUtil.getSessionFactory();
 			session 			= sessionFactory.openSession();
-			hql 		= " select districtName from district where districtId <> 00 and districtId = " + districtId;
+			hql 		= " select districtName from district where districtId <> 00 and districtId = '" + districtId + "'";
 			
 			logger.info("[getDistrictName] hql :: " + hql);
 			

@@ -141,6 +141,7 @@ public class CustomerDetailsMaintananceServlet extends EnjoyStandardSvc {
 			this.form.setStatusCombo(this.dao.getStatusCombo(session));
 			
 			this.setSexCombo();
+			this.setIdTypeCombo();
 			
 			
 		}catch(EnjoyException e){
@@ -178,6 +179,30 @@ public class CustomerDetailsMaintananceServlet extends EnjoyStandardSvc {
 			throw new EnjoyException("setSexCombo is error");
 		}finally{
 			logger.info("[setSexCombo][End]");
+		}
+	}
+	
+	private void setIdTypeCombo() throws EnjoyException{
+		
+		logger.info("[setIdTypeCombo][Begin]");
+		
+		List<ComboBean>			idTypeCombo = null;
+		
+		try{
+			
+			idTypeCombo = new ArrayList<ComboBean>();
+			
+			idTypeCombo.add(new ComboBean("0"	, "ไม่ระบุ"));
+			idTypeCombo.add(new ComboBean("1"	, "บุคคลธรรมดา"));
+			idTypeCombo.add(new ComboBean("2"	, "นิติบุคคล"));
+			
+			this.form.setIdTypeCombo(idTypeCombo);
+		}
+		catch(Exception e){
+			logger.info(e.getMessage());
+			throw new EnjoyException("setIdTypeCombo is error");
+		}finally{
+			logger.info("[setIdTypeCombo][End]");
 		}
 	}
 	
@@ -240,6 +265,13 @@ public class CustomerDetailsMaintananceServlet extends EnjoyStandardSvc {
 	   String				provinceName				= null;
 	   String				districtName				= null;
 	   String				subdistrictName				= null;
+	   String				idType 						= null;
+	   String				idNumber 					= null;
+	   String				cusCode 					= null;
+	   String				cusName 					= null;
+	   String				cusSurname 					= null;
+	   String				branchName					= null;
+	   String				branchNameTmp				= "";
 	   JSONObject 			obj 						= new JSONObject();
 	   AddressBean			addressBean					= null;
 	   
@@ -247,33 +279,65 @@ public class CustomerDetailsMaintananceServlet extends EnjoyStandardSvc {
 		   provinceName		= EnjoyUtils.nullToStr(this.request.getParameter("provinceName"));
 		   districtName		= EnjoyUtils.nullToStr(this.request.getParameter("districtName"));
 		   subdistrictName	= EnjoyUtils.nullToStr(this.request.getParameter("subdistrictName"));
+		   idType 			= EnjoyUtil.nullToStr(request.getParameter("idType"));
+		   idNumber 		= EnjoyUtil.nullToStr(request.getParameter("idNumber"));
+		   cusCode 			= EnjoyUtil.nullToStr(request.getParameter("cusCode"));
+		   cusName 			= EnjoyUtil.nullToStr(request.getParameter("cusName"));
+		   cusSurname 		= EnjoyUtil.nullToStr(request.getParameter("cusSurname"));
+		   branchName 		= EnjoyUtil.nullToStr(request.getParameter("branchName"));
 		   
 		   logger.info("[lp_validate] provinceName 			:: " + provinceName);
 		   logger.info("[lp_validate] districtName 			:: " + districtName);
 		   logger.info("[lp_validate] subdistrictName 		:: " + subdistrictName);
+		   logger.info("[lp_validate] idType 				:: " + idType);
+		   logger.info("[lp_validate] idNumber 				:: " + idNumber);
+		   logger.info("[lp_validate] cusCode 				:: " + cusCode);
+		   logger.info("[lp_validate] cusName 				:: " + cusName);
+		   logger.info("[lp_validate] cusSurname 			:: " + cusSurname);
+		   logger.info("[lp_validate] branchName 			:: " + branchName);
 		   
-		   addressBean 		= this.addressDao.validateAddress(provinceName, districtName, subdistrictName);
-		   
-		   if(addressBean.getErrMsg().equals("")){
-			   
-			   provinceCode 	= addressBean.getProvinceId();
-			   districtCode 	= addressBean.getDistrictId();
-			   subdistrictCode 	= addressBean.getSubdistrictId();
-			   
-			   logger.info("[lp_validate] provinceCode 			:: " + provinceCode);
-			   logger.info("[lp_validate] districtCode 			:: " + districtCode);
-			   logger.info("[lp_validate] subdistrictCode 		:: " + subdistrictCode);
-			   
-			   obj.put(STATUS, 				SUCCESS);
-			   obj.put("provinceCode", 		provinceCode);
-			   obj.put("districtCode", 		districtCode);
-			   obj.put("subdistrictCode", 	subdistrictCode);
-			   
-			   
-		   }else{
-			   obj.put(ERR_TYPE, 			addressBean.getErrType());
-			   throw new EnjoyException(addressBean.getErrMsg());
+		   if(!idType.equals("0")){
+			   if(this.dao.checkDupIdNumber(idNumber, cusCode) > 0){
+				   obj.put(ERR_TYPE, 			"E");
+				   throw new EnjoyException("เลขที่บัตร " + idNumber + " มีอยู่ในระบบแล้ว");
+			   }
 		   }
+		   
+		   if(this.dao.checkDupCusName(cusName, cusSurname, branchName, cusCode) > 0){
+			   if(!branchName.equals("")){
+				   branchNameTmp = " สาขา " + branchName;
+			   }
+			   
+			   
+			   obj.put(ERR_TYPE, 			"E");
+			   throw new EnjoyException("ชื่อ"+cusName + " " + cusSurname + branchNameTmp + " มีอยู่แล้วในระบบ");
+		   }
+		   
+		   if(!provinceName.equals("") && !districtName.equals("") && !subdistrictName.equals("")){
+			   addressBean 		= this.addressDao.validateAddress(provinceName, districtName, subdistrictName);
+			   
+			   if(addressBean.getErrMsg().equals("")){
+				   
+				   provinceCode 	= addressBean.getProvinceId();
+				   districtCode 	= addressBean.getDistrictId();
+				   subdistrictCode 	= addressBean.getSubdistrictId();
+				   
+				   logger.info("[lp_validate] provinceCode 			:: " + provinceCode);
+				   logger.info("[lp_validate] districtCode 			:: " + districtCode);
+				   logger.info("[lp_validate] subdistrictCode 		:: " + subdistrictCode);
+				   
+				   obj.put("provinceCode", 		provinceCode);
+				   obj.put("districtCode", 		districtCode);
+				   obj.put("subdistrictCode", 	subdistrictCode);
+				   
+				   
+			   }else{
+				   obj.put(ERR_TYPE, 			addressBean.getErrType());
+				   throw new EnjoyException(addressBean.getErrMsg());
+			   }
+		   }
+		   
+		   obj.put(STATUS, 				SUCCESS);
 		   
 	   }catch(EnjoyException e){
 		   obj.put(STATUS, 				ERROR);
@@ -298,6 +362,7 @@ public class CustomerDetailsMaintananceServlet extends EnjoyStandardSvc {
 		String				cusCode 				= null;
 		String				cusName 				= null;
 		String				cusSurname 				= null;
+		String				branchName				= null;
 		String				sex 					= null;
 		String				idType 					= null;
 		String				idNumber 				= null;
@@ -331,6 +396,7 @@ public class CustomerDetailsMaintananceServlet extends EnjoyStandardSvc {
 			cusCode 					= EnjoyUtil.nullToStr(request.getParameter("cusCode"));
 			cusName 					= EnjoyUtil.nullToStr(request.getParameter("cusName"));
 			cusSurname 					= EnjoyUtil.nullToStr(request.getParameter("cusSurname"));
+			branchName 					= EnjoyUtil.nullToStr(request.getParameter("branchName"));
 			sex 						= EnjoyUtil.nullToStr(request.getParameter("sex"));
 			idType 						= EnjoyUtil.nullToStr(request.getParameter("idType"));
 			idNumber 					= EnjoyUtil.nullToStr(request.getParameter("idNumber"));
@@ -363,6 +429,7 @@ public class CustomerDetailsMaintananceServlet extends EnjoyStandardSvc {
 			logger.info("[onSave] cusCode 				:: " + cusCode);
 			logger.info("[onSave] cusName 				:: " + cusName);
 			logger.info("[onSave] cusSurname 			:: " + cusSurname);
+			logger.info("[onSave] branchName 			:: " + branchName);
 			logger.info("[onSave] sex 					:: " + sex);
 			logger.info("[onSave] idType 				:: " + idType);
 			logger.info("[onSave] idNumber 				:: " + idNumber);
@@ -390,6 +457,7 @@ public class CustomerDetailsMaintananceServlet extends EnjoyStandardSvc {
 			customerDetailsBean.setCusCode				(cusCode);
 			customerDetailsBean.setCusName				(cusName);
 			customerDetailsBean.setCusSurname			(cusSurname);
+			customerDetailsBean.setBranchName			(branchName);
 			customerDetailsBean.setSex					(sex);
 			customerDetailsBean.setIdType				(idType);
 			customerDetailsBean.setIdNumber				(idNumber);

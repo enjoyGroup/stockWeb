@@ -10,6 +10,7 @@
 	CustomerDetailsBean 	customerDetailsBean = customerDetailsMaintananceForm.getCustomerDetailsBean();
 	List<ComboBean> 		statusCombo 		= customerDetailsMaintananceForm.getStatusCombo();
 	List<ComboBean> 		sexCombo 			= customerDetailsMaintananceForm.getSexCombo();
+	List<ComboBean> 		idTypeCombo 		= customerDetailsMaintananceForm.getIdTypeCombo();
 	String					titlePage			= customerDetailsMaintananceForm.getTitlePage();
 
 
@@ -24,12 +25,14 @@
 	<script>
 		var gv_service 				= null;
 		var gv_url 					= '<%=servURL%>/EnjoyGenericSrv';
-		var gv_checkFormatIdNumber 	= false;
+		var gv_checkFormatIdNumber 	= true;
 		
 		$(document).ready(function(){
 			gp_progressBarOn();
 			
 			gv_service 		= "service=" + $('#service').val();
+			
+			lp_ctrlIdType();
 			
 			if($("#pageMode").val()=="EDIT"){
 				lp_setModeEdit();
@@ -140,11 +143,11 @@
 		});
 		
 		function lp_validate(){
-			var la_idName               = new Array("idNumber"	, "cusStatus", "startDate"	);
-		    var la_msg               	= new Array("เลขที่บัตร"	, "สถานะ"	 , "วันที่สมัคร"	);
+		    var la_validate             = new Array( "cusName:ชื่อ"	
+													, "cusSurname:นามสกุล"
+													, "cusStatus:สถานะ"
+													, "startDate:วันที่สมัคร");
 		    var lv_return				= true;
-		    var la_idType				= null;
-		    var cou						= 0;
 		    var provinceName			= "";
 		    var districtName			= "";
 		    var subdistrictName			= "";
@@ -153,39 +156,35 @@
 		    
 			try{
 				
-				la_idType 		= document.getElementsByName("idType");
 				provinceName	= gp_trim($("#provinceName").val());
 				districtName	= gp_trim($("#districtName").val());
 				subdistrictName	= gp_trim($("#subdistrictName").val());
 				startDate		= gp_trim($("#startDate").val());
 				expDate			= gp_trim($("#expDate").val());
 				
-				for(var i=0;i<la_idType.length;i++){
-					if(la_idType[i].checked==true){
-						cou++;
-						break;
-					}
-				}
-				
-				if(cou==0){
-					alert("กรุณาระบุประเภทบัตร");
-					return false;
-				}
-				
-				for(var i=0;i<la_idName.length;i++){
-		            lo_obj          = eval('$("#' + la_idName[i] + '")');
+				for(var i=0;i<la_validate.length;i++){
+					la_temp			= la_validate[i].split(":");
+		            lo_obj          = eval('$("#' + la_temp[0] + '")');
 		            
 		            if(gp_trim(lo_obj.val())==""){
-		            	alert("กรุณาระบุ " + la_msg[i]);
+		            	alert("กรุณาระบุ " + la_temp[1]);
 		            	lo_obj.focus();
 		                return false;
 		            }
 		        }
-				//alert(gp_validatePin($("#tin").val()));
-				if(gv_checkFormatIdNumber==false){
-					alert("เลขที่บัตรผิด");
-					$("#idNumber").focus();
-	                return false;
+				
+				if($("#idType").val()!="0"){
+					if($("#idNumber").val().trim()==""){
+						alert("กรุณาระบุเลขที่บัตร");
+						$("#idNumber").focus();
+		                return false;
+					}
+					
+					if(gv_checkFormatIdNumber==false){
+						alert("เลขที่บัตรผิด");
+						$("#idNumber").focus();
+		                return false;
+					}
 				}
 				
 				if(expDate!=""){
@@ -200,7 +199,7 @@
 					$("#provinceCode").val("");
         			$("#districtCode").val("");
         			$("#subdistrictCode").val("");
-					return true;
+					//return true;
 				}else{
 					if(provinceName=="" || districtName=="" || subdistrictName==""){
 						alert("กรุณาระบุจังหวัด อำเภอ/เขต และตำบล/แขวงให้ครบ");
@@ -225,10 +224,11 @@
 		            		status	= jsonObj.status;
 		            		
 		            		if(status=="SUCCESS"){
-		            			
-		            			$("#provinceCode").val(jsonObj.provinceCode);
-		            			$("#districtCode").val(jsonObj.districtCode);
-		            			$("#subdistrictCode").val(jsonObj.subdistrictCode);
+		            			if(provinceName!="" && districtName!="" && subdistrictName!=""){
+			            			$("#provinceCode").val(jsonObj.provinceCode);
+			            			$("#districtCode").val(jsonObj.districtCode);
+			            			$("#subdistrictCode").val(jsonObj.subdistrictCode);
+		            			}
 		            			
 		            			lv_return = true;
 		            		}else{
@@ -376,6 +376,7 @@
 				$("#inValidSpan").html("");
 				
 				if(lv_idNumber==""){
+					gv_checkFormatIdNumber = true;
 					return;
 				}
 				
@@ -394,6 +395,20 @@
 				
 			}catch(e){
 				alert("lp_checkIdNumber :: " + e);
+			}
+		}
+		
+		function lp_ctrlIdType(){
+			try{
+				if($("#idType").val()=="0"){
+					$("#idNumber").val('');
+					$("#idNumber").prop("disabled", true);
+					lp_checkIdNumber();
+				}else{
+					$("#idNumber").prop("disabled", false);
+				}
+			}catch(e){
+				alert("lp_ctrlIdType :: " + e);
 			}
 		}
 
@@ -447,7 +462,7 @@
 				            			<table class="table user-register-table" style="border-bottom-color: white;">
 												<tr>
 									        		<td align="right">
-														ชื่อ :
+														ชื่อ <span style="color: red;"><b>*</b></span> :
 													</td>
 								        			<td align="left">
 								        				<input type='text' 
@@ -458,7 +473,7 @@
 								        					   style="width: 220px;" />
 								        			</td>
 								        			<td align="right">
-														นามสกุล :
+														นามสกุล <span style="color: red;"><b>*</b></span> :
 													</td>
 								        			<td align="left">
 								        				<input type='text' 
@@ -469,50 +484,54 @@
 								        					   style="width: 220px;" />
 								        			</td>
 								        			<td align="right">
-														เพศ :
+														สาขา :
 													</td>
 								        			<td align="left">
+								        				<input type='text' 
+								        					   id="branchName" 
+								        					   name='branchName' 
+								        					   value="<%=customerDetailsBean.getBranchName()%>" 
+								        					   maxlength="30" 
+								        					   style="width: 220px;" />
+								        			</td>
+									        	</tr>
+									        	<tr>
+									        		<td align="right">
+														ประเภทบัตร :
+													</td>
+								        			<td align="left">
+								        				<select id="idType" name="idType" style="width: 120px;" onchange="lp_ctrlIdType();" >
+								        					<% for(ComboBean comboBean:idTypeCombo){ %>
+								        					<option value="<%=comboBean.getCode()%>" <%if(customerDetailsBean.getIdType().equals(comboBean.getCode())){ %> selected <%} %> ><%=comboBean.getDesc()%></option>
+								        					<%} %>
+								        				</select>
+								        			</td>
+								        			<td align="right">
+														เลขที่บัตร :
+													</td>
+								        			<td align="left" colspan="4">
+								        				<input  type="text" 
+								        						id="idNumber" 
+								        						name="idNumber" 
+								        						class="numberOnly"
+								        						style="width: 200px;"
+								        						onblur="lp_checkIdNumber();"
+								        						value="<%=customerDetailsBean.getIdNumber()%>" 
+								        						maxlength="13"  />
+								        				&nbsp;
+								        				<span id="inValidSpan"></span>
+								        			</td>
+								        		</tr>
+								        		<tr>
+								        			<td align="right">
+														เพศ :
+													</td>
+								        			<td align="left" colspan="5">
 								        				<select id="sex" name="sex" style="width: 120px;" >
 								        					<% for(ComboBean comboBean:sexCombo){ %>
 								        					<option value="<%=comboBean.getCode()%>" <%if(customerDetailsBean.getSex().equals(comboBean.getCode())){ %> selected <%} %> ><%=comboBean.getDesc()%></option>
 								        					<%} %>
 								        				</select>
-								        			</td>
-									        	</tr>
-									        	<tr>
-									        		<td></td>
-								        			<td align="left" colspan="5" valign="middle">
-								        				<span>
-									        				<input  type="radio" 
-																	id="idType1" 
-																	name="idType" 
-																	value="1" 
-																	<%if(customerDetailsBean.getIdType().equals("1")){%> checked="checked" <%} %> 
-															/>
-															บุคคลธรรมดา
-														</span>
-														<span style="margin-left: 5px;">
-															<input  type="radio" 
-																	id="idType2" 
-																	name="idType" 
-																	value="2" 
-																	<%if(customerDetailsBean.getIdType().equals("2")){%> checked="checked" <%} %> 
-															/>
-															นิติบุคคล
-														</span>
-														<span style="margin-left: 50px;">
-															เลขที่บัตร<span style="color: red;"><b>*</b></span> :
-															<input  type="text" 
-									        						id="idNumber" 
-									        						name="idNumber" 
-									        						class="numberOnly"
-									        						style="width: 200px;"
-									        						onblur="lp_checkIdNumber();"
-									        						value="<%=customerDetailsBean.getIdNumber()%>" 
-									        						maxlength="13"  />
-									        				&nbsp;
-									        				<span id="inValidSpan"></span>
-								        				</span>
 								        			</td>
 								        		</tr>
 								        		<tr>

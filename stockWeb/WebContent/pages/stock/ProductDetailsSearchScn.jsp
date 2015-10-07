@@ -1,13 +1,13 @@
 <%@ include file="/pages/include/checkLogin.jsp"%>
 <%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
-<%@ page import="th.go.stock.app.enjoy.bean.ProductDetailsBean,th.go.stock.app.enjoy.bean.ComboBean"%>
+<%@ page import="th.go.stock.app.enjoy.bean.ProductmasterBean,th.go.stock.app.enjoy.bean.ComboBean"%>
 <%@ page import="java.util.*"%>
 <jsp:useBean id="productDetailsSearchForm" class="th.go.stock.app.enjoy.form.ProductDetailsSearchForm" scope="session"/>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
 <%
-	ProductDetailsBean 			productDetailsBean 		= productDetailsSearchForm.getProductDetailsBean();
-	List<ProductDetailsBean> 	dataList 				= productDetailsSearchForm.getDataList();
+	ProductmasterBean 			productmasterBean 		= productDetailsSearchForm.getProductmasterBean();
+	List<ProductmasterBean> 	dataList 				= productDetailsSearchForm.getDataList();
 	String						titlePage				= "ค้นหารายละเอียดสินค้า";
 %>
 
@@ -388,7 +388,7 @@
 										        				<input type='text' 
 										        					   id="productTypeName" 
 										        					   name='productTypeName' 
-										        					   value="<%=productDetailsBean.getProductTypeName()%>" 
+										        					   value="<%=productmasterBean.getProductTypeName()%>" 
 										        					   maxlength="200" 
 										        					   style="width: 220px;" />
 										        			</td>
@@ -399,7 +399,7 @@
 										        				<input type='text' 
 										        					   id="productGroupName" 
 										        					   name='productGroupName' 
-										        					   value="<%=productDetailsBean.getProductGroupName()%>" 
+										        					   value="<%=productmasterBean.getProductGroupName()%>" 
 										        					   maxlength="200" 
 										        					   style="width: 220px;" />
 										        			</td>
@@ -412,13 +412,14 @@
 										        				<input type='text' 
 										        					   id="productName" 
 										        					   name='productName' 
-										        					   value="<%=productDetailsBean.getProductName()%>" 
+										        					   value="<%=productmasterBean.getProductName()%>" 
 										        					   maxlength="255" 
 										        					   style="width: 220px;" />
 										        			</td>
 										        		</tr>
 										        		<tr>
-										        			<td align="right" colspan="4">
+										        			<td align="left" colspan="4">
+										        				<span style="color: red;">*ถ้าต้องการค้นหาทั้งหมดให้ระบุช่องนั้นเป็น *** (ยกเว้นหมวดสินค้า)</span>
 										        				<input type="button" id="btnSearch" class='btn btn-primary pull-right padding-sm' style="margin-right:12px; padding-right:24px; padding-left:24px;" value='ค้นหา'/>
 										        				<input type="button" id="btnReset" class='btn pull-right padding-sm'  style="margin-right:12px" value='เริ่มใหม่' />
 										        			</td>
@@ -468,12 +469,12 @@
 											</tfoot>
 											<tbody>
 												<%
-												ProductDetailsBean 	bean 		= null;
-	    											int					  	seq		= 1;
-													
+													ProductmasterBean 	bean 		= null;
+	    											int					seq			= 1;
+											
 													if(dataList.size()>0){
 														for(int i=0;i<dataList.size();i++){
-															bean = dataList.get(i);															
+															bean = dataList.get(i);
 												%>
 															<tr class="rowSelect" onclick="lp_sendEditPage('<%=bean.getProductCode()%>')" >
 																<td style="text-align:center;">
@@ -489,7 +490,7 @@
 																<td style="text-align:left;"><%=bean.getProductGroupName()%></td>
 																<td style="text-align:left;"><%=bean.getProductCode()%></td>
 																<td style="text-align:left;"><%=bean.getProductName()%></td>
-																<td style="text-align:left;"><%=bean.getSalePrice()%></td>
+																<td style="text-align:left;"><%=bean.getSalePrice1()%></td>
 															</tr>
 												<% 			seq++;
 														} 

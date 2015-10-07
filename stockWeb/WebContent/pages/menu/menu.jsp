@@ -36,13 +36,21 @@
 			$(window).scroll(function(){//alert($(window).scrollTop());
 				
 				h = $(document).height();
+				//var options = {};
 				
-		        if(document.documentElement.scrollTop || jQuery(this).scrollTop() > 10){//alert("s " + h);
+		        if(document.documentElement.scrollTop || jQuery(this).scrollTop() > 10){//alert("s " + h); 
 		        	document.getElementById("m1").className 			= "fixs";
 		        	document.getElementById("headwrap").style.display 	= "none";
+		        	
+		        	//document.getElementById("m1").className 			= "fixs";
+		        	//$("#headwrap").removeAttr("style").hide();
+		        	
 		        }else{
 		        	document.getElementById("m1").className 			= "";
 		        	document.getElementById("headwrap").style.display 	= "block";
+		        	
+		        	//$("#headwrap").show("slide",{direction: 'up'}, 1000);
+		        	//document.getElementById("m1").className 			= "";
 		        }
 		        $('body').css('height', h);
 		    });

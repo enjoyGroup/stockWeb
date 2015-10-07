@@ -61,13 +61,13 @@ public class RelationUserAndCompanyDao {
 			for(Object[] row:list){
 				bean 	= new RelationUserAndCompanyBean();
 				
-				bean.setUserUniqueId	(row[0].toString());
-				bean.setTin				(row[1].toString());
-				bean.setUserId			(row[2].toString());
-				bean.setUserFullName	(row[3].toString());
-				bean.setUserStatus		(row[4].toString());
-				bean.setUserStatusName	(row[5].toString());
-				bean.setSeq				(String.valueOf(seq));
+				bean.setUserUniqueId	(EnjoyUtils.nullToStr(row[0]));
+				bean.setTin				(EnjoyUtils.nullToStr(row[1]));
+				bean.setUserId			(EnjoyUtils.nullToStr(row[2]));
+				bean.setUserFullName	(EnjoyUtils.nullToStr(row[3]));
+				bean.setUserStatus		(EnjoyUtils.nullToStr(row[4]));
+				bean.setUserStatusName	(EnjoyUtils.nullToStr(row[5]));
+				bean.setSeq				(EnjoyUtils.nullToStr(seq));
 				
 				relationUserAndCompanyList.add(bean);
 				seq++;

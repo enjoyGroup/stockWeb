@@ -18,19 +18,21 @@ public class EnjoyUtils {
 //		currDateThai();
 //		System.out.println(dateToStringThai(date));
 //		genPassword();
+//		increaseDate(new Date(), 15);
 
 	}
 	
-	public static String nullToStr(String str){
-        return (str==null?"":str.trim());
+	public static String nullToStr(Object str){
+		
+        return (str==null?"":str.toString().trim());
     }
 
-	public static String nullToStr(String str, String strRep){
-        return (str==null?strRep:str.trim());
+	public static String nullToStr(Object str, String strRep){
+        return (str==null?strRep:str.toString().trim());
     }
 	
-	public static String nullToStrUpperCase(String str){
-        return (str==null?"":str.trim().toUpperCase());
+	public static String nullToStrUpperCase(Object str){
+        return (str==null?"":str.toString().trim().toUpperCase());
     }
 	
     public static String dateToString(Date dDate, String stFormat){
@@ -69,6 +71,31 @@ public class EnjoyUtils {
         return stDate;
     }
     
+    public static String increaseDate(Date dDate, int increaseDay){
+    	Calendar 	c 		= null;
+    	String 		stDate 	= "";
+        int 		year 	= 0;
+        int 		month 	= 0;
+        int 		day 	= 0;
+    	
+    	try{
+    		c = Calendar.getInstance(Locale.US); 
+    		c.setTime(dDate);
+    		c.add(Calendar.DATE, increaseDay);
+    		
+    		year 	= c.get(Calendar.YEAR);
+			month 	= c.get(Calendar.MONTH) + 1;
+			day 	= c.get(Calendar.DATE);
+			
+			stDate = String.format("%02d/%02d/%04d", day, month, year+543);
+			
+			System.out.println(stDate);
+    	}catch (Exception e) {
+            e.printStackTrace();
+        }
+    	return stDate;
+    }
+    
     public static String currDateThai(){
         String 	stDate 	= "";
         Date 	date	= new Date();
@@ -87,20 +114,23 @@ public class EnjoyUtils {
         return stDate;
     }
     
-    public static String dateFormat (String av_date, String av_currFormat, String av_toFormat){
+    public static String dateFormat (Object ao_obj, String av_currFormat, String av_toFormat){
         System.out.println("[FormatUtil][dateFormat][Begin]");
         
         SimpleDateFormat    dt              = null;
         Date                date            = null;
         SimpleDateFormat    dt1             = null;
         String              dateFormat      = null;
+        String				lv_val			= "";
         
         try{
-            if(av_date==null || av_date.equals("")){
+        	lv_val = ao_obj==null?"":ao_obj.toString().trim();
+        	
+            if(lv_val==null || lv_val.equals("")){
                 dateFormat = "";
             }else{
                 dt      = new SimpleDateFormat(av_currFormat); 
-                date    = dt.parse(av_date); 
+                date    = dt.parse(lv_val); 
 //                dt1     = new SimpleDateFormat(av_toFormat,Locale.US);// ค.ศ.
                 dt1     = new SimpleDateFormat(av_toFormat, new Locale("th", "TH"));//พ.ศ.
                 
@@ -147,8 +177,10 @@ public class EnjoyUtils {
         return lv_return;
     }
     
-	public static String convertFloatToDisplay(String stFloat,int point){
-
+	public static String convertFloatToDisplay(Object obj,int point){
+		
+		String stFloat = obj==null?"":obj.toString().trim();
+		
 		if (stFloat!=null&&!stFloat.equals("")){
 			String strFormat = "##,##0";
 			if (point > 0) { strFormat = strFormat + "."; }
@@ -345,15 +377,16 @@ public class EnjoyUtils {
         return lv_ret;
 	}
 	
-	public static String chkBoxtoDb(String av_val) {
+	public static String chkBoxtoDb(Object av_val) {
 		
 		String lv_ret = null;
 		
         try {
-        	if (av_val!=null&&!av_val.equals("")){	
-        		lv_ret = av_val;
-			} else {
-				lv_ret = "N";			
+        	
+        	lv_ret = av_val==null?"N":av_val.toString().trim();
+        	
+        	if (lv_ret.equals("")){	
+        		lv_ret = "N";	
 			}
         } catch (Exception e) {
         	e.printStackTrace();
@@ -361,25 +394,33 @@ public class EnjoyUtils {
         return lv_ret;
 	}
 	
-	public static int parseInt(String av_val) {
+	public static int parseInt(Object ao_obj) {
 		
-		int lv_ret = 0;
+		int 	lv_ret = 0;
+		String 	lv_val = "";
 		
         try {
-        	if (av_val!=null&&!av_val.equals("")) lv_ret = Integer.parseInt(av_val);
+        	lv_val = ao_obj==null?"":ao_obj.toString().trim();
+        	
+        	
+        	if (lv_val!=null&&!lv_val.equals("")) lv_ret = Integer.parseInt(lv_val.replaceAll(",", ""));
         } catch (Exception e) {
         	e.printStackTrace();
         } 
         return lv_ret;
 	}
 	
-	public static Double parseDouble(String av_val) {
+	public static Double parseDouble(Object ao_obj) {
 		
-		Double lv_ret = 0.00;
+		Double 	lv_ret = 0.00;
+		String 	lv_val = "";
 		
         try {
-        	if (av_val!=null&&!av_val.equals("")){	
-        		lv_ret = Double.parseDouble(av_val);
+        	
+        	lv_val = ao_obj==null?"":ao_obj.toString().trim();
+        	
+        	if (lv_val!=null&&!lv_val.equals("")){	
+        		lv_ret = Double.parseDouble(lv_val);
 			} 
         } catch (Exception e) {
         	e.printStackTrace();
@@ -387,13 +428,16 @@ public class EnjoyUtils {
         return lv_ret;
 	}
 	
-	public static BigDecimal parseBigDecimal(String av_val) {
+	public static BigDecimal parseBigDecimal(Object ao_obj) {
 		
-		BigDecimal lv_ret = new BigDecimal("0");
+		BigDecimal 	lv_ret = new BigDecimal("0");
+		String 		lv_val = "";
 		
         try {
-        	if (av_val!=null&&!av_val.equals("")){	
-        		lv_ret = new BigDecimal(av_val.replaceAll(",", ""));
+        	lv_val = ao_obj==null?"":ao_obj.toString().trim();
+        	
+        	if (lv_val!=null&&!lv_val.equals("")){	
+        		lv_ret = new BigDecimal(lv_val.replaceAll(",", ""));
 			} 
         } catch (Exception e) {
         	e.printStackTrace();

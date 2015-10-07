@@ -1,17 +1,16 @@
 <%@ include file="/pages/include/checkLogin.jsp"%>
 <%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
-<%@ page import="th.go.stock.app.enjoy.bean.ProductDetailsBean,th.go.stock.app.enjoy.bean.ProductDiscountBean,th.go.stock.app.enjoy.bean.ComboBean"%>
+<%@ page import="th.go.stock.app.enjoy.bean.ProductmasterBean,th.go.stock.app.enjoy.bean.ProductdetailBean,th.go.stock.app.enjoy.bean.ComboBean"%>
 <%@ page import="java.util.*"%>
 <jsp:useBean id="productDetailsMaintananceForm" class="th.go.stock.app.enjoy.form.ProductDetailsMaintananceForm" scope="session"/>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
 <%
 	String 						pageMode 			= productDetailsMaintananceForm.getPageMode();
-	ProductDetailsBean 			productDetailsBean 	= productDetailsMaintananceForm.getProductDetailsBean();
+	ProductmasterBean 			productmasterBean 	= productDetailsMaintananceForm.getProductmasterBean();
 	List<ComboBean> 			statusCombo 		= productDetailsMaintananceForm.getStatusCombo();
 	String						titlePage			= productDetailsMaintananceForm.getTitlePage();
-	List<ProductDiscountBean> 	productDiscountList	= productDetailsMaintananceForm.getProductDiscountList();
-
+	List<ProductdetailBean> 	productdetailList	= productDetailsMaintananceForm.getProductdetailList();
 %>
 
 <html>
@@ -141,23 +140,26 @@
 													, "productTypeName:หมวดสินค้า"
 													, "productGroupName:หมู่สินค้า"
 													, "unitName:หน่วยสินค้า"
+													, "quantity:ปริมาณสินค้า"
 													, "minQuan:ยอดต่ำสุดที่ต้องแจ้งเตือน"
 													, "costPrice:ราคาทุน"
-													, "salePrice:ราคาขาย"
-													, "startDate:วันที่เริ่มใช้งาน"
-													, "productStatus:สถานะสินค้า");
+													, "salePrice1:ราคาขาย 1");
 			var la_temp					= "";
 		    var lv_return				= true;
-		    var startDate				= "";
-		    var expDate					= "";
+		    //var startDate				= "";
+		    //var expDate					= "";
 		    var la_quanDiscount			= null;
-		    var la_discount				= null;
+		    var la_discountRate			= null;
+		    var la_startDate			= null;
+		    var la_expDate				= null;
 		    
 			try{
-				startDate		= gp_trim($("#startDate").val());
-				expDate			= gp_trim($("#expDate").val());
+				//startDate		= gp_trim($("#startDate").val());
+				//expDate			= gp_trim($("#expDate").val());
 				la_quanDiscount = document.getElementsByName("quanDiscount");
-				la_discount 	= document.getElementsByName("discount");
+				la_discountRate = document.getElementsByName("discountRate");
+				la_startDate 	= document.getElementsByName("startDate");
+				la_expDate 		= document.getElementsByName("expDate");
 				
 				for(var i=0;i<la_validate.length;i++){
 					la_temp			= la_validate[i].split(":");
@@ -170,25 +172,38 @@
 		            }
 		        }
 				
-				if(expDate!=""){
+				/*if(expDate!=""){
 					if(gp_toDate(startDate) > gp_toDate(expDate)){
 						alert("วันที่สิ้นสุดการใช้งานต้องมากกว่าวันที่เริ่มต้น");
 		                return false;
 	                }
-				}
+				}*/
 				
 				for(var i=0;i<la_quanDiscount.length;i++){
-					if(gp_trim(la_quanDiscount[i].value)==""){
+					if(gp_trim(la_quanDiscount[i].value)=="" || gp_trim(la_quanDiscount[i].value)=="0.00"){
 		            	alert("กรุณาระบุปริมาณที่ซื้อ");
 		            	la_quanDiscount[i].focus();
 		                return false;
 		            }
 					
-					if(gp_trim(la_discount[i].value)==""){
+					if(gp_trim(la_discountRate[i].value)=="" || gp_trim(la_discountRate[i].value)=="0.00"){
 		            	alert("กรุณาระบุลดจำนวนเงิน");
-		            	la_discount[i].focus();
+		            	la_discountRate[i].focus();
 		                return false;
 		            }
+					
+					if(gp_trim(la_startDate[i].value)==""){
+		            	alert("กรุณาระบุวันที่มีผล");
+		            	la_startDate[i].focus();
+		                return false;
+		            }
+					
+					if(la_expDate[i].value.trim()!=""){
+						if(gp_toDate(la_startDate[i].value.trim()) > gp_toDate(la_expDate[i].value.trim())){
+							alert("วันที่สิ้นสุดการใช้งานต้องมากกว่าวันที่มีผล");
+			                return false;
+		                }
+					}
 					
 				}
 				
@@ -328,6 +343,8 @@
 		    var newNodeTd2 						= null;
 		    var newNodeTd3 						= null;
 		    var newNodeTd4 						= null;
+		    var newNodeTd5 						= null;
+		    var newNodeTd6 						= null;
 			
 			try{
 				
@@ -354,6 +371,8 @@
 		                        newNodeTd2      = newNodeTr.insertCell(1);
 		                        newNodeTd3      = newNodeTr.insertCell(2);
 		                        newNodeTd4      = newNodeTr.insertCell(3);
+		                        newNodeTd5      = newNodeTr.insertCell(4);
+		                        newNodeTd6      = newNodeTr.insertCell(5);
 		                        
 		                        //ลำดับ
 		                        newNodeTd1.align 			= "center";
@@ -363,15 +382,25 @@
 		                       	newNodeTd2.innerHTML        = '<input type="text" style="width: 100%;" onblur="gp_checkAmtOnly(this, 9);lp_updateRecord('+lv_maxSeq+');" class="moneyOnly" id="quanDiscount' + lv_maxSeq + '" name="quanDiscount" value="" />';
 		                       	
 		                      	//ลดจำนวนเงิน
-		                       	newNodeTd3.innerHTML        = '<input type="text" style="width: 100%" onblur="gp_checkAmtOnly(this, 9);lp_updateRecord('+lv_maxSeq+');" class="moneyOnly" id="discount' + lv_maxSeq + '" name="discount" value="" />';
+		                       	newNodeTd3.innerHTML        = '<input type="text" style="width: 100%;" onblur="gp_checkAmtOnly(this, 9);lp_updateRecord('+lv_maxSeq+');" class="moneyOnly" id="discountRate' + lv_maxSeq + '" name="discountRate" value="" />';
+		                       	
+		                      	//วันที่มีผล
+		                       	newNodeTd4.innerHTML        = '<input type="text" style="width: 100px;"  onchange="gp_checkDate(this);lp_updateRecord('+lv_maxSeq+');" class="dateFormat" id="startDate' + lv_maxSeq + '"  placeholder="DD/MM/YYYY" name="startDate" value="" />';
+		                       	
+		                      	//วันที่มีผล
+		                       	newNodeTd5.innerHTML        = '<input type="text" style="width: 100px;"  onchange="gp_checkDate(this);lp_updateRecord('+lv_maxSeq+');" class="dateFormat" id="expDate' + lv_maxSeq + '"  placeholder="DD/MM/YYYY" name="expDate" value="" />';
 		                       	
 		                      	//Action
-		                      	newNodeTd4.align 			= "center";
-		                       	newNodeTd4.innerHTML        = '<img alt="ลบ" title="ลบ" src="<%=imgURL%>/wrong.png" width="24" height="24" border="0" onclick="lp_deleteRecord(this, \'' + lv_maxSeq + '\');" />'
+		                      	newNodeTd6.align 			= "center";
+		                       	newNodeTd6.innerHTML        = '<img alt="ลบ" title="ลบ" src="<%=imgURL%>/wrong.png" width="24" height="24" border="0" onclick="lp_deleteRecord(this, \'' + lv_maxSeq + '\');" />'
 															+ '<input type="hidden" id="seq'+lv_maxSeq+'" name="seq" value="'+lv_maxSeq+'" />';
 		                        
 								lo_seqTemp.value  = lv_maxSeq;
 								$('#quanDiscount' + lv_maxSeq).focus();
+								
+								$( ".dateFormat" ).datepicker( $.datepicker.regional["th"] );
+							    $( ".dateFormat" ).datepicker( "option", "defaultDate", +0 );
+								
 		            		}else{
 		            			alert(jsonObj.errMsg);
 		            			
@@ -434,14 +463,22 @@
 		function lp_updateRecord(av_val){
 			var params					= "";
 			var quanDiscount			= null;
-			var discount				= null;
+			var discountRate			= null;
+			var startDate				= null;
+			var expDate					= null;
 			
 			try{
 				
 				quanDiscount 	= document.getElementById("quanDiscount" + av_val).value;
-				discount 		= document.getElementById("discount" + av_val).value;
+				discountRate 	= document.getElementById("discountRate" + av_val).value;
+				startDate 		= document.getElementById("startDate" + av_val).value;
+				expDate 		= document.getElementById("expDate" + av_val).value;
 				
-				params 	= gv_service + "&pageAction=updateRecord&seq=" + av_val + "&quanDiscount=" + quanDiscount + "&discount=" + discount;
+				params 	= gv_service + "&pageAction=updateRecord&seq=" + av_val 
+															 + "&quanDiscount=" + quanDiscount 
+															 + "&discountRate=" + discountRate
+															 + "&startDate=" 	+ startDate
+															 + "&expDate=" 		+ expDate;
 				
 				$.ajax({
 					async:false,
@@ -478,8 +515,7 @@
 	<form id="frm">
 		<input type="hidden" id="service" 	name="service" value="servlet.ProductDetailsMaintananceServlet" />
 		<input type="hidden" id="pageMode" 	name="pageMode" value="<%=pageMode%>" />
-		<input type="hidden" id="quantity" name="quantity" value="<%=productDetailsBean.getQuantity()%>" />
-		<input type="hidden" id="seqTemp" name="seqTemp" value="<%=productDetailsMaintananceForm.getSeqTemp() %>" />
+		<input type="hidden" id="seqTemp" name="seqTemp" value="<%=productDetailsMaintananceForm.getSeqTemp()%>" />
 		<div id="menu" style="width: 100%;background: black;">
 			<%@ include file="/pages/menu/menu.jsp"%>
 		</div>
@@ -507,7 +543,7 @@
 								        				<input type='text' 
 								        					   id="productCode" 
 								        					   name='productCode' 
-								        					   value="<%=productDetailsBean.getProductCode()%>" 
+								        					   value="<%=productmasterBean.getProductCode()%>" 
 								        					   maxlength="17" 
 								        					   style="width: 220px;" />
 								        			</td>
@@ -520,7 +556,7 @@
 								        				<input type='text' 
 								        					   id="productName" 
 								        					   name='productName' 
-								        					   value="<%=productDetailsBean.getProductName()%>" 
+								        					   value="<%=productmasterBean.getProductName()%>" 
 								        					   maxlength="255" 
 								        					   style="width: 220px;" />
 								        			</td>
@@ -533,10 +569,10 @@
 								        				<input type='text' 
 								        					   id="productTypeName" 
 								        					   name='productTypeName' 
-								        					   value="<%=productDetailsBean.getProductTypeName()%>" 
+								        					   value="<%=productmasterBean.getProductTypeName()%>" 
 								        					   maxlength="200" 
 								        					   style="width: 220px;" />
-								        				<input type="hidden" id="productTypeCode" name="productTypeCode" value="<%=productDetailsBean.getProductTypeCode()%>" />
+								        				<input type="hidden" id="productTypeCode" name="productTypeCode" value="<%=productmasterBean.getProductTypeCode()%>" />
 								        			</td>
 									        	</tr>
 									        	<tr>
@@ -547,10 +583,10 @@
 								        				<input type='text' 
 								        					   id="productGroupName" 
 								        					   name='productGroupName' 
-								        					   value="<%=productDetailsBean.getProductGroupName()%>" 
+								        					   value="<%=productmasterBean.getProductGroupName()%>" 
 								        					   maxlength="200" 
 								        					   style="width: 220px;" />
-								        				<input type="hidden" id="productGroupCode" name="productGroupCode" value="<%=productDetailsBean.getProductGroupCode()%>" />
+								        				<input type="hidden" id="productGroupCode" name="productGroupCode" value="<%=productmasterBean.getProductGroupCode()%>" />
 								        			</td>
 									        	</tr>
 									        	<tr>
@@ -561,10 +597,24 @@
 								        				<input type='text' 
 								        					   id="unitName" 
 								        					   name='unitName' 
-								        					   value="<%=productDetailsBean.getUnitName()%>" 
+								        					   value="<%=productmasterBean.getUnitName()%>" 
 								        					   maxlength="200" 
 								        					   style="width: 220px;" />
-								        				<input type="hidden" id="unitCode" name="unitCode" value="<%=productDetailsBean.getUnitCode()%>" />
+								        				<input type="hidden" id="unitCode" name="unitCode" value="<%=productmasterBean.getUnitCode()%>" />
+								        			</td>
+									        	</tr>
+									        	<tr>
+									        		<td align="right">
+														ปริมาณสินค้า <span style="color: red;"><b>*</b></span> :
+													</td>
+								        			<td align="left">
+								        				<input type='text' 
+								        					   id="quantity" 
+								        					   name='quantity' 
+								        					   value="<%=productmasterBean.getQuantity()%>" 
+								        					   class="moneyOnly"
+								        					   onblur="gp_checkAmtOnly(this, 9);"
+								        					   style="width: 220px;" />
 								        			</td>
 									        	</tr>
 									        	<tr>
@@ -577,7 +627,7 @@
 								        					   name='minQuan' 
 								        					   class="moneyOnly"
 								        					   onblur="gp_checkAmtOnly(this, 9);"
-								        					   value="<%=productDetailsBean.getMinQuan()%>" 
+								        					   value="<%=productmasterBean.getMinQuan()%>" 
 								        					   style="width: 220px;" />
 								        			</td>
 									        	</tr>
@@ -591,76 +641,103 @@
 								        					   name='costPrice' 
 								        					   class="moneyOnly"
 								        					   onblur="gp_checkAmtOnly(this, 11);"
-								        					   value="<%=productDetailsBean.getCostPrice()%>" 
+								        					   value="<%=productmasterBean.getCostPrice()%>" 
 								        					   style="width: 220px;" />
 								        				&nbsp;บาท
 								        			</td>
 									        	</tr>
 									        	<tr>
 									        		<td align="right">
-														ราคาขาย <span style="color: red;"><b>*</b></span> :
+														ราคาขาย 1 <span style="color: red;"><b>*</b></span> :
 													</td>
 								        			<td align="left">
 								        				<input type='text' 
-								        					   id="salePrice" 
-								        					   name='salePrice' 
+								        					   id="salePrice1" 
+								        					   name='salePrice1' 
 								        					   class="moneyOnly"
 								        					   onblur="gp_checkAmtOnly(this, 11);"
-								        					   value="<%=productDetailsBean.getSalePrice()%>" 
+								        					   value="<%=productmasterBean.getSalePrice1()%>" 
 								        					   style="width: 220px;" />
 								        				&nbsp;บาท
 								        			</td>
 									        	</tr>
 									        	<tr>
 									        		<td align="right">
-														วันที่ใช้งาน <span style="color: red;"><b>*</b></span> :
+														ราคาขาย 2 :
 													</td>
 								        			<td align="left">
 								        				<input type='text' 
-								        					   id="startDate" 
-								        					   name='startDate' 
-								        					   placeholder="DD/MM/YYYY"
-								        					   class="dateFormat"
-								        					   onchange="gp_checkDate(this);"
-								        					   value="<%=productDetailsBean.getStartDate() %>" 
-								        					   style="width: 100px;" />
-								        				&nbsp;-&nbsp;
-								        				<input type='text' 
-								        					   id="expDate" 
-								        					   name='expDate' 
-								        					   placeholder="DD/MM/YYYY"
-								        					   class="dateFormat"
-								        					   onchange="gp_checkDate(this);"
-								        					   value="<%=productDetailsBean.getExpDate() %>" 
-								        					   style="width: 100px;" />
+								        					   id="salePrice2" 
+								        					   name='salePrice2' 
+								        					   class="moneyOnly"
+								        					   onblur="gp_checkAmtOnly(this, 11);"
+								        					   value="<%=productmasterBean.getSalePrice2()%>" 
+								        					   style="width: 220px;" />
+								        				&nbsp;บาท
 								        			</td>
 									        	</tr>
 									        	<tr>
 									        		<td align="right">
-														สถานะสินค้า <span style="color: red;"><b>*</b></span> :
+														ราคาขาย 3 :
 													</td>
 								        			<td align="left">
-								        				<select id="productStatus" name="productStatus" style="width: 220px;" >
-								        					<% for(ComboBean comboBean:statusCombo){ %>
-								        					<option value="<%=comboBean.getCode()%>" <%if(productDetailsBean.getProductStatus().equals(comboBean.getCode())){ %> selected <%} %> ><%=comboBean.getDesc()%></option>
-								        					<%} %>
-								        				</select>
+								        				<input type='text' 
+								        					   id="salePrice3" 
+								        					   name='salePrice3' 
+								        					   class="moneyOnly"
+								        					   onblur="gp_checkAmtOnly(this, 11);"
+								        					   value="<%=productmasterBean.getSalePrice3()%>" 
+								        					   style="width: 220px;" />
+								        				&nbsp;บาท
 								        			</td>
 									        	</tr>
+									        	<tr>
+									        		<td align="right">
+														ราคาขาย 4 :
+													</td>
+								        			<td align="left">
+								        				<input type='text' 
+								        					   id="salePrice4" 
+								        					   name='salePrice4' 
+								        					   class="moneyOnly"
+								        					   onblur="gp_checkAmtOnly(this, 11);"
+								        					   value="<%=productmasterBean.getSalePrice4()%>" 
+								        					   style="width: 220px;" />
+								        				&nbsp;บาท
+								        			</td>
+									        	</tr>
+									        	<tr>
+									        		<td align="right">
+														ราคาขาย 5 :
+													</td>
+								        			<td align="left">
+								        				<input type='text' 
+								        					   id="salePrice5" 
+								        					   name='salePrice5' 
+								        					   class="moneyOnly"
+								        					   onblur="gp_checkAmtOnly(this, 11);"
+								        					   value="<%=productmasterBean.getSalePrice5()%>" 
+								        					   style="width: 220px;" />
+								        				&nbsp;บาท
+								        			</td>
+									        	</tr>
+									        	
 									        </table>
 									        <br/>
 									        <table class="table sim-panel-result-table" id="resultData">
 												<tr height="26px;">
 													<th  style="text-align: center;" width="5%" ><B>ลำดับ</B></th>
 													<th  style="text-align: center;" width="20%"><B>ปริมาณที่ซื้อ</B></th>
-													<th  style="text-align: center;" width="60%"><B>ลดจำนวนเงิน</B></th>
+													<th  style="text-align: center;" width="20%"><B>ลดจำนวนเงิน</B></th>
+													<th  style="text-align: center;" width="20%"><B>วันที่มีผล</B></th>
+													<th  style="text-align: center;" width="20%"><B>วันที่สิ้นสุด</B></th>
 													<th style="text-align: center;" width="15%">Action</th>
 												</tr> 
 												<%
-	   											int					  	seq		= 1;
-												for(ProductDiscountBean bean:productDiscountList){
-													if(!bean.getRowStatus().equals(productDetailsMaintananceForm.DEL)){
-												%>
+ 													int					  	seq		= 1;
+													for(ProductdetailBean bean:productdetailList){
+														if(!bean.getRowStatus().equals(productDetailsMaintananceForm.DEL)){
+ 												%>
 												<tr>
 													<td style="text-align:center">
 														<%=seq%>
@@ -678,10 +755,30 @@
 														<input type="text" 
 															   style="width: 100%" 
 															   onblur="gp_checkAmtOnly(this, 9);lp_updateRecord(<%=bean.getSeq()%>);" 
-															   id="discount<%=bean.getSeq()%>" 
-															   name="discount" 
+															   id="discountRate<%=bean.getSeq()%>" 
+															   name="discountRate" 
 															   class="moneyOnly"
-															   value="<%=bean.getDiscount()%>" />
+															   value="<%=bean.getDiscountRate()%>" />
+													</td>
+													<td align="left">
+														<input type='text' 
+								        					   id="startDate<%=bean.getSeq()%>" 
+								        					   name='startDate' 
+								        					   placeholder="DD/MM/YYYY"
+								        					   class="dateFormat"
+								        					   onchange="gp_checkDate(this);"
+								        					   value="<%=bean.getStartDate() %>" 
+								        					   style="width: 100px;" />
+													</td>
+													<td align="left">
+														<input type='text' 
+								        					   id="expDate<%=bean.getSeq()%>" 
+								        					   name='expDate' 
+								        					   placeholder="DD/MM/YYYY"
+								        					   class="dateFormat"
+								        					   onchange="gp_checkDate(this);"
+								        					   value="<%=bean.getExpDate() %>" 
+								        					   style="width: 100px;" />
 													</td>
 													<td align="center">
 														<img alt="ลบ" title="ลบ" src="<%=imgURL%>/wrong.png" width="24" height="24" border="0" onclick="lp_deleteRecord(this, '<%=bean.getSeq()%>');" />
@@ -690,7 +787,7 @@
 												</tr>
 												<% seq++;}}%>
 												<tr>
-													<td colspan="3">&nbsp;</td>
+													<td colspan="5">&nbsp;</td>
 													<td align="center">
 														<img alt="เพิ่ม" title="เพิ่ม" src="<%=imgURL%>/Add.png" width="24" height="24" border="0" onclick="lp_newRecord(this);" />
 													</td>

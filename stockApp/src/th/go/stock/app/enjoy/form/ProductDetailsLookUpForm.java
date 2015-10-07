@@ -4,117 +4,44 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import th.go.stock.app.enjoy.bean.ComboBean;
-import th.go.stock.app.enjoy.bean.ProductDetailsBean;
+import th.go.stock.app.enjoy.bean.ProductmasterBean;
 
 public class ProductDetailsLookUpForm {
 	
-	private String						find;
-	private String						column;
-	private String						orderBy;
-	private String						sortBy;
-	private String						likeFlag;
-	
-	private List<ComboBean> 			columnList;
-	private List<ComboBean> 			orderByList;
-	private List<ComboBean> 			sortByList;
-	private List<ProductDetailsBean> 	dataList;
-	
+	private ProductmasterBean 			productmasterBean;
+	private String						errMsg;
 	private int							pageNum;
 	private int							totalPage;
 	private String						totalRecord;
+	private List<ProductmasterBean> 	dataList;
 	private HashMap						hashTable;
 	
 	public ProductDetailsLookUpForm(){
 		
-		this.find				= "";
-		this.column				= "";
-		this.orderBy			= "";
-		this.sortBy				= "";
-		this.likeFlag			= "";
-		
-		
-		this.columnList				= new ArrayList<ComboBean>();
-		this.orderByList			= new ArrayList<ComboBean>();
-		this.sortByList				= new ArrayList<ComboBean>();
-		this.dataList				= new ArrayList<ProductDetailsBean>();
-		
+		this.productmasterBean 		= new ProductmasterBean();
+		this.errMsg					= "";
 		this.pageNum				= 1;
 		this.totalPage				= 1;
 		this.totalRecord			= "";
+		this.dataList				= new ArrayList<ProductmasterBean>();
 		this.hashTable				= new HashMap();
 	}
 
-	public String getFind() {
-		return find;
+
+	public ProductmasterBean getProductmasterBean() {
+		return productmasterBean;
 	}
 
-	public void setFind(String find) {
-		this.find = find;
+	public void setProductmasterBean(ProductmasterBean productmasterBean) {
+		this.productmasterBean = productmasterBean;
 	}
 
-	public String getColumn() {
-		return column;
+	public String getErrMsg() {
+		return errMsg;
 	}
 
-	public void setColumn(String column) {
-		this.column = column;
-	}
-
-	public String getOrderBy() {
-		return orderBy;
-	}
-
-	public void setOrderBy(String orderBy) {
-		this.orderBy = orderBy;
-	}
-
-	public String getSortBy() {
-		return sortBy;
-	}
-
-	public void setSortBy(String sortBy) {
-		this.sortBy = sortBy;
-	}
-
-	public String getLikeFlag() {
-		return likeFlag;
-	}
-
-	public void setLikeFlag(String likeFlag) {
-		this.likeFlag = likeFlag;
-	}
-
-	public List<ComboBean> getColumnList() {
-		return columnList;
-	}
-
-	public void setColumnList(List<ComboBean> columnList) {
-		this.columnList = columnList;
-	}
-
-	public List<ComboBean> getOrderByList() {
-		return orderByList;
-	}
-
-	public void setOrderByList(List<ComboBean> orderByList) {
-		this.orderByList = orderByList;
-	}
-
-	public List<ComboBean> getSortByList() {
-		return sortByList;
-	}
-
-	public void setSortByList(List<ComboBean> sortByList) {
-		this.sortByList = sortByList;
-	}
-
-	public List<ProductDetailsBean> getDataList() {
-		return dataList;
-	}
-
-	public void setDataList(List<ProductDetailsBean> dataList) {
-		this.dataList = dataList;
+	public void setErrMsg(String errMsg) {
+		this.errMsg = errMsg;
 	}
 
 	public int getPageNum() {
@@ -141,6 +68,14 @@ public class ProductDetailsLookUpForm {
 		this.totalRecord = totalRecord;
 	}
 
+	public List<ProductmasterBean> getDataList() {
+		return dataList;
+	}
+
+	public void setDataList(List<ProductmasterBean> dataList) {
+		this.dataList = dataList;
+	}
+
 	public HashMap getHashTable() {
 		return hashTable;
 	}
@@ -148,4 +83,5 @@ public class ProductDetailsLookUpForm {
 	public void setHashTable(HashMap hashTable) {
 		this.hashTable = hashTable;
 	}
+
 }

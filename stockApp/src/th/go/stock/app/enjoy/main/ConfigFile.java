@@ -18,6 +18,7 @@ public class ConfigFile {
 	private static final String FILE_EXT   			= "file.extends";
 	private static final String PATH_LOG   			= "path.log";
 	private static final String OPEN_LOG   			= "open.log";
+	private static final String VAT   				= "system.vat";
 	private static ConfigFile configFile;
 	private static Properties properties ;
 	
@@ -88,5 +89,8 @@ public class ConfigFile {
 	
 	public static String getOpenLog() {
 		return getText(OPEN_LOG);
+	}
+	public static String getVat() {
+		return getText(VAT);
 	}
 }

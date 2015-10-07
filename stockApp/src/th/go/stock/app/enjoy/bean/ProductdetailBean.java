@@ -2,23 +2,27 @@ package th.go.stock.app.enjoy.bean;
 
 
 
-public class ProductDiscountBean {
+public class ProductdetailBean {
 	
 	private String productCode;
 	private String quanDiscount;
-	private String discount;
+	private String discountRate;
 	private String seqDb;
 	private String rowStatus;
 	private String seq;
+	private String startDate;
+	private String expDate;
 	
 	
-	public ProductDiscountBean(){
+	public ProductdetailBean(){
 		this.productCode 	= "";
 		this.quanDiscount 	= "";
-		this.discount 		= "";
+		this.discountRate 	= "";
 		this.seqDb 			= "";
 		this.rowStatus 		= "";
 		this.seq 			= "";
+		this.startDate 		= "";
+		this.expDate 		= "";
 	}
 
 
@@ -42,13 +46,13 @@ public class ProductDiscountBean {
 	}
 
 
-	public String getDiscount() {
-		return discount;
+	public String getDiscountRate() {
+		return discountRate;
 	}
 
 
-	public void setDiscount(String discount) {
-		this.discount = discount;
+	public void setDiscountRate(String discountRate) {
+		this.discountRate = discountRate;
 	}
 
 
@@ -80,4 +84,25 @@ public class ProductDiscountBean {
 	public void setSeq(String seq) {
 		this.seq = seq;
 	}
+
+
+	public String getStartDate() {
+		return startDate;
+	}
+
+
+	public void setStartDate(String startDate) {
+		this.startDate = startDate;
+	}
+
+
+	public String getExpDate() {
+		return expDate;
+	}
+
+
+	public void setExpDate(String expDate) {
+		this.expDate = expDate;
+	}
+
 }

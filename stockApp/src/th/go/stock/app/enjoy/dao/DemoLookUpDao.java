@@ -72,9 +72,9 @@ public class DemoLookUpDao {
 					logger.info("[getLookUpList] pathPages 		:: " + row[2]);
 					
 					
-					demoZoomBean.setPageCodes				(EnjoyUtils.nullToStr(row[0].toString()));
-					demoZoomBean.setPageNames				(EnjoyUtils.nullToStr(row[1].toString()));
-					demoZoomBean.setPathPages				(EnjoyUtils.nullToStr(row[2].toString()));
+					demoZoomBean.setPageCodes				(EnjoyUtils.nullToStr(row[0]));
+					demoZoomBean.setPageNames				(EnjoyUtils.nullToStr(row[1]));
+					demoZoomBean.setPathPages				(EnjoyUtils.nullToStr(row[2]));
 					
 					listData.add(demoZoomBean);
 				}	

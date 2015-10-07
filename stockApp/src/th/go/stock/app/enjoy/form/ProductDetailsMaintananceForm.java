@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import th.go.stock.app.enjoy.bean.ComboBean;
-import th.go.stock.app.enjoy.bean.ProductDetailsBean;
-import th.go.stock.app.enjoy.bean.ProductDiscountBean;
+import th.go.stock.app.enjoy.bean.ProductmasterBean;
+import th.go.stock.app.enjoy.bean.ProductdetailBean;
 
 public class ProductDetailsMaintananceForm {
 	
@@ -14,30 +14,30 @@ public class ProductDetailsMaintananceForm {
 	public static final String DEL 	= "DEL";
 	
 	
-	private ProductDetailsBean 			productDetailsBean;
+	private ProductmasterBean 			productmasterBean;
 	private List<ComboBean> 			statusCombo;
 	private String						errMsg;
 	private String						pageMode;
 	private String						titlePage;
-	private List<ProductDiscountBean> 	productDiscountList;
+	private List<ProductdetailBean> 	productdetailList;
 	private String						seqTemp;
 	
 	public ProductDetailsMaintananceForm(){
-		this.productDetailsBean 	= new ProductDetailsBean();
+		this.productmasterBean 		= new ProductmasterBean();
 		this.statusCombo			= new ArrayList<ComboBean>();
 		this.errMsg					= "";
 		this.pageMode				= NEW;
 		this.titlePage				= "";
-		this.productDiscountList	= new ArrayList<ProductDiscountBean>();
+		this.productdetailList		= new ArrayList<ProductdetailBean>();
 		this.seqTemp				= "0";
 	}
 
-	public ProductDetailsBean getProductDetailsBean() {
-		return productDetailsBean;
+	public ProductmasterBean getProductmasterBean() {
+		return productmasterBean;
 	}
 
-	public void setProductDetailsBean(ProductDetailsBean productDetailsBean) {
-		this.productDetailsBean = productDetailsBean;
+	public void setProductmasterBean(ProductmasterBean productmasterBean) {
+		this.productmasterBean = productmasterBean;
 	}
 
 	public List<ComboBean> getStatusCombo() {
@@ -72,12 +72,12 @@ public class ProductDetailsMaintananceForm {
 		this.titlePage = titlePage;
 	}
 
-	public List<ProductDiscountBean> getProductDiscountList() {
-		return productDiscountList;
+	public List<ProductdetailBean> getProductdetailList() {
+		return productdetailList;
 	}
 
-	public void setProductDiscountList(List<ProductDiscountBean> productDiscountList) {
-		this.productDiscountList = productDiscountList;
+	public void setProductdetailList(List<ProductdetailBean> productdetailList) {
+		this.productdetailList = productdetailList;
 	}
 
 	public String getSeqTemp() {
@@ -87,4 +87,5 @@ public class ProductDetailsMaintananceForm {
 	public void setSeqTemp(String seqTemp) {
 		this.seqTemp = seqTemp;
 	}
+
 }

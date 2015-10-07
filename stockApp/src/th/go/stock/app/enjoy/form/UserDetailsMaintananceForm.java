@@ -18,6 +18,7 @@ public class UserDetailsMaintananceForm {
 	private List<ComboBean> 		statusCombo;
 	private List<Userprivilege> 	userprivilegeList;
 	private List<UserDetailsBean> 	userDetailsBeanList;
+	private List<ComboBean> 		companyCombo;
 	private String					errMsg;
 	private String					pageMode;
 	private String					titlePage;
@@ -27,6 +28,7 @@ public class UserDetailsMaintananceForm {
 		this.statusCombo			= new ArrayList<ComboBean>();
 		this.userprivilegeList		= new ArrayList<Userprivilege>();
 		this.userDetailsBeanList	= new ArrayList<UserDetailsBean>();
+		this.companyCombo			= new ArrayList<ComboBean>();
 		this.errMsg					= "";
 		this.pageMode				= NEW;
 		this.titlePage				= "";
@@ -86,6 +88,14 @@ public class UserDetailsMaintananceForm {
 
 	public void setTitlePage(String titlePage) {
 		this.titlePage = titlePage;
+	}
+
+	public List<ComboBean> getCompanyCombo() {
+		return companyCombo;
+	}
+
+	public void setCompanyCombo(List<ComboBean> companyCombo) {
+		this.companyCombo = companyCombo;
 	}
 	
 }

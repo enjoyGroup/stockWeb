@@ -234,7 +234,8 @@
 		    var lo_table                        = document.getElementById("resultData");
 		    var lo_seqTemp            			= document.getElementById("seqTemp");
 		    var lv_maxSeq                       = parseInt(lo_seqTemp.value) + 1;
-		    var rowIndex                      	= lo_table.rows.length;
+		    var rowIndex                      	= gp_rowTableIndex(document.getElementById("btnZoom"));
+		    //var rowIndex                      	= lo_table.rows.length;
 		    var newNodeTr 	                	= null;
 		    var newNodeTd1 						= null;
 		    var newNodeTd2 						= null;
@@ -457,6 +458,7 @@
 						        					   name='companyName' 
 						        					   maxlength="100" 
 						        					   placeholder="ชื่อบริษัท"  
+						        					   <%if(chk==false){%> onkeypress="return lp_enterToSearch(event);"<%}%>
 						        					   value="<%=relationUserAndCompanyForm.getCompanyName()%>" 
 						        					   <%if(chk==true){%> class="input-disabled" readonly<%}%> />
 						        			</td>
@@ -469,6 +471,7 @@
 						        					   name='userFullName' 
 						        					   maxlength="151" 
 						        					   placeholder="ชื่อพนักงาน"  
+						        					   <%if(chk==false){%> onkeypress="return lp_enterToSearch(event);"<%}%>
 						        					   value="<%=relationUserAndCompanyForm.getUserFullName()%>" 
 						        					   <%if(chk==true){%> class="input-disabled" readonly<%}%> />
 						        			</td>
@@ -484,6 +487,7 @@
 										<h6 class="panel-title" style="font-size:1.0em">ข้อมูลผูกความสัมพันธ์ผุ้ใช้กับบริษัท</h6>
 									</div>
 				         			<div class="panel-body">
+				         				<%-- 
 				         				<table border="0" cellpadding="3" cellspacing="0" width="100%">
 											<tr>
 												<td align="left">
@@ -491,6 +495,7 @@
 												</td>
 											</tr>
 										</table>
+										--%>
 				         				<table class="table sim-panel-result-table" id="resultData">
 											<tr height="26px;">
 												<th  style="text-align: center;" width="5%" ><B>ลำดับ</B></th>
@@ -527,6 +532,12 @@
 														</td>
 													</tr>
 											<% seq++;}}%>
+													<tr>
+														<td colspan="4">&nbsp;</td>
+														<td align="center">
+															<img alt="เลือกผู้ใช้งานระบบ" width="30px" height="30px" title="เลือกผู้ใช้งานระบบ" id="btnZoom" src="<%=imgURL%>/zoom.png" border="0" />
+														</td>
+													</tr>
 										</table>
 										<br/>
 										<table border="0" cellpadding="3" cellspacing="0" width="100%">

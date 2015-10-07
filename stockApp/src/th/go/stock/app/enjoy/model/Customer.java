@@ -18,7 +18,11 @@ public class Customer implements Serializable {
 
 	private String birthDate;
 
+	private String branchName;
+
 	private String buildingName;
+
+	private int cusGroupCode;
 
 	private String cusName;
 
@@ -85,12 +89,28 @@ public class Customer implements Serializable {
 		this.birthDate = birthDate;
 	}
 
+	public String getBranchName() {
+		return this.branchName;
+	}
+
+	public void setBranchName(String branchName) {
+		this.branchName = branchName;
+	}
+
 	public String getBuildingName() {
 		return this.buildingName;
 	}
 
 	public void setBuildingName(String buildingName) {
 		this.buildingName = buildingName;
+	}
+
+	public int getCusGroupCode() {
+		return this.cusGroupCode;
+	}
+
+	public void setCusGroupCode(int cusGroupCode) {
+		this.cusGroupCode = cusGroupCode;
 	}
 
 	public String getCusName() {

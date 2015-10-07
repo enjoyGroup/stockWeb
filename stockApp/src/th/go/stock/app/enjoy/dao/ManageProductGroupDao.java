@@ -17,6 +17,7 @@ import th.go.stock.app.enjoy.exception.EnjoyException;
 import th.go.stock.app.enjoy.model.Productgroup;
 import th.go.stock.app.enjoy.model.ProductgroupPK;
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
+import th.go.stock.app.enjoy.utils.EnjoyUtils;
 import th.go.stock.app.enjoy.utils.HibernateUtil;
 
 public class ManageProductGroupDao {
@@ -54,17 +55,17 @@ public class ManageProductGroupDao {
 			for(Object[] row:list){
 				bean 	= new ManageProductGroupBean();
 				
-				logger.info("productTypeCode 		:: " + row[0].toString());
-				logger.info("productGroupCode 		:: " + row[1].toString());
-				logger.info("productGroupName 		:: " + row[2].toString());
-				logger.info("productGroupStatus 	:: " + row[3].toString());
+				logger.info("productTypeCode 		:: " + row[0]);
+				logger.info("productGroupCode 		:: " + row[1]);
+				logger.info("productGroupName 		:: " + row[2]);
+				logger.info("productGroupStatus 	:: " + row[3]);
 				logger.info("seq 					:: " + seq);
 				
-				bean.setProductTypeCode				(row[0].toString());
-				bean.setProductGroupCode			(row[1].toString());
-				bean.setProductGroupName			(row[2].toString());
-				bean.setProductGroupStatus			(row[3].toString());
-				bean.setSeq							(String.valueOf(seq));
+				bean.setProductTypeCode				(EnjoyUtils.nullToStr(row[0]));
+				bean.setProductGroupCode			(EnjoyUtils.nullToStr(row[1]));
+				bean.setProductGroupName			(EnjoyUtils.nullToStr(row[2]));
+				bean.setProductGroupStatus			(EnjoyUtils.nullToStr(row[3]));
+				bean.setSeq							(EnjoyUtils.nullToStr(seq));
 				
 				manageProductGroupBeanList.add(bean);
 				seq++;
@@ -257,11 +258,11 @@ public class ManageProductGroupDao {
 				for(Object[] row:listTemp){
 					comboBean 	= new ComboBean();
 					
-					logger.info("productGroupCode 		:: " + row[0].toString());
-					logger.info("productGroupName 		:: " + row[1].toString());
+					logger.info("productGroupCode 		:: " + row[0]);
+					logger.info("productGroupName 		:: " + row[1]);
 					
-					comboBean.setCode				(row[0].toString());
-					comboBean.setDesc				(row[1].toString());
+					comboBean.setCode				(EnjoyUtils.nullToStr(row[0]));
+					comboBean.setDesc				(EnjoyUtils.nullToStr(row[1]));
 					
 					comboList.add(comboBean);
 				}

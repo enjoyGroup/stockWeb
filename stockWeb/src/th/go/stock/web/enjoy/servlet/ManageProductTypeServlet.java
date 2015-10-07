@@ -13,7 +13,7 @@ import org.hibernate.SessionFactory;
 import org.json.simple.JSONObject;
 
 import th.go.stock.app.enjoy.bean.ManageProductTypeBean;
-import th.go.stock.app.enjoy.bean.ProductDiscountBean;
+import th.go.stock.app.enjoy.bean.ProductdetailBean;
 import th.go.stock.app.enjoy.bean.UserDetailsBean;
 import th.go.stock.app.enjoy.dao.ManageProductTypeDao;
 import th.go.stock.app.enjoy.exception.EnjoyException;

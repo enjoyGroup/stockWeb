@@ -57,6 +57,7 @@ public class UserDetailsDao {
 		    date 	   		= new Date();
 		    
 		    query.addScalar("userUniqueId"			, new StringType());
+		    query.addScalar("tinCompany"			, new StringType());
 		    query.addScalar("userId"				, new StringType());
 		    query.addScalar("userName"				, new StringType());
 		    query.addScalar("userSurname"			, new StringType());
@@ -66,6 +67,9 @@ public class UserDetailsDao {
 		    query.addScalar("userStatus"			, new StringType());
 		    query.addScalar("flagChangePassword"	, new StringType());
 		    query.addScalar("flagAlertStock"		, new StringType());
+		    query.addScalar("flagSalesman"			, new StringType());
+		    query.addScalar("commission"			, new StringType());
+		    query.addScalar("remark"				, new StringType());
 		    
 		    list		 	= query.list();
 		    
@@ -79,30 +83,38 @@ public class UserDetailsDao {
 				flagChkCompany		= this.flagChkCompany(session);
 				
 				logger.info("[userSelect] userUniqueId 			:: " + row[0]);
-				logger.info("[userSelect] userId 				:: " + row[1]);
-				logger.info("[userSelect] userName 				:: " + row[2]);
-				logger.info("[userSelect] userSurname 			:: " + row[3]);
-				logger.info("[userSelect] userEmail 			:: " + row[4]);
-				logger.info("[userSelect] userPrivilege 		:: " + row[5]);
-				logger.info("[userSelect] userLevel 			:: " + row[6]);
-				logger.info("[userSelect] userStatus 			:: " + row[7]);
-				logger.info("[userSelect] flagChangePassword 	:: " + row[8]);
-				logger.info("[userSelect] flagAlertStock 		:: " + row[9]);
+				logger.info("[userSelect] tinCompany 			:: " + row[1]);
+				logger.info("[userSelect] userId 				:: " + row[2]);
+				logger.info("[userSelect] userName 				:: " + row[3]);
+				logger.info("[userSelect] userSurname 			:: " + row[4]);
+				logger.info("[userSelect] userEmail 			:: " + row[5]);
+				logger.info("[userSelect] userPrivilege 		:: " + row[6]);
+				logger.info("[userSelect] userLevel 			:: " + row[7]);
+				logger.info("[userSelect] userStatus 			:: " + row[8]);
+				logger.info("[userSelect] flagChangePassword 	:: " + row[9]);
+				logger.info("[userSelect] flagAlertStock 		:: " + row[10]);
 				logger.info("[userSelect] flagChkCompany 		:: " + flagChkCompany);
+				logger.info("[userSelect] flagSalesman 			:: " + row[11]);
+				logger.info("[userSelect] commission 			:: " + row[12]);
+				logger.info("[userSelect] remark 				:: " + row[13]);
 				
-				userDetailsBean.setUserUniqueId			(Integer.parseInt(row[0].toString()));
-				userDetailsBean.setUserId				(EnjoyUtils.nullToStr(row[1].toString()));
+				userDetailsBean.setUserUniqueId			(EnjoyUtils.parseInt(row[0]));
+				userDetailsBean.setTinCompany			(EnjoyUtils.nullToStr(row[1]));
+				userDetailsBean.setUserId				(EnjoyUtils.nullToStr(row[2]));
 				userDetailsBean.setPwd					(passWord);
-				userDetailsBean.setUserName				(EnjoyUtils.nullToStr(row[2].toString()));
-				userDetailsBean.setUserSurname			(EnjoyUtils.nullToStr(row[3].toString()));
-				userDetailsBean.setUserEmail			(EnjoyUtils.nullToStr(row[4].toString()));
-				userDetailsBean.setUserPrivilege		(EnjoyUtils.nullToStr(row[5].toString()));
-				userDetailsBean.setUserLevel			(EnjoyUtils.nullToStr(row[6].toString()));
-				userDetailsBean.setUserStatus			(EnjoyUtils.nullToStr(row[7].toString()));
-				userDetailsBean.setFlagChangePassword	(EnjoyUtils.chkBoxtoDb(row[8].toString()));
+				userDetailsBean.setUserName				(EnjoyUtils.nullToStr(row[3]));
+				userDetailsBean.setUserSurname			(EnjoyUtils.nullToStr(row[4]));
+				userDetailsBean.setUserEmail			(EnjoyUtils.nullToStr(row[5]));
+				userDetailsBean.setUserPrivilege		(EnjoyUtils.nullToStr(row[6]));
+				userDetailsBean.setUserLevel			(EnjoyUtils.nullToStr(row[7]));
+				userDetailsBean.setUserStatus			(EnjoyUtils.nullToStr(row[8]));
+				userDetailsBean.setFlagChangePassword	(EnjoyUtils.chkBoxtoDb(row[9]));
 				userDetailsBean.setCurrentDate			(dateFormat.format(date));
-				userDetailsBean.setFlagAlertStock		(EnjoyUtils.chkBoxtoDb(row[9].toString()));
+				userDetailsBean.setFlagAlertStock		(EnjoyUtils.chkBoxtoDb(row[10]));
 				userDetailsBean.setFlagChkCompany		(flagChkCompany);
+				userDetailsBean.setFlagSalesman			(EnjoyUtils.chkBoxtoDb(row[11]));
+				userDetailsBean.setCommission			(EnjoyUtils.convertFloatToDisplay(row[12], 2));
+				userDetailsBean.setRemark			    (EnjoyUtils.nullToStr(row[13]));
 			}
 			
 			
@@ -143,11 +155,11 @@ public class UserDetailsDao {
 			for(Object[] row:list){
 				comboBean = new ComboBean();
 				
-				logger.info("[getRefuserstatusCombo] userStatusCode :: " + row[0].toString());
-				logger.info("[getRefuserstatusCombo] userStatusName :: " + row[1].toString());
+				logger.info("[getRefuserstatusCombo] userStatusCode :: " + row[0]);
+				logger.info("[getRefuserstatusCombo] userStatusName :: " + row[1]);
 				
-				comboBean.setCode(row[0].toString());
-				comboBean.setDesc(row[1].toString());
+				comboBean.setCode(EnjoyUtils.nullToStr(row[0]));
+				comboBean.setDesc(EnjoyUtils.nullToStr(row[1]));
 				
 				comboList.add(comboBean);
 			}
@@ -209,6 +221,7 @@ public class UserDetailsDao {
 		try{			
 			hql					= "select a.userUniqueId"
 										+ ", a.userId"
+										+ ", a.tinCompany"
 										+ ", a.userName"
 										+ ", a.userSurname"
 										+ ", a.userEmail"
@@ -217,16 +230,27 @@ public class UserDetailsDao {
 										+ ", a.userStatus"
 										+ ", a.flagChangePassword"
 										+ ", a.flagAlertStock"
+										+ ", a.flagSalesman"
+										+ ", a.commission"
+										+ ", a.remark"
 										+ ", b.userStatusName"
 								+ "	from userdetails a, refuserstatus b "
 								+ "	where b.userStatusCode = a.userStatus "
 								+ " 	and a.userId <> 'admin'";
 			
-			if(!userdetailForm.getUserName().equals("")){
-				hql += " and CONCAT(a.userName, ' ', a.userSurname) like ('" + userdetailForm.getUserName() + "%')";
+			if(!userdetailForm.getUserName().equals("***")){
+				if(userdetailForm.getUserName().equals("")){
+					hql += " and CONCAT(a.userName, ' ', a.userSurname) = ''";
+				}else{
+					hql += " and CONCAT(a.userName, ' ', a.userSurname) like ('" + userdetailForm.getUserName() + "%')";
+				}
 			}
-			if(!userdetailForm.getUserId().equals("")){
-				hql += " and a.userId = '" + userdetailForm.getUserId() + "'";
+			if(!userdetailForm.getUserId().equals("***")){
+				if(userdetailForm.getUserId().equals("")){
+					hql += " and (a.userId is null or a.userId = '')";
+				}else{
+					hql += " and a.userId = '" + userdetailForm.getUserId() + "'";
+				}
 			}
 			if(!userdetailForm.getUserStatus().equals("")){
 				hql += " and a.userStatus = '" + userdetailForm.getUserStatus() + "'";
@@ -234,6 +258,7 @@ public class UserDetailsDao {
 
 			query			= session.createSQLQuery(hql);			
 			query.addScalar("userUniqueId"			, new IntegerType());
+			query.addScalar("tinCompany"			, new StringType());
 			query.addScalar("userId"				, new StringType());
 			query.addScalar("userName"				, new StringType());
 			query.addScalar("userSurname"			, new StringType());
@@ -243,6 +268,9 @@ public class UserDetailsDao {
 			query.addScalar("userStatus"			, new StringType());
 			query.addScalar("flagChangePassword"	, new StringType());
 			query.addScalar("flagAlertStock"		, new StringType());
+			query.addScalar("flagSalesman"			, new StringType());
+			query.addScalar("commission"			, new StringType());
+			query.addScalar("remark"				, new StringType());
 			query.addScalar("userStatusName"		, new StringType());
 			
 			list		 	= query.list();
@@ -259,32 +287,40 @@ public class UserDetailsDao {
 					privilegeName   	= "";
 					
 					logger.info("[getListUserdetail] userUniqueId 		:: " + row[0]);
-					logger.info("[getListUserdetail] userId 			:: " + row[1]);
-					logger.info("[getListUserdetail] userName 			:: " + row[2]);
-					logger.info("[getListUserdetail] userSurname 		:: " + row[3]);
-					logger.info("[getListUserdetail] userEmail 			:: " + row[4]);
-					logger.info("[getListUserdetail] userPrivilege 		:: " + row[5]);
-					logger.info("[getListUserdetail] userLevel 			:: " + row[6]);
-					logger.info("[getListUserdetail] userStatus 		:: " + row[7]);
-					logger.info("[getListUserdetail] flagChangePassword :: " + row[8]);
-					logger.info("[getListUserdetail] flagAlertStock 	:: " + row[9]);
-					logger.info("[getListUserdetail] userStatusName 	:: " + row[10]);
+					logger.info("[getListUserdetail] tinCompany 		:: " + row[1]);
+					logger.info("[getListUserdetail] userId 			:: " + row[2]);
+					logger.info("[getListUserdetail] userName 			:: " + row[3]);
+					logger.info("[getListUserdetail] userSurname 		:: " + row[4]);
+					logger.info("[getListUserdetail] userEmail 			:: " + row[5]);
+					logger.info("[getListUserdetail] userPrivilege 		:: " + row[6]);
+					logger.info("[getListUserdetail] userLevel 			:: " + row[7]);
+					logger.info("[getListUserdetail] userStatus 		:: " + row[8]);
+					logger.info("[getListUserdetail] flagChangePassword :: " + row[9]);
+					logger.info("[getListUserdetail] flagAlertStock 	:: " + row[10]);
+					logger.info("[getListUserdetail] flagSalesman 		:: " + row[11]);
+					logger.info("[getListUserdetail] commission 		:: " + row[12]);
+					logger.info("[getListUserdetail] remark 			:: " + row[13]);
+					logger.info("[getListUserdetail] userStatusName 	:: " + row[14]);
 					
-					arrPrivilegeCode	= EnjoyUtils.nullToStr(row[5].toString()).split("\\,");
+					arrPrivilegeCode	= EnjoyUtils.nullToStr(row[6]).split("\\,");
 					for(int j=0;j<arrPrivilegeCode.length;j++){
 						if (! privilegeName.equals("")) privilegeName = privilegeName + "<br>";
 						privilegeName   = privilegeName + "- " +fUserprivilege.get(arrPrivilegeCode[j]);
 					}
-					userDetailsBean.setUserUniqueId			(Integer.parseInt(row[0].toString()));
-					userDetailsBean.setUserId				(EnjoyUtils.nullToStr(row[1].toString()));
-					userDetailsBean.setUserName				(EnjoyUtils.nullToStr(row[2].toString()) + "  " + EnjoyUtils.nullToStr(row[3].toString()));
-					userDetailsBean.setUserSurname			(EnjoyUtils.nullToStr(row[3].toString()));
-					userDetailsBean.setUserEmail			(EnjoyUtils.nullToStr(row[4].toString()));
+					userDetailsBean.setUserUniqueId			(EnjoyUtils.parseInt(row[0]));
+					userDetailsBean.setTinCompany			(EnjoyUtils.nullToStr(row[1]));
+					userDetailsBean.setUserId				(EnjoyUtils.nullToStr(row[2]));
+					userDetailsBean.setUserName				(EnjoyUtils.nullToStr(row[3]) + "  " + EnjoyUtils.nullToStr(row[4]));
+					userDetailsBean.setUserSurname			(EnjoyUtils.nullToStr(row[5]));
+					userDetailsBean.setUserEmail			(EnjoyUtils.nullToStr(row[6]));
 					userDetailsBean.setUserPrivilege		(privilegeName);
-					userDetailsBean.setUserLevel			(EnjoyUtils.nullToStr(row[6].toString()));
-					userDetailsBean.setFlagChangePassword	(EnjoyUtils.chkBoxtoDb(row[8].toString()));
-					userDetailsBean.setFlagAlertStock		(EnjoyUtils.chkBoxtoDb(row[9].toString()));
-					userDetailsBean.setUserStatus			(EnjoyUtils.nullToStr(row[10].toString()));
+					userDetailsBean.setUserLevel			(EnjoyUtils.nullToStr(row[7]));
+					userDetailsBean.setFlagChangePassword	(EnjoyUtils.chkBoxtoDb(row[9]));
+					userDetailsBean.setFlagAlertStock		(EnjoyUtils.chkBoxtoDb(row[10]));
+					userDetailsBean.setFlagSalesman			(EnjoyUtils.chkBoxtoDb(row[11]));
+					userDetailsBean.setCommission			(EnjoyUtils.convertFloatToDisplay(row[12], 2));
+					userDetailsBean.setRemark			    (EnjoyUtils.nullToStr(row[13]));
+					userDetailsBean.setUserStatus			(EnjoyUtils.nullToStr(row[14]));
 					
 					listUserDetailsBean.add(userDetailsBean);
 				}	
@@ -316,8 +352,10 @@ public class UserDetailsDao {
 		try{
 			
 			hql					= "select userUniqueId"
+										+ ", tinCompany"
 										+ ", userId"
 										+ ", userName"
+										+ ", tinCompany"
 										+ ", userSurname"
 										+ ", userEmail"
 										+ ", userPrivilege"
@@ -325,10 +363,14 @@ public class UserDetailsDao {
 										+ ", userStatus"
 										+ ", flagChangePassword"
 										+ ", flagAlertStock"
+										+ ", flagSalesman"
+										+ ", commission"
+										+ ", remark"
 								+ "	from userdetails where userUniqueId = " + userUniqueId;
 			query			= session.createSQLQuery(hql);
 			
 			query.addScalar("userUniqueId"			, new IntegerType());
+			query.addScalar("tinCompany"			, new StringType());
 			query.addScalar("userId"				, new StringType());
 			query.addScalar("userName"				, new StringType());
 			query.addScalar("userSurname"			, new StringType());
@@ -338,6 +380,9 @@ public class UserDetailsDao {
 			query.addScalar("userStatus"			, new StringType());
 			query.addScalar("flagChangePassword"	, new StringType());
 			query.addScalar("flagAlertStock"		, new StringType());
+			query.addScalar("flagSalesman"			, new StringType());
+			query.addScalar("commission"			, new StringType());
+			query.addScalar("remark"				, new StringType());
 			
 			list		 	= query.list();
 			
@@ -350,26 +395,34 @@ public class UserDetailsDao {
 				userDetailsBean 	= new UserDetailsBean();
 				
 				logger.info("[getUserdetail] userUniqueId 		:: " + row[0]);
-				logger.info("[getUserdetail] userId 			:: " + row[1]);
-				logger.info("[getUserdetail] userName 			:: " + row[2]);
-				logger.info("[getUserdetail] userSurname 		:: " + row[3]);
-				logger.info("[getUserdetail] userEmail 			:: " + row[4]);
-				logger.info("[getUserdetail] userPrivilege 		:: " + row[5]);
-				logger.info("[getUserdetail] userLevel 			:: " + row[6]);
-				logger.info("[getUserdetail] userStatus 		:: " + row[7]);
-				logger.info("[getUserdetail] flagChangePassword :: " + row[8]);
-				logger.info("[getUserdetail] flagAlertStock 	:: " + row[9]);
+				logger.info("[getUserdetail] tinCompany 		:: " + row[1]);
+				logger.info("[getUserdetail] userId 			:: " + row[2]);
+				logger.info("[getUserdetail] userName 			:: " + row[3]);
+				logger.info("[getUserdetail] userSurname 		:: " + row[4]);
+				logger.info("[getUserdetail] userEmail 			:: " + row[5]);
+				logger.info("[getUserdetail] userPrivilege 		:: " + row[6]);
+				logger.info("[getUserdetail] userLevel 			:: " + row[7]);
+				logger.info("[getUserdetail] userStatus 		:: " + row[8]);
+				logger.info("[getUserdetail] flagChangePassword :: " + row[9]);
+				logger.info("[getUserdetail] flagAlertStock 	:: " + row[10]);
+				logger.info("[getListUserdetail] flagSalesman 	:: " + row[11]);
+				logger.info("[getListUserdetail] commission 	:: " + row[12]);
+				logger.info("[getListUserdetail] remark 		:: " + row[13]);
 				
-				userDetailsBean.setUserUniqueId			(Integer.parseInt(row[0].toString()));
-				userDetailsBean.setUserId				(row[1].toString());
-				userDetailsBean.setUserName				(row[2].toString());
-				userDetailsBean.setUserSurname			(row[3].toString());
-				userDetailsBean.setUserEmail			(row[4].toString());
-				userDetailsBean.setUserPrivilege		(row[5].toString());
-				userDetailsBean.setUserLevel			(row[6].toString());
-				userDetailsBean.setUserStatus			(row[7].toString());
-				userDetailsBean.setFlagChangePassword	(row[8].toString());
-				userDetailsBean.setFlagAlertStock		(row[9].toString());
+				userDetailsBean.setUserUniqueId			(EnjoyUtils.parseInt(row[0]));
+				userDetailsBean.setTinCompany			(EnjoyUtils.nullToStr(row[1]));
+				userDetailsBean.setUserId				(EnjoyUtils.nullToStr(row[2]));
+				userDetailsBean.setUserName				(EnjoyUtils.nullToStr(row[3]));
+				userDetailsBean.setUserSurname			(EnjoyUtils.nullToStr(row[4]));
+				userDetailsBean.setUserEmail			(EnjoyUtils.nullToStr(row[5]));
+				userDetailsBean.setUserPrivilege		(EnjoyUtils.nullToStr(row[6]));
+				userDetailsBean.setUserLevel			(EnjoyUtils.nullToStr(row[7]));
+				userDetailsBean.setUserStatus			(EnjoyUtils.nullToStr(row[8]));
+				userDetailsBean.setFlagChangePassword	(EnjoyUtils.nullToStr(row[9]));
+				userDetailsBean.setFlagAlertStock		(EnjoyUtils.nullToStr(row[10]));
+				userDetailsBean.setFlagSalesman			(EnjoyUtils.chkBoxtoDb(row[11]));
+				userDetailsBean.setCommission			(EnjoyUtils.convertFloatToDisplay(row[12], 2));
+				userDetailsBean.setRemark			    (EnjoyUtils.nullToStr(row[13]));
 			}
 			
 		}catch(Exception e){
@@ -472,6 +525,7 @@ public class UserDetailsDao {
 			userdetailDb = new Userdetail();
 			
 			userdetailDb.setUserId(userDetailsBean.getUserId());
+			userdetailDb.setTinCompany(userDetailsBean.getTinCompany());
 			userdetailDb.setUserPassword(userDetailsBean.getPwd());
 			userdetailDb.setUserName(userDetailsBean.getUserName());
 			userdetailDb.setUserSurname(userDetailsBean.getUserSurname());
@@ -481,6 +535,9 @@ public class UserDetailsDao {
 			userdetailDb.setUserStatus(userDetailsBean.getUserStatus());
 			userdetailDb.setFlagChangePassword(userDetailsBean.getFlagChangePassword());
 			userdetailDb.setFlagAlertStock(userDetailsBean.getFlagAlertStock());
+			userdetailDb.setFlagSalesman(userDetailsBean.getFlagSalesman());
+			userdetailDb.setCommission(EnjoyUtils.parseBigDecimal(userDetailsBean.getCommission()));
+			userdetailDb.setRemark(userDetailsBean.getRemark());
 			
 			
 			session.saveOrUpdate(userdetailDb);
@@ -506,6 +563,7 @@ public class UserDetailsDao {
 		
 		try{
 			hql				= "update  Userdetail set userId 			= :userId"
+												+ ", tinCompany			= :tinCompany"
 												+ ", userName			= :userName"
 												+ ", userSurname		= :userSurname"
 												+ ", userEmail			= :userEmail"
@@ -514,10 +572,14 @@ public class UserDetailsDao {
 												+ ", userStatus			= :userStatus"
 												+ ", flagChangePassword = :flagChangePassword"
 												+ ", flagAlertStock 	= :flagAlertStock"
+												+ ", flagSalesman 		= :flagSalesman"
+												+ ", commission 		= :commission"
+												+ ", remark 			= :remark"
 										+ " where userUniqueId = :userUniqueId";
 			
 			query = session.createQuery(hql);
 			query.setParameter("userId"				, userDetailsBean.getUserId());
+			query.setParameter("tinCompany"			, userDetailsBean.getTinCompany());
 			query.setParameter("userName"			, userDetailsBean.getUserName());
 			query.setParameter("userSurname"		, userDetailsBean.getUserSurname());
 			query.setParameter("userEmail"			, userDetailsBean.getUserEmail());
@@ -526,6 +588,9 @@ public class UserDetailsDao {
 			query.setParameter("userStatus"			, userDetailsBean.getUserStatus());
 			query.setParameter("flagChangePassword"	, userDetailsBean.getFlagChangePassword());
 			query.setParameter("flagAlertStock"		, userDetailsBean.getFlagAlertStock());
+			query.setParameter("flagSalesman"		, userDetailsBean.getFlagSalesman());
+			query.setParameter("commission"			, EnjoyUtils.parseBigDecimal(userDetailsBean.getCommission()));
+			query.setParameter("remark"				, userDetailsBean.getRemark());
 			query.setParameter("userUniqueId"		, userDetailsBean.getUserUniqueId());
 			
 			result = query.executeUpdate();
@@ -561,7 +626,7 @@ public class UserDetailsDao {
 			list		 	= query.list();
 			
 			if(list!=null && list.size() > 0){
-				result = list.get(0);
+				result = list.get(0)==null?0:list.get(0);
 			}
 			
 			logger.info("[lastId] result 			:: " + result);
@@ -646,11 +711,11 @@ public class UserDetailsDao {
 			for(Object[] row:list){
 				comboBean 	= new ComboBean();
 				
-				logger.info("userUniqueId 		:: " + row[0].toString());
-				logger.info("userFullName 		:: " + row[1].toString());
+				logger.info("userUniqueId 		:: " + row[0]);
+				logger.info("userFullName 		:: " + row[1]);
 				
-				comboBean.setCode				(row[0].toString());
-				comboBean.setDesc				(row[1].toString());
+				comboBean.setCode				(EnjoyUtils.nullToStr(row[0]));
+				comboBean.setDesc				(EnjoyUtils.nullToStr(row[1]));
 				
 				comboList.add(comboBean);
 			}	
@@ -724,11 +789,11 @@ public class UserDetailsDao {
 					logger.info("[getUserDetailsLookUpList] userStatusName 	:: " + row[4]);
 					
 					
-					userDetailsBean.setUserUniqueId			(EnjoyUtils.parseInt(row[0].toString()));
-					userDetailsBean.setUserId				(EnjoyUtils.nullToStr(row[1].toString()));
-					userDetailsBean.setUserFullName			(EnjoyUtils.nullToStr(row[2].toString()));
-					userDetailsBean.setUserStatus			(EnjoyUtils.nullToStr(row[3].toString()));
-					userDetailsBean.setUserStatusName		(EnjoyUtils.nullToStr(row[4].toString()));
+					userDetailsBean.setUserUniqueId			(EnjoyUtils.parseInt(row[0]));
+					userDetailsBean.setUserId				(EnjoyUtils.nullToStr(row[1]));
+					userDetailsBean.setUserFullName			(EnjoyUtils.nullToStr(row[2]));
+					userDetailsBean.setUserStatus			(EnjoyUtils.nullToStr(row[3]));
+					userDetailsBean.setUserStatusName		(EnjoyUtils.nullToStr(row[4]));
 					
 					listData.add(userDetailsBean);
 				}	

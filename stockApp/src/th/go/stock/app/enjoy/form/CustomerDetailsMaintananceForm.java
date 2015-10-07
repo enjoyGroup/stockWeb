@@ -15,6 +15,7 @@ public class CustomerDetailsMaintananceForm {
 	private CustomerDetailsBean 	customerDetailsBean;
 	private List<ComboBean> 		statusCombo;
 	private List<ComboBean> 		sexCombo;
+	private List<ComboBean> 		idTypeCombo;
 	private String					errMsg;
 	private String					pageMode;
 	private String					titlePage;
@@ -23,6 +24,7 @@ public class CustomerDetailsMaintananceForm {
 		this.customerDetailsBean 	= new CustomerDetailsBean();
 		this.statusCombo			= new ArrayList<ComboBean>();
 		this.sexCombo				= new ArrayList<ComboBean>();
+		this.idTypeCombo			= new ArrayList<ComboBean>();
 		this.errMsg					= "";
 		this.pageMode				= NEW;
 		this.titlePage				= "";
@@ -74,6 +76,14 @@ public class CustomerDetailsMaintananceForm {
 
 	public void setSexCombo(List<ComboBean> sexCombo) {
 		this.sexCombo = sexCombo;
+	}
+
+	public List<ComboBean> getIdTypeCombo() {
+		return idTypeCombo;
+	}
+
+	public void setIdTypeCombo(List<ComboBean> idTypeCombo) {
+		this.idTypeCombo = idTypeCombo;
 	}
 	
 }

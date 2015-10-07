@@ -16,6 +16,7 @@ import th.go.stock.app.enjoy.bean.ManageUnitTypeBean;
 import th.go.stock.app.enjoy.exception.EnjoyException;
 import th.go.stock.app.enjoy.model.Unittype;
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
+import th.go.stock.app.enjoy.utils.EnjoyUtils;
 import th.go.stock.app.enjoy.utils.HibernateUtil;
 
 public class ManageUnitTypeDao {
@@ -51,15 +52,15 @@ public class ManageUnitTypeDao {
 			for(Object[] row:list){
 				bean 	= new ManageUnitTypeBean();
 				
-				logger.info("unitCode 		:: " + row[0].toString());
-				logger.info("unitName 		:: " + row[1].toString());
-				logger.info("unitStatus 		:: " + row[2].toString());
-				logger.info("seq 					:: " + seq);
+				logger.info("unitCode 		:: " + row[0]);
+				logger.info("unitName 		:: " + row[1]);
+				logger.info("unitStatus 	:: " + row[2]);
+				logger.info("seq 			:: " + seq);
 				
-				bean.setUnitCode			(row[0].toString());
-				bean.setUnitName			(row[1].toString());
-				bean.setUnitStatus			(row[2].toString());
-				bean.setSeq					(String.valueOf(seq));
+				bean.setUnitCode			(EnjoyUtils.nullToStr(row[0]));
+				bean.setUnitName			(EnjoyUtils.nullToStr(row[1]));
+				bean.setUnitStatus			(EnjoyUtils.nullToStr(row[2]));
+				bean.setSeq					(EnjoyUtils.nullToStr(seq));
 				
 				manageUnitTypeList.add(bean);
 				seq++;
@@ -208,11 +209,11 @@ public class ManageUnitTypeDao {
 			for(Object[] row:list){
 				comboBean 	= new ComboBean();
 				
-				logger.info("unitCode 		:: " + row[0].toString());
-				logger.info("unitName 		:: " + row[1].toString());
+				logger.info("unitCode 		:: " + row[0]);
+				logger.info("unitName 		:: " + row[1]);
 				
-				comboBean.setCode				(row[0].toString());
-				comboBean.setDesc				(row[1].toString());
+				comboBean.setCode				(EnjoyUtils.nullToStr(row[0]));
+				comboBean.setDesc				(EnjoyUtils.nullToStr(row[1]));
 				
 				comboList.add(comboBean);
 			}	

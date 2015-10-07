@@ -16,7 +16,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import th.go.stock.app.enjoy.bean.ComboBean;
-import th.go.stock.app.enjoy.bean.ProductDetailsBean;
+import th.go.stock.app.enjoy.bean.ProductmasterBean;
 import th.go.stock.app.enjoy.bean.UserDetailsBean;
 import th.go.stock.app.enjoy.dao.ManageProductGroupDao;
 import th.go.stock.app.enjoy.dao.ManageProductTypeDao;
@@ -166,16 +166,16 @@ public class ProductDetailsSearchServlet extends EnjoyStandardSvc {
 	private void onSearch() throws EnjoyException{
 		logger.info("[onSearch][Begin]");
 		
-		ProductDetailsBean 			productDetailsBean	= null;
+		ProductmasterBean 			productmasterBean	= null;
 		SessionFactory 				sessionFactory		= null;
 		Session 					session				= null;
-		List<ProductDetailsBean> 	dataList 			= null;
+		List<ProductmasterBean> 	dataList 			= null;
 		int							cou					= 0;
 		int							pageNum				= 1;
         int							totalPage			= 0;
         int							totalRs				= 0;
-        List<ProductDetailsBean> 	list 				= new ArrayList<ProductDetailsBean>();
-        List<ProductDetailsBean> 	listTemp 			= new ArrayList<ProductDetailsBean>();
+        List<ProductmasterBean> 	list 				= new ArrayList<ProductmasterBean>();
+        List<ProductmasterBean> 	listTemp 			= new ArrayList<ProductmasterBean>();
         HashMap						hashTable			= new HashMap();
 
 		try{
@@ -183,25 +183,25 @@ public class ProductDetailsSearchServlet extends EnjoyStandardSvc {
 			session 					= sessionFactory.openSession();			
 			session.beginTransaction();
 			
-			productDetailsBean				= new ProductDetailsBean();
+			productmasterBean				= new ProductmasterBean();
 			
-			productDetailsBean.setProductTypeName		(EnjoyUtils.nullToStr(this.request.getParameter("productTypeName")));
-			productDetailsBean.setProductGroupName		(EnjoyUtils.nullToStr(this.request.getParameter("productGroupName")));
-			productDetailsBean.setProductName			(EnjoyUtils.nullToStr(this.request.getParameter("productName")));
-			productDetailsBean.setProductStatus			(EnjoyUtils.nullToStr(this.request.getParameter("productStatus")));
+			productmasterBean.setProductTypeName		(EnjoyUtils.nullToStr(this.request.getParameter("productTypeName")));
+			productmasterBean.setProductGroupName		(EnjoyUtils.nullToStr(this.request.getParameter("productGroupName")));
+			productmasterBean.setProductName			(EnjoyUtils.nullToStr(this.request.getParameter("productName")));
+//			productDetailsBean.setProductStatus			(EnjoyUtils.nullToStr(this.request.getParameter("productStatus")));
 			
-			this.form.setProductDetailsBean	(productDetailsBean);
+			this.form.setProductmasterBean	(productmasterBean);
 			this.form.setRadPrint			(EnjoyUtils.nullToStr(this.request.getParameter("radPrint")));
 			
-			dataList	 		= this.dao.searchByCriteria(session, productDetailsBean);
+			dataList	 		= this.dao.searchByCriteria(session, productmasterBean);
 			
 			if(dataList.size() > 0){				
 				
 				hashTable.put(pageNum, list);
-				for(ProductDetailsBean bean:dataList){
+				for(ProductmasterBean bean:dataList){
 					if(cou==10){
 			    		cou 		= 0;
-			    		list 		= new ArrayList<ProductDetailsBean>();
+			    		list 		= new ArrayList<ProductmasterBean>();
 			    		pageNum++;
 			    	}
 					
@@ -221,7 +221,7 @@ public class ProductDetailsSearchServlet extends EnjoyStandardSvc {
 			    this.form.setHashTable(hashTable);
 			    this.form.setPageNum(1);
 				
-			    listTemp = (List<ProductDetailsBean>) this.form.getHashTable().get(this.form.getPageNum());
+			    listTemp = (List<ProductmasterBean>) this.form.getHashTable().get(this.form.getPageNum());
 			    
 			    logger.info("[onSearch] listTemp :: " + listTemp.size());
 			    
@@ -257,14 +257,14 @@ public class ProductDetailsSearchServlet extends EnjoyStandardSvc {
 	   logger.info("[lp_getPage][Begin]");
 	   
 	   int								pageNum				= 1;
-	   List<ProductDetailsBean> 		dataList 			= new ArrayList<ProductDetailsBean>();
+	   List<ProductmasterBean> 			dataList 			= new ArrayList<ProductmasterBean>();
 	   
 	   try{
 		   pageNum					= Integer.parseInt(this.request.getParameter("pageNum"));
 		   
 		   this.form.setPageNum(pageNum);
 		   
-		   dataList = (List<ProductDetailsBean>) this.form.getHashTable().get(pageNum);
+		   dataList = (List<ProductmasterBean>) this.form.getHashTable().get(pageNum);
 		   this.form.setDataList(dataList);
 		   
 	   }catch(Exception e){
@@ -274,6 +274,7 @@ public class ProductDetailsSearchServlet extends EnjoyStandardSvc {
 	   }
 	   
    }
+	
 	private void getProductTypeNameList(){
 	   logger.info("[getProductTypeNameList][Begin]");
 	   
@@ -397,7 +398,7 @@ public class ProductDetailsSearchServlet extends EnjoyStandardSvc {
 		String 							chkBoxSeq			= null;
 		String 							chkBox				= null;
 		int								pageNum				= 1;
-		List<ProductDetailsBean> 		dataList 			= new ArrayList<ProductDetailsBean>();
+		List<ProductmasterBean> 		dataList 			= new ArrayList<ProductmasterBean>();
 		
 		try{
 			
@@ -410,9 +411,9 @@ public class ProductDetailsSearchServlet extends EnjoyStandardSvc {
 			logger.info("[setForPrint] pageNum 		:: " + pageNum);
 			logger.info("[setForPrint] chkBox 		:: " + chkBox);
 			
-			dataList 				= (List<ProductDetailsBean>) this.form.getHashTable().get(pageNum);
+			dataList 				= (List<ProductmasterBean>) this.form.getHashTable().get(pageNum);
 			
-			for(ProductDetailsBean bean:dataList){
+			for(ProductmasterBean bean:dataList){
 				if(bean.getChkBoxSeq().equals(chkBoxSeq)){
 					bean.setChkBox(chkBox);
 					break;
@@ -432,8 +433,7 @@ public class ProductDetailsSearchServlet extends EnjoyStandardSvc {
 			logger.info("[setForPrint][End]");
 		}
 	}
-		
-	   
+			   
 	private void checkForPrint(){
 	   logger.info("[checkForPrint][Begin]");
 	   
@@ -441,7 +441,7 @@ public class ProductDetailsSearchServlet extends EnjoyStandardSvc {
 	   JSONObject 					obj 				= null;
 	   JSONArray 					detailJSONArray 	= null;
 	   JSONObject 					objDetail 			= null;
-	   List<ProductDetailsBean> 	dataList			= null;
+	   List<ProductmasterBean> 		dataList			= null;
 	   HashMap						hashTable			= null;
  
 	   try{
@@ -452,9 +452,9 @@ public class ProductDetailsSearchServlet extends EnjoyStandardSvc {
 		   obj.put(STATUS, 			SUCCESS);
 		   
 		   for (Object key : hashTable.keySet()) {
-			   dataList = (List<ProductDetailsBean>) hashTable.get(key);
+			   dataList = (List<ProductmasterBean>) hashTable.get(key);
 			   
-			   for(ProductDetailsBean bean:dataList){
+			   for(ProductmasterBean bean:dataList){
 				   if(bean.getChkBox().equals("Y")){
 					   objDetail 		= new JSONObject();
 					   objDetail.put("productCode"			,bean.getProductCode());

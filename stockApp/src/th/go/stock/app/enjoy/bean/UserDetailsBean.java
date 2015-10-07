@@ -5,6 +5,7 @@ import java.util.ArrayList;
 public class UserDetailsBean {
 	
 	private int 							userUniqueId;
+	private String							tinCompany;
 	private String 							userId;
 	private String 							userName;
 	private String 							userSurname;
@@ -21,9 +22,13 @@ public class UserDetailsBean {
 	private String							userFullName;
 	private String							userStatusName;
 	private	String							flagChkCompany;
+	private String							flagSalesman;
+	private String							commission;
+	private String							remark;
 	
 	public UserDetailsBean(){
 		this.userUniqueId		= 0;
+		this.tinCompany			= "";
 		this.userId				= "";
 		this.userName			= "";
 		this.userSurname		= "";
@@ -40,6 +45,9 @@ public class UserDetailsBean {
 		this.userFullName		= "";
 		this.userStatusName		= "";
 		this.flagChkCompany		= "";
+		this.flagSalesman		= "";
+		this.commission			= "";
+		this.remark				= "";
 	}
 
 	public int getUserUniqueId() {
@@ -176,5 +184,37 @@ public class UserDetailsBean {
 
 	public void setFlagChkCompany(String flagChkCompany) {
 		this.flagChkCompany = flagChkCompany;
+	}
+
+	public String getFlagSalesman() {
+		return flagSalesman;
+	}
+
+	public void setFlagSalesman(String flagSalesman) {
+		this.flagSalesman = flagSalesman;
+	}
+
+	public String getCommission() {
+		return commission;
+	}
+
+	public void setCommission(String commission) {
+		this.commission = commission;
+	}
+
+	public String getRemark() {
+		return remark;
+	}
+
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
+
+	public String getTinCompany() {
+		return tinCompany;
+	}
+
+	public void setTinCompany(String tinCompany) {
+		this.tinCompany = tinCompany;
 	}
 }

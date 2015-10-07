@@ -13,6 +13,7 @@ import javax.servlet.http.HttpSession;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
+import th.go.stock.app.enjoy.bean.ComboBean;
 import th.go.stock.app.enjoy.bean.CustomerDetailsBean;
 import th.go.stock.app.enjoy.bean.UserDetailsBean;
 import th.go.stock.app.enjoy.dao.CustomerDetailsDao;
@@ -91,7 +92,7 @@ public class CustomerDetailsSearchServlet extends EnjoyStandardSvc {
 		
 		try{
 			this.setRefference();			
-			this.form.setTitlePage("เงื่อนไขค้นหารายละเอียดลูกค้า");			
+			this.form.setTitlePage("ค้นหารายละเอียดลูกค้า");			
 		}catch(EnjoyException e){
 			throw new EnjoyException(e.getMessage());
 		}catch(Exception e){
@@ -109,12 +110,21 @@ public class CustomerDetailsSearchServlet extends EnjoyStandardSvc {
 		
 		SessionFactory 		sessionFactory	= null;
 		Session 			session			= null;
+		List<ComboBean> 	comboList		= null;
+		ComboBean			comboBean		= null;
 		
 		try{
 			sessionFactory 	= HibernateUtil.getSessionFactory();
 			session 		= sessionFactory.openSession();
 			
-			this.form.setStatusCombo(this.dao.getStatusCombo(session));
+			comboList = this.dao.getStatusCombo(session);
+			
+			if(comboList!=null && comboList.size() > 0){
+				comboBean = comboList.get(0);
+				comboBean.setDesc("ทุกสถานะ");
+			}
+			
+			this.form.setStatusCombo(comboList);
 			
 			
 		}catch(EnjoyException e){

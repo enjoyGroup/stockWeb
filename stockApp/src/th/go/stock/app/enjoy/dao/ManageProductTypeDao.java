@@ -16,6 +16,7 @@ import th.go.stock.app.enjoy.bean.ManageProductTypeBean;
 import th.go.stock.app.enjoy.exception.EnjoyException;
 import th.go.stock.app.enjoy.model.Productype;
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
+import th.go.stock.app.enjoy.utils.EnjoyUtils;
 import th.go.stock.app.enjoy.utils.HibernateUtil;
 
 public class ManageProductTypeDao {
@@ -51,15 +52,15 @@ public class ManageProductTypeDao {
 			for(Object[] row:list){
 				bean 	= new ManageProductTypeBean();
 				
-				logger.info("productTypeCode 		:: " + row[0].toString());
-				logger.info("productTypeName 		:: " + row[1].toString());
-				logger.info("productTypeStatus 		:: " + row[2].toString());
+				logger.info("productTypeCode 		:: " + row[0]);
+				logger.info("productTypeName 		:: " + row[1]);
+				logger.info("productTypeStatus 		:: " + row[2]);
 				logger.info("seq 					:: " + seq);
 				
-				bean.setProductTypeCode				(row[0].toString());
-				bean.setProductTypeName				(row[1].toString());
-				bean.setProductTypeStatus			(row[2].toString());
-				bean.setSeq							(String.valueOf(seq));
+				bean.setProductTypeCode				(EnjoyUtils.nullToStr(row[0]));
+				bean.setProductTypeName				(EnjoyUtils.nullToStr(row[1]));
+				bean.setProductTypeStatus			(EnjoyUtils.nullToStr(row[2]));
+				bean.setSeq							(EnjoyUtils.nullToStr(seq));
 				
 				manageProductTypeBeanList.add(bean);
 				seq++;
@@ -245,11 +246,11 @@ public class ManageProductTypeDao {
 			for(Object[] row:list){
 				comboBean 	= new ComboBean();
 				
-				logger.info("productTypeCode 		:: " + row[0].toString());
-				logger.info("productTypeName 		:: " + row[1].toString());
+				logger.info("productTypeCode 		:: " + row[0]);
+				logger.info("productTypeName 		:: " + row[1]);
 				
-				comboBean.setCode				(row[0].toString());
-				comboBean.setDesc				(row[1].toString());
+				comboBean.setCode				(EnjoyUtils.nullToStr(row[0]));
+				comboBean.setDesc				(EnjoyUtils.nullToStr(row[1]));
 				
 				comboList.add(comboBean);
 			}	

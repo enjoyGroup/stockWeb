@@ -4,25 +4,19 @@ import java.io.Serializable;
 import javax.persistence.*;
 
 /**
- * The primary key class for the reciveorder database table.
+ * The primary key class for the compareprice database table.
  * 
  */
 @Embeddable
-public class ReciveorderPK implements Serializable {
+public class ComparepricePK implements Serializable {
 	//default serial version id, required for serializable classes.
 	private static final long serialVersionUID = 1L;
 
-	private String reciveNo;
-
 	private String productCode;
 
-	public ReciveorderPK() {
-	}
-	public String getReciveNo() {
-		return this.reciveNo;
-	}
-	public void setReciveNo(String reciveNo) {
-		this.reciveNo = reciveNo;
+	private int seq;
+
+	public ComparepricePK() {
 	}
 	public String getProductCode() {
 		return this.productCode;
@@ -30,25 +24,31 @@ public class ReciveorderPK implements Serializable {
 	public void setProductCode(String productCode) {
 		this.productCode = productCode;
 	}
+	public int getSeq() {
+		return this.seq;
+	}
+	public void setSeq(int seq) {
+		this.seq = seq;
+	}
 
 	public boolean equals(Object other) {
 		if (this == other) {
 			return true;
 		}
-		if (!(other instanceof ReciveorderPK)) {
+		if (!(other instanceof ComparepricePK)) {
 			return false;
 		}
-		ReciveorderPK castOther = (ReciveorderPK)other;
+		ComparepricePK castOther = (ComparepricePK)other;
 		return 
-			this.reciveNo.equals(castOther.reciveNo)
-			&& this.productCode.equals(castOther.productCode);
+			this.productCode.equals(castOther.productCode)
+			&& (this.seq == castOther.seq);
 	}
 
 	public int hashCode() {
 		final int prime = 31;
 		int hash = 17;
-		hash = hash * prime + this.reciveNo.hashCode();
 		hash = hash * prime + this.productCode.hashCode();
+		hash = hash * prime + this.seq;
 		
 		return hash;
 	}

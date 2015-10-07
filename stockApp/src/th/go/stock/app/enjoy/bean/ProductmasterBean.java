@@ -2,7 +2,7 @@ package th.go.stock.app.enjoy.bean;
 
 
 
-public class ProductDetailsBean {
+public class ProductmasterBean {
 	
 	private String productCode;
 	private String productName;
@@ -14,17 +14,21 @@ public class ProductDetailsBean {
 	private String unitName;
 	private String minQuan;
 	private String costPrice;
-	private String salePrice;
-	private String startDate;
-	private String expDate;
+	private String salePrice1;
+	private String salePrice2;
+	private String salePrice3;
+	private String salePrice4;
+	private String salePrice5;
+//	private String startDate;
+//	private String expDate;
 	private String quantity;
-	private String productStatus;
+//	private String productStatus;
 	/*Begin สำหรับหน้า Search*/
 	private String chkBox;
 	private String chkBoxSeq;
 	/*End สำหรับหน้า Search*/
 	
-	public ProductDetailsBean(){
+	public ProductmasterBean(){
 		this.productCode 		= "";
 		this.productName 		= "";
 		this.productTypeCode 	= "";
@@ -35,11 +39,15 @@ public class ProductDetailsBean {
 		this.unitName 			= "";
 		this.minQuan 			= "";
 		this.costPrice 			= "";
-		this.salePrice 			= "";
-		this.startDate 			= "";
-		this.expDate 			= "";
+		this.salePrice1 		= "";
+		this.salePrice2 		= "";
+		this.salePrice3 		= "";
+		this.salePrice4 		= "";
+		this.salePrice5 		= "";
+//		this.startDate 			= "";
+//		this.expDate 			= "";
 		this.quantity 			= "0";
-		this.productStatus 		= "";
+//		this.productStatus 		= "";
 		this.chkBox 			= "N";
 		this.chkBoxSeq 			= "0";
 	}
@@ -50,6 +58,14 @@ public class ProductDetailsBean {
 
 	public void setProductCode(String productCode) {
 		this.productCode = productCode;
+	}
+
+	public String getProductName() {
+		return productName;
+	}
+
+	public void setProductName(String productName) {
+		this.productName = productName;
 	}
 
 	public String getProductTypeCode() {
@@ -84,14 +100,6 @@ public class ProductDetailsBean {
 		this.productGroupName = productGroupName;
 	}
 
-	public String getProductName() {
-		return productName;
-	}
-
-	public void setProductName(String productName) {
-		this.productName = productName;
-	}
-
 	public String getUnitCode() {
 		return unitCode;
 	}
@@ -124,28 +132,44 @@ public class ProductDetailsBean {
 		this.costPrice = costPrice;
 	}
 
-	public String getSalePrice() {
-		return salePrice;
+	public String getSalePrice1() {
+		return salePrice1;
 	}
 
-	public void setSalePrice(String salePrice) {
-		this.salePrice = salePrice;
+	public void setSalePrice1(String salePrice1) {
+		this.salePrice1 = salePrice1;
 	}
 
-	public String getStartDate() {
-		return startDate;
+	public String getSalePrice2() {
+		return salePrice2;
 	}
 
-	public void setStartDate(String startDate) {
-		this.startDate = startDate;
+	public void setSalePrice2(String salePrice2) {
+		this.salePrice2 = salePrice2;
 	}
 
-	public String getExpDate() {
-		return expDate;
+	public String getSalePrice3() {
+		return salePrice3;
 	}
 
-	public void setExpDate(String expDate) {
-		this.expDate = expDate;
+	public void setSalePrice3(String salePrice3) {
+		this.salePrice3 = salePrice3;
+	}
+
+	public String getSalePrice4() {
+		return salePrice4;
+	}
+
+	public void setSalePrice4(String salePrice4) {
+		this.salePrice4 = salePrice4;
+	}
+
+	public String getSalePrice5() {
+		return salePrice5;
+	}
+
+	public void setSalePrice5(String salePrice5) {
+		this.salePrice5 = salePrice5;
 	}
 
 	public String getQuantity() {
@@ -154,14 +178,6 @@ public class ProductDetailsBean {
 
 	public void setQuantity(String quantity) {
 		this.quantity = quantity;
-	}
-
-	public String getProductStatus() {
-		return productStatus;
-	}
-
-	public void setProductStatus(String productStatus) {
-		this.productStatus = productStatus;
 	}
 
 	public String getChkBox() {
@@ -179,4 +195,5 @@ public class ProductDetailsBean {
 	public void setChkBoxSeq(String chkBoxSeq) {
 		this.chkBoxSeq = chkBoxSeq;
 	}
+
 }

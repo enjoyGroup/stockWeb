@@ -91,7 +91,7 @@ public class CompanyDetailsSearchServlet extends EnjoyStandardSvc {
 		
 		try{
 			this.setRefference();			
-			this.form.setTitlePage("เงื่อนไขค้นหารายละเอียดบริษัท");			
+			this.form.setTitlePage("ค้นหารายละเอียดบริษัท");			
 		}catch(EnjoyException e){
 			throw new EnjoyException(e.getMessage());
 		}catch(Exception e){

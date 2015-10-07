@@ -16,7 +16,7 @@ $.datepicker.regional['th'] ={
     prevText: 'ก่อนหน้า',
     nextText: 'ถัดไป',
     yearRange: '-20:+20',
-    buttonText: 'เลือก',
+    buttonText: 'เลือก'
   
 };
 
@@ -37,7 +37,7 @@ $.datepicker.regional['birthDateTH'] ={
     prevText: 'ก่อนหน้า',
     nextText: 'ถัดไป',
     yearRange: '-100:+0',
-    buttonText: 'เลือก',
+    buttonText: 'เลือก'
   
 };
 
@@ -757,6 +757,13 @@ function gp_validatePin(av_pin){
 	}else{
 		return false;
 	}
+}
+
+function gp_parseFloat(av_val){
+	
+	var av_ret = av_val!=null && av_val.trim()!=""?parseFloat(gp_replaceComma(av_val)):0.00;
+	
+	return av_ret;
 }
 
 

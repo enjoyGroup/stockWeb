@@ -12,6 +12,7 @@ import org.hibernate.SessionFactory;
 import org.json.simple.JSONObject;
 
 import th.go.stock.app.enjoy.bean.UserDetailsBean;
+import th.go.stock.app.enjoy.dao.CompanyDetailsDao;
 import th.go.stock.app.enjoy.dao.UserDetailsDao;
 import th.go.stock.app.enjoy.exception.EnjoyException;
 import th.go.stock.app.enjoy.form.UserDetailsMaintananceForm;
@@ -36,6 +37,7 @@ public class UserDetailsMaintananceServlet extends EnjoyStandardSvc {
     private HttpSession                 session                     = null;
     private UserDetailsBean             userBean                    = null;
     private UserDetailsDao				dao							= null;
+    private CompanyDetailsDao			companyDetailsDao			= null;
     private UserDetailsMaintananceForm	form						= null;
     
 	@Override
@@ -59,6 +61,7 @@ public class UserDetailsMaintananceServlet extends EnjoyStandardSvc {
              this.userBean           	= (UserDetailsBean)session.getAttribute("userBean");
              this.form               	= (UserDetailsMaintananceForm)session.getAttribute(FORM_NAME);
              this.dao					= new UserDetailsDao();
+             this.companyDetailsDao		= new CompanyDetailsDao();
  			
              logger.info("[execute] pageAction : " + pageAction );
              
@@ -125,7 +128,7 @@ public class UserDetailsMaintananceServlet extends EnjoyStandardSvc {
 			
 			this.form.setStatusCombo(this.dao.getRefuserstatusCombo(session));
 			this.form.setUserprivilegeList(this.dao.getUserprivilege(session));
-			
+			this.form.setCompanyCombo(this.companyDetailsDao.getCompanyCombo(session));
 			
 		}catch(EnjoyException e){
 			throw new EnjoyException(e.getMessage());
@@ -245,6 +248,7 @@ public class UserDetailsMaintananceServlet extends EnjoyStandardSvc {
 		
 		String				pageMode			= null;
 		int					userUniqueId		= 0;
+		String				tinCompany			= null;
 		String				userName			= null;
 		String				userSurname			= null;
 		String 				userId 				= null;
@@ -252,6 +256,9 @@ public class UserDetailsMaintananceServlet extends EnjoyStandardSvc {
 		String				userStatus			= null;
 		String				flagChangePassword 	= null;
 		String				flagAlertStock 		= null;
+		String				flagSalesman 		= null;
+		String				commission 			= null;
+		String				remark 				= null;
 		String				userPrivilege		= null;
 		String				pwd					= null;
 		String				pwdEncypt			= null;
@@ -265,6 +272,7 @@ public class UserDetailsMaintananceServlet extends EnjoyStandardSvc {
 		
 		try{
 			pageMode 					= EnjoyUtil.nullToStr(request.getParameter("pageMode"));
+			tinCompany 					= EnjoyUtil.nullToStr(request.getParameter("tinCompany"));
 			userName 					= EnjoyUtil.nullToStr(request.getParameter("userName"));
 			userSurname 				= EnjoyUtil.nullToStr(request.getParameter("userSurname"));
 			userId 						= EnjoyUtil.nullToStr(request.getParameter("userId"));
@@ -272,6 +280,9 @@ public class UserDetailsMaintananceServlet extends EnjoyStandardSvc {
 			userStatus 					= EnjoyUtil.nullToStr(request.getParameter("userStatus"));
 			flagChangePassword 			= EnjoyUtil.chkBoxtoDb(request.getParameter("flagChangePassword"));
 			flagAlertStock 				= EnjoyUtil.chkBoxtoDb(request.getParameter("flagAlertStock"));
+			flagSalesman 				= EnjoyUtil.chkBoxtoDb(request.getParameter("flagSalesman"));
+			commission 					= EnjoyUtil.chkBoxtoDb(request.getParameter("commission"));
+			remark 						= EnjoyUtil.chkBoxtoDb(request.getParameter("remark"));
 			userPrivilege 				= EnjoyUtil.nullToStr(request.getParameter("hidUserPrivilege"));
 			userUniqueId 				= EnjoyUtil.parseInt(request.getParameter("userUniqueId"));
 			userLevel					= userPrivilege.indexOf("R01") > -1?"9":"1";
@@ -282,6 +293,7 @@ public class UserDetailsMaintananceServlet extends EnjoyStandardSvc {
 			sendMail					= new SendMail();
 			
 			logger.info("[onSave] pageMode 				:: " + pageMode);
+			logger.info("[onSave] tinCompany 			:: " + tinCompany);
 			logger.info("[onSave] userName 				:: " + userName);
 			logger.info("[onSave] userSurname 			:: " + userSurname);
 			logger.info("[onSave] userId 				:: " + userId);
@@ -289,12 +301,16 @@ public class UserDetailsMaintananceServlet extends EnjoyStandardSvc {
 			logger.info("[onSave] userStatus 			:: " + userStatus);
 			logger.info("[onSave] flagChangePassword 	:: " + flagChangePassword);
 			logger.info("[onSave] flagAlertStock 		:: " + flagAlertStock);
+			logger.info("[onSave] flagSalesman 			:: " + flagSalesman);
+			logger.info("[onSave] commission 			:: " + commission);
+			logger.info("[onSave] remark 				:: " + remark);
 			logger.info("[onSave] userPrivilege 		:: " + userPrivilege);
 			logger.info("[onSave] userUniqueId 			:: " + userUniqueId);
 			logger.info("[onSave] pwd 					:: " + pwd);
 			logger.info("[onSave] pwdEncypt 			:: " + pwdEncypt);
 			logger.info("[onSave] userLevel 			:: " + userLevel);
 			
+			userDetailsBean.setTinCompany(tinCompany);
 			userDetailsBean.setUserName(userName);
 			userDetailsBean.setUserSurname(userSurname);
 			userDetailsBean.setUserId(userId);
@@ -302,6 +318,9 @@ public class UserDetailsMaintananceServlet extends EnjoyStandardSvc {
 			userDetailsBean.setUserStatus(userStatus);
 			userDetailsBean.setFlagChangePassword(flagChangePassword);
 			userDetailsBean.setFlagAlertStock(flagAlertStock);
+			userDetailsBean.setFlagSalesman(flagSalesman);
+			userDetailsBean.setCommission(commission);
+			userDetailsBean.setRemark(remark);
 			userDetailsBean.setUserPrivilege(userPrivilege);
 			userDetailsBean.setUserUniqueId(userUniqueId);
 			userDetailsBean.setUserLevel(userLevel);

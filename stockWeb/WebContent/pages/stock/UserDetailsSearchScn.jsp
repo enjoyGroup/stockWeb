@@ -196,7 +196,13 @@
 								        					<option value="<%=comboBean.getCode()%>" <%if(userDetailsBean.getUserStatus().equals(comboBean.getCode())){ %> selected <%} %> ><%=comboBean.getDesc()%></option>
 								        					<%} %>
 								        				</select>
-								        				
+								        			</td>
+								        		</tr>
+								        		<tr>
+								        			<td align="left" colspan="2">
+								        				<span style="color: red;">*ถ้าต้องการค้นหาทั้งหมดให้ระบุช่องนั้นเป็น ***</span>
+								        			</td>
+								        			<td align="right" colspan="2">
 								        				<input type="button" id="btnSearch" class='btn btn-primary pull-right padding-sm' style="margin-right:12px; padding-right:24px; padding-left:24px;" value='ค้นหา'/>
 								        				<input type="button" id="btnReset" class='btn pull-right padding-sm'  style="margin-right:12px" value='เริ่มใหม่' />
 								        			</td>
