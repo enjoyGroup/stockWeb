@@ -70,9 +70,11 @@
 			
 		});
 		
-		function lp_sendEditPage(av_val){
+		function lp_sendEditPage(av_code, av_fullName){
+			
 			try{
-				window.location.replace(gv_url + "?service=servlet.CustomerDetailsMaintananceServlet&pageAction=getDetail&cusCode=" + av_val);
+				window.location.replace(gv_url + "?service=servlet.CustomerDetailsMaintananceServlet&pageAction=getDetail&cusCode=" + av_code);
+				
 			}catch(e){
 				alert("lp_sendEditPage :: " + e);
 			}
@@ -148,6 +150,7 @@
 <body>
 	<form id="frm">
 		<input type="hidden" id="service" 	name="service" value="servlet.CustomerDetailsSearchServlet" />
+		<input type="hidden" id="pageMode" 	name="pageMode" value="<%=customerDetailsSearchForm.getPageMode()%>" />
 		<div id="menu" style="width: 100%;background: black;">
 			<%@ include file="/pages/menu/menu.jsp"%>
 		</div>
@@ -161,58 +164,55 @@
 									<div class="alert alert-block alert-error fade in container">
 						            	<h4 class="alert-heading"><%=customerDetailsSearchForm.getTitlePage() %></h4>
 						            </div>
-						            
-										<div class="container main-container round-sm padding-no" >
-											
-												<div class="panel-body" align="center">
-										        	<table class="user-register-table user-search-table" width="100%" border="0" cellpadding="5" cellspacing="5">
-										        		<tr>
-										        			<td align="right" width="150px;">
-										        				รหัสลูกค้า  : &nbsp;
-										        			</td>
-										        			<td align="left" width="350px;">
-										        				<input type='text' id="cusCode" name='cusCode' maxlength="5" value="<%=customerDetailsBean.getCusCode() %>" />
-										        			</td>
-										        			<td align="right">
-										        				ชื่อ-นามสกุล : &nbsp;
-										        			</td>
-										        			<td align="left">
-										        				<input type='text' id="fullName" name='fullName' value="<%=customerDetailsBean.getFullName() %>" />
-										        			</td>
-										        		</tr>
-										        		<tr>
-										        			<td align="right">
-										        				สถานะ :&nbsp;
-										        			</td>
-										        			<td align="left">
-										        				<select id="cusStatus" name="cusStatus" style="width: 250px;" >
-										        					<% for(ComboBean comboBean:statusCombo){ %>
-										        					<option value="<%=comboBean.getCode()%>" <%if(customerDetailsBean.getCusStatus().equals(comboBean.getCode())){ %> selected <%} %> ><%=comboBean.getDesc()%></option>
-										        					<%} %>
-										        				</select>
-										        			</td>
-										        			<td align="right">
-										        				เลขที่บัตร :&nbsp;
-										        			</td>
-										        			<td align="left">
-										        				<input type='text' id="idNumber" name='idNumber' maxlength="13" value="<%=customerDetailsBean.getIdNumber() %>" />
-										        			</td>
-										        		</tr>
-										        		<tr>
-										        			<td align="left" colspan="2">
-										        				<span style="color: red;">*ถ้าต้องการค้นหาทั้งหมดให้ระบุช่องนั้นเป็น ***</span>
-										        			</td>
-										        			<td align="right" colspan="2">
-										        				<input type="button" id="btnSearch" class='btn btn-primary pull-right padding-sm' style="margin-right:12px; padding-right:24px; padding-left:24px;" value='ค้นหา'/>
-										        				<input type="button" id="btnReset" class='btn pull-right padding-sm'  style="margin-right:12px" value='เริ่มใหม่' />
-										        			</td>
-										        		</tr>
-										        	</table>
-									        	</div>
-											</div>
-										</div>
-										<div style="clear:both"></div><br>
-									
+									<div class="container main-container round-sm padding-no" >
+										<div class="panel-body" align="center">
+								        	<table class="user-register-table user-search-table" width="100%" border="0" cellpadding="5" cellspacing="5">
+								        		<tr>
+								        			<td align="right" width="150px;">
+								        				รหัสลูกค้า  : &nbsp;
+								        			</td>
+								        			<td align="left" width="350px;">
+								        				<input type='text' id="cusCode" name='cusCode' maxlength="5" value="<%=customerDetailsBean.getCusCode() %>" />
+								        			</td>
+								        			<td align="right">
+								        				ชื่อ-นามสกุล : &nbsp;
+								        			</td>
+								        			<td align="left">
+								        				<input type='text' id="fullName" name='fullName' value="<%=customerDetailsBean.getFullName() %>" />
+								        			</td>
+								        		</tr>
+								        		<tr>
+								        			<td align="right">
+								        				สถานะ :&nbsp;
+								        			</td>
+								        			<td align="left">
+								        				<select id="cusStatus" name="cusStatus" style="width: 250px;" >
+								        					<% for(ComboBean comboBean:statusCombo){ %>
+								        					<option value="<%=comboBean.getCode()%>" <%if(customerDetailsBean.getCusStatus().equals(comboBean.getCode())){ %> selected <%} %> ><%=comboBean.getDesc()%></option>
+								        					<%} %>
+								        				</select>
+								        			</td>
+								        			<td align="right">
+								        				เลขที่บัตร :&nbsp;
+								        			</td>
+								        			<td align="left">
+								        				<input type='text' id="idNumber" name='idNumber' maxlength="13" value="<%=customerDetailsBean.getIdNumber() %>" />
+								        			</td>
+								        		</tr>
+								        		<tr>
+								        			<td align="left" colspan="2">
+								        				<span style="color: red;">*ถ้าต้องการค้นหาทั้งหมดให้ระบุช่องนั้นเป็น ***</span>
+								        			</td>
+								        			<td align="right" colspan="2">
+								        				<input type="button" id="btnSearch" class='btn btn-primary pull-right padding-sm' style="margin-right:12px; padding-right:24px; padding-left:24px;" value='ค้นหา'/>
+								        				<input type="button" id="btnReset" class='btn pull-right padding-sm'  style="margin-right:12px" value='เริ่มใหม่' />
+								        			</td>
+								        		</tr>
+								        	</table>
+							        	</div>
+									</div>
+								</div>
+								<div style="clear:both"></div><br>
 							</section>
 							<section class="scrollable padder">
 									<div class="container main-container round-sm padding-no" >
@@ -257,7 +257,7 @@
 														for(int i=0;i<dataList.size();i++){
 															bean = dataList.get(i);															
 												%>
-															<tr class="rowSelect" onclick="lp_sendEditPage('<%=bean.getCusCode()%>')" >
+															<tr class="rowSelect" onclick="lp_sendEditPage('<%=bean.getCusCode()%>', '<%=bean.getFullName()%>')" >
 																<td style="text-align:center"><%=seq%></td>
 																<td><%=bean.getFullName()%></td>
 																<td><%=bean.getAddress()%></td>

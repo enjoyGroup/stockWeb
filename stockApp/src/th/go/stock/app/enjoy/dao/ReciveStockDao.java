@@ -7,6 +7,7 @@ import java.util.List;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 
@@ -19,6 +20,7 @@ import th.go.stock.app.enjoy.model.ReciveordedetailPK;
 import th.go.stock.app.enjoy.model.Reciveordermaster;
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
 import th.go.stock.app.enjoy.utils.EnjoyUtils;
+import th.go.stock.app.enjoy.utils.HibernateUtil;
 
 public class ReciveStockDao {
 	
@@ -39,12 +41,13 @@ public class ReciveStockDao {
 		
 		try{	
 			
-			reciveDateFrom 	= EnjoyUtils.dateFormat(reciveOrderMasterBean.getReciveDateFrom(), "dd/MM/yyyy", "yyyyMMdd");
-			reciveDateTo	= EnjoyUtils.dateFormat(reciveOrderMasterBean.getReciveDateTo(), "dd/MM/yyyy", "yyyyMMdd");
+			reciveDateFrom 	= EnjoyUtils.dateThaiToDb(reciveOrderMasterBean.getReciveDateFrom());
+			reciveDateTo	= EnjoyUtils.dateThaiToDb(reciveOrderMasterBean.getReciveDateTo());
 			
-			hql					= "select a.*, CONCAT(b.username, ' ', b.userSurname) as usrName"
-								+ "	from reciveordermaster a, userdetails b"
-								+ "	where b. userUniqueId = a. userUniqueId";
+			hql					= "select a.*, CONCAT(b.username, ' ', b.userSurname) as usrName, c.reciveStatusName"
+								+ "	from reciveordermaster a, userdetails b, refreciveorderstatus c"
+								+ "	where a.userUniqueId = b.userUniqueId"
+								+ " 	and a.reciveStatus = c.reciveStatusCode";
 			
 			if(!reciveOrderMasterBean.getReciveNo().equals("***")){
 				if(reciveOrderMasterBean.getReciveNo().equals("")){
@@ -55,19 +58,25 @@ public class ReciveStockDao {
 			}
 			
 			if(!reciveDateFrom.equals("")){
-				hql += " and reciveDate >= STR_TO_DATE('" + reciveDateFrom + "', '%Y%m%d')";
+				hql += " and a.reciveDate >= STR_TO_DATE('" + reciveDateFrom + "', '%Y%m%d')";
 			}
 			
 			if(!reciveDateTo.equals("")){
-				hql += " and reciveDate <= STR_TO_DATE('" + reciveDateTo + "', '%Y%m%d')";
+				hql += " and a.reciveDate <= STR_TO_DATE('" + reciveDateTo + "', '%Y%m%d')";
+			}
+			
+			if(!reciveOrderMasterBean.getReciveStatus().equals("")){
+				hql += " and a.reciveStatus = '" + reciveOrderMasterBean.getReciveStatus() + "'";
 			}
 			
 			logger.info("[searchByCriteria] hql :: " + hql);
 
 			query			= session.createSQLQuery(hql);			
-			query.addScalar("reciveNo"		, new StringType());
-			query.addScalar("reciveDate"	, new StringType());
-			query.addScalar("usrName"		, new StringType());
+			query.addScalar("reciveNo"			, new StringType());
+			query.addScalar("reciveDate"		, new StringType());
+			query.addScalar("usrName"			, new StringType());
+			query.addScalar("reciveStatus"		, new StringType());
+			query.addScalar("reciveStatusName"	, new StringType());
 			
 			list		 	= query.list();
 			
@@ -79,10 +88,14 @@ public class ReciveStockDao {
 				logger.info("reciveNo 			:: " + row[0]);
 				logger.info("reciveDate 		:: " + row[1]);
 				logger.info("usrName 			:: " + row[2]);
+				logger.info("reciveStatus 		:: " + row[3]);
+				logger.info("reciveStatusName 	:: " + row[4]);
 				
 				bean.setReciveNo			(EnjoyUtils.nullToStr(row[0]));
-				bean.setReciveDate			(EnjoyUtils.dateFormat(row[1], "yyyyMMdd", "dd/MM/yyyy"));
+				bean.setReciveDate			(EnjoyUtils.dateToThaiDisplay(row[1]));
 				bean.setUsrName				(EnjoyUtils.nullToStr(row[2]));
+				bean.setReciveStatus		(EnjoyUtils.nullToStr(row[3]));
+				bean.setReciveStatusDesc	(EnjoyUtils.nullToStr(row[4]));
 				
 				reciveOrderMasterList.add(bean);
 			}	
@@ -159,10 +172,10 @@ public class ReciveStockDao {
 					logger.info("reciveTotal 			:: " + row[14]);
 					
 					bean.setReciveNo				(EnjoyUtils.nullToStr(row[0]));
-					bean.setReciveDate				(EnjoyUtils.dateFormat(row[1], "yyyyMMdd", "dd/MM/yyyy"));
+					bean.setReciveDate				(EnjoyUtils.dateToThaiDisplay(row[1]));
 					bean.setReciveType				(EnjoyUtils.nullToStr(row[2]));
 					bean.setCreditDay				(EnjoyUtils.nullToStr(row[3]));
-					bean.setCreditExpire			(EnjoyUtils.dateFormat(row[4], "yyyyMMdd", "dd/MM/yyyy"));
+					bean.setCreditExpire			(EnjoyUtils.dateToThaiDisplay(row[4]));
 					bean.setVendorCode				(EnjoyUtils.nullToStr(row[5]));
 					bean.setBranchName				(EnjoyUtils.nullToStr(row[6]));
 					bean.setBillNo					(EnjoyUtils.nullToStr(row[7]));
@@ -513,7 +526,7 @@ public class ReciveStockDao {
 	}
 	
 	/*ดึงสถานะมาอยู่ใน Combo*/
-	public List<ComboBean> getRefReciveOrderStatusCombo(Session session) throws EnjoyException{
+	public List<ComboBean> getRefReciveOrderStatusCombo() throws EnjoyException{
 		logger.info("[getRefReciveOrderStatusCombo][Begin]");
 		
 		String						hql						= null;
@@ -521,10 +534,13 @@ public class ReciveStockDao {
 		List<Object[]>				list					= null;
 		ComboBean					comboBean				= null;
 		List<ComboBean> 			comboList				= new ArrayList<ComboBean>();
+		SessionFactory 				sessionFactory			= null;
+		Session 					session					= null;
 		
 		try{
-			
-			hql						= "select * from refreciveorderstatus order by reciveStatusCode asc";
+			sessionFactory 	= HibernateUtil.getSessionFactory();
+			session 		= sessionFactory.openSession();
+			hql				= "select * from refreciveorderstatus order by reciveStatusCode asc";
 			query			= session.createSQLQuery(hql);
 			query.addScalar("reciveStatusCode"		, new StringType());
 			query.addScalar("reciveStatusName"		, new StringType());
@@ -549,7 +565,11 @@ public class ReciveStockDao {
 			logger.info("[getRefReciveOrderStatusCombo] " + e.getMessage());
 			throw new EnjoyException("เกิดข้อผิดพลาดในการดึงสถานะมาอยู่ใน Combo");
 		}finally{
-			hql						= null;
+			session.close();
+			
+			hql				= null;
+			sessionFactory	= null;
+			session			= null;
 			logger.info("[getRefReciveOrderStatusCombo][End]");
 		}
 		

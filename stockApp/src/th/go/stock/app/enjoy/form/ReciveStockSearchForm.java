@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import th.go.stock.app.enjoy.bean.ComboBean;
 import th.go.stock.app.enjoy.bean.ReciveOrderMasterBean;
 
 public class ReciveStockSearchForm {
@@ -21,6 +22,7 @@ public class ReciveStockSearchForm {
 	private String						totalRecord;
 	private List<ReciveOrderMasterBean> dataList;
 	private HashMap						hashTable;
+	private List<ComboBean> 			statusCombo;
 	
 	public ReciveStockSearchForm(){
 		this.reciveOrderMasterBean 	= new ReciveOrderMasterBean();
@@ -32,6 +34,7 @@ public class ReciveStockSearchForm {
 		this.totalRecord			= "";
 		this.dataList				= new ArrayList<ReciveOrderMasterBean>();
 		this.hashTable				= new HashMap();
+		this.statusCombo				= new ArrayList<ComboBean>();
 	}
 
 	public ReciveOrderMasterBean getReciveOrderMasterBean() {
@@ -106,4 +109,11 @@ public class ReciveStockSearchForm {
 		this.hashTable = hashTable;
 	}
 
+	public List<ComboBean> getStatusCombo() {
+		return statusCombo;
+	}
+
+	public void setStatusCombo(List<ComboBean> statusCombo) {
+		this.statusCombo = statusCombo;
+	}
 }

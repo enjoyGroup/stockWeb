@@ -11,17 +11,21 @@ public class AdjustStockBean {
 	private String productName;
 	private String quantity;
 	private String balanceVolume;
+	private String unitName;
+	private int lastOrder;
 	
 	public AdjustStockBean(){
 		this.adjustNo 			= "";
 		this.adjustDate 		= "";
 		this.productCode 		= "";
-		this.quanOld 			= "";
-		this.quanNew 			= "";
+		this.quanOld 			= "0.00";
+		this.quanNew 			= "0.00";
 		this.remark 			= "";
 		this.productName 		= "";
-		this.quantity 			= "";
-		this.balanceVolume 		= "";
+		this.quantity 			= "0.00";
+		this.balanceVolume 		= "0.00";
+		this.unitName			= "";
+		this.lastOrder			= 0;
 	}
 
 	public String getAdjustNo() {
@@ -95,4 +99,21 @@ public class AdjustStockBean {
 	public void setBalanceVolume(String balanceVolume) {
 		this.balanceVolume = balanceVolume;
 	}
+
+	public String getUnitName() {
+		return unitName;
+	}
+
+	public void setUnitName(String unitName) {
+		this.unitName = unitName;
+	}
+
+	public int getLastOrder() {
+		return lastOrder;
+	}
+
+	public void setLastOrder(int lastOrder) {
+		this.lastOrder = lastOrder;
+	}
+
 }

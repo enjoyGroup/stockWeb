@@ -7,6 +7,7 @@ import java.util.List;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.type.StringType;
 
 import th.go.stock.app.enjoy.bean.ComparePriceBean;
@@ -15,6 +16,7 @@ import th.go.stock.app.enjoy.model.Compareprice;
 import th.go.stock.app.enjoy.model.ComparepricePK;
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
 import th.go.stock.app.enjoy.utils.EnjoyUtils;
+import th.go.stock.app.enjoy.utils.HibernateUtil;
 
 public class ComparePriceDao {
 	
@@ -139,6 +141,67 @@ public class ComparePriceDao {
 			query 								= null;
 			logger.info("[deleteCompareprice][End]");
 		}
+	}
+	
+	public String getPrice(ComparePriceBean comparePriceBean) throws EnjoyException{
+		logger.info("[getPrice][Begin]");
+		
+		String			hql					= null;
+		List<String>	list				= null;
+		SQLQuery 		query 				= null;
+		String 			price				= "0.00";
+		SessionFactory 	sessionFactory		= null;
+		Session 		session				= null;
+		String			productCode			= "";
+		String			vendorCode			= "";
+		double			quantity			= 0;
+		
+		
+		try{
+			sessionFactory 		= HibernateUtil.getSessionFactory();
+			session 			= sessionFactory.openSession();
+			productCode			= EnjoyUtils.nullToStr(comparePriceBean.getProductCode());
+			vendorCode			= EnjoyUtils.nullToStr(comparePriceBean.getVendorCode());
+			quantity			= EnjoyUtils.parseDouble(comparePriceBean.getQuantity());
+			
+			hql		= "select price from compareprice"
+					+ "		where productCode = '" + productCode + "'"
+					+ "			and vendorCode = '" + vendorCode + "'"
+					+ "			and quantity <= " + quantity
+					+ "		order by quantity ASC"
+					+ "		LIMIT 1";
+			
+			query			= session.createSQLQuery(hql);
+			
+			query.addScalar("price"			, new StringType());
+			
+			list		 	= query.list();
+			
+			if(list!=null && list.size() > 0){
+				price = EnjoyUtils.convertFloatToDisplay(list.get(0), 2);
+			}
+			
+			logger.info("[getPrice] price 			:: " + price);
+			
+			
+			
+		}catch(Exception e){
+			logger.info(e.getMessage());
+			throw new EnjoyException(e.getMessage());
+		}finally{
+			session.flush();
+			session.clear();
+			session.close();
+			
+			hql				= null;
+			list			= null;
+			query 			= null;
+			sessionFactory	= null;
+			session			= null;
+			logger.info("[getPrice][End]");
+		}
+		
+		return price;
 	}
 	
 }

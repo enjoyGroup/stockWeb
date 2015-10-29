@@ -9,6 +9,8 @@
 	String					titlePage			= "เปรียบเทียบราคา";
 	List<ComparePriceBean> 	comparePriceList	= comparePriceForm.getComparePriceList();
 	boolean					chk					= comparePriceForm.isChk();
+	String					classDiv			= "";
+	String					classDiv1			= "alert alert-block alert-error";
 %>
 
 <html>
@@ -129,6 +131,7 @@
 			      },
 			      select: function( event, ui ) {
 			    	  lp_getProductDetailByName();
+			    	  $('#btnSearch').click();
 			      }
 			});
 			
@@ -554,12 +557,15 @@
 	</script>
 </head>
 <body>
-	<form id="frm">
+	<form id="frm" onsubmit="return false;">
 		<input type="hidden" id="service" 	name="service" value="servlet.ComparePriceServlet" />
 		<input type="hidden" id="seqTemp" name="seqTemp" value="<%=comparePriceForm.getSeqTemp()%>" />
 		<input type="hidden" id="productCode" name="productCode" value="<%=comparePriceForm.getProductCode()%>" />
 		<input type="hidden" id="pageAction" name="pageAction" value="<%=comparePriceForm.getPageAction()%>" />
-		<%if(!comparePriceForm.getPageAction().equals("lookup")){ %>
+		<%if(!comparePriceForm.getPageAction().equals("lookup")){ 
+			classDiv			= "container main-container round-sm padding-xl-h";
+			classDiv1			= "alert alert-block alert-error fade in container";
+		%>
 		<div id="menu" style="width: 100%;background: black;">
 			<%@ include file="/pages/menu/menu.jsp"%>
 		</div>
@@ -570,116 +576,117 @@
 					<section id="content">
 						<section class="vbox">
 							<section class="scrollable padder">
-							<div class="alert alert-block alert-error fade in container">
-								<h4 class="alert-heading"><%=titlePage%></h4>
-							</div>					          	
-							<div class="container main-container round-sm padding-xl-h">
-								<div class="col-sm-12 toppad" >
-									<table class="user-register-table user-search-table" width="100%" border="0" cellpadding="5" cellspacing="5">
-						        		<tr>
-						        			<td align="right" width="100px;">
-						        				สินค้า <span style="color: red;"><b>*</b></span> : &nbsp;
-						        			</td>
-						        			<td align="left">
-						        				<input type='text' 
-						        					   id="productName" 
-						        					   name='productName' 
-						        					   maxlength="255" 
-						        					   <%if(chk==false){%> onblur="lp_getProductDetailByName();"<%}%>
-						        					   <%if(chk==false){%> onkeypress="return lp_enterToSearch(event);"<%}%>
-						        					   placeholder="สินค้า"  
-						        					   value="<%=comparePriceForm.getProductName()%>" 
-						        					   <%if(chk==true){%> class="input-disabled" readonly<%}%> />
-						        				<input type="button" id="btnSearch" class='btn btn-primary padding-sm' style="margin-right:12px; padding-right:24px; padding-left:24px;" value='ค้นหา' <%if(chk==true){%>disabled<%}%> />
-						        			</td>
-						        		</tr>
-						        	</table><br/>
-						        	<%if(chk==true){%>
-									<div id="seasonTitle" class="padding-md round-sm season-title-head">
-										<h6 class="panel-title" style="font-size:1.0em">ข้อมูลเปรียบเทียบราคา</h6>
-									</div>
-				         			<div class="panel-body">
-				         				<table class="table sim-panel-result-table" id="resultData">
-											<tr height="26px;">
-												<th  style="text-align: center;" width="5%" ><B>ลำดับ</B></th>
-												<th  style="text-align: center;" width="20%"><B>บริษัท</B></th>
-												<th  style="text-align: center;" width="20%"><B>สาขา</B></th>
-												<th  style="text-align: center;" width="20%"><B>ปริมาณ</B></th>
-												<th  style="text-align: center;" width="20%"><B>ราคาที่ซื้อ</B></th>
-												<th style="text-align: center;" width="15%">Action</th>
-											</tr> 
-											<%
-   											int					  	seq		= 1;
-											for(ComparePriceBean bean:comparePriceList){
-												if(!bean.getRowStatus().equals(comparePriceForm.DEL)){
-											%>
-													<tr>
-														<td style="text-align:center">
-															<%=seq%>
-														</td>
-														<td align="left">
-															<input type='text' 
-									        					   id="vendorName<%=bean.getSeq()%>" 
-									        					   name='vendorName' 
-									        					   value="<%=bean.getVendorName() %>" 
-									        					   maxlength="100" 
-									        					   onblur="lp_getCompanyVendorDetail(<%=bean.getSeq()%>, 'V');"
+								<div class="<%=classDiv1%>">
+									<h4 class="alert-heading"><%=titlePage%></h4>
+								</div>					          	
+								<div class="<%=classDiv%>">
+									<div class="col-sm-12 toppad" >
+										<table width="100%" border="0" cellpadding="5" cellspacing="5">
+							        		<tr>
+							        			<td align="right" width="10%">
+							        				สินค้า <span style="color: red;"><b>*</b></span> : &nbsp;
+							        			</td>
+							        			<td align="left">
+							        				<input type='text' 
+							        					   id="productName" 
+							        					   name='productName' 
+							        					   size="40"
+						        					   	   maxlength="255" 
+							        					   <%if(chk==false){%> onblur="lp_getProductDetailByName();"<%}%>
+							        					   <%if(chk==false){%> onkeypress="return lp_enterToSearch(event);"<%}%>
+							        					   placeholder="สินค้า"  
+							        					   value="<%=comparePriceForm.getProductName()%>" 
+							        					   <%if(chk==true){%> class="input-disabled" readonly<%}%> />
+							        				<input type="button" id="btnSearch" class='btn btn-primary padding-sm' style="margin-right:12px; padding-right:24px; padding-left:24px;" value='ค้นหา' <%if(chk==true){%>disabled<%}%> />
+							        			</td>
+							        		</tr>
+							        	</table><br/>
+							        	<%if(chk==true){%>
+										<div id="seasonTitle" class="padding-md round-sm season-title-head">
+											<h6 class="panel-title" style="font-size:1.0em">ข้อมูลเปรียบเทียบราคา</h6>
+										</div>
+					         			<div class="panel-body">
+					         				<table class="table sim-panel-result-table" id="resultData">
+												<tr height="26px;">
+													<th  style="text-align: center;" width="5%" ><B>ลำดับ</B></th>
+													<th  style="text-align: center;" width="20%"><B>บริษัท</B></th>
+													<th  style="text-align: center;" width="20%"><B>สาขา</B></th>
+													<th  style="text-align: center;" width="20%"><B>ปริมาณ</B></th>
+													<th  style="text-align: center;" width="20%"><B>ราคาที่ซื้อ</B></th>
+													<th style="text-align: center;" width="15%">Action</th>
+												</tr> 
+												<%
+	   											int					  	seq		= 1;
+												for(ComparePriceBean bean:comparePriceList){
+													if(!bean.getRowStatus().equals(comparePriceForm.DEL)){
+												%>
+														<tr>
+															<td style="text-align:center">
+																<%=seq%>
+															</td>
+															<td align="left">
+																<input type='text' 
+										        					   id="vendorName<%=bean.getSeq()%>" 
+										        					   name='vendorName' 
+										        					   value="<%=bean.getVendorName() %>" 
+										        					   maxlength="100" 
+										        					   onblur="lp_getCompanyVendorDetail(<%=bean.getSeq()%>, 'V');"
+										        					   style="width: 100%;" />
+										        				<input type="hidden" id="vendorCode<%=bean.getSeq()%>" name="vendorCode" value="<%=bean.getVendorCode()%>" />
+															</td>
+															<td align="left">
+																<input type='text' 
+									        					   id="branchName<%=bean.getSeq()%>" 
+									        					   name='branchName' 
+									        					   value="<%=bean.getBranchName() %>" 
+									        					   maxlength="30" 
+									        					   onblur="lp_getCompanyVendorDetail(<%=bean.getSeq()%>, 'B');"
 									        					   style="width: 100%;" />
-									        				<input type="hidden" id="vendorCode<%=bean.getSeq()%>" name="vendorCode" value="<%=bean.getVendorCode()%>" />
-														</td>
-														<td align="left">
-															<input type='text' 
-								        					   id="branchName<%=bean.getSeq()%>" 
-								        					   name='branchName' 
-								        					   value="<%=bean.getBranchName() %>" 
-								        					   maxlength="30" 
-								        					   onblur="lp_getCompanyVendorDetail(<%=bean.getSeq()%>, 'B');"
-								        					   style="width: 100%;" />
-														</td>
-														<td align="left">
-															<input type='text' 
-									        					   id="quantity<%=bean.getSeq()%>" 
-									        					   name='quantity'
-									        					   class="moneyOnly"
-									        					   onblur="gp_checkAmtOnly(this, 12);lp_updateRecord(<%=bean.getSeq()%>);"
-									        					   value="<%=bean.getQuantity() %>" 
-									        					   style="width: 100%" />
-														</td>
-														<td align="left">
-															<input type='text' 
-									        					   id="price<%=bean.getSeq()%>" 
-									        					   name='price'
-									        					   class="moneyOnly"
-									        					   onblur="gp_checkAmtOnly(this, 12);lp_updateRecord(<%=bean.getSeq()%>);"
-									        					   value="<%=bean.getPrice()%>" 
-									        					   style="width: 100%" />
-														</td>
-														<td align="center">
-															<img alt="ลบ" title="ลบ" src="<%=imgURL%>/wrong.png" width="24" height="24" border="0" onclick="lp_deleteRecord(this, '<%=bean.getSeq()%>');" />
-															<input type="hidden" id="seq<%=bean.getSeq()%>" name="seq" value="<%=bean.getSeq()%>" />
-														</td>
-													</tr>
-											<% seq++;}}%>
-													<tr>
-														<td colspan="5">&nbsp;</td>
-														<td align="center">
-															<img alt="เพิ่ม" title="เพิ่ม" src="<%=imgURL%>/Add.png" width="24" height="24" border="0" id="btnAdd" onclick="lp_newRecord(this, null);" />
-														</td>
-													</tr>
-										</table>
-										<br/>
-										<table border="0" cellpadding="3" cellspacing="0" width="100%">
-											<tr>
-												<td align="right">
-													<input type="button" id="btnSave" class="btn btn-sm btn-warning" value='บันทึก' onclick="lp_save();" />&nbsp;&nbsp;&nbsp;
-				   									<input type="button" id="btnReset" onclick="lp_reset();" class="btn btn-sm btn-danger" value='เริ่มใหม่' />
-												</td>
-											</tr>
-										</table>
-									</div>
-									<%}%>
-								</div>          
-							</div>
+															</td>
+															<td align="left">
+																<input type='text' 
+										        					   id="quantity<%=bean.getSeq()%>" 
+										        					   name='quantity'
+										        					   class="moneyOnly"
+										        					   onblur="gp_checkAmtOnly(this, 12);lp_updateRecord(<%=bean.getSeq()%>);"
+										        					   value="<%=bean.getQuantity() %>" 
+										        					   style="width: 100%" />
+															</td>
+															<td align="left">
+																<input type='text' 
+										        					   id="price<%=bean.getSeq()%>" 
+										        					   name='price'
+										        					   class="moneyOnly"
+										        					   onblur="gp_checkAmtOnly(this, 12);lp_updateRecord(<%=bean.getSeq()%>);"
+										        					   value="<%=bean.getPrice()%>" 
+										        					   style="width: 100%" />
+															</td>
+															<td align="center">
+																<img alt="ลบ" title="ลบ" src="<%=imgURL%>/wrong.png" width="24" height="24" border="0" onclick="lp_deleteRecord(this, '<%=bean.getSeq()%>');" />
+																<input type="hidden" id="seq<%=bean.getSeq()%>" name="seq" value="<%=bean.getSeq()%>" />
+															</td>
+														</tr>
+												<% seq++;}}%>
+														<tr>
+															<td colspan="5">&nbsp;</td>
+															<td align="center">
+																<img alt="เพิ่ม" title="เพิ่ม" src="<%=imgURL%>/Add.png" width="24" height="24" border="0" id="btnAdd" onclick="lp_newRecord(this, null);" />
+															</td>
+														</tr>
+											</table>
+											<br/>
+											<table border="0" cellpadding="3" cellspacing="0" width="100%">
+												<tr>
+													<td align="right">
+														<input type="button" id="btnSave" class="btn btn-sm btn-warning" value='บันทึก' onclick="lp_save();" />&nbsp;&nbsp;&nbsp;
+					   									<input type="button" id="btnReset" onclick="lp_reset();" class="btn btn-sm btn-danger" value='เริ่มใหม่' />
+													</td>
+												</tr>
+											</table>
+										</div>
+										<%}%>
+									</div>          
+								</div>
 							</section>
 						</section>
 					</section>

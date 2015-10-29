@@ -79,6 +79,8 @@ public class AdjustStockServlet extends EnjoyStandardSvc {
  				this.onSearch();
  			}else if(pageAction.equals("getProductNameList")){
 				this.getProductNameList();
+			}else if(pageAction.equals("loadNextRangeOrder")){
+				this.loadNextRangeOrder();
 			}
  			
  			session.setAttribute(FORM_NAME, this.form);
@@ -101,20 +103,36 @@ public class AdjustStockServlet extends EnjoyStandardSvc {
 		SessionFactory 						sessionFactory				= null;
 		Session 							session						= null;
 		JSONObject 							obj 						= null;
+		String								productCode					= null;
+		String								quanOld						= null;
 		String 								quanNew						= null;
 		String 								remark						= null;
+		String								quantity					= null;
 		AdjustStockBean 					adjustStockBean				= null;
+		ProductmasterBean 					productmasterBean			= null;
 		
 		try{
 			sessionFactory 				= HibernateUtil.getSessionFactory();
 			session 					= sessionFactory.openSession();
 			obj 						= new JSONObject();
+			productCode					= EnjoyUtils.nullToStr(this.request.getParameter("productCode"));
+			quanOld						= EnjoyUtils.nullToStr(this.request.getParameter("quanOld"));
 			quanNew						= EnjoyUtils.nullToStr(this.request.getParameter("quanNew"));
 			remark						= EnjoyUtils.nullToStr(this.request.getParameter("remark"));
+			quantity					= EnjoyUtils.nullToStr(this.request.getParameter("quantity"));
 			adjustStockBean				= this.form.getAdjustStockBean();
 			
 			session.beginTransaction();
 			
+			productmasterBean = new ProductmasterBean();
+			productmasterBean.setProductCode(productCode);
+			productmasterBean.setQuantity(quantity);
+			
+			productDetailsDao.updateProductQuantity(session, productmasterBean);
+			
+			adjustStockBean.setAdjustDate(EnjoyUtils.currDateThai());
+			adjustStockBean.setProductCode(productCode);
+			adjustStockBean.setQuanOld(quanOld);
 			adjustStockBean.setQuanNew(quanNew);
 			adjustStockBean.setRemark(remark);
 			
@@ -159,6 +177,8 @@ public class AdjustStockServlet extends EnjoyStandardSvc {
 		String								productName						= null;
 		ProductmasterBean					productmasterBean				= null;
 		JSONObject 							obj 							= null;
+		int									limitAdjustHistoryOrder			= 0;
+		int									lastOrder						= 0;
 
 		try{
 			sessionFactory 				= HibernateUtil.getSessionFactory();
@@ -176,12 +196,20 @@ public class AdjustStockServlet extends EnjoyStandardSvc {
 			adjustStockBean.setProductCode(productmasterBean.getProductCode());
 			adjustStockBean.setProductName(productmasterBean.getProductName());
 			adjustStockBean.setQuanOld(productmasterBean.getQuantity());
+			adjustStockBean.setUnitName(productmasterBean.getUnitName());
 			
 			this.form.setChk(true);
 			
 			session.beginTransaction();
 			
-			adjustHistoryListList	 		= this.dao.getAdjustHistoryList(session, adjustStockBean);
+			limitAdjustHistoryOrder = this.dao.checkLimitAdjustHistoryOrder(session, productmasterBean.getProductCode(), adjustStockBean.getLastOrder());
+			adjustHistoryListList	= this.dao.getAdjustHistoryList(session, adjustStockBean);
+			
+			if(limitAdjustHistoryOrder > AdjustStockForm.ORDER_LIMIT){
+				lastOrder = EnjoyUtils.parseInt(adjustStockBean.getLastOrder()) + AdjustStockForm.ORDER_LIMIT;
+				adjustStockBean.setLastOrder(lastOrder);
+				this.form.setLimitAdjustHistoryFlag(true);
+			}
 			
 			this.form.setAdjustHistoryListList(adjustHistoryListList);
 			this.form.setAdjustStockBean(adjustStockBean);
@@ -242,4 +270,74 @@ public class AdjustStockServlet extends EnjoyStandardSvc {
 		   logger.info("[getProductNameList][End]");
 	   }
 	}
+	
+	private void loadNextRangeOrder(){
+		logger.info("[loadNextRangeOrder][Begin]");
+		
+		String 					lastOrder	 					= null;
+		int						limitAdjustHistoryOrder			= 0;
+		String					productCode						= null;
+		SessionFactory 			sessionFactory					= null;
+		Session 				session							= null;
+		JSONObject 				obj 							= null;
+		JSONObject 				objDetail 						= null;
+		JSONArray 				jSONArray 						= null;
+		int						newLastOrder					= 0;
+		List<AdjustStockBean> 	adjustHistoryList				= null;
+		
+		try{
+			sessionFactory 				= HibernateUtil.getSessionFactory();
+			session 					= sessionFactory.openSession();
+			obj 						= new JSONObject();
+			jSONArray 					= new JSONArray();
+			lastOrder 					= EnjoyUtils.nullToStr(this.request.getParameter("lastOrder"));
+			productCode 				= EnjoyUtils.nullToStr(this.request.getParameter("productCode"));
+			
+			session.beginTransaction();
+			
+			limitAdjustHistoryOrder 	= this.dao.checkLimitAdjustHistoryOrder(session, productCode, EnjoyUtils.parseInt(lastOrder));
+			adjustHistoryList			= this.dao.getAdjustHistoryList(session, this.form.getAdjustStockBean());
+			
+			for(AdjustStockBean bean:adjustHistoryList){
+				objDetail = new JSONObject();
+				
+				objDetail.put("adjustDate"	, bean.getAdjustDate());
+				objDetail.put("quanOld"		, bean.getQuanOld());
+				objDetail.put("quanNew"		, bean.getQuanNew());
+				objDetail.put("remark"		, bean.getRemark());
+				
+				jSONArray.add(objDetail);
+			}
+			
+			if(limitAdjustHistoryOrder > AdjustStockForm.ORDER_LIMIT){
+				newLastOrder = EnjoyUtils.parseInt(lastOrder) + AdjustStockForm.ORDER_LIMIT;
+				this.form.getAdjustStockBean().setLastOrder(newLastOrder);
+				this.form.setLimitAdjustHistoryFlag(true);
+				
+				obj.put("limitAdjustHistoryFlag"	, true);
+			}else{
+				this.form.setLimitAdjustHistoryFlag(false);
+				
+				obj.put("limitAdjustHistoryFlag"	, false);
+			}
+			
+			obj.put("adjustHistoryList"	, jSONArray);
+			obj.put("lastOrder"			, newLastOrder);
+			obj.put(STATUS				, SUCCESS);
+			
+		}catch(Exception e){
+			logger.info(e.getMessage());
+			e.printStackTrace();
+			obj.put(STATUS, 		ERROR);
+			obj.put(ERR_MSG, 		"loadNextRangeOrder is error");
+		}finally{
+			session.close();
+			sessionFactory	= null;
+			session			= null;
+			
+			this.enjoyUtil.writeMSG(obj.toString());
+			logger.info("[loadNextRangeOrder][End]");
+		}
+	}
+	
 }

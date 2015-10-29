@@ -60,6 +60,7 @@
 					
 					gp_progressBarOn();
 					lo_dialog.empty();
+					lo_dialog.dialog("option", "title", "ค้นหาผู้ใช้งานระบบ");
 					lo_dialog.append(lo_iframe).dialog( "open" );
 					event.preventDefault();
 				}catch(e){

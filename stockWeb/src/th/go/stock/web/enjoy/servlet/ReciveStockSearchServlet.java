@@ -13,6 +13,7 @@ import javax.servlet.http.HttpSession;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
+import th.go.stock.app.enjoy.bean.ComboBean;
 import th.go.stock.app.enjoy.bean.ReciveOrderMasterBean;
 import th.go.stock.app.enjoy.bean.UserDetailsBean;
 import th.go.stock.app.enjoy.dao.ReciveStockDao;
@@ -90,7 +91,8 @@ public class ReciveStockSearchServlet extends EnjoyStandardSvc {
 		logger.info("[onLoad][Begin]");
 		
 		try{		
-			this.form.setTitlePage("ค้นหาตามใบสั่งของ");			
+			this.form.setTitlePage("ค้นหาตามใบสั่งของ");
+			this.setRefference();
 		}catch(Exception e){
 			logger.info(e.getMessage());
 			throw new EnjoyException("onLoad is error");
@@ -100,6 +102,47 @@ public class ReciveStockSearchServlet extends EnjoyStandardSvc {
 		
 	}
 	
+	private void setRefference() throws EnjoyException{
+		
+		logger.info("[setRefference][Begin]");
+		
+		try{
+			this.setStatusCombo();
+		}catch(EnjoyException e){
+			throw new EnjoyException(e.getMessage());
+		}catch(Exception e){
+			e.printStackTrace();
+			logger.info(e.getMessage());
+		}finally{
+			logger.info("[setRefference][End]");
+		}
+	}
+	
+	private void setStatusCombo() throws EnjoyException{
+		
+		logger.info("[setStatusCombo][Begin]");
+		
+		List<ComboBean>			statusList 			= null;
+		List<ComboBean> 		statusCombo			= new ArrayList<ComboBean>();
+		
+		try{
+			
+			statusList = this.dao.getRefReciveOrderStatusCombo();
+			
+			statusCombo.add(new ComboBean("", "ทุกสถานะ"));
+			for(ComboBean comboBean:statusList){
+				statusCombo.add(new ComboBean(comboBean.getCode(), comboBean.getDesc()));
+			}
+			
+			this.form.setStatusCombo(statusCombo);
+		}
+		catch(Exception e){
+			logger.info(e.getMessage());
+			throw new EnjoyException("setStatusCombo is error");
+		}finally{
+			logger.info("[setStatusCombo][End]");
+		}
+	}
 	
 	private void onSearch() throws EnjoyException{
 		logger.info("[onSearch][Begin]");
@@ -126,6 +169,7 @@ public class ReciveStockSearchServlet extends EnjoyStandardSvc {
 			reciveOrderMasterBean.setReciveNo			(EnjoyUtils.nullToStr(this.request.getParameter("reciveNo")));
 			reciveOrderMasterBean.setReciveDateFrom		(EnjoyUtils.nullToStr(this.request.getParameter("reciveDateFrom")));
 			reciveOrderMasterBean.setReciveDateTo		(EnjoyUtils.nullToStr(this.request.getParameter("reciveDateTo")));
+			reciveOrderMasterBean.setReciveStatus		(EnjoyUtils.nullToStr(this.request.getParameter("reciveStatus")));
 			
 			this.form.setReciveOrderMasterBean(reciveOrderMasterBean);
 			

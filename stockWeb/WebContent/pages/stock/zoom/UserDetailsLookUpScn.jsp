@@ -145,86 +145,80 @@
 	</script>
 </head>
 <body>
-	<form id="frm">
+	<form id="frm" onsubmit="return false;">
 		<input type="hidden" id="service" 	name="service" value="servlet.UserDetailsLookUpServlet" />
-		<div>
-			<div class="container main-container round-sm padding-no" >
-				<div class="panel-body" align="center">
-		        	<table class="user-register-table user-search-table" width="100%" border="0" cellpadding="5" cellspacing="5">
-		        		<tr>
-		        			<td align="right" width="80px;">
-		        				Find  : &nbsp;
-		        			</td>
-		        			<td align="left" width="150px;">
-		        				<input type='text' id="find" name='find' value="<%=userDetailsLookUpForm.getFind()%>" />
-		        			</td>
-		        			<td align="right" width="80px;">
-		        				Column : &nbsp;
-		        			</td>
-		        			<td align="left" width="150px;">
-		        				<select id="column" name="column">
-		        					<%
-		        						for(ComboBean bean:userDetailsLookUpForm.getColumnList()){
-		        					%>
-		        						<option value="<%=bean.getCode()%>" <%if(bean.getCode().equals(userDetailsLookUpForm.getColumn())){%> selected="selected" <%}%>>
-		        							<%=bean.getDesc()%>
-		        						</option>
-		        					<%
-		        						}
-		        					%>
-		        				</select>
-		        			</td>
-		        			<td align="left">
-		        				<input type="checkbox" id="likeFlag" name="likeFlag" value="Y" <%if("Y".equals(userDetailsLookUpForm.getLikeFlag())){%> checked <%}%> /> like
-		        			</td>
-		        		</tr>
-		        		<tr>
-		        			<td align="right">
-		        				Order By  : &nbsp;
-		        			</td>
-		        			<td align="left">
-		        				<select id="orderBy" name="orderBy">
-		        					<%
-		        						for(ComboBean bean:userDetailsLookUpForm.getOrderByList()){
-		        					%>
-		        						<option value="<%=bean.getCode()%>" <%if(bean.getCode().equals(userDetailsLookUpForm.getOrderBy())){%> selected="selected" <%}%>>
-		        							<%=bean.getDesc()%>
-		        						</option>
-		        					<%
-		        						}
-		        					%>
-		        				</select>
-		        			</td>
-		        			<td align="right">
-		        				Sort By : &nbsp;
-		        			</td>
-		        			<td align="left">
-		        				<select id="sortBy" name="sortBy">
-		        					<%
-		        						for(ComboBean bean:userDetailsLookUpForm.getSortByList()){
-		        					%>
-		        						<option value="<%=bean.getCode()%>" <%if(bean.getCode().equals(userDetailsLookUpForm.getSortBy())){%> selected="selected" <%}%>>
-		        							<%=bean.getDesc()%>
-		        						</option>
-		        					<%
-		        						}
-		        					%>
-		        				</select>
-		        			</td>
-		        			<td></td>
-		        		</tr>
-		        		<tr>
-		        			<td align="right" colspan="5">
-		        				<input type="button" id="btnSearch" class='btn btn-primary pull-right padding-sm' style="margin-right:12px; padding-right:24px; padding-left:24px;" value='ค้นหา'/>
-		        				<input type="button" id="btnReset" class='btn pull-right padding-sm'  style="margin-right:12px" value='เริ่มใหม่' />
-		        			</td>
-		        		</tr>
-		        	</table>
-		        </div>
-			</div>
-		</div>
-		<div class="container main-container round-sm padding-no" >
-			<div id="seasonTitle" class="padding-md round-sm season-title-head" style="">
+		<div style="background-color:white;width: 100%;height: 100%;">
+			<table class="user-register-table user-search-table" width="100%" border="0" cellpadding="5" cellspacing="5">
+        		<tr>
+        			<td align="right" width="80px;">
+        				Find  : &nbsp;
+        			</td>
+        			<td align="left" width="150px;">
+        				<input type='text' id="find" name='find' value="<%=userDetailsLookUpForm.getFind()%>" />
+        			</td>
+        			<td align="right" width="80px;">
+        				Column : &nbsp;
+        			</td>
+        			<td align="left" width="150px;">
+        				<select id="column" name="column">
+        					<%
+        						for(ComboBean bean:userDetailsLookUpForm.getColumnList()){
+        					%>
+        						<option value="<%=bean.getCode()%>" <%if(bean.getCode().equals(userDetailsLookUpForm.getColumn())){%> selected="selected" <%}%>>
+        							<%=bean.getDesc()%>
+        						</option>
+        					<%
+        						}
+        					%>
+        				</select>
+        			</td>
+        			<td align="left">
+        				<input type="checkbox" id="likeFlag" name="likeFlag" value="Y" <%if("Y".equals(userDetailsLookUpForm.getLikeFlag())){%> checked <%}%> /> like
+        			</td>
+        		</tr>
+        		<tr>
+        			<td align="right">
+        				Order By  : &nbsp;
+        			</td>
+        			<td align="left">
+        				<select id="orderBy" name="orderBy">
+        					<%
+        						for(ComboBean bean:userDetailsLookUpForm.getOrderByList()){
+        					%>
+        						<option value="<%=bean.getCode()%>" <%if(bean.getCode().equals(userDetailsLookUpForm.getOrderBy())){%> selected="selected" <%}%>>
+        							<%=bean.getDesc()%>
+        						</option>
+        					<%
+        						}
+        					%>
+        				</select>
+        			</td>
+        			<td align="right">
+        				Sort By : &nbsp;
+        			</td>
+        			<td align="left">
+        				<select id="sortBy" name="sortBy">
+        					<%
+        						for(ComboBean bean:userDetailsLookUpForm.getSortByList()){
+        					%>
+        						<option value="<%=bean.getCode()%>" <%if(bean.getCode().equals(userDetailsLookUpForm.getSortBy())){%> selected="selected" <%}%>>
+        							<%=bean.getDesc()%>
+        						</option>
+        					<%
+        						}
+        					%>
+        				</select>
+        			</td>
+        			<td></td>
+        		</tr>
+        		<tr>
+        			<td align="right" colspan="5">
+        				<input type="button" id="btnSearch" class='btn btn-primary pull-right padding-sm' style="margin-right:12px; padding-right:24px; padding-left:24px;" value='ค้นหา'/>
+        				<input type="button" id="btnReset" class='btn pull-right padding-sm'  style="margin-right:12px" value='เริ่มใหม่' />
+        			</td>
+        		</tr>
+        	</table>
+        	<div id="seasonTitle" class="padding-md round-sm season-title-head">
 				<h6 class="panel-title" style="font-size:1.0em">ข้อมูล</h6>
 			</div>
 			<table class="table sim-panel-result-table" id="tbl_result" width="100%">

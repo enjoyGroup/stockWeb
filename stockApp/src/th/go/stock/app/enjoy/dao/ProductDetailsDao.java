@@ -203,8 +203,8 @@ public class ProductDetailsDao {
 					logger.info("productGroup 			:: " + row[2]);
 					logger.info("productName 			:: " + row[3]);
 					logger.info("unitCode 				:: " + row[4]);
-					logger.info("quantity 				:: " + row[5]);
-					logger.info("minQuan 				:: " + row[6]);
+					logger.info("minQuan 				:: " + row[5]);
+					logger.info("quantity 				:: " + row[6]);
 					logger.info("costPrice 				:: " + row[7]);
 					logger.info("salePrice1 			:: " + row[8]);
 					logger.info("salePrice2 			:: " + row[9]);
@@ -220,8 +220,8 @@ public class ProductDetailsDao {
 					bean.setProductGroupCode		(EnjoyUtils.nullToStr(row[2]));
 					bean.setProductName				(EnjoyUtils.nullToStr(row[3]));
 					bean.setUnitCode				(EnjoyUtils.nullToStr(row[4]));
-					bean.setQuantity				(EnjoyUtils.convertFloatToDisplay(row[5], 2));
-					bean.setMinQuan					(EnjoyUtils.convertFloatToDisplay(row[6], 2));
+					bean.setMinQuan					(EnjoyUtils.convertFloatToDisplay(row[5], 2));
+					bean.setQuantity				(EnjoyUtils.convertFloatToDisplay(row[6], 2));
 					bean.setCostPrice				(EnjoyUtils.convertFloatToDisplay(row[7], 2));
 					bean.setSalePrice1				(EnjoyUtils.convertFloatToDisplay(row[8], 2));
 					bean.setSalePrice2				(EnjoyUtils.convertFloatToDisplay(row[9], 2));
@@ -369,7 +369,7 @@ public class ProductDetailsDao {
 	}
 	
 	public int checkDupProductCode(Session session, String productCode) throws EnjoyException{
-		logger.info("[updateProductQuantity][Begin]");
+		logger.info("[checkDupProductCode][Begin]");
 		
 		String							hql									= null;
 		List<Integer>			 		list								= null;
@@ -474,37 +474,39 @@ public class ProductDetailsDao {
 			session 			= sessionFactory.openSession();
 			comboList			=  new ArrayList<ComboBean>();
 			
-			/*Begin check ProductType section*/
-			hql 				= " select productTypeCode from productype where productTypeName = '"+productTypeName+"' and productTypeStatus = 'A'";
-			
-			logger.info("[productNameList] Check ProductType hql :: " + hql);
-			
-			query			= session.createSQLQuery(hql);
-			query.addScalar("productTypeCode"			, new StringType());
-			
-			list		 	= query.list();
-			
-			if(list!=null && list.size() == 1){
-				productTypeCode = list.get(0);
-			}
-		    /*End check ProductType section*/
-			
-		    if(productTypeCode!=null){
-		    	/*Begin check ProductGroup section*/
-				hql 				= " select productGroupCode from productgroup where productTypeCode = '"+productTypeCode+"' and productGroupStatus = 'A'";
+			if(productTypeName!=null && productGroupName!=null){
+				/*Begin check ProductType section*/
+				hql 				= " select productTypeCode from productype where productTypeName = '"+productTypeName+"' and productTypeStatus = 'A'";
 				
 				logger.info("[productNameList] Check ProductType hql :: " + hql);
 				
 				query			= session.createSQLQuery(hql);
-				query.addScalar("productGroupCode"			, new StringType());
+				query.addScalar("productTypeCode"			, new StringType());
 				
 				list		 	= query.list();
 				
 				if(list!=null && list.size() == 1){
-					productGroupCode = list.get(0);
+					productTypeCode = list.get(0);
 				}
-			    /*End check ProductGroup section*/
-		    }
+			    /*End check ProductType section*/
+				
+			    if(productTypeCode!=null){
+			    	/*Begin check ProductGroup section*/
+					hql 				= " select productGroupCode from productgroup where productTypeCode = '"+productTypeCode+"' and productGroupStatus = 'A'";
+					
+					logger.info("[productNameList] Check ProductType hql :: " + hql);
+					
+					query			= session.createSQLQuery(hql);
+					query.addScalar("productGroupCode"			, new StringType());
+					
+					list		 	= query.list();
+					
+					if(list!=null && list.size() == 1){
+						productGroupCode = list.get(0);
+					}
+				    /*End check ProductGroup section*/
+			    }
+			}
 		    
 		    hql = "";
 		    
@@ -514,6 +516,7 @@ public class ProductDetailsDao {
 		    			+ " where productType 			= '" + productTypeCode + "'"
 		    					+ " and productGroup 	= '" + productGroupCode + "'"
 //		    					+ " and productStatus = 'A'"
+		    			+ " and productName like('"+productName+"%')"
 		    			+ " order by productName asc limit 10";
 		    }else{
 		    	if(flag==true){
@@ -522,6 +525,7 @@ public class ProductDetailsDao {
 		    		if(productTypeCode!=null) 	hql+= " and productType 	= '" + productTypeCode + "'";
 		    		if(productGroupCode!=null) 	hql+= " and productGroup 	= '" + productGroupCode + "'";
 		    		
+		    		hql += " and productName like('"+productName+"%')";
 		    		hql += " order by productName asc limit 10";
 		    	}
 		    }
@@ -725,8 +729,8 @@ public class ProductDetailsDao {
 				bean.setSeqDb				(EnjoyUtils.nullToStr(row[1]));
 				bean.setQuanDiscount		(EnjoyUtils.convertFloatToDisplay(row[2], 2));
 				bean.setDiscountRate		(EnjoyUtils.convertFloatToDisplay(row[3], 2));
-				bean.setStartDate			(EnjoyUtils.dateFormat(row[4], "yyyyMMdd", "dd/MM/yyyy"));
-				bean.setExpDate				(EnjoyUtils.dateFormat(row[5], "yyyyMMdd", "dd/MM/yyyy"));
+				bean.setStartDate			(EnjoyUtils.dateToThaiDisplay(row[4]));
+				bean.setExpDate				(EnjoyUtils.dateToThaiDisplay(row[5]));
 				bean.setSeq					(String.valueOf(seq));
 				
 				productdetailList.add(bean);
@@ -863,8 +867,8 @@ public class ProductDetailsDao {
 					logger.info("productGroup 			:: " + row[2]);
 					logger.info("productName 			:: " + row[3]);
 					logger.info("unitCode 				:: " + row[4]);
-					logger.info("quantity 				:: " + row[5]);
-					logger.info("minQuan 				:: " + row[6]);
+					logger.info("minQuan 				:: " + row[5]);
+					logger.info("quantity 				:: " + row[6]);
 					logger.info("costPrice 				:: " + row[7]);
 					logger.info("salePrice1 			:: " + row[8]);
 					logger.info("salePrice2 			:: " + row[9]);
@@ -880,8 +884,8 @@ public class ProductDetailsDao {
 					bean.setProductGroupCode		(EnjoyUtils.nullToStr(row[2]));
 					bean.setProductName				(EnjoyUtils.nullToStr(row[3]));
 					bean.setUnitCode				(EnjoyUtils.nullToStr(row[4]));
-					bean.setQuantity				(EnjoyUtils.convertFloatToDisplay(row[5], 2));
-					bean.setMinQuan					(EnjoyUtils.convertFloatToDisplay(row[6], 2));
+					bean.setMinQuan					(EnjoyUtils.convertFloatToDisplay(row[5], 2));
+					bean.setQuantity				(EnjoyUtils.convertFloatToDisplay(row[6], 2));
 					bean.setCostPrice				(EnjoyUtils.convertFloatToDisplay(row[7], 2));
 					bean.setSalePrice1				(EnjoyUtils.convertFloatToDisplay(row[8], 2));
 					bean.setSalePrice2				(EnjoyUtils.convertFloatToDisplay(row[9], 2));
@@ -900,7 +904,7 @@ public class ProductDetailsDao {
 			e.printStackTrace();
 			throw new EnjoyException("error getProductDetailByName");
 		}finally{
-		hql						= null;
+			hql					= null;
 			session.close();
 			sessionFactory		= null;
 			session				= null;
@@ -909,6 +913,112 @@ public class ProductDetailsDao {
 		
 		return bean;
 		
+	}
+	
+	public String getQuanDiscount(String productCode, String quantity) throws EnjoyException{
+		logger.info("[getQuanDiscount][Begin]");
+		
+		String			hql							= null;
+		List<String>	list						= null;
+		SQLQuery 		query 						= null;
+		String 			discountRate				= "0.00";
+		SessionFactory 	sessionFactory				= null;
+		Session 		session						= null;
+		
+		
+		try{
+			sessionFactory 		= HibernateUtil.getSessionFactory();
+			session 			= sessionFactory.openSession();
+			
+			hql		= "select discountRate from productdetail"
+					+ "		where productCode = '" + productCode + "'"
+					+ "			and quanDiscount <= " + quantity
+					+ "			and startDate <= '" + EnjoyUtils.currDateThai() + "'"
+					+ "			and (expDate is null or expDate = '' or expDate >= '" + EnjoyUtils.currDateThai() + "')"
+					+ "		order by quanDiscount ASC"
+					+ "		LIMIT 1";
+			
+			query			= session.createSQLQuery(hql);
+			
+			query.addScalar("discountRate"			, new StringType());
+			
+			list		 	= query.list();
+			
+			if(list!=null && list.size() > 0){
+				discountRate = EnjoyUtils.convertFloatToDisplay(list.get(0), 2);
+			}
+			
+			logger.info("[getQuanDiscount] discountRate 			:: " + discountRate);
+			
+			
+			
+		}catch(Exception e){
+			logger.info(e.getMessage());
+			throw new EnjoyException(e.getMessage());
+		}finally{
+			session.flush();
+			session.clear();
+			session.close();
+			
+			hql				= null;
+			list			= null;
+			query 			= null;
+			sessionFactory	= null;
+			session			= null;
+			logger.info("[getQuanDiscount][End]");
+		}
+		
+		return discountRate;
+	}
+	
+	public String getInventory(String productCode) throws EnjoyException{
+		logger.info("[getQuanDiscount][Begin]");
+		
+		String			hql							= null;
+		List<String>	list						= null;
+		SQLQuery 		query 						= null;
+		String 			inventory					= "0.00";
+		SessionFactory 	sessionFactory				= null;
+		Session 		session						= null;
+		
+		
+		try{
+			sessionFactory 				= HibernateUtil.getSessionFactory();
+			session 					= sessionFactory.openSession();
+			
+			hql		= "select quantity from productmaster where productCode = '" + productCode + "'";
+			
+			query			= session.createSQLQuery(hql);
+			
+			query.addScalar("quantity"			, new StringType());
+			
+			list		 	= query.list();
+			
+			if(list!=null && list.size() > 0){
+				inventory = EnjoyUtils.convertFloatToDisplay(list.get(0), 2);
+			}
+			
+			logger.info("[getInventory] inventory 			:: " + inventory);
+			
+			
+			
+		}catch(Exception e){
+			logger.info(e.getMessage());
+			throw new EnjoyException(e.getMessage());
+		}finally{
+			session.flush();
+			session.clear();
+			session.close();
+			
+			hql				= null;
+			list			= null;
+			query 			= null;
+			sessionFactory	= null;
+			session			= null;
+			logger.info("[getInventory][End]");
+		}
+		
+		return inventory;
 	}
 	
 }

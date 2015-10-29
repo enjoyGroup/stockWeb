@@ -134,7 +134,6 @@ public class UserDetailsSearchServlet extends EnjoyStandardSvc {
 	private void onSearchUserDetail() throws EnjoyException{
 		logger.info("[onSearchUserDetail][Begin]");
 		
-		UserDetailsBean 			userdetailForm		= null;
 		Userprivilege				userprivilege		= null;
 		SessionFactory 				sessionFactory		= null;
 		Session 					session				= null;
@@ -148,6 +147,7 @@ public class UserDetailsSearchServlet extends EnjoyStandardSvc {
         List<UserDetailsBean> 		list 				= new ArrayList<UserDetailsBean>();
         List<UserDetailsBean> 		listTemp 			= new ArrayList<UserDetailsBean>();
         HashMap						hashTable			= new HashMap();
+        UserDetailsBean 			userDetailsBean 	= null;
 
 		try{
 			listUserDetailsBean 		= new ArrayList<UserDetailsBean>();
@@ -158,24 +158,24 @@ public class UserDetailsSearchServlet extends EnjoyStandardSvc {
 			session 					= sessionFactory.openSession();			
 			session.beginTransaction();
 			
-			userdetailForm				= new UserDetailsBean();
+			userDetailsBean				= new UserDetailsBean();
 			
-			userdetailForm.setUserName	(EnjoyUtils.nullToStr(this.request.getParameter("userName")));
-			userdetailForm.setUserId	(EnjoyUtils.nullToStr(this.request.getParameter("userId")));
-			userdetailForm.setUserStatus(EnjoyUtils.nullToStr(this.request.getParameter("userStatus")));
+			userDetailsBean.setUserName	(EnjoyUtils.nullToStr(this.request.getParameter("userName")));
+			userDetailsBean.setUserId	(EnjoyUtils.nullToStr(this.request.getParameter("userId")));
+			userDetailsBean.setUserStatus(EnjoyUtils.nullToStr(this.request.getParameter("userStatus")));
 			
-			this.form.setUserDetailsBean(userdetailForm);
+			this.form.setUserDetailsBean(userDetailsBean);
 			
-			logger.info("[onSearchUserDetail] userdetailForm.getUserName() 	 :: " + userdetailForm.getUserName());
-			logger.info("[onSearchUserDetail] userdetailForm.getUserId() 	 :: " + userdetailForm.getUserId());
-			logger.info("[onSearchUserDetail] userdetailForm.getUserStatus() :: " + userdetailForm.getUserStatus());
+			logger.info("[onSearchUserDetail] userName 	 :: " + userDetailsBean.getUserName());
+			logger.info("[onSearchUserDetail] userId 	 :: " + userDetailsBean.getUserId());
+			logger.info("[onSearchUserDetail] userStatus :: " + userDetailsBean.getUserStatus());
 			
 			listUserprivilege 			= this.dao.getUserprivilege(session);
 			for(int i=0;i<listUserprivilege.size();i++){
 				userprivilege			= listUserprivilege.get(i);
 				fUserprivilege.put(userprivilege.getPrivilegeCode() , userprivilege.getPrivilegeName());
 			}	
-			listUserDetailsBean	 		= this.dao.getListUserdetail(session, userdetailForm, fUserprivilege);
+			listUserDetailsBean	 		= this.dao.getListUserdetail(session, userDetailsBean, fUserprivilege);
 
 			//logger.info("[onSearchUserDetail] listUserDetailsBean.size :: " + listUserDetailsBean.size());
 			logger.info("[onSearchUserDetail] listUserDetailsBean :: " + listUserDetailsBean.size());
@@ -239,28 +239,25 @@ public class UserDetailsSearchServlet extends EnjoyStandardSvc {
 	
 	
 	private void lp_getPage(){
-		   logger.info("[lp_getPage][Begin]");
+	   logger.info("[lp_getPage][Begin]");
+	   
+	   int								pageNum				= 1;
+	   List<UserDetailsBean> 			list 				= new ArrayList<UserDetailsBean>();
+	   
+	   try{
+		   pageNum					= Integer.parseInt(this.request.getParameter("pageNum"));
 		   
-		   int								pageNum				= 1;
-		   List<UserDetailsBean> 			list 				= new ArrayList<UserDetailsBean>();
+		   this.form.setPageNum(pageNum);
 		   
-		   try{
-			   pageNum					= Integer.parseInt(this.request.getParameter("pageNum"));
-			   
-			   this.form.setPageNum(pageNum);
-			   
-			   list = (List<UserDetailsBean>) this.form.getHashTable().get(pageNum);
-			   this.form.setUserDetailsBeanList(list);
-			   
-		   }catch(Exception e){
-			   e.printStackTrace();
-		   }finally{
-			   logger.info("[lp_getPage][End]");
-		   }
+		   list = (List<UserDetailsBean>) this.form.getHashTable().get(pageNum);
+		   this.form.setUserDetailsBeanList(list);
 		   
+	   }catch(Exception e){
+		   e.printStackTrace();
+	   }finally{
+		   logger.info("[lp_getPage][End]");
 	   }
-	
-	
+   }
 	
 	
 	

@@ -17,9 +17,11 @@ import org.json.simple.JSONObject;
 import th.go.stock.app.enjoy.bean.AddressBean;
 import th.go.stock.app.enjoy.bean.ComboBean;
 import th.go.stock.app.enjoy.bean.CustomerDetailsBean;
+import th.go.stock.app.enjoy.bean.RelationGroupCustomerBean;
 import th.go.stock.app.enjoy.bean.UserDetailsBean;
 import th.go.stock.app.enjoy.dao.AddressDao;
 import th.go.stock.app.enjoy.dao.CustomerDetailsDao;
+import th.go.stock.app.enjoy.dao.RelationGroupCustomerDao;
 import th.go.stock.app.enjoy.exception.EnjoyException;
 import th.go.stock.app.enjoy.form.CompanyDetailsMaintananceForm;
 import th.go.stock.app.enjoy.form.CustomerDetailsMaintananceForm;
@@ -48,6 +50,7 @@ public class CustomerDetailsMaintananceServlet extends EnjoyStandardSvc {
     private CustomerDetailsDao				dao							= null;
     private CustomerDetailsMaintananceForm	form						= null;
     private AddressDao						addressDao					= null;
+    private RelationGroupCustomerDao		relationGroupCustomerDao	= null;
     
 	@Override
 	public void execute(HttpServletRequest request, HttpServletResponse response)
@@ -62,15 +65,16 @@ public class CustomerDetailsMaintananceServlet extends EnjoyStandardSvc {
          String pageAction = null; 
  		
  		try{
- 			 pageAction 				= EnjoyUtil.nullToStr(request.getParameter("pageAction"));
- 			 this.enjoyUtil 			= new EnjoyUtil(request, response);
- 			 this.request            	= request;
-             this.response           	= response;
-             this.session            	= request.getSession(false);
-             this.userBean           	= (UserDetailsBean)session.getAttribute("userBean");
-             this.form               	= (CustomerDetailsMaintananceForm)session.getAttribute(FORM_NAME);
-             this.dao					= new CustomerDetailsDao();
-             this.addressDao			= new AddressDao();
+ 			 pageAction 					= EnjoyUtil.nullToStr(request.getParameter("pageAction"));
+ 			 this.enjoyUtil 				= new EnjoyUtil(request, response);
+ 			 this.request            		= request;
+             this.response           		= response;
+             this.session            		= request.getSession(false);
+             this.userBean           		= (UserDetailsBean)session.getAttribute("userBean");
+             this.form               		= (CustomerDetailsMaintananceForm)session.getAttribute(FORM_NAME);
+             this.dao						= new CustomerDetailsDao();
+             this.addressDao				= new AddressDao();
+             this.relationGroupCustomerDao 	= new RelationGroupCustomerDao();
  			
              logger.info("[execute] pageAction : " + pageAction );
              
@@ -131,17 +135,13 @@ public class CustomerDetailsMaintananceServlet extends EnjoyStandardSvc {
 		
 		logger.info("[setRefference][Begin]");
 		
-		SessionFactory 		sessionFactory	= null;
-		Session 			session			= null;
-		
 		try{
-			sessionFactory 	= HibernateUtil.getSessionFactory();
-			session 		= sessionFactory.openSession();
 			
-			this.form.setStatusCombo(this.dao.getStatusCombo(session));
+			this.form.setStatusCombo(this.dao.getStatusCombo());
 			
 			this.setSexCombo();
 			this.setIdTypeCombo();
+			this.setGroupSalePriceCombo();
 			
 			
 		}catch(EnjoyException e){
@@ -151,9 +151,6 @@ public class CustomerDetailsMaintananceServlet extends EnjoyStandardSvc {
 			logger.info(e.getMessage());
 			throw new EnjoyException("setRefference is error");
 		}finally{
-			session.close();
-			sessionFactory	= null;
-			session			= null;
 			logger.info("[setRefference][End]");
 		}
 	}
@@ -203,6 +200,41 @@ public class CustomerDetailsMaintananceServlet extends EnjoyStandardSvc {
 			throw new EnjoyException("setIdTypeCombo is error");
 		}finally{
 			logger.info("[setIdTypeCombo][End]");
+		}
+	}
+	
+	private void setGroupSalePriceCombo() throws EnjoyException{
+		
+		logger.info("[setGroupSalePriceCombo][Begin]");
+		
+		List<ComboBean>					combo 						= null;
+		SessionFactory 					sessionFactory				= null;
+		Session 						session						= null;
+		List<RelationGroupCustomerBean> list 						= null;
+		RelationGroupCustomerBean		relationGroupCustomerBean 	= null;
+		
+		try{
+			sessionFactory 					= HibernateUtil.getSessionFactory();
+			session 						= sessionFactory.openSession();
+			combo 					= new ArrayList<ComboBean>();
+			relationGroupCustomerBean 		= new RelationGroupCustomerBean();
+			list							= this.relationGroupCustomerDao.searchByCriteria(session, relationGroupCustomerBean);
+			
+			combo.add(new ComboBean(""	, "กรุณาเลือก"));
+			for(RelationGroupCustomerBean bean:list){
+				combo.add(new ComboBean(bean.getCusGroupCode()	, bean.getCusGroupName()));
+			}
+			
+			this.form.setGroupSalePriceCombo(combo);
+		}
+		catch(Exception e){
+			logger.info(e.getMessage());
+			throw new EnjoyException("setGroupSalePriceCombo is error");
+		}finally{
+			session.close();
+			sessionFactory	= null;
+			session			= null;
+			logger.info("[setGroupSalePriceCombo][End]");
 		}
 	}
 	
@@ -363,6 +395,7 @@ public class CustomerDetailsMaintananceServlet extends EnjoyStandardSvc {
 		String				cusName 				= null;
 		String				cusSurname 				= null;
 		String				branchName				= null;
+		String				cusGroupCode			= null;
 		String				sex 					= null;
 		String				idType 					= null;
 		String				idNumber 				= null;
@@ -397,6 +430,7 @@ public class CustomerDetailsMaintananceServlet extends EnjoyStandardSvc {
 			cusName 					= EnjoyUtil.nullToStr(request.getParameter("cusName"));
 			cusSurname 					= EnjoyUtil.nullToStr(request.getParameter("cusSurname"));
 			branchName 					= EnjoyUtil.nullToStr(request.getParameter("branchName"));
+			cusGroupCode 				= EnjoyUtil.nullToStr(request.getParameter("cusGroupCode"));
 			sex 						= EnjoyUtil.nullToStr(request.getParameter("sex"));
 			idType 						= EnjoyUtil.nullToStr(request.getParameter("idType"));
 			idNumber 					= EnjoyUtil.nullToStr(request.getParameter("idNumber"));
@@ -430,6 +464,7 @@ public class CustomerDetailsMaintananceServlet extends EnjoyStandardSvc {
 			logger.info("[onSave] cusName 				:: " + cusName);
 			logger.info("[onSave] cusSurname 			:: " + cusSurname);
 			logger.info("[onSave] branchName 			:: " + branchName);
+			logger.info("[onSave] cusGroupCode 			:: " + cusGroupCode);
 			logger.info("[onSave] sex 					:: " + sex);
 			logger.info("[onSave] idType 				:: " + idType);
 			logger.info("[onSave] idNumber 				:: " + idNumber);
@@ -458,10 +493,11 @@ public class CustomerDetailsMaintananceServlet extends EnjoyStandardSvc {
 			customerDetailsBean.setCusName				(cusName);
 			customerDetailsBean.setCusSurname			(cusSurname);
 			customerDetailsBean.setBranchName			(branchName);
+			customerDetailsBean.setCusGroupCode			(cusGroupCode);
 			customerDetailsBean.setSex					(sex);
 			customerDetailsBean.setIdType				(idType);
 			customerDetailsBean.setIdNumber				(idNumber);
-			customerDetailsBean.setBirthDate			(EnjoyUtils.dateFormat(birthDate, "dd/MM/yyyy", "yyyyMMdd"));
+			customerDetailsBean.setBirthDate			(EnjoyUtils.dateThaiToDb(birthDate));
 			customerDetailsBean.setReligion				(religion);
 			customerDetailsBean.setJob					(job);
 			customerDetailsBean.setBuildingName			(buildingName);
@@ -477,8 +513,8 @@ public class CustomerDetailsMaintananceServlet extends EnjoyStandardSvc {
 			customerDetailsBean.setFax					(fax);
 			customerDetailsBean.setEmail				(email);
 			customerDetailsBean.setCusStatus			(cusStatus);
-			customerDetailsBean.setStartDate			(EnjoyUtils.dateFormat(startDate, "dd/MM/yyyy", "yyyyMMdd"));
-			customerDetailsBean.setExpDate				(EnjoyUtils.dateFormat(expDate, "dd/MM/yyyy", "yyyyMMdd"));
+			customerDetailsBean.setStartDate			(EnjoyUtils.dateThaiToDb(startDate));
+			customerDetailsBean.setExpDate				(EnjoyUtils.dateThaiToDb(expDate));
 			customerDetailsBean.setPoint				(point);
 			customerDetailsBean.setRemark				(remark);
 			

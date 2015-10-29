@@ -9,9 +9,8 @@ import th.go.stock.app.enjoy.bean.CustomerDetailsBean;
 
 public class CustomerDetailsSearchForm {
 	
-	public static final String NEW 	= "NEW";
-	public static final String EDIT = "EDIT";
-	
+	public static final String NEW 		= "NEW";
+	public static final String EDIT 	= "EDIT";
 	
 	private CustomerDetailsBean 		customerDetailsBean;
 	private List<ComboBean> 			statusCombo;

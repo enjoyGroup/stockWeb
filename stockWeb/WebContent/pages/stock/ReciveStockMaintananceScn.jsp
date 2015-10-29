@@ -626,6 +626,8 @@
 		            			for(var i=1;i<(lo_table.rows.length - 1);i++){
 		                            lo_table.rows[i].cells[0].innerHTML = (i);
 		                        }
+		            			
+		            			lp_calReciveAmount();
 		            		}else{
 		            			alert(jsonObj.errMsg);
 		            			
@@ -716,7 +718,7 @@
 		                       	newNodeTd3.innerHTML        = '<input type="text" style="width: 100%;" class="input-disabled" readonly="readonly" id="inventory' + lv_maxSeq + '" name="inventory" value="'+lv_inventory+'" />';
 		                       	
 		                      	//ปริมาณ
-		                       	newNodeTd4.innerHTML        = '<input type="text" style="width: 100%"  onblur="gp_checkAmtOnly(this, 12);lp_calAmount('+lv_maxSeq+');" class="moneyOnly" id="quantity' + lv_maxSeq + '" name="quantity" value="0.00" />';
+		                       	newNodeTd4.innerHTML        = '<input type="text" style="width: 100%"  onblur="gp_checkAmtOnly(this, 12);lp_getPrice('+lv_maxSeq+');" class="moneyOnly" id="quantity' + lv_maxSeq + '" name="quantity" value="0.00" />';
 		                       	
 		                      	//หน่วย
 		                       	newNodeTd5.innerHTML        = '<input type="text" style="width: 100%;" id="unitName' + lv_maxSeq + '" class="input-disabled" readonly="readonly" name="unitName" value="'+lv_unitName+'" />'
@@ -739,10 +741,11 @@
 								lo_seqTemp.value  = lv_maxSeq;
 								
 								if(ao_jsonObj!=null){
-									lp_updateRecord(lv_maxSeq);
+									//lp_updateRecord(lv_maxSeq);
+									lp_calAmount(lv_maxSeq);
+								}else{
+									$('#productName' + lv_maxSeq).focus();
 								}
-								
-								$('#productName' + lv_maxSeq).focus();
 								
 		            		}else{
 		            			alert(jsonObj.errMsg);
@@ -807,12 +810,24 @@
 		
 		function lp_getProductDetailByName(av_seq, av_productName){
 			
+			var params 		= "";
+			var vendorCode 	= null;
+			var quantity	= null;
+			
 			try{
+				vendorCode 	= $("#vendorCode").val().trim();
+				quantity	= $("#quantity" + av_seq).val().trim();
+				
+				params = "&pageAction=getProductDetailByName" 
+						+ "&productName=" + av_productName.trim()
+						+ "&vendorCode=" + vendorCode
+						+ "&quantity=" + quantity;
+				
 				$.ajax({
 					async:false,
 		            type: "POST",
 		            url: gv_url,
-		            data: gv_service + "&pageAction=getProductDetailByName&productName=" + av_productName.trim(),
+		            data: gv_service + params,
 		            beforeSend: "",
 		            success: function(data){
 		            	var jsonObj 			= null;
@@ -825,11 +840,25 @@
 		            		
 		            		if(status=="SUCCESS"){
 		            			
-		            			$("#productCode" + av_seq).val(jsonObj.productCode);
-		            			//$("#productName" + av_seq).val(jsonObj.productName);
-		            			$("#inventory" + av_seq).val(jsonObj.inventory);
-		            			$("#unitCode" + av_seq).val(jsonObj.unitCode);
-		            			$("#unitName" + av_seq).val(jsonObj.unitName);
+		            			if(jsonObj.productCode==""){
+		            				$("#productCode" + av_seq).val('');
+			            			$("#price" + av_seq).val('0.00');
+			            			$("#inventory" + av_seq).val('');
+			            			//$("#quantity" + av_seq).val('0.00');
+			            			$("#unitCode" + av_seq).val('');
+			            			$("#unitName" + av_seq).val('');
+			            			//$("#discountRate" + av_seq).val('0.00');
+		            			}else{
+		            				$("#productCode" + av_seq).val(jsonObj.productCode);
+			            			$("#price" + av_seq).val(jsonObj.price);
+			            			$("#inventory" + av_seq).val(jsonObj.inventory);
+			            			//$("#quantity" + av_seq).val('1.00');
+			            			$("#unitCode" + av_seq).val(jsonObj.unitCode);
+			            			$("#unitName" + av_seq).val(jsonObj.unitName);
+			            			//$("#discountRate" + av_seq).val(jsonObj.discountRate);
+		            			}
+		            			
+		            			lp_calAmount(av_seq);
 		            			
 		            		}else{
 		            			errMsg 	= jsonObj.errMsg;
@@ -842,6 +871,54 @@
 		        });
 			}catch(e){
 				alert("lp_getProductDetailByName :: " + e);
+			}
+		}
+		
+		function lp_getPrice(av_seq){
+			
+			var lv_productCode 	= "";
+			var lv_quantity 	= "";
+			var lv_vendorCode 	= "";
+			
+			try{
+				lv_productCode 	= $("#productCode" + av_seq).val().trim();
+				lv_quantity		= $("#quantity" + av_seq).val().trim();
+				lv_vendorCode	= $("#vendorCode").val().trim();
+				
+				if(lv_productCode==""){
+					return;
+				}
+				
+				$.ajax({
+					async:false,
+		            type: "POST",
+		            url: gv_url,
+		            data: gv_service + "&pageAction=getPrice&productCode=" + lv_productCode + "&quantity=" + lv_quantity + "&vendorCode=" + lv_vendorCode,
+		            beforeSend: "",
+		            success: function(data){
+		            	var jsonObj 			= null;
+		            	var status				= null;
+		            	var errMsg				= null;
+		            	
+		            	try{
+		            		jsonObj = JSON.parse(data);
+		            		status	= jsonObj.status;
+		            		
+		            		if(status=="SUCCESS"){
+		            			$("#price" + av_seq).val(jsonObj.price);
+		            			lp_calAmount(av_seq);
+		            		}else{
+		            			errMsg 	= jsonObj.errMsg;
+		            			alert(errMsg);
+		            		}
+		            	}catch(e){
+		            		alert("in lp_getPrice :: " + e);
+		            	}
+		            }
+		        });
+				
+			}catch(e){
+				alert("lp_getPrice :: " + e);
 			}
 		}
 		
@@ -900,12 +977,17 @@
 			var lv_reciveAmount		= 0.00;
 			var lv_reciveDiscount	= 0.00;
 			var lv_systemVat		= 0.00;
+			var lo_priceType1		= null;
 			
 			try{
+				lo_priceType1		= document.getElementById("priceType1");
 				lv_systemVat		= gp_parseFloat($("#systemVat").val());
 				lv_reciveAmount 	= gp_parseFloat($("#reciveAmount").val());
 				lv_reciveDiscount 	= gp_parseFloat($("#reciveDiscount").val());
-				lv_reciveVat		= ((lv_reciveAmount - lv_reciveDiscount) * lv_systemVat)/100;
+				
+				if(lo_priceType1.checked==true){
+					lv_reciveVat		= ((lv_reciveAmount - lv_reciveDiscount) * lv_systemVat)/100;
+				}
 				
 				$("#reciveVat").val(lv_reciveVat);
 				gp_format(document.getElementById("reciveVat"), 2);
@@ -1204,7 +1286,7 @@
 	</script>
 </head>
 <body>
-	<form id="frm">
+	<form id="frm" onsubmit="return false;">
 		<input type="hidden" id="service" 	name="service" value="servlet.ReciveStockMaintananceServlet" />
 		<input type="hidden" id="pageMode" 	name="pageMode" value="<%=pageMode%>" />
 		<input type="hidden" id="provinceCode" name="provinceCode" value="" />
@@ -1563,6 +1645,7 @@
 									        				<input  type="radio" 
 																	id="priceType1" 
 																	name="priceType" 
+																	onclick="lp_calReciveVat();"
 																	value="V" 
 																	<%if(reciveOrderMasterBean.getPriceType().equals("V")){%> checked="checked" <%} %> 
 															/>
@@ -1572,6 +1655,7 @@
 															<input  type="radio" 
 																	id="priceType2" 
 																	name="priceType" 
+																	onclick="lp_calReciveVat();"
 																	value="N" 
 																	<%if(reciveOrderMasterBean.getPriceType().equals("N")){%> checked="checked" <%} %> 
 															/>
@@ -1583,10 +1667,10 @@
 													</td>
 								        			<td align="left" colspan="3">
 								        				<select id="reciveStatus" name="reciveStatus" style="width: 220px;" >
-									        					<% for(ComboBean comboBean:statusCombo){ %>
-									        					<option value="<%=comboBean.getCode()%>" <%if(reciveOrderMasterBean.getReciveStatus().equals(comboBean.getCode())){ %> selected <%} %> ><%=comboBean.getDesc()%></option>
-									        					<%} %>
-									        				</select>
+								        					<% for(ComboBean comboBean:statusCombo){ %>
+								        					<option value="<%=comboBean.getCode()%>" <%if(reciveOrderMasterBean.getReciveStatus().equals(comboBean.getCode())){ %> selected <%} %> ><%=comboBean.getDesc()%></option>
+								        					<%} %>
+								        				</select>
 								        			</td>
 								        		</tr>
 									        </table>
@@ -1638,7 +1722,7 @@
 								        					   id="quantity<%=bean.getSeq()%>" 
 								        					   name='quantity'
 								        					   class="moneyOnly"
-								        					   onblur="gp_checkAmtOnly(this, 12);lp_calAmount('<%=bean.getSeq()%>');"
+								        					   onblur="gp_checkAmtOnly(this, 12);lp_getPrice('<%=bean.getSeq()%>');"
 								        					   value="<%=bean.getQuantity() %>" 
 								        					   style="width: 100%" />
 													</td>

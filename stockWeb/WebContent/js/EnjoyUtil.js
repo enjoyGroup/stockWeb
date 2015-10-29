@@ -555,25 +555,25 @@ function onKeyPressMoney(evt){
 
 function onKeyDownMoney(evt){
     var keyCode = evt.keyCode ? evt.keyCode : evt.which;
-
+//alert("onKeyDownMoney :: " + keyCode);
     /*key 17 = Ctrl, key 86 = v, key 67 = c */
     if(keyCode == 17 || keyCode == 86 || keyCode == 67 || keyCode == 8 || keyCode == 9 || keyCode == 35 || keyCode == 36 || keyCode == 37 || keyCode == 38 || keyCode == 39 || keyCode == 40 || keyCode == 46 || keyCode == 144 || keyCode == 110){
         return true;
     }
-    if ( (keyCode > 95 && keyCode < 106) || keyCode == 44 || keyCode == 188 || keyCode == 190 ) {
+    if ( (keyCode > 95 && keyCode < 106) || keyCode == 44 || keyCode == 45 || keyCode == 188 || keyCode == 190 || keyCode == 109 || keyCode == 189 ) {
         return true;
     } else {
-        return checkAllowKey(keyCode, '0123456789.,');
+        return checkAllowKey(keyCode, '-0123456789.,');
     }
 }
 
 function onKeyUpMoney(evt){
     var keyCode = evt.keyCode ? evt.keyCode : evt.which;
-
-    if(keyCode == 8 || keyCode == 9 || keyCode == 35 || keyCode == 36 || keyCode == 37 || keyCode == 38 || keyCode == 39 || keyCode == 40 || keyCode == 46 || keyCode == 144 || keyCode == 110){
+//alert("onKeyUpMoney :: " + keyCode);
+    if(keyCode == 8 || keyCode == 9 || keyCode == 35 || keyCode == 36 || keyCode == 37 || keyCode == 38 || keyCode == 39 || keyCode == 40 || keyCode == 45 || keyCode == 46 || keyCode == 144 || keyCode == 110){
         return true;
     }
-    return checkAllowKey(keyCode, '0123456789.,');
+    return checkAllowKey(keyCode, '-0123456789.,');
 }
 
 function onKeyPressTel(evt){

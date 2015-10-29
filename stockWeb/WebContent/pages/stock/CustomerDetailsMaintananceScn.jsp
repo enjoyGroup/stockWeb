@@ -11,6 +11,7 @@
 	List<ComboBean> 		statusCombo 		= customerDetailsMaintananceForm.getStatusCombo();
 	List<ComboBean> 		sexCombo 			= customerDetailsMaintananceForm.getSexCombo();
 	List<ComboBean> 		idTypeCombo 		= customerDetailsMaintananceForm.getIdTypeCombo();
+	List<ComboBean> 		groupSalePriceCombo = customerDetailsMaintananceForm.getGroupSalePriceCombo();
 	String					titlePage			= customerDetailsMaintananceForm.getTitlePage();
 
 
@@ -146,7 +147,8 @@
 		    var la_validate             = new Array( "cusName:ชื่อ"	
 													, "cusSurname:นามสกุล"
 													, "cusStatus:สถานะ"
-													, "startDate:วันที่สมัคร");
+													, "startDate:วันที่สมัคร"
+													, "cusGroupCode:กลุ่มลูกค้า");
 		    var lv_return				= true;
 		    var provinceName			= "";
 		    var districtName			= "";
@@ -308,7 +310,7 @@
 				params 	= "pageAction=save&" + $('#frm').serialize();
 				
 				$.ajax({
-					async:false,
+					async:true,
 		            type: "POST",
 		            url: gv_url,
 		            data: params,
@@ -781,6 +783,18 @@
 								        						style="width: 150px;"
 								        						value="<%=customerDetailsBean.getPoint()%>" 
 								        						maxlength="10" />
+								        			</td>
+								        		</tr>
+								        		<tr>
+								        			<td align="right">
+														กลุ่มลูกค้า <span style="color: red;"><b>*</b></span> :
+													</td>
+								        			<td align="left" colspan="5">
+								        				<select id="cusGroupCode" name="cusGroupCode" style="width: 220px;" >
+								        					<% for(ComboBean comboBean:groupSalePriceCombo){ %>
+								        					<option value="<%=comboBean.getCode()%>" <%if(customerDetailsBean.getCusGroupCode().equals(comboBean.getCode())){ %> selected <%} %> ><%=comboBean.getDesc()%></option>
+								        					<%} %>
+								        				</select>
 								        			</td>
 								        		</tr>
 								        		<tr>

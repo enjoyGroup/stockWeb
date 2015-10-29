@@ -1,10 +1,7 @@
 
 package th.go.stock.app.enjoy.dao;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -39,8 +36,6 @@ public class UserDetailsDao {
 		Session 			session			= null;
 		String				hql				= null;
         String				passWord		= null;
-		DateFormat 			dateFormat		= null;
-        Date 				date			= null;
         SQLQuery 			query 			= null;
         List<Object[]>		list			= null;
         Object[] 			row 			= null;
@@ -53,8 +48,6 @@ public class UserDetailsDao {
 //			hql				= "select * from userdetails where userId = '" + userId + "'";
 			hql				= "select * from userdetails where userId = '" + userId + "' and userPassword = '" + passWord + "'";
 			query			= session.createSQLQuery(hql);
-			dateFormat 		= new SimpleDateFormat("dd/MM/yyyy");
-		    date 	   		= new Date();
 		    
 		    query.addScalar("userUniqueId"			, new StringType());
 		    query.addScalar("tinCompany"			, new StringType());
@@ -109,7 +102,7 @@ public class UserDetailsDao {
 				userDetailsBean.setUserLevel			(EnjoyUtils.nullToStr(row[7]));
 				userDetailsBean.setUserStatus			(EnjoyUtils.nullToStr(row[8]));
 				userDetailsBean.setFlagChangePassword	(EnjoyUtils.chkBoxtoDb(row[9]));
-				userDetailsBean.setCurrentDate			(dateFormat.format(date));
+				userDetailsBean.setCurrentDate			(EnjoyUtils.dateToThaiDisplay(EnjoyUtils.currDateThai()));
 				userDetailsBean.setFlagAlertStock		(EnjoyUtils.chkBoxtoDb(row[10]));
 				userDetailsBean.setFlagChkCompany		(flagChkCompany);
 				userDetailsBean.setFlagSalesman			(EnjoyUtils.chkBoxtoDb(row[11]));
@@ -748,6 +741,7 @@ public class UserDetailsDao {
 			hql					= "select * from (select a.*, CONCAT(a.userName, ' ', a.userSurname) userFullName, b.userStatusName"
 													+ "	from userdetails a, refuserstatus b "
 													+ "	where b.userStatusCode = a.userStatus"
+													+ " 	and a.userStatus = 'A'"
 													+ " 	and a.userId <> 'admin') t where 1=1";
 			
 			if(find!=null && !find.equals("")){
@@ -800,12 +794,12 @@ public class UserDetailsDao {
 			}
 			
 		}catch(Exception e){
-			logger.info("[getLookUpList] " + e.getMessage());
+			logger.info("[getUserDetailsLookUpList] " + e.getMessage());
 			e.printStackTrace();
 			throw new EnjoyException("เกิดข้อผิดพลาดในการดึง LookUp");
 		}finally{
 			hql						= null;
-			logger.info("[getLookUpList][End]");
+			logger.info("[getUserDetailsLookUpList][End]");
 		}
 		
 		return listData;

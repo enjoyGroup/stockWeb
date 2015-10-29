@@ -69,7 +69,7 @@
 	</script>
 <div class="headwrap" id="headwrap">
 	<div class="row" style="position: relative;">
-    	<div class="brand span4" style="padding-left: 15px;">
+    	<div class="brand span4" style="position: absolute;left:10px;" align="left">
         	<img src="<%=servURL1%>/images/logo.png" />
         </div>
         

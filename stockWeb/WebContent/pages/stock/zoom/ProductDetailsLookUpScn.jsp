@@ -24,7 +24,6 @@
 	<script>
 		var gv_service 			= null;
 		var gv_url 				= '<%=servURL%>/EnjoyGenericSrv';
-		var gv_checkDupUserId 	= false;
 		
 		$(document).ready(function(){
 			
@@ -340,59 +339,56 @@
 <body>
 	<form id="frm">
 		<input type="hidden" id="service" 	name="service" value="servlet.ProductDetailsLookUpServlet" />
-		<div>
-			<div class="container main-container round-sm padding-no" >
-				<div class="panel-body" align="center">
-		        	<table class="user-register-table user-search-table" width="100%" border="0" cellpadding="5" cellspacing="5">
-		        		<tr>
-		        			<td align="right" width="150px;">
-		        				หมวดสินค้า<span style="color: red;"><b>*</b></span> : &nbsp;
-		        			</td>
-		        			<td align="left" width="350px;">
-		        				<input type='text' 
-		        					   id="productTypeName" 
-		        					   name='productTypeName' 
-		        					   value="<%=productmasterBean.getProductTypeName()%>" 
-		        					   maxlength="200" 
-		        					   style="width: 220px;" />
-		        			</td>
-		        			<td align="right">
-		        				หมู่สินค้า : &nbsp;
-		        			</td>
-		        			<td align="left">
-		        				<input type='text' 
-		        					   id="productGroupName" 
-		        					   name='productGroupName' 
-		        					   value="<%=productmasterBean.getProductGroupName()%>" 
-		        					   maxlength="200" 
-		        					   style="width: 220px;" />
-		        			</td>
-		        		</tr>
-		        		<tr>
-		        			<td align="right">
-		        				ชื่อสินค้า :&nbsp;
-		        			</td>
-		        			<td align="left" colspan="3">
-		        				<input type='text' 
-		        					   id="productName" 
-		        					   name='productName' 
-		        					   value="<%=productmasterBean.getProductName()%>" 
-		        					   maxlength="255" 
-		        					   style="width: 220px;" />
-		        			</td>
-		        		</tr>
-		        		<tr>
-		        			<td align="right" colspan="4">
-		        				<input type="button" id="btnSearch" class='btn btn-primary pull-right padding-sm' style="margin-right:12px; padding-right:24px; padding-left:24px;" value='ค้นหา'/>
-		        				<input type="button" id="btnReset" class='btn pull-right padding-sm'  style="margin-right:12px" value='เริ่มใหม่' />
-		        			</td>
-		        		</tr>
-		        	</table>
-		        </div>
-			</div>
-		</div>
-		<div class="container main-container round-sm padding-no" >
-			<div id="seasonTitle" class="padding-md round-sm season-title-head" style="">
+		<div style="background-color:white;width: 100%;height: 100%;">
+			<table class="user-register-table user-search-table" width="100%" border="0" cellpadding="5" cellspacing="5">
+        		<tr>
+        			<td align="right" width="150px;">
+        				หมวดสินค้า<span style="color: red;"><b>*</b></span> : &nbsp;
+        			</td>
+        			<td align="left" width="350px;">
+        				<input type='text' 
+        					   id="productTypeName" 
+        					   name='productTypeName' 
+        					   value="<%=productmasterBean.getProductTypeName()%>" 
+        					   maxlength="200" 
+        					   style="width: 220px;" />
+        			</td>
+        			<td align="right">
+        				หมู่สินค้า : &nbsp;
+        			</td>
+        			<td align="left">
+        				<input type='text' 
+        					   id="productGroupName" 
+        					   name='productGroupName' 
+        					   value="<%=productmasterBean.getProductGroupName()%>" 
+        					   maxlength="200" 
+        					   style="width: 220px;" />
+        			</td>
+        		</tr>
+        		<tr>
+        			<td align="right">
+        				ชื่อสินค้า :&nbsp;
+        			</td>
+        			<td align="left" colspan="3">
+        				<input type='text' 
+        					   id="productName" 
+        					   name='productName' 
+        					   value="<%=productmasterBean.getProductName()%>" 
+        					   maxlength="255" 
+        					   style="width: 220px;" />
+        			</td>
+        		</tr>
+        		<tr>
+        			<td align="left" colspan="2">
+        				<span style="color: red;">*ถ้าต้องการค้นหาทั้งหมดให้ระบุช่องนั้นเป็น ***</span>
+        			</td>
+        			<td align="right" colspan="2">
+        				<input type="button" id="btnSearch" class='btn btn-primary pull-right padding-sm' style="margin-right:12px; padding-right:24px; padding-left:24px;" value='ค้นหา'/>
+        				<input type="button" id="btnReset" class='btn pull-right padding-sm'  style="margin-right:12px" value='เริ่มใหม่' />
+        			</td>
+        		</tr>
+        	</table>
+        	<div id="seasonTitle" class="padding-md round-sm season-title-head" style="">
 				<h6 class="panel-title" style="font-size:1.0em">ข้อมูลรายละเอียดสินค้า</h6>
 			</div>
 			<table class="table sim-panel-result-table" id="tbl_result" width="100%">

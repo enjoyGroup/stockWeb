@@ -69,4 +69,19 @@ textarea {
 	text-align: right;
 }
 
+.moneyOnly-disabled{
+	text-align: right;
+	background-color:#EBEBE4;
+    border:1px solid #ABADB3;
+    color:rgb(84, 84, 84);
+}
+
+.wrong{
+	color: red;
+}
+
+.correct{
+	color: blue;
+}
+
 

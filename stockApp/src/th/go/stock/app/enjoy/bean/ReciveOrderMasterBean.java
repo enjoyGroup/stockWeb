@@ -12,6 +12,7 @@ public class ReciveOrderMasterBean {
 	private String billNo;
 	private String priceType;
 	private String reciveStatus;
+	private String reciveStatusDesc;
 	private String userUniqueId;
 	private String reciveAmount;
 	private String reciveDiscount;
@@ -22,24 +23,25 @@ public class ReciveOrderMasterBean {
 	private String usrName;
 	
 	public ReciveOrderMasterBean(){
-		this.reciveNo 		= "";
-		this.reciveDate 	= "";
-		this.reciveType 	= "";
-		this.creditDay 		= "";
-		this.creditExpire 	= "";
-		this.vendorCode 	= "";
-		this.branchName 	= "";
-		this.billNo 		= "";
-		this.priceType 		= "";
-		this.reciveStatus 	= "";
-		this.userUniqueId 	= "";
-		this.reciveAmount 	= "0.00";
-		this.reciveDiscount = "0.00";
-		this.reciveVat 		= "0.00";
-		this.reciveTotal 	= "0.00";
-		this.reciveDateFrom = "";
-		this.reciveDateTo	= "";
-		this.usrName		= "";
+		this.reciveNo 			= "";
+		this.reciveDate 		= "";
+		this.reciveType 		= "";
+		this.creditDay 			= "";
+		this.creditExpire 		= "";
+		this.vendorCode 		= "";
+		this.branchName 		= "";
+		this.billNo 			= "";
+		this.priceType 			= "";
+		this.reciveStatus 		= "";
+		this.reciveStatusDesc 	= "";
+		this.userUniqueId 		= "";
+		this.reciveAmount 		= "0.00";
+		this.reciveDiscount 	= "0.00";
+		this.reciveVat 			= "0.00";
+		this.reciveTotal 		= "0.00";
+		this.reciveDateFrom 	= "";
+		this.reciveDateTo		= "";
+		this.usrName			= "";
 	}
 
 	public String getReciveNo() {
@@ -184,5 +186,13 @@ public class ReciveOrderMasterBean {
 
 	public void setUsrName(String usrName) {
 		this.usrName = usrName;
+	}
+
+	public String getReciveStatusDesc() {
+		return reciveStatusDesc;
+	}
+
+	public void setReciveStatusDesc(String reciveStatusDesc) {
+		this.reciveStatusDesc = reciveStatusDesc;
 	}
 }

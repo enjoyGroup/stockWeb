@@ -70,14 +70,10 @@
 			
 		});
 		
-		function lp_sendEditPage(av_val, av_index){
+		function lp_sendEditPage(av_code, av_name){
+			
 			try{
-//				if(la_flagAddSales[av_index].value=="N" || 
-//						(la_flagAddSales[av_index].value=="Y" && (la_chassisDisp[av_index].value!="" && la_engineNoDisp[av_index].value!=""))){
-					window.location.replace(gv_url + "?service=servlet.UserDetailsMaintananceServlet&pageAction=getUserDetail&userUniqueId=" + av_val);
-//				}else{
-//					alert("ไม่อนุญาตให้แก้ไขใบส่งเสิรมการขายโดยตรง");
-//				}
+				window.location.replace(gv_url + "?service=servlet.UserDetailsMaintananceServlet&pageAction=getUserDetail&userUniqueId=" + av_code);
 			}catch(e){
 				alert("lp_sendEditPage :: " + e);
 			}
@@ -154,6 +150,7 @@
 	<form id="frm">
 		<input type="hidden" id="service" 	name="service" value="servlet.UserDetailsSearchServlet" />
 		<input type="hidden" id="userUniqueId" 	name="userUniqueId" value="<%=userDetailsBean.getUserUniqueId()%>" />
+		<input type="hidden" id="pageMode" 	name="pageMode" value="<%=userDetailsSearchForm.getPageMode()%>" />
 		<div id="menu" style="width: 100%;background: black;">
 			<%@ include file="/pages/menu/menu.jsp"%>
 		</div>
@@ -256,7 +253,7 @@
 														for(int i=0;i<dataList.size();i++){
 															bean = dataList.get(i);															
 												%>
-															<tr class="rowSelect" onclick="lp_sendEditPage('<%=bean.getUserUniqueId()%>', <%=i%>)" >
+															<tr class="rowSelect" onclick="lp_sendEditPage('<%=bean.getUserUniqueId()%>', '<%=bean.getUserName()%>');" >
 																<td style="text-align:center"><%=seq%></td>
 																<td><%=bean.getUserName()%></td>
 																<td><%=bean.getUserId()%></td>

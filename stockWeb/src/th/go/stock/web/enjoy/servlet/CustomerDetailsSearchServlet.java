@@ -71,7 +71,7 @@ public class CustomerDetailsSearchServlet extends EnjoyStandardSvc {
  				this.onLoad();
 				request.setAttribute("target", Constants.PAGE_URL +"/CustomerDetailsSearchScn.jsp");
  			}else if(pageAction.equals("search")){
- 				this.onSearch();
+ 				this.onSearch(null);
  			}else if(pageAction.equals("getPage")){
 				this.lp_getPage();
 			}
@@ -107,17 +107,12 @@ public class CustomerDetailsSearchServlet extends EnjoyStandardSvc {
 	private void setRefference() throws EnjoyException{
 		
 		logger.info("[setRefference][Begin]");
-		
-		SessionFactory 		sessionFactory	= null;
-		Session 			session			= null;
 		List<ComboBean> 	comboList		= null;
 		ComboBean			comboBean		= null;
 		
 		try{
-			sessionFactory 	= HibernateUtil.getSessionFactory();
-			session 		= sessionFactory.openSession();
 			
-			comboList = this.dao.getStatusCombo(session);
+			comboList = this.dao.getStatusCombo();
 			
 			if(comboList!=null && comboList.size() > 0){
 				comboBean = comboList.get(0);
@@ -134,18 +129,14 @@ public class CustomerDetailsSearchServlet extends EnjoyStandardSvc {
 			logger.info(e.getMessage());
 			throw new EnjoyException("setRefference is error");
 		}finally{
-			session.close();
-			sessionFactory	= null;
-			session			= null;
 			logger.info("[setRefference][End]");
 		}
 	}
 	
 	
-	private void onSearch() throws EnjoyException{
+	private void onSearch(CustomerDetailsBean 	customerDetailsBean) throws EnjoyException{
 		logger.info("[onSearch][Begin]");
 		
-		CustomerDetailsBean 		customerDetailsBean	= null;
 		SessionFactory 				sessionFactory		= null;
 		Session 					session				= null;
 		List<CustomerDetailsBean> 	dataList 			= null;
@@ -162,12 +153,14 @@ public class CustomerDetailsSearchServlet extends EnjoyStandardSvc {
 			session 					= sessionFactory.openSession();			
 			session.beginTransaction();
 			
-			customerDetailsBean				= new CustomerDetailsBean();
-			
-			customerDetailsBean.setCusCode			(EnjoyUtils.nullToStr(this.request.getParameter("cusCode")));
-			customerDetailsBean.setFullName			(EnjoyUtils.nullToStr(this.request.getParameter("fullName")));
-			customerDetailsBean.setCusStatus		(EnjoyUtils.nullToStr(this.request.getParameter("cusStatus")));
-			customerDetailsBean.setIdNumber			(EnjoyUtils.nullToStr(this.request.getParameter("idNumber")));
+			if(customerDetailsBean==null){
+				customerDetailsBean				= new CustomerDetailsBean();
+				
+				customerDetailsBean.setCusCode			(EnjoyUtils.nullToStr(this.request.getParameter("cusCode")));
+				customerDetailsBean.setFullName			(EnjoyUtils.nullToStr(this.request.getParameter("fullName")));
+				customerDetailsBean.setCusStatus		(EnjoyUtils.nullToStr(this.request.getParameter("cusStatus")));
+				customerDetailsBean.setIdNumber			(EnjoyUtils.nullToStr(this.request.getParameter("idNumber")));
+			}
 			
 			this.form.setCustomerDetailsBean(customerDetailsBean);
 			
@@ -230,29 +223,28 @@ public class CustomerDetailsSearchServlet extends EnjoyStandardSvc {
 		
 	}
 	
-	
 	private void lp_getPage(){
-		   logger.info("[lp_getPage][Begin]");
+	   logger.info("[lp_getPage][Begin]");
+	   
+	   int								pageNum				= 1;
+	   List<CustomerDetailsBean> 		dataList 			= new ArrayList<CustomerDetailsBean>();
+	   
+	   try{
+		   pageNum					= Integer.parseInt(this.request.getParameter("pageNum"));
 		   
-		   int								pageNum				= 1;
-		   List<CustomerDetailsBean> 		dataList 			= new ArrayList<CustomerDetailsBean>();
+		   this.form.setPageNum(pageNum);
 		   
-		   try{
-			   pageNum					= Integer.parseInt(this.request.getParameter("pageNum"));
-			   
-			   this.form.setPageNum(pageNum);
-			   
-			   dataList = (List<CustomerDetailsBean>) this.form.getHashTable().get(pageNum);
-			   this.form.setDataList(dataList);
-			   
-		   }catch(Exception e){
-			   e.printStackTrace();
-		   }finally{
-			   logger.info("[lp_getPage][End]");
-		   }
+		   dataList = (List<CustomerDetailsBean>) this.form.getHashTable().get(pageNum);
+		   this.form.setDataList(dataList);
 		   
+	   }catch(Exception e){
+		   e.printStackTrace();
+	   }finally{
+		   logger.info("[lp_getPage][End]");
 	   }
-	
+	   
+   }
+
 	
 	
 	

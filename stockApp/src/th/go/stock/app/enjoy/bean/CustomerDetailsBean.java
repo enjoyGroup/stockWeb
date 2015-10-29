@@ -8,6 +8,7 @@ public class CustomerDetailsBean {
 	private String cusName;
 	private String cusSurname;
 	private String branchName;
+	private String cusGroupCode;
 	private String sex;
 	private String idType;
 	private String idNumber;
@@ -36,12 +37,14 @@ public class CustomerDetailsBean {
 	private String remark;
 	private String fullName;
 	private String customerStatusName;
+	private String groupSalePrice;
 	
 	public CustomerDetailsBean(){
 		this.cusCode 			= "";
 		this.cusName 			= "";
 		this.cusSurname 		= "";
 		this.branchName			= "";
+		this.cusGroupCode		= "";
 		this.sex 				= "";
 		this.idType 			= "";
 		this.idNumber 			= "";
@@ -70,6 +73,7 @@ public class CustomerDetailsBean {
 		this.remark 			= "";
 		this.fullName 			= "";
 		this.customerStatusName = "";
+		this.groupSalePrice		= "";
 	}
 	
 	public String getCusCode() {
@@ -385,5 +389,19 @@ public class CustomerDetailsBean {
 		this.branchName = branchName;
 	}
 
-	
+	public String getCusGroupCode() {
+		return cusGroupCode;
+	}
+
+	public void setCusGroupCode(String cusGroupCode) {
+		this.cusGroupCode = cusGroupCode;
+	}
+
+	public String getGroupSalePrice() {
+		return groupSalePrice;
+	}
+
+	public void setGroupSalePrice(String groupSalePrice) {
+		this.groupSalePrice = groupSalePrice;
+	}
 }

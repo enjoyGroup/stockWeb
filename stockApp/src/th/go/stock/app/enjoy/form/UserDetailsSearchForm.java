@@ -10,9 +10,8 @@ import th.go.stock.app.enjoy.model.Userprivilege;
 
 public class UserDetailsSearchForm {
 	
-	public static final String NEW 	= "NEW";
-	public static final String EDIT = "EDIT";
-	
+	public static final String NEW 		= "NEW";
+	public static final String EDIT 	= "EDIT";
 	
 	private UserDetailsBean 		userDetailsBean;
 	private List<ComboBean> 		statusCombo;

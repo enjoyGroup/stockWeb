@@ -14,6 +14,7 @@ import org.hibernate.type.StringType;
 import th.go.stock.app.enjoy.bean.ComboBean;
 import th.go.stock.app.enjoy.bean.CustomerDetailsBean;
 import th.go.stock.app.enjoy.exception.EnjoyException;
+import th.go.stock.app.enjoy.form.CustomerDetailsLookUpForm;
 import th.go.stock.app.enjoy.model.Customer;
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
 import th.go.stock.app.enjoy.utils.EnjoyUtils;
@@ -103,6 +104,7 @@ public class CustomerDetailsDao {
 			query.addScalar("remark"			, new StringType());
 			query.addScalar("customerStatusName", new StringType());
 			query.addScalar("branchName"		, new StringType());
+			query.addScalar("cusGroupCode"		, new StringType());
 			
 			list		 	= query.list();
 			
@@ -139,6 +141,7 @@ public class CustomerDetailsDao {
 				logger.info("remark 			:: " + row[25]);
 				logger.info("customerStatusName :: " + row[26]);
 				logger.info("branchName			:: " + row[27]);
+				logger.info("cusGroupCode		:: " + row[28]);
 				
 				bean.setCusCode				(EnjoyUtils.nullToStr(row[0]));
 				bean.setCusName				(EnjoyUtils.nullToStr(row[1]));
@@ -146,7 +149,7 @@ public class CustomerDetailsDao {
 				bean.setSex					(EnjoyUtils.nullToStr(row[3]));
 				bean.setIdType				(EnjoyUtils.nullToStr(row[4]));
 				bean.setIdNumber			(EnjoyUtils.nullToStr(row[5]));
-				bean.setBirthDate			(EnjoyUtils.dateFormat(row[6], "yyyyMMdd", "dd/MM/yyyy"));
+				bean.setBirthDate			(EnjoyUtils.dateToThaiDisplay(row[6]));
 				bean.setReligion			(EnjoyUtils.nullToStr(row[7]));
 				bean.setJob					(EnjoyUtils.nullToStr(row[8]));
 				bean.setBuildingName		(EnjoyUtils.nullToStr(row[9]));
@@ -182,13 +185,14 @@ public class CustomerDetailsDao {
 				bean.setFax					(EnjoyUtils.nullToStr(row[19]));
 				bean.setEmail				(EnjoyUtils.nullToStr(row[20]));
 				bean.setCusStatus			(EnjoyUtils.nullToStr(row[21]));
-				bean.setStartDate			(EnjoyUtils.dateFormat(row[22], "yyyyMMdd", "dd/MM/yyyy"));
-				bean.setExpDate				(EnjoyUtils.dateFormat(row[23], "yyyyMMdd", "dd/MM/yyyy"));
+				bean.setStartDate			(EnjoyUtils.dateToThaiDisplay(row[22]));
+				bean.setExpDate				(EnjoyUtils.dateToThaiDisplay(row[23]));
 				bean.setPoint				(EnjoyUtils.nullToStr(row[24]));
 				bean.setRemark				(EnjoyUtils.nullToStr(row[25]));
 				bean.setCustomerStatusName	(EnjoyUtils.nullToStr(row[26]));
 				bean.setFullName			(fullName);
 				bean.setBranchName			(EnjoyUtils.nullToStr(row[27]));
+				bean.setCusGroupCode		(EnjoyUtils.nullToStr(row[28]));
 				
 				customerDetailsBeanList.add(bean);
 			}	
@@ -222,12 +226,14 @@ public class CustomerDetailsDao {
 		String						provinceName			= null;
 		String						districtName			= null;
 		String						subdistrictName			= null;
+		String						fullName				= "";
 		
 		try{		
 			addressDao 			= new AddressDao();
-			hql					= "select * "
-								+ "	from customer"
-								+ "	where cusCode = '" + customerDetailsBean.getCusCode() + "'";
+			hql					= "select a.*, b.groupSalePrice"
+									+ " from customer a LEFT JOIN relationgroupcustomer b"
+									+ " 	ON a.cusGroupCode = b.cusGroupCode and b.cusGroupStatus = 'A'"
+								+ "	where a.cusCode = '" + customerDetailsBean.getCusCode() + "'";
 			
 			logger.info("[getCustomerDetail] hql :: " + hql);
 
@@ -259,6 +265,8 @@ public class CustomerDetailsDao {
 			query.addScalar("point"				, new StringType());
 			query.addScalar("remark"			, new StringType());
 			query.addScalar("branchName"		, new StringType());
+			query.addScalar("cusGroupCode"		, new StringType());
+			query.addScalar("groupSalePrice"	, new StringType());
 			
 			list		 	= query.list();
 			
@@ -274,7 +282,7 @@ public class CustomerDetailsDao {
 					bean.setSex					(EnjoyUtils.nullToStr(row[3]));
 					bean.setIdType				(EnjoyUtils.nullToStr(row[4]));
 					bean.setIdNumber			(EnjoyUtils.nullToStr(row[5]));
-					bean.setBirthDate			(EnjoyUtils.dateFormat(row[6], "yyyyMMdd", "dd/MM/yyyy"));
+					bean.setBirthDate			(EnjoyUtils.dateToThaiDisplay(row[6]));
 					bean.setReligion			(EnjoyUtils.nullToStr(row[7]));
 					bean.setJob					(EnjoyUtils.nullToStr(row[8]));
 					bean.setBuildingName		(EnjoyUtils.nullToStr(row[9]));
@@ -297,6 +305,8 @@ public class CustomerDetailsDao {
 						subdistrictName		= "";
 					}
 					
+					fullName			= EnjoyUtils.nullToStr(row[1]) + " " + EnjoyUtils.nullToStr(row[2]);
+					
 					bean.setProvinceCode		(provinceCode);
 					bean.setDistrictCode		(districtCode);
 					bean.setSubdistrictCode		(subdistrictCode);
@@ -308,11 +318,14 @@ public class CustomerDetailsDao {
 					bean.setFax					(EnjoyUtils.nullToStr(row[19]));
 					bean.setEmail				(EnjoyUtils.nullToStr(row[20]));
 					bean.setCusStatus			(EnjoyUtils.nullToStr(row[21]));
-					bean.setStartDate			(EnjoyUtils.dateFormat(row[22], "yyyyMMdd", "dd/MM/yyyy"));
-					bean.setExpDate				(EnjoyUtils.dateFormat(row[23], "yyyyMMdd", "dd/MM/yyyy"));
+					bean.setStartDate			(EnjoyUtils.dateToThaiDisplay(row[22]));
+					bean.setExpDate				(EnjoyUtils.dateToThaiDisplay(row[23]));
 					bean.setPoint				(EnjoyUtils.nullToStr(row[24]));
 					bean.setRemark				(EnjoyUtils.nullToStr(row[25]));
 					bean.setBranchName			(EnjoyUtils.nullToStr(row[26]));
+					bean.setCusGroupCode		(EnjoyUtils.nullToStr(row[27]));
+					bean.setGroupSalePrice		(EnjoyUtils.nullToStr(row[28]));
+					bean.setFullName			(fullName);
 					
 				}	
 			}
@@ -332,7 +345,7 @@ public class CustomerDetailsDao {
 		
 	}
 	
-	public List<ComboBean> getStatusCombo(Session session) throws EnjoyException{
+	public List<ComboBean> getStatusCombo() throws EnjoyException{
 		logger.info("[getStatusCombo][Begin]");
 		
 		String						hql						= null;
@@ -340,8 +353,12 @@ public class CustomerDetailsDao {
 		List<Object[]>				list					= null;
 		ComboBean					comboBean				= null;
 		List<ComboBean> 			comboList				= new ArrayList<ComboBean>();
+		SessionFactory 				sessionFactory			= null;
+		Session 					session					= null;
 		
 		try{
+			sessionFactory 	= HibernateUtil.getSessionFactory();
+			session 		= sessionFactory.openSession();
 			
 			hql	= "select * from refcustomerstatus";
 
@@ -372,7 +389,10 @@ public class CustomerDetailsDao {
 			logger.info("[getStatusCombo] " + e.getMessage());
 			throw new EnjoyException("Error getStatusCombo");
 		}finally{
-			hql						= null;
+			session.close();
+			sessionFactory	= null;
+			session			= null;
+			hql				= null;
 			logger.info("[getStatusCombo][End]");
 		}
 		
@@ -392,6 +412,7 @@ public class CustomerDetailsDao {
 			customer.setCusName				(customerDetailsBean.getCusName());
 			customer.setCusSurname			(customerDetailsBean.getCusSurname());
 			customer.setBranchName			(customerDetailsBean.getBranchName());
+			customer.setCusGroupCode		(EnjoyUtils.parseInt(customerDetailsBean.getCusGroupCode()));
 			customer.setSex					(customerDetailsBean.getSex());
 			customer.setIdType				(customerDetailsBean.getIdType());
 			customer.setIdNumber			(customerDetailsBean.getIdNumber());
@@ -439,6 +460,7 @@ public class CustomerDetailsDao {
 			hql				= "update  Customer set cusName 			= :cusName"
 												+ ", cusSurname			= :cusSurname"
 												+ ", branchName			= :branchName"
+												+ ", cusGroupCode		= :cusGroupCode"
 												+ ", sex				= :sex"
 												+ ", idType				= :idType"
 												+ ", idNumber			= :idNumber"
@@ -468,6 +490,7 @@ public class CustomerDetailsDao {
 			query.setParameter("cusName"			, customerDetailsBean.getCusName());
 			query.setParameter("cusSurname"			, customerDetailsBean.getCusSurname());
 			query.setParameter("branchName"			, customerDetailsBean.getBranchName());
+			query.setParameter("cusGroupCode"		, EnjoyUtils.parseInt(customerDetailsBean.getCusGroupCode()));
 			query.setParameter("sex"				, customerDetailsBean.getSex());
 			query.setParameter("idType"				, customerDetailsBean.getIdType());
 			query.setParameter("idNumber"			, customerDetailsBean.getIdNumber());
@@ -656,4 +679,188 @@ public class CustomerDetailsDao {
 		return result;
 	}
 	
+	public List<CustomerDetailsBean> getCustomerDetailsLookUpList(	Session 					session, 
+																	CustomerDetailsLookUpForm 	form) throws EnjoyException{
+		logger.info("[getCustomerDetailsLookUpList][Begin]");
+		
+		String						hql						= null;
+		SQLQuery 					query 					= null;
+		List<Object[]>				list					= null;
+		CustomerDetailsBean 		bean					= null;
+		List<CustomerDetailsBean> 	listData 				= new ArrayList<CustomerDetailsBean>();
+		String						find					= null;
+		AddressDao					addressDao				= null;
+		String						provinceCode			= null;
+		String						districtCode			= null;
+		String						subdistrictCode			= null;
+		String						provinceName			= null;
+		String						districtName			= null;
+		String						subdistrictName			= null;
+		String						fullName				= null;
+		String						column					= "";
+		String						orderBy					= "";
+		
+		try{
+			find				= form.getFind();
+			addressDao 			= new AddressDao();
+			hql					= "select a.*, b.groupSalePrice"
+									+ " from customer a LEFT JOIN relationgroupcustomer b"
+									+ " 	ON a.cusGroupCode = b.cusGroupCode and b.cusGroupStatus = 'A'"
+									+ " where a.cusStatus = 'A'";
+			
+			if(find!=null && !find.equals("")){
+				
+				column 	= form.getColumn().equals("fullName")?"CONCAT(a.cusName, ' ', a.cusSurname)":"a." + form.getColumn();
+				hql 	+= " and " + column;
+				
+				if(form.getLikeFlag().equals("Y")){
+					hql += " like ('" + find + "%')";
+				}else{
+					hql += " = '" + find + "'";
+				}
+				
+			}
+			orderBy = form.getOrderBy().equals("fullName")?"CONCAT(a.cusName, ' ', a.cusSurname)":"a." + form.getOrderBy();
+			hql 	+= " order by " + orderBy + " " + form.getSortBy();
+			
+			logger.info("[getCustomerDetailsLookUpList] hql :: " + hql);
+
+			query			= session.createSQLQuery(hql);			
+			query.addScalar("cusCode"			, new StringType());
+			query.addScalar("cusName"			, new StringType());
+			query.addScalar("cusSurname"		, new StringType());
+			query.addScalar("sex"				, new StringType());
+			query.addScalar("idType"			, new StringType());
+			query.addScalar("idNumber"			, new StringType());
+			query.addScalar("birthDate"			, new StringType());
+			query.addScalar("religion"			, new StringType());
+			query.addScalar("job"				, new StringType());
+			query.addScalar("buildingName"		, new StringType());
+			query.addScalar("houseNumber"		, new StringType());
+			query.addScalar("mooNumber"			, new StringType());
+			query.addScalar("soiName"			, new StringType());
+			query.addScalar("streetName"		, new StringType());
+			query.addScalar("provinceCode"		, new StringType());
+			query.addScalar("districtCode"		, new StringType());
+			query.addScalar("subdistrictCode"	, new StringType());
+			query.addScalar("postCode"			, new StringType());
+			query.addScalar("tel"				, new StringType());
+			query.addScalar("fax"				, new StringType());
+			query.addScalar("email"				, new StringType());
+			query.addScalar("cusStatus"			, new StringType());
+			query.addScalar("startDate"			, new StringType());
+			query.addScalar("expDate"			, new StringType());
+			query.addScalar("point"				, new StringType());
+			query.addScalar("remark"			, new StringType());
+			query.addScalar("branchName"		, new StringType());
+			query.addScalar("cusGroupCode"		, new StringType());
+			query.addScalar("groupSalePrice"	, new StringType());
+			
+			list		 	= query.list();
+			
+			logger.info("[getCustomerDetailsLookUpList] list :: " + list);
+			
+			if(list!=null){
+				logger.info("[getCustomerDetailsLookUpList] list.size() :: " + list.size());
+				
+				for(Object[] row:list){
+					bean 	= new CustomerDetailsBean();
+					
+					logger.info("cusCode 			:: " + row[0]);
+					logger.info("cusName 			:: " + row[1]);
+					logger.info("cusSurname 		:: " + row[2]);
+					logger.info("sex 				:: " + row[3]);
+					logger.info("idType 			:: " + row[4]);
+					logger.info("idNumber 			:: " + row[5]);
+					logger.info("birthDate 			:: " + row[6]);
+					logger.info("religion 			:: " + row[7]);
+					logger.info("job 				:: " + row[8]);
+					logger.info("buildingName 		:: " + row[9]);
+					logger.info("houseNumber 		:: " + row[10]);
+					logger.info("mooNumber 			:: " + row[11]);
+					logger.info("soiName 			:: " + row[12]);
+					logger.info("streetName 		:: " + row[13]);
+					logger.info("provinceCode 		:: " + row[14]);
+					logger.info("districtCode 		:: " + row[15]);
+					logger.info("subdistrictCode 	:: " + row[16]);
+					logger.info("postCode 			:: " + row[17]);
+					logger.info("tel 				:: " + row[18]);
+					logger.info("fax 				:: " + row[19]);
+					logger.info("email 				:: " + row[20]);
+					logger.info("cusStatus 			:: " + row[21]);
+					logger.info("startDate 			:: " + row[22]);
+					logger.info("expDate 			:: " + row[23]);
+					logger.info("point 				:: " + row[24]);
+					logger.info("remark 			:: " + row[25]);
+					logger.info("branchName			:: " + row[26]);
+					logger.info("cusGroupCode		:: " + row[27]);
+					logger.info("groupSalePrice		:: " + row[28]);
+					
+					bean.setCusCode				(EnjoyUtils.nullToStr(row[0]));
+					bean.setCusName				(EnjoyUtils.nullToStr(row[1]));
+					bean.setCusSurname			(EnjoyUtils.nullToStr(row[2]));
+					bean.setSex					(EnjoyUtils.nullToStr(row[3]));
+					bean.setIdType				(EnjoyUtils.nullToStr(row[4]));
+					bean.setIdNumber			(EnjoyUtils.nullToStr(row[5]));
+					bean.setBirthDate			(EnjoyUtils.dateToThaiDisplay(row[6]));
+					bean.setReligion			(EnjoyUtils.nullToStr(row[7]));
+					bean.setJob					(EnjoyUtils.nullToStr(row[8]));
+					bean.setBuildingName		(EnjoyUtils.nullToStr(row[9]));
+					bean.setHouseNumber			(EnjoyUtils.nullToStr(row[10]));
+					bean.setMooNumber			(EnjoyUtils.nullToStr(row[11]));
+					bean.setSoiName				(EnjoyUtils.nullToStr(row[12]));
+					bean.setStreetName			(EnjoyUtils.nullToStr(row[13]));
+					
+					provinceCode 		= EnjoyUtils.nullToStr(row[14]);
+					districtCode 		= EnjoyUtils.nullToStr(row[15]);
+					subdistrictCode 	= EnjoyUtils.nullToStr(row[16]);
+					
+					if(!provinceCode.equals("") && !districtCode.equals("") && !subdistrictCode .equals("")){
+						provinceName		= EnjoyUtils.nullToStr(addressDao.getProvinceName(provinceCode));
+						districtName		= EnjoyUtils.nullToStr(addressDao.getDistrictName(districtCode));
+						subdistrictName		= EnjoyUtils.nullToStr(addressDao.getSubdistrictName(subdistrictCode));
+					}else{
+						provinceName		= "";
+						districtName		= "";
+						subdistrictName		= "";
+					}
+					
+					fullName			= EnjoyUtils.nullToStr(row[1]) + " " + EnjoyUtils.nullToStr(row[2]);
+					
+					bean.setProvinceCode		(provinceCode);
+					bean.setDistrictCode		(districtCode);
+					bean.setSubdistrictCode		(subdistrictCode);
+					bean.setProvinceName		(provinceName);
+					bean.setDistrictName		(districtName);
+					bean.setSubdistrictName		(subdistrictName);
+					bean.setPostCode			(EnjoyUtils.nullToStr(row[17]));
+					bean.setTel					(EnjoyUtils.nullToStr(row[18]));
+					bean.setFax					(EnjoyUtils.nullToStr(row[19]));
+					bean.setEmail				(EnjoyUtils.nullToStr(row[20]));
+					bean.setCusStatus			(EnjoyUtils.nullToStr(row[21]));
+					bean.setStartDate			(EnjoyUtils.dateToThaiDisplay(row[22]));
+					bean.setExpDate				(EnjoyUtils.dateToThaiDisplay(row[23]));
+					bean.setPoint				(EnjoyUtils.nullToStr(row[24]));
+					bean.setRemark				(EnjoyUtils.nullToStr(row[25]));
+					bean.setFullName			(fullName);
+					bean.setBranchName			(EnjoyUtils.nullToStr(row[26]));
+					bean.setCusGroupCode		(EnjoyUtils.nullToStr(row[27]));
+					bean.setGroupSalePrice		(EnjoyUtils.nullToStr(row[28]));
+					
+					listData.add(bean);
+				}	
+			}
+			
+		}catch(Exception e){
+			logger.info("[getCustomerDetailsLookUpList] " + e.getMessage());
+			e.printStackTrace();
+			throw new EnjoyException("เกิดข้อผิดพลาดในการดึง LookUp");
+		}finally{
+			hql						= null;
+			logger.info("[getCustomerDetailsLookUpList][End]");
+		}
+		
+		return listData;
+		
+	}	
 }

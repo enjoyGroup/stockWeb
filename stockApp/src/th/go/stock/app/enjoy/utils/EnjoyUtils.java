@@ -105,7 +105,7 @@ public class EnjoyUtils {
             
 //            df.applyPattern("yyyyMMdd");
             stDate = df.format(date);
-            System.out.println(stDate);
+            System.out.println("currDateThai :: " + stDate);
             
         } catch (Exception e) {
             e.printStackTrace();
@@ -114,32 +114,68 @@ public class EnjoyUtils {
         return stDate;
     }
     
-    public static String dateFormat (Object ao_obj, String av_currFormat, String av_toFormat){
+//    public static String dateFormat(Object ao_obj, String av_currFormat, String av_toFormat){
+//        System.out.println("[FormatUtil][dateFormat][Begin]");
+//        
+//        SimpleDateFormat    dt              = null;
+//        Date                date            = null;
+//        SimpleDateFormat    dt1             = null;
+//        String              dateFormat      = null;
+//        String				lv_val			= "";
+//        
+//        try{
+//        	lv_val = ao_obj==null?"":ao_obj.toString().trim();
+//        	
+//        	System.out.println("[FormatUtil][dateFormat] lv_val 		:: " + lv_val);
+//        	System.out.println("[FormatUtil][dateFormat] av_currFormat 	:: " + av_currFormat);
+//        	System.out.println("[FormatUtil][dateFormat] av_toFormat 	:: " + av_toFormat);
+//        	
+//            if(lv_val==null || lv_val.equals("")){
+//                dateFormat = "";
+//            }else{
+//                dt      = new SimpleDateFormat(av_currFormat); 
+//                date    = dt.parse(lv_val); 
+//                
+//                System.out.println("[FormatUtil][dateFormat] date 	:: " + date);
+//                
+////                dt1     = new SimpleDateFormat(av_toFormat,Locale.US);// ค.ศ.
+//                dt1     = new SimpleDateFormat(av_toFormat, new Locale("th", "TH"));//พ.ศ.
+//                dateFormat = dt1.format(date);
+//                
+//                System.out.println("[FormatUtil][dateFormat] dateFormat 	:: " + dateFormat);
+//            }
+//        }catch(Exception e){
+//                e.printStackTrace();
+//        }finally{
+//            System.out.println("[FormatUtil][dateFormat][End]");
+//        }
+//        
+//        return dateFormat;
+//    }
+    
+    public static String dateThaiToDb(Object ao_obj){
         System.out.println("[FormatUtil][dateFormat][Begin]");
         
-        SimpleDateFormat    dt              = null;
-        Date                date            = null;
-        SimpleDateFormat    dt1             = null;
-        String              dateFormat      = null;
+        String              dateFormat      = "";
         String				lv_val			= "";
+        String				day				= "";
+        String				month			= "";
+        String				year			= "";
+        String[]			date			= null;
         
         try{
         	lv_val = ao_obj==null?"":ao_obj.toString().trim();
         	
-            if(lv_val==null || lv_val.equals("")){
-                dateFormat = "";
-            }else{
-                dt      = new SimpleDateFormat(av_currFormat); 
-                date    = dt.parse(lv_val); 
-//                dt1     = new SimpleDateFormat(av_toFormat,Locale.US);// ค.ศ.
-                dt1     = new SimpleDateFormat(av_toFormat, new Locale("th", "TH"));//พ.ศ.
-                
-                dateFormat = dt1.format(date);
+        	System.out.println("[FormatUtil][dateThaiToDb] lv_val 		:: " + lv_val);
+        	
+            if(!lv_val.equals("")){
+            	date = lv_val.split("/");
+            	dateFormat = date[2] + date[1] + date[0];
             }
         }catch(Exception e){
                 e.printStackTrace();
         }finally{
-            System.out.println("[FormatUtil][dateFormat][End]");
+            System.out.println("[FormatUtil][dateThaiToDb][End]");
         }
         
         return dateFormat;
@@ -420,7 +456,7 @@ public class EnjoyUtils {
         	lv_val = ao_obj==null?"":ao_obj.toString().trim();
         	
         	if (lv_val!=null&&!lv_val.equals("")){	
-        		lv_ret = Double.parseDouble(lv_val);
+        		lv_ret = Double.parseDouble(lv_val.replaceAll(",", ""));
 			} 
         } catch (Exception e) {
         	e.printStackTrace();
@@ -546,17 +582,25 @@ public class EnjoyUtils {
         return dateDB;
     }
     
-    public static String dateToThaiDisplay(String dDate){
-        String 	stDate 	= "";
-        String  day     = "";
-        String  month   = "";
-        String  year    = "";
-        String  display  = "";
-        try{     
-            day    = dDate.substring(6, 8);
-       		month  = dDate.substring(4, 6);
-       		year   = dDate.substring(0, 4);
-       		display = day+"/"+month+"/"+year;
+	/*dd/MM/yyyy*/
+    public static String dateToThaiDisplay(Object dDate){
+        String day     	= "";
+        String month   	= "";
+        String year    	= "";
+        String display  = "";
+        String date		= "";
+        
+        try{ 
+        	
+        	date = dDate==null?"":dDate.toString().trim();
+        	
+        	if(!date.equals("")){
+        		day    	= date.substring(6, 8);
+           		month  	= date.substring(4, 6);
+           		year   	= date.substring(0, 4);
+           		display = day+"/"+month+"/"+year;
+        	}
+        	
 		    System.out.println("EnjoyUtils dateToThaiDisplay : "+ display);
         } catch (Exception e) {
             e.printStackTrace();
