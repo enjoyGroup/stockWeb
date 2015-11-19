@@ -610,7 +610,7 @@
 		            				$("#productCode" + av_seq).val(jsonObj.productCode);
 			            			$("#pricePerUnit" + av_seq).val(jsonObj.pricePerUnit);
 			            			$("#inventory" + av_seq).val(jsonObj.inventory);
-			            			$("#quantity" + av_seq).val('1.00');
+			            			//$("#quantity" + av_seq).val('1.00');
 			            			$("#unitCode" + av_seq).val(jsonObj.unitCode);
 			            			$("#unitName" + av_seq).val(jsonObj.unitName);
 			            			$("#discount" + av_seq).val(jsonObj.discount);

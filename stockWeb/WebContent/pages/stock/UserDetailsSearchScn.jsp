@@ -258,7 +258,7 @@
 																<td><%=bean.getUserName()%></td>
 																<td><%=bean.getUserId()%></td>
 																<td><%=bean.getUserEmail()%></td>
-																<td><%=bean.getUserStatus()%></td>
+																<td><%=bean.getUserStatusName()%></td>
 																<td><%=bean.getUserPrivilege()%></td>
 															</tr>
 												<% 			seq++;

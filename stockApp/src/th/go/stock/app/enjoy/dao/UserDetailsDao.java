@@ -304,16 +304,16 @@ public class UserDetailsDao {
 					userDetailsBean.setTinCompany			(EnjoyUtils.nullToStr(row[1]));
 					userDetailsBean.setUserId				(EnjoyUtils.nullToStr(row[2]));
 					userDetailsBean.setUserName				(EnjoyUtils.nullToStr(row[3]) + "  " + EnjoyUtils.nullToStr(row[4]));
-					userDetailsBean.setUserSurname			(EnjoyUtils.nullToStr(row[5]));
-					userDetailsBean.setUserEmail			(EnjoyUtils.nullToStr(row[6]));
+					userDetailsBean.setUserEmail			(EnjoyUtils.nullToStr(row[5]));
 					userDetailsBean.setUserPrivilege		(privilegeName);
 					userDetailsBean.setUserLevel			(EnjoyUtils.nullToStr(row[7]));
+					userDetailsBean.setUserStatus			(EnjoyUtils.nullToStr(row[8]));
 					userDetailsBean.setFlagChangePassword	(EnjoyUtils.chkBoxtoDb(row[9]));
 					userDetailsBean.setFlagAlertStock		(EnjoyUtils.chkBoxtoDb(row[10]));
 					userDetailsBean.setFlagSalesman			(EnjoyUtils.chkBoxtoDb(row[11]));
 					userDetailsBean.setCommission			(EnjoyUtils.convertFloatToDisplay(row[12], 2));
 					userDetailsBean.setRemark			    (EnjoyUtils.nullToStr(row[13]));
-					userDetailsBean.setUserStatus			(EnjoyUtils.nullToStr(row[14]));
+					userDetailsBean.setUserStatusName		(EnjoyUtils.nullToStr(row[14]));
 					
 					listUserDetailsBean.add(userDetailsBean);
 				}	
@@ -348,7 +348,6 @@ public class UserDetailsDao {
 										+ ", tinCompany"
 										+ ", userId"
 										+ ", userName"
-										+ ", tinCompany"
 										+ ", userSurname"
 										+ ", userEmail"
 										+ ", userPrivilege"

@@ -87,9 +87,9 @@
 </div><!-- headwrap -->
 <div id="m1">
   <ul id="menu1" <%if(userDeatil.getFlagChkCompany().equals("Y")){ %> style="visibility: hidden;"<%}%> >
-  	<li style="width: 180px;"><a href="javascript:void(0);" id="logOut" name="logOut" >ออกจากระบบ</a></li>
+  	<li><a href="javascript:void(0);" id="logOut" name="logOut" >ออกจากระบบ</a></li>
 	<%if(!userDeatil.getUserId().equals(Constants.ADMIN)){ %>
-	<li style="width: 180px;"><a href="<%=servURL1%>/EnjoyGenericSrv?service=servlet.ChangePasswordServlet&pageAction=new">เปลี่ยนรหัสผ่าน</a></li>
+	<li><a href="<%=servURL1%>/EnjoyGenericSrv?service=servlet.ChangePasswordServlet&pageAction=new">เปลี่ยนรหัสผ่าน</a></li>
  	<%} %>
 	<%
 		UserPrivilegeBean 			userPrivilegeBean 		= null;
