@@ -282,7 +282,7 @@ public class UserDetailsMaintananceServlet extends EnjoyStandardSvc {
 			flagAlertStock 				= EnjoyUtil.chkBoxtoDb(request.getParameter("flagAlertStock"));
 			flagSalesman 				= EnjoyUtil.chkBoxtoDb(request.getParameter("flagSalesman"));
 			commission 					= EnjoyUtil.chkBoxtoDb(request.getParameter("commission"));
-			remark 						= EnjoyUtil.chkBoxtoDb(request.getParameter("remark"));
+			remark 						= EnjoyUtil.nullToStr(request.getParameter("remark"));
 			userPrivilege 				= EnjoyUtil.nullToStr(request.getParameter("hidUserPrivilege"));
 			userUniqueId 				= EnjoyUtil.parseInt(request.getParameter("userUniqueId"));
 			userLevel					= userPrivilege.indexOf("R01") > -1?"9":"1";

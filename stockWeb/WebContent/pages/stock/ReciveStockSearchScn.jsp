@@ -41,7 +41,7 @@
 			$('#btnSearch').click(function(){ 
 				try{
 					$.ajax({
-						async:false,
+						async:true,
 			            type: "POST",
 			            url: gv_url,
 			            data: gv_service + "&pageAction=search&" + $('#frm').serialize(),

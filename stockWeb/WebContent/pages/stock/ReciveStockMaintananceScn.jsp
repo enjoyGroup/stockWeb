@@ -548,7 +548,7 @@
 				params 	= "pageAction=save&" + $('#frm').serialize();
 				
 				$.ajax({
-					async:false,
+					async:true,
 		            type: "POST",
 		            url: gv_url,
 		            data: params,

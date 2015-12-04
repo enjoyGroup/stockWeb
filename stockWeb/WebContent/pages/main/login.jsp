@@ -109,7 +109,7 @@
 					
 					params 	= "userId=" + userId + "&passWord=" + pass;
 					$.ajax({
-						async:false,
+						async:true,
 			            type: "POST",
 			            url: url,
 			            data: params,
