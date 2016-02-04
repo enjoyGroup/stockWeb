@@ -956,6 +956,49 @@ window.alert = function(message, successCallback){
 		//event.preventDefault();
 };
 
+window.confirm = function(message, successCallback){
+	
+	gp_progressBarOn();
+	
+	$(document.createElement('div'))
+	    .html("<p>" + message + "</p>")
+	    .dialog({
+	      autoOpen: true,
+	      height: 175,
+	      width: 400,
+	      show: {
+	        effect: "slide",
+	        direction: "down",
+	        duration: 200
+	      },
+	      hide: {
+	        effect: "slide",
+	        direction: "down",
+	        duration: 200
+	      },
+	      close: function() {
+	    	  gp_progressBarOff();
+	    	  $( this ).removeClass( "zoom" );
+	        },
+	      title: "การแจ้งเตือน",
+	      draggable: false,
+        buttons: {
+          Yes: function() {
+	    	  if(successCallback!=null && successCallback != 'undefined'){
+	    		  successCallback();
+	    	  }
+	    	  $( this ).dialog( "close" );
+	    	  return;
+          },
+          No: function() {
+	    	  $( this ).dialog( "close" );
+	    	  return;
+          }
+        },
+	      dialogClass: 'zoom'
+	    });
+};
+
 function gp_dialogPopUp(av_path, av_title){
 	
 	//var lo_dialog = null;

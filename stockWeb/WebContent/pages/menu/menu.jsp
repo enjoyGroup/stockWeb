@@ -57,9 +57,9 @@
 			
 			$('#logOut').click(function(){ 
 				try{
-					if(confirm("ต้องการออกจากระบบ?")){   
-						window.location.replace('<%=servURL1%>');
-					}	
+					confirm("ต้องการออกจากระบบ?", function(){
+						window.location.replace('<%=servURL1%>'); 
+					});
 				}catch(err){
 					alert("logOut :: " + err);
 				}

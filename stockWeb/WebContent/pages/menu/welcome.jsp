@@ -14,6 +14,13 @@
 		<div id="menu" style="width: 100%;background: black;">
 			<%@ include file="/pages/menu/menu.jsp"%>
 		</div>
+		<div id="dialog" title="Look up"></div>
+		<div align="center" class="FreezeScreen" style="display:none;">
+        	<center>
+        		<img id="imgProgress" valign="center" src="<%=imgURL%>/loading36.gif" alt="" />
+        		<span style="font-weight: bold;font-size: large;color: black;">Loading...</span>
+        	</center>
+    	</div>
 	</form>
 </body>
 </html>
