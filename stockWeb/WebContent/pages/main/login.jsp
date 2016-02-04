@@ -85,8 +85,16 @@
 		} 
 		
 		$(document).ready(function(){
+			
+		    if (gp_getCookie("username") != "") {
+		    	$('#username').val(gp_getCookie("username"));
+		    	$('#user_pwd').focus();
+		    }else{
+		    	$('#username').focus();
+		    }
+			
 			$(".form-login").corner();
-			$('#username').focus();				
+			
 			$('#btnLogin').click(function(){
 				var url 	= '<%=servURL%>/EnjoyGenericSrv?service=servlet.LoginServlet';
 				var userId	= null;
@@ -97,13 +105,19 @@
 					userId 	= $('#username').val();
 					pass 	= $('#user_pwd').val();						
 					if (userId == "") {
-						alert("กรุณาระบุรหัสผู้ใช่ก่อนทำการเข้าสู่ระบบ");
-						$('#username').focus();
+						alert("กรุณาระบุรหัสผู้ใช่ก่อนทำการเข้าสู่ระบบ", function() { 
+							$('#username').focus();
+		    		    });
+						//alert("กรุณาระบุรหัสผู้ใช่ก่อนทำการเข้าสู่ระบบ");
+						//$('#username').focus();
 						return false;
 					}
 					if (pass == "") {
-						alert("กรุณาระบุรหัสผ่านก่อนทำการเข้าสู่ระบบ");
-						$('#user_pwd').focus();
+						alert("กรุณาระบุรหัสผ่านก่อนทำการเข้าสู่ระบบ", function() { 
+							$('#user_pwd').focus();
+		    		    });
+						//alert("กรุณาระบุรหัสผ่านก่อนทำการเข้าสู่ระบบ");
+						//$('#user_pwd').focus();
 						return false;
 					}
 					
@@ -113,14 +127,18 @@
 			            type: "POST",
 			            url: url,
 			            data: params,
-			            beforeSend: "",
+			            beforeSend: gp_progressBarOn(),
 			            success: function(data){
+			            	//gp_progressBarOff();
+			            	
 			            	var jsonObj 			= null;
 			            	var status				= null;
 		            		jsonObj = JSON.parse(data);
 		            		status	= jsonObj.status;
 		            		
 		            		if(status=="SUCCESS"){
+		            			
+		            			gp_setCookie("username", userId, 3);
 		            			
 		            			if (jsonObj.flagChkCompany == "Y"){
 		            				window.location.replace('<%=servURL%>/EnjoyGenericSrv?service=servlet.CompanyDetailsMaintananceServlet&pageAction=new');
@@ -173,6 +191,7 @@
 		            </div>	
 			    </div>
 			</div>
+			<div id="dialog" title="Look up"></div>
 			<div align="center" class="FreezeScreen" style="display:none;">
 	        	<center>
 	        		<img id="imgProgress" valign="center" src="<%=imgURL%>/loading36.gif" alt="" />

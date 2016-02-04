@@ -25,7 +25,7 @@
 		var gv_checkFormatIdNumber 	= true;
 		
 		$(document).ready(function(){
-			gp_progressBarOn();
+			//gp_progressBarOn();
 			
 			gv_service 		= "service=" + $('#service').val();
 			
@@ -130,45 +130,46 @@
 			
 			
 			
-			gp_progressBarOff();
+			//gp_progressBarOff();
 			
 		});
 		
 		
 		function lp_validate(){
 			var la_validate             = new Array( "vendorName:บริษัท"	
-													, "branchName:สาขา");
+													, "branchName:สาขา"
+													, "provinceName:จังหวัด"
+													, "districtName:อำเภอ/เขต"
+													, "subdistrictName:ตำบล/แขวง"
+													, "postCode:รหัสไปรษณีย์"
+													, "tel:เบอร์โทร");
 		    var lv_return				= true;
-		    var provinceName			= "";
-		    var districtName			= "";
-		    var subdistrictName			= "";
+		    //var provinceName			= "";
+		    //var districtName			= "";
+		    //var subdistrictName			= "";
 		    
 			try{
-				provinceName		= $("#provinceName").val().trim();
-				districtName		= $("#districtName").val().trim();
-				subdistrictName		= $("#subdistrictName").val().trim();
+				//provinceName		= $("#provinceName").val().trim();
+				//districtName		= $("#districtName").val().trim();
+				//subdistrictName		= $("#subdistrictName").val().trim();
 				
-				for(var i=0;i<la_validate.length;i++){
-					la_temp			= la_validate[i].split(":");
-		            lo_obj          = eval('$("#' + la_temp[0] + '")');
-		            
-		            if(gp_trim(lo_obj.val())==""){
-		            	alert("กรุณาระบุ " + la_temp[1]);
-		            	lo_obj.focus();
-		                return false;
-		            }
-		        }
+				if(!gp_validateEmptyObj(la_validate)){
+					return false;
+				}
 				
 				/*Begin Check เลขประจำตัวผู้เสียภาษี*/
 				if(gv_checkFormatIdNumber==false){
-					alert("เลขประจำตัวผู้เสียภาษีผิด");
-					$("#tin").focus();
+					alert("เลขประจำตัวผู้เสียภาษีผิด", function() { 
+						$("#tin").focus();
+	    		    });
+					//alert("เลขประจำตัวผู้เสียภาษีผิด");
+					//$("#tin").focus();
 	                return false;
 				}
 				/*End Check เลขประจำตัวผู้เสียภาษี*/
 				
 				/*Begin Check จังหวัด อำเภอ/เขต และตำบล/แขวง*/
-				if(provinceName=="" && districtName=="" && subdistrictName==""){
+				/*if(provinceName=="" && districtName=="" && subdistrictName==""){
 					$("#provinceCode").val("");
         			$("#districtCode").val("");
         			$("#subdistrictCode").val("");
@@ -178,7 +179,7 @@
 						alert("กรุณาระบุจังหวัด อำเภอ/เขต และตำบล/แขวงให้ครบ");
 						return false;
 					}
-				}
+				}*/
 				
 				$.ajax({
 					async:false,
@@ -244,14 +245,22 @@
 				lo_postCode 			= document.getElementById("postCode");
 				
 				if(gp_number(lo_postCode)==false){
-					alert("กรุณาระบุตัวเลขเท่านั้น");
-					lo_postCode.value = "";
+					alert("กรุณาระบุตัวเลขเท่านั้น", function() { 
+						//lo_postCode.value = "";
+						$('#postCode').val('');
+						$('#postCode').focus().select();
+	    		    });
+					//alert("กรุณาระบุตัวเลขเท่านั้น");
+					//lo_postCode.value = "";
 					return;
 				}
 				
 				if(gp_trim(lo_postCode.value)!="" && gp_trim(lo_postCode.value).length < 5){
-					alert("ระบุได้รหัสไปรษณ๊ย์ผิด");
-					$('#postCode').focus().select();
+					alert("ระบุได้รหัสไปรษณีย์ผิด", function() { 
+						$('#postCode').focus().select();
+	    		    });
+					//alert("ระบุได้รหัสไปรษณ๊ย์ผิด");
+					//$('#postCode').focus().select();
 					return;
 				}
 				
@@ -273,7 +282,7 @@
 				params 	= "pageAction=save&" + $('#frm').serialize();
 				
 				$.ajax({
-					async:false,
+					async:true,
 		            type: "POST",
 		            url: gv_url,
 		            data: params,
@@ -283,15 +292,17 @@
 		            	var status				= null;
 		            	
 		            	try{
-		            		gp_progressBarOff();
+		            		//gp_progressBarOff();
 		            		
 		            		jsonObj = JSON.parse(data);
 		            		status	= jsonObj.status;
 		            		
 		            		if(status=="SUCCESS"){
-		            			alert("บันทึกเรียบร้อย");
-		            			//window.location = gv_url + "?service=servlet.UserDetailsMaintananceServlet&pageAction=getUserDetail&userUniqueId=" + userUniqueId;
-		            			lp_reset();
+		            			alert("บันทึกเรียบร้อย", function() { 
+		            				lp_reset();
+		    	    		    });
+		            			//alert("บันทึกเรียบร้อย");
+		            			//lp_reset();
 		            		}else{
 		            			alert(jsonObj.errMsg);
 		            			
@@ -335,7 +346,7 @@
 					return;
 				}
 				
-				if(!gp_validatePin(lv_tin)){
+				if(!gp_validatePin("tin")){
 					$("#inValidSpan").css("color", "red");
     				$("#inValidSpan").html("เลขประจำตัวผู้เสียภาษีผิด");
     				
@@ -345,7 +356,7 @@
 					gv_checkFormatIdNumber = true;
 				}
 				
-				$("#tin").val(lv_tin);
+				//$("#tin").val(lv_tin);
 				
 				
 			}catch(e){
@@ -530,7 +541,7 @@
 															/>
 													</td>
 													<td align="right">
-														รหัสไปรษณ๊ย์:
+														รหัสไปรษณีย์:
 													</td>
 													<td align="left" colspan="3">
 														<input  type="text" 

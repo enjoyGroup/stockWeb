@@ -28,12 +28,14 @@
 		var gv_checkFormatTin 	= false;
 		
 		$(document).ready(function(){
-			gp_progressBarOn();
+			//gp_progressBarOn();
 			
 			gv_service 		= "service=" + $('#service').val();
 			
 			if($("#pageMode").val()=="EDIT"){
 				lp_setModeEdit();
+			}else{
+				$("#companyStatusDis").prop('disabled', true);
 			}
 			
 			$( "#provinceName" ).autocomplete({ 
@@ -133,44 +135,52 @@
 			      }
 			});
 			
-			gp_progressBarOff();
+			//gp_progressBarOff();
 			
 		});
 		
 		function lp_validate(){
-			var la_idName               = new Array("tin"				, "companyName"	, "branchName"	, "companyStatus");
-		    var la_msg               	= new Array("เลขประจำตัวผู้เสียภาษี"	, "ชื่อบริษัท"	 	, "สาขาที่"		, "สถานะ");
+			var la_validate             = new Array( "tin:เลขประจำตัวผู้เสียภาษี"	
+													, "companyName:ชื่อบริษัท"
+													, "branchName:สาขาที่"
+													, "provinceName:จังหวัด"
+													, "districtName:อำเภอ/เขต"
+													, "subdistrictName:ตำบล/แขวง"
+													, "postCode:รหัสไปรษณ๊ย์");
+			
+			
 		    var lv_return				= true;
 		    var cou						= 0;
-		    var provinceName			= "";
-		    var districtName			= "";
-		    var subdistrictName			= "";
+		    //var provinceName			= "";
+		    //var districtName			= "";
+		    //var subdistrictName			= "";
 		    
 			try{
 				
-				provinceName	= gp_trim($("#provinceName").val());
-				districtName	= gp_trim($("#districtName").val());
-				subdistrictName	= gp_trim($("#subdistrictName").val());
+				//provinceName	= gp_trim($("#provinceName").val());
+				//districtName	= gp_trim($("#districtName").val());
+				//subdistrictName	= gp_trim($("#subdistrictName").val());
 				
-				for(var i=0;i<la_idName.length;i++){
-		            lo_obj          = eval('$("#' + la_idName[i] + '")');
-		            
-		            if(gp_trim(lo_obj.val())==""){
-		            	alert("กรุณาระบุ " + la_msg[i]);
-		            	lo_obj.focus();
-		                return false;
-		            }
-		        }
+				if(!gp_validateEmptyObj(la_validate)){
+					return false;
+				}
+				
 				//alert(gp_validatePin($("#tin").val()));
 				if(gv_checkFormatTin==false){
-					alert("เลขประจำตัวผู้เสียภาษีผิด");
-					$("#tin").focus();
+					alert("เลขประจำตัวผู้เสียภาษีผิด", function() { 
+						$("#tin").focus();
+	    		    });
+					//alert("เลขประจำตัวผู้เสียภาษีผิด");
+					//$("#tin").focus();
 	                return false;
 				}
 				
 				if(gv_checkDupTin==false){
-					alert("มีเลขประจำตัวผู้เสียภาษีนี้ในระบบแล้ว");
-					$("#userId").focus();
+					alert("มีเลขประจำตัวผู้เสียภาษีนี้ในระบบแล้ว", function() { 
+						$("#userId").focus();
+	    		    });
+					//alert("มีเลขประจำตัวผู้เสียภาษีนี้ในระบบแล้ว");
+					//$("#userId").focus();
 					return false;
 				}
 				
@@ -178,7 +188,7 @@
 					return false;
 				}
 				
-				if(provinceName=="" && districtName=="" && subdistrictName==""){
+				/*if(provinceName=="" && districtName=="" && subdistrictName==""){
 					$("#provinceCode").val("");
         			$("#districtCode").val("");
         			$("#subdistrictCode").val("");
@@ -188,7 +198,7 @@
 						alert("กรุณาระบุจังหวัด อำเภอ/เขต และตำบล/แขวงให้ครบ");
 						return false;
 					}
-				}
+				}*/
 				
 				$.ajax({
 					async:false,
@@ -257,7 +267,7 @@
 					return;
 				}
 				
-				if(!gp_validatePin($("#tin").val())){
+				if(!gp_validatePin("tin")){
 					$("#inValidSpan").css("color", "red");
     				$("#inValidSpan").html("เลขประจำตัวผู้เสียภาษีผิด");
     				
@@ -267,11 +277,9 @@
 					gv_checkFormatTin = true;
 				}
 				
-				$("#tin").val(lv_tin);
-				
 				params 	= "pageAction=checkDupTin&" + $('#frm').serialize();
 				$.ajax({
-					async:false,
+					async:true,
 		            type: "POST",
 		            url: gv_url,
 		            data: params,
@@ -326,14 +334,22 @@
 				lo_postCode 			= document.getElementById("postCode");
 				
 				if(gp_number(lo_postCode)==false){
-					alert("กรุณาระบุตัวเลขเท่านั้น");
-					lo_postCode.value = "";
+					alert("กรุณาระบุตัวเลขเท่านั้น", function() { 
+						//lo_postCode.value = "";
+						$('#postCode').val('');
+						$('#postCode').focus().select();
+	    		    });
+					//alert("กรุณาระบุตัวเลขเท่านั้น");
+					//lo_postCode.value = "";
 					return;
 				}
 				
 				if(gp_trim(lo_postCode.value)!="" && gp_trim(lo_postCode.value).length < 5){
-					alert("ระบุได้รหัสไปรษณ๊ย์ผิด");
-					$('#postCode').focus().select();
+					alert("ระบุได้รหัสไปรษณ๊ย์ผิด", function() { 
+						$('#postCode').focus().select();
+	    		    });
+					//alert("ระบุได้รหัสไปรษณ๊ย์ผิด");
+					//$('#postCode').focus().select();
 					return;
 				}
 				
@@ -355,6 +371,8 @@
 				gv_checkDupTin 		= true;
 				gv_checkFormatTin 	= true;
 				
+				gp_setFormatPin("tin");
+				
 			}catch(e){
 				alert("lp_setModeEdit :: " + e);
 			}
@@ -373,7 +391,7 @@
 				params 	= "pageAction=save&" + $('#frm').serialize();
 				
 				$.ajax({
-					async:false,
+					async:true,
 		            type: "POST",
 		            url: gv_url,
 		            data: params,
@@ -383,19 +401,19 @@
 		            	var status				= null;
 		            	
 		            	try{
-		            		gp_progressBarOff();
+		            		//gp_progressBarOff();
 		            		
 		            		jsonObj = JSON.parse(data);
 		            		status	= jsonObj.status;
 		            		
 		            		if(status=="SUCCESS"){
-		            			alert("บันทึกเรียบร้อย");
-		            			
-		            			if (jsonObj.flagChkCompany == "Y" && jsonObj.FlagChange == "Y"){
-		            				window.location.replace('<%=pagesURL%>/ChangePassScn.jsp');
-		            			} else {
-		            				lp_reset();
-		            			}
+		            			alert("บันทึกเรียบร้อย", function() { 
+		            				if (jsonObj.flagChkCompany == "Y" && jsonObj.FlagChange == "Y"){
+			            				window.location.replace('<%=pagesURL%>/ChangePassScn.jsp');
+			            			} else {
+			            				lp_reset();
+			            			}
+		    	    		    });
 		            			
 		            		}else{
 		            			alert(jsonObj.errMsg);
@@ -424,6 +442,14 @@
 				alert("lp_reset :: " + e);
 			}
 			
+		}
+		
+		function lp_setCompanyStatus(){
+			try{
+				$("#companyStatus").val($("#companyStatusDis").val());
+			}catch(e){
+				alert("lp_setCompanyStatus :: " + e);
+			}
 		}
 		
 	</script>
@@ -463,8 +489,7 @@
 								        					   id="tin" 
 								        					   name='tin' 
 								        					   class="numberOnly"
-								        					   value="<%=companyDetailsBean.getTin() %>" 
-								        					   maxlength="13" 
+								        					   value="<%=companyDetailsBean.getTin() %>"
 								        					   style="width: 250px;" 
 								        					   onchange="lp_checkDupTin();" />
 								        				&nbsp;
@@ -550,7 +575,7 @@
 												</tr>
 												<tr>
 													<td align="right">
-														จังหวัด :
+														จังหวัด <span style="color: red;"><b>*</b></span> :
 													</td>
 													<td align="left" >
 														<input  type="text" 
@@ -562,7 +587,7 @@
 														/>
 													</td>
 													<td align="right">
-														อำเภอ/เขต :
+														อำเภอ/เขต <span style="color: red;"><b>*</b></span> :
 													</td>
 													<td align="left" >
 														<input  type="text"
@@ -576,7 +601,7 @@
 												</tr>
 								        		<tr>
 													<td align="right">
-														ตำบล/แขวง :
+														ตำบล/แขวง <span style="color: red;"><b>*</b></span> :
 													</td>
 													<td align="left" >
 														<input  type="text"
@@ -588,7 +613,7 @@
 															/>
 													</td>
 													<td align="right">
-														รหัสไปรษณ๊ย์:
+														รหัสไปรษณ๊ย์ <span style="color: red;"><b>*</b></span> :
 													</td>
 													<td align="left" >
 														<input  type="text" 
@@ -670,11 +695,12 @@
 								        				สถานะ <span style="color: red;"><b>*</b></span> :
 								        			</td>
 								        			<td align="left" colspan="3">
-								        				<select id="companyStatus" name="companyStatus" style="width: 250px;" >
+								        				<select id="companyStatusDis" name="companyStatusDis" style="width: 250px;" onchange="lp_setCompanyStatus();" >
 								        					<% for(ComboBean comboBean:statusCombo){ %>
 								        					<option value="<%=comboBean.getCode()%>" <%if(companyDetailsBean.getCompanyStatus().equals(comboBean.getCode())){ %> selected <%} %> ><%=comboBean.getDesc()%></option>
 								        					<%} %>
 								        				</select>
+								        				<input type="hidden" id="companyStatus" name="companyStatus" value="<%=companyDetailsBean.getCompanyStatus()%>" />
 								        			</td>
 								        		</tr>
 								        		<tr>
@@ -695,6 +721,7 @@
 				</section>
 			</section>
 		</section>
+		<div id="dialog" title="Look up"></div>
 		<div align="center" class="FreezeScreen" style="display:none;">
         	<center>
         		<img id="imgProgress" valign="center" src="<%=imgURL%>/loading36.gif" alt="" />

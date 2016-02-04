@@ -650,6 +650,35 @@ public class EnjoyUtils {
     	
         return display;
     }
+    
+    public static String formatPin(Object av_pin) throws Exception{
+    	String lv_pin 		= "";
+    	String lv_newPin 	= "";
+    	
+    	try{
+    		if(av_pin!=null){
+    			lv_pin = av_pin.toString().trim().replaceAll("-","");
+    			if(!lv_pin.equals("") && lv_pin.length()==13){
+    				for(int i=0;i<lv_pin.length();i++){
+    					
+    					if(i==1 || i==5 || i==10 || i==12){
+    						lv_newPin += "-" + lv_pin.charAt(i);
+    					}else{
+    						lv_newPin += lv_pin.charAt(i);
+    					}
+    				}
+    			}
+    			
+    		}
+    		
+    		
+    		
+    	}catch(Exception e){
+    		e.printStackTrace();
+    		throw e;
+    	}
+    	return lv_newPin;
+    }
 
      
 	

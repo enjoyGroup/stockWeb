@@ -96,7 +96,7 @@ public class ManageUnitTypeDao {
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			logger.info(e.getMessage());
+			logger.error(e);
 			throw new EnjoyException("Error insertUnitType");
 		}finally{
 			

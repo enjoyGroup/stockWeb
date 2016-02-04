@@ -176,8 +176,8 @@ public class UserDetailsLookUpServlet extends EnjoyStandardSvc {
 			
 			sortByList = new ArrayList<ComboBean>();
 			
-			sortByList.add(new ComboBean("ASC", "ASC"));
-			sortByList.add(new ComboBean("DESC", "DESC"));
+			sortByList.add(new ComboBean("ASC", "เรียงจากน้อยไปมาก"));
+			sortByList.add(new ComboBean("DESC", "เรียงจากมากไปน้อย"));
 			
 			this.form.setSortByList(sortByList);
 		}

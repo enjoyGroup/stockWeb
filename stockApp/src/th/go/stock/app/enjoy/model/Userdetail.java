@@ -1,7 +1,9 @@
 package th.go.stock.app.enjoy.model;
 
 import java.io.Serializable;
+
 import javax.persistence.*;
+
 import java.math.BigDecimal;
 
 
@@ -16,6 +18,7 @@ public class Userdetail implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
+	@GeneratedValue(strategy=GenerationType.AUTO)
 	private int userUniqueId;
 
 	private BigDecimal commission;
@@ -27,8 +30,6 @@ public class Userdetail implements Serializable {
 	private String flagSalesman;
 
 	private String remark;
-
-	private String tinCompany;
 
 	private String userEmail;
 
@@ -95,14 +96,6 @@ public class Userdetail implements Serializable {
 
 	public void setRemark(String remark) {
 		this.remark = remark;
-	}
-
-	public String getTinCompany() {
-		return this.tinCompany;
-	}
-
-	public void setTinCompany(String tinCompany) {
-		this.tinCompany = tinCompany;
 	}
 
 	public String getUserEmail() {

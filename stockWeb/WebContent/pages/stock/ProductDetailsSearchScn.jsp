@@ -30,19 +30,22 @@
 		var gv_checkDupUserId 	= false;
 		
 		$(document).ready(function(){
-			gp_progressBarOn();
+			//gp_progressBarOn();
 			
 			gv_service 		= "service=" + $('#service').val();
 			
-			gp_progressBarOff();
+			//gp_progressBarOff();
 			
 			 
 			$('#btnSearch').click(function(){ 
 				try{
 					
 					if(gp_trim($("#productTypeName").val())==""){
-						alert("กรุณาระบุหมวดสินค้า");
-						$("#productTypeName").focus();
+						alert("กรุณาระบุหมวดสินค้า", function() { 
+							$("#productTypeName").focus();
+		    		    });
+						//alert("กรุณาระบุหมวดสินค้า");
+						//$("#productTypeName").focus();
 						return;
 					}
 					
@@ -525,6 +528,7 @@
 				</section>
 			</section>
 		</section>
+		<div id="dialog" title="Look up"></div>
 		<div align="center" class="FreezeScreen" style="display:none;">
 	        <center>
 	        	<img id="imgProgress" valign="center" src="<%=imgURL%>/loading36.gif" alt="" />

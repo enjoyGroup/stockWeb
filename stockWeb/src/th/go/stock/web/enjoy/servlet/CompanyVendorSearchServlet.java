@@ -125,6 +125,7 @@ public class CompanyVendorSearchServlet extends EnjoyStandardSvc {
 			companyVendorBean.setVendorName			(EnjoyUtils.nullToStr(this.request.getParameter("vendorName")));
 			companyVendorBean.setBranchName			(EnjoyUtils.nullToStr(this.request.getParameter("branchName")));
 			companyVendorBean.setTin				(EnjoyUtils.nullToStr(this.request.getParameter("tin")));
+			companyVendorBean.setTel				(EnjoyUtils.nullToStr(this.request.getParameter("tel")));
 			
 			this.form.setCompanyVendorBean(companyVendorBean);
 			

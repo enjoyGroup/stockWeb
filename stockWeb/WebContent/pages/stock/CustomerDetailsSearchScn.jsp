@@ -31,17 +31,17 @@
 		var gv_checkDupUserId 	= false;
 		
 		$(document).ready(function(){
-			gp_progressBarOn();
+			//gp_progressBarOn();
 			
 			gv_service 		= "service=" + $('#service').val();
 			
-			gp_progressBarOff();
+			//gp_progressBarOff();
 			
 			 
 			$('#btnSearch').click(function(){ 
 				try{
 					$.ajax({
-						async:false,
+						async:true,
 			            type: "POST",
 			            url: gv_url,
 			            data: gv_service + "&pageAction=search&" + $('#frm').serialize(),
@@ -172,7 +172,7 @@
 								        				รหัสลูกค้า  : &nbsp;
 								        			</td>
 								        			<td align="left" width="350px;">
-								        				<input type='text' id="cusCode" name='cusCode' maxlength="5" value="<%=customerDetailsBean.getCusCode() %>" />
+								        				<input type='text' id="cusCode" name='cusCode' value="<%=customerDetailsBean.getCusCode() %>" />
 								        			</td>
 								        			<td align="right">
 								        				ชื่อ-นามสกุล : &nbsp;
@@ -280,6 +280,7 @@
 				</section>
 			</section>
 		</section>
+		<div id="dialog" title="Look up"></div>
 		<div align="center" class="FreezeScreen" style="display:none;">
 	        <center>
 	        	<img id="imgProgress" valign="center" src="<%=imgURL%>/loading36.gif" alt="" />

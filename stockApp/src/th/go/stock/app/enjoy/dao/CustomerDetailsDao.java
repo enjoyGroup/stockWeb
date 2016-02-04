@@ -15,6 +15,7 @@ import th.go.stock.app.enjoy.bean.ComboBean;
 import th.go.stock.app.enjoy.bean.CustomerDetailsBean;
 import th.go.stock.app.enjoy.exception.EnjoyException;
 import th.go.stock.app.enjoy.form.CustomerDetailsLookUpForm;
+import th.go.stock.app.enjoy.main.ConfigFile;
 import th.go.stock.app.enjoy.model.Customer;
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
 import th.go.stock.app.enjoy.utils.EnjoyUtils;
@@ -209,7 +210,6 @@ public class CustomerDetailsDao {
 		return customerDetailsBeanList;
 		
 	}
-
 	
 	public CustomerDetailsBean getCustomerDetail(	Session 					session, 
 													CustomerDetailsBean 		customerDetailsBean) throws EnjoyException{
@@ -370,7 +370,7 @@ public class CustomerDetailsDao {
 			
 			list		 	= query.list();
 			
-			comboList.add(new ComboBean("", "กรุณาระบุ"));
+			//comboList.add(new ComboBean("", "กรุณาระบุ"));
 			for(Object[] row:list){
 				comboBean = new ComboBean();
 				
@@ -403,12 +403,15 @@ public class CustomerDetailsDao {
 	public void insertCustomerDetails(Session session, CustomerDetailsBean customerDetailsBean) throws EnjoyException{
 		logger.info("[insertCustomerDetails][Begin]");
 		
-		Customer	customer						= null;
+		Customer	customer	= null;
+		String		cusCode		= "";
 		
 		try{
 			
-			customer = new Customer();
+			customer 	= new Customer();
+			cusCode		= this.genCusCode();
 			
+			customer.setCusCode				(cusCode);
 			customer.setCusName				(customerDetailsBean.getCusName());
 			customer.setCusSurname			(customerDetailsBean.getCusSurname());
 			customer.setBranchName			(customerDetailsBean.getBranchName());
@@ -514,7 +517,7 @@ public class CustomerDetailsDao {
 			query.setParameter("expDate"			, customerDetailsBean.getExpDate());
 			query.setParameter("point"				, EnjoyUtils.parseInt(customerDetailsBean.getPoint()));
 			query.setParameter("remark"				, customerDetailsBean.getRemark());
-			query.setParameter("cusCode"			, EnjoyUtils.parseInt(customerDetailsBean.getCusCode()));
+			query.setParameter("cusCode"			, customerDetailsBean.getCusCode());
 			
 			query.executeUpdate();
 			
@@ -530,31 +533,42 @@ public class CustomerDetailsDao {
 		}
 	}
 	
-	public int lastId(Session session) throws EnjoyException{
-		logger.info("[lastId][Begin]");
+	public String genCusCode() throws EnjoyException{
+		logger.info("[genCusCode][Begin]");
 		
-		String							hql									= null;
-		List<Integer>			 		list								= null;
-		SQLQuery 						query 								= null;
-		int 							result								= 0;
-		
+		String				hql						= null;
+		List<Integer>		list					= null;
+		SQLQuery 			query 					= null;
+		SessionFactory 		sessionFactory			= null;
+		Session 			session					= null;
+		String				newId					= "";
+		String				codeDisplay				= null;
+		RefconstantcodeDao	refconstantcodeDao		= null;
 		
 		try{
+			sessionFactory 		= HibernateUtil.getSessionFactory();
+			session 			= sessionFactory.openSession();
+			refconstantcodeDao 	= new RefconstantcodeDao();
+			codeDisplay			= refconstantcodeDao.getCodeDisplay("1");
 			
-			hql				= "select max(cusCode) lastId from customer";
+			hql				= "SELECT (MAX(SUBSTRING_INDEX(cusCode, '-', -1)) + 1) AS newId"
+							+ "	FROM customer"
+							+ "	WHERE"
+							+ "		SUBSTRING_INDEX(cusCode, '-', 1) = '" + codeDisplay + "'";
 			query			= session.createSQLQuery(hql);
 			
-			query.addScalar("lastId"			, new IntegerType());
+			
+			query.addScalar("newId"			, new IntegerType());
 			
 			list		 	= query.list();
 			
 			if(list!=null && list.size() > 0){
-				result = list.get(0);
+				newId = codeDisplay + "-" + String.format(ConfigFile.getPadingCusCode(), list.get(0));
+			}else{
+				newId = codeDisplay + "-" + String.format(ConfigFile.getPadingCusCode(), 1);
 			}
 			
-			logger.info("[lastId] result 			:: " + result);
-			
-			
+			logger.info("[genCusCode] newId 			:: " + newId);
 			
 		}catch(Exception e){
 			e.printStackTrace();
@@ -562,13 +576,16 @@ public class CustomerDetailsDao {
 			throw new EnjoyException(e.getMessage());
 		}finally{
 			
-			hql									= null;
-			list								= null;
-			query 								= null;
-			logger.info("[lastId][End]");
+			session.close();
+			sessionFactory	= null;
+			session			= null;
+			hql				= null;
+			list			= null;
+			query 			= null;
+			logger.info("[genCusCode][End]");
 		}
 		
-		return result;
+		return newId;
 	}
 	
 	public int checkDupIdNumber(String idNumber, String cusCode) throws EnjoyException{
@@ -862,5 +879,74 @@ public class CustomerDetailsDao {
 		
 		return listData;
 		
-	}	
+	}
+	
+	public List<CustomerDetailsBean> getCusFullName(CustomerDetailsBean customerDetailsBean) throws EnjoyException{
+		logger.info("[getCusFullName][Begin]");
+		
+		String						hql						= null;
+		SQLQuery 					query 					= null;
+		List<Object[]>				list					= null;
+		CustomerDetailsBean			bean					= null;
+		List<CustomerDetailsBean> 	customerDetailsBeanList = new ArrayList<CustomerDetailsBean>();
+		String						fullName				= null;
+		SessionFactory 				sessionFactory			= null;
+		Session 					session					= null;
+		
+		try{	
+			sessionFactory 		= HibernateUtil.getSessionFactory();
+			session 			= sessionFactory.openSession();
+			hql					= "select * "
+								+ "	from customer"
+								+ "	where cusStatus = 'A'";
+			
+			if(!customerDetailsBean.getFullName().equals("")){
+				hql += " and CONCAT(cusName, ' ', cusSurname) like ('" + customerDetailsBean.getFullName() + "%')";
+			}
+			
+			hql += " order by CONCAT(cusName, ' ', cusSurname) asc limit 10";
+			
+			logger.info("[getCusFullName] hql :: " + hql);
+
+			query			= session.createSQLQuery(hql);			
+			query.addScalar("cusCode"			, new StringType());
+			query.addScalar("cusName"			, new StringType());
+			query.addScalar("cusSurname"		, new StringType());
+			
+			list		 	= query.list();
+			
+			logger.info("[getCusFullName] list.size() :: " + list.size());
+			
+			for(Object[] row:list){
+				bean 	= new CustomerDetailsBean();
+				
+				logger.info("[getCusFullName] cusCode 			:: " + row[0]);
+				logger.info("[getCusFullName] cusName 			:: " + row[1]);
+				logger.info("[getCusFullName] cusSurname 		:: " + row[2]);
+				
+				bean.setCusCode				(EnjoyUtils.nullToStr(row[0]));
+				
+				fullName			= EnjoyUtils.nullToStr(row[1]) + " " + EnjoyUtils.nullToStr(row[2]);
+				
+				bean.setFullName			(fullName);
+				
+				customerDetailsBeanList.add(bean);
+			}	
+			
+		}catch(Exception e){
+			logger.error(e);
+			e.printStackTrace();
+			throw new EnjoyException("error getCusFullName");
+		}finally{
+			session.close();
+			sessionFactory		= null;
+			session				= null;
+			hql					= null;
+			logger.info("[getCusFullName][End]");
+		}
+		
+		return customerDetailsBeanList;
+		
+	}
+	
 }

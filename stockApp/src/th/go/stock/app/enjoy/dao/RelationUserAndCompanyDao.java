@@ -184,4 +184,53 @@ public class RelationUserAndCompanyDao {
 		}
 	}
 	
+	public int countForCheckLogin(int userUniqueId) throws EnjoyException{
+		logger.info("[countForCheckLogin][Begin]");
+		
+		String						hql					= null;
+		List<Integer>			 	list				= null;
+		SQLQuery 					query 				= null;
+		int 						result				= 0;
+		SessionFactory 				sessionFactory		= null;
+		Session 					session				= null;
+		
+		
+		try{
+			sessionFactory 				= HibernateUtil.getSessionFactory();
+			session 					= sessionFactory.openSession();			
+			
+			hql				= "select count(*) cou from relationuserncompany"
+								+ " where userUniqueId 	= " + userUniqueId;
+			
+			query			= session.createSQLQuery(hql);
+			
+			query.addScalar("cou"			, new IntegerType());
+			
+			list		 	= query.list();
+			
+			if(list!=null && list.size() > 0){
+				result = list.get(0);
+			}
+			
+			logger.info("[countForCheckLogin] result 			:: " + result);
+			
+			
+			
+		}catch(Exception e){
+			logger.error(e);
+			e.printStackTrace();
+		}finally{
+			session.close();
+			
+			sessionFactory	= null;
+			session			= null;
+			hql				= null;
+			list			= null;
+			query 			= null;
+			logger.info("[countForCheckLogin][End]");
+		}
+		
+		return result;
+	}
+	
 }

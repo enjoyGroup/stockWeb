@@ -24,11 +24,11 @@
 		//var gv_checkFormatIdNumber 	= true;
 		
 		$(document).ready(function(){
-			gp_progressBarOn();
+			//gp_progressBarOn();
 			
 			gv_service 		= "service=" + $('#service').val();
 			
-			gp_progressBarOff();
+			//gp_progressBarOff();
 				
 		});
 			
@@ -41,8 +41,11 @@
 				
 				for(var i=0;i<la_codeDisplay.length;i++){
 					if(la_codeDisplay[i].value.trim()==""){
-						alert("กรุณาระบุรหัสเอกสาร");
-						la_codeDisplay[i].focus();
+						alert("กรุณาระบุรหัสเอกสาร", function() { 
+							la_codeDisplay[i].focus();
+		    		    });
+						//alert("กรุณาระบุรหัสเอกสาร");
+						//la_codeDisplay[i].focus();
 						return false;
 					}
 				}
@@ -69,7 +72,7 @@
 				params 	= "pageAction=save&" + $('#frm').serialize();
 				
 				$.ajax({
-					async:false,
+					async:true,
 		            type: "POST",
 		            url: gv_url,
 		            data: params,
@@ -79,14 +82,17 @@
 		            	var status				= null;
 		            	
 		            	try{
-		            		gp_progressBarOff();
+		            		//gp_progressBarOff();
 		            		
 		            		jsonObj = JSON.parse(data);
 		            		status	= jsonObj.status;
 		            		
 		            		if(status=="SUCCESS"){
-		            			alert("บันทึกเรียบร้อย");
-		            			lp_reset();
+		            			alert("บันทึกเรียบร้อย", function() { 
+		            				lp_reset();
+				    		    });
+		            			//alert("บันทึกเรียบร้อย");
+		            			//lp_reset();
 		            		}else{
 		            			alert(jsonObj.errMsg);
 		            			
@@ -113,14 +119,18 @@
 		}		
 
 		function lp_updateRecord(av_val){
-			var params					= "";
+			var params				= "";
+			var lv_flagYear			= "N";
 			
 			try{
-				
+				if($("#flagYear" + av_val + ":checked").length > 0){
+					lv_flagYear = "Y";
+				}
 				params 	= gv_service + "&pageAction=updateRecord&id=" + av_val 
 												 + "&codeDisplay=" 	+ $("#codeDisplay" + av_val).val() .trim()
 												 + "&codeNameTH=" 	+ $("#codeNameTH" + av_val).val() .trim()
-												 + "&codeNameEN=" 	+ $("#codeNameEN" + av_val).val() .trim();
+												 + "&codeNameEN=" 	+ $("#codeNameEN" + av_val).val() .trim()
+												 + "&flagYear=" 	+ lv_flagYear;
 				
 				$.ajax({
 					async:false,
@@ -179,9 +189,10 @@
 									        <table class="table sim-panel-result-table" id="resultData">
 												<tr height="26px;">
 													<th  style="text-align: center;" width="5%" ><B>ลำดับ</B></th>
+													<th  style="text-align: center;" width="5%"><B>มีปีนำหน้า</B></th>
 													<th  style="text-align: center;" width="25%"><B>รหัสเอกสาร</B></th>
 													<th  style="text-align: center;" width="35%"><B>ชื่อเอกสาร(ไทย)</B></th>
-													<th  style="text-align: center;" width="35%"><B>ชื่อเอกสาร(อังกฤษ)</th>
+													<th  style="text-align: center;" width="30%"><B>ชื่อเอกสาร(อังกฤษ)</B></th>
 												</tr> 
 												<%
  													int					  	seq		= 1;
@@ -192,12 +203,21 @@
 													<td style="text-align:center">
 														<%=seq%>
 													</td>
+													<td style="text-align:center">
+														<input type="checkbox" 
+															   id="flagYear<%=bean.getId()%>" 
+															   name="flagYear" 
+															   <%if(bean.getFlagYear().equals("Y")){%>checked="checked"<%}%>
+															   onclick="lp_updateRecord('<%=bean.getId()%>');"
+															   value="Y" />
+													</td>
 													<td align="left">
 														<input type="text" 
 															   style="width: 100%"
 															   id="codeDisplay<%=bean.getId()%>" 
 															   name="codeDisplay" 
 															   onblur="lp_updateRecord('<%=bean.getId()%>');"
+															   maxlength="3"
 															   value="<%=bean.getCodeDisplay()%>" />
 														<input type="hidden" id="id<%=bean.getId()%>" name="id" value="<%=bean.getId()%>" />
 													</td>

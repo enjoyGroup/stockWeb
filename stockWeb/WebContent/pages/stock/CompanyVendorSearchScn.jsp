@@ -30,17 +30,17 @@
 		var gv_checkDupUserId 	= false;
 		
 		$(document).ready(function(){
-			gp_progressBarOn();
+			//gp_progressBarOn();
 			
 			gv_service 		= "service=" + $('#service').val();
 			
-			gp_progressBarOff();
+			//gp_progressBarOff();
 			
 			 
 			$('#btnSearch').click(function(){ 
 				try{
 					$.ajax({
-						async:false,
+						async:true,
 			            type: "POST",
 			            url: gv_url,
 			            data: gv_service + "&pageAction=search&" + $('#frm').serialize(),
@@ -186,6 +186,12 @@
 										        			<td align="left" width="350px;">
 										        				<input type='text' id="tin" name='tin' value="<%=companyVendorBean.getTin() %>" />
 										        			</td>
+										        			<td align="right">
+										        				เบอร์โทร : &nbsp;
+										        			</td>
+										        			<td align="left">
+										        				<input type="text" id="tel" name='tel' value="<%=companyVendorBean.getTel() %>" />
+										        			</td>
 										        		</tr>
 										        		<tr>
 										        			<td align="left" colspan="2">
@@ -215,12 +221,13 @@
 													<th  style="text-align: center;" width="15%"><B>เลขประจำตัวผู้เสียภาษี</B></th>
 													<th  style="text-align: center;" width="15%"><B>ชื่อบริษัท</B></th> 
 													<th  style="text-align: center;" width="15%"><B>สาขา</B></th> 
-													<th  style="text-align: center;" width="50%"><B>ที่อยู่</B></th>
+													<th  style="text-align: center;" width="40%"><B>ที่อยู่</B></th>
+													<th  style="text-align: center;" width="10%"><B>เบอร์โทร</B></th>
 												</tr> 
 											</thead>
 											<tfoot>
 												<tr height="26px;">
-													<td colspan="5" align="right">
+													<td colspan="6" align="right">
 														<span style="top: -3px;">จำนวน&nbsp;</span>
 														<input type="text" id="i_txt_nvt_totalresult" name="i_txt_nvt_totalresult" style="top:0px;left:0px;width: 50px;"  readonly="readonly" value="<%=companyVendorSearchForm.getTotalRecord()%>" >
 														<span style="top: -3px;">&nbsp;รายการ&nbsp;&nbsp;</span>
@@ -251,11 +258,12 @@
 																<td><%=bean.getVendorName()%></td>
 																<td><%=bean.getBranchName()%></td>
 																<td><%=bean.getAddress()%></td>
+																<td><%=bean.getTel()%></td>
 															</tr>
 												<% 			seq++;
 														} 
 													} else{  %>
-														<tr height="26px;"><td colspan="5" align="center"><b>ไม่พบข้อมูลที่ระบุ</b></td></tr>
+														<tr height="26px;"><td colspan="6" align="center"><b>ไม่พบข้อมูลที่ระบุ</b></td></tr>
 												<%  } %>  
 											</tbody>
 										</table>
@@ -268,6 +276,7 @@
 				</section>
 			</section>
 		</section>
+		<div id="dialog" title="Look up"></div>
 		<div align="center" class="FreezeScreen" style="display:none;">
 	        <center>
 	        	<img id="imgProgress" valign="center" src="<%=imgURL%>/loading36.gif" alt="" />

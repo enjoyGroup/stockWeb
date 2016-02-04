@@ -13,7 +13,10 @@ import javax.servlet.http.HttpSession;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
+import th.go.stock.app.enjoy.bean.ComboBean;
 import th.go.stock.app.enjoy.bean.UserDetailsBean;
 import th.go.stock.app.enjoy.dao.UserDetailsDao;
 import th.go.stock.app.enjoy.exception.EnjoyException;
@@ -74,6 +77,8 @@ public class UserDetailsSearchServlet extends EnjoyStandardSvc {
  				this.onSearchUserDetail();
  			}else if(pageAction.equals("getPage")){
 				this.lp_getPage();
+			}else if(pageAction.equals("userFullNameList")){
+				this.userFullNameList();
 			}
  			
  			session.setAttribute(FORM_NAME, this.form);
@@ -108,14 +113,9 @@ public class UserDetailsSearchServlet extends EnjoyStandardSvc {
 		
 		logger.info("[setRefference][Begin]");
 		
-		SessionFactory 		sessionFactory	= null;
-		Session 			session			= null;
-		
 		try{
-			sessionFactory 	= HibernateUtil.getSessionFactory();
-			session 		= sessionFactory.openSession();
 			
-			this.form.setStatusCombo(this.dao.getRefuserstatusCombo(session));
+			this.setStatusCombo();
 			
 		}catch(EnjoyException e){
 			throw new EnjoyException(e.getMessage());
@@ -123,13 +123,30 @@ public class UserDetailsSearchServlet extends EnjoyStandardSvc {
 			logger.info(e.getMessage());
 			throw new EnjoyException("setRefference is error");
 		}finally{
-			session.close();
-			sessionFactory	= null;
-			session			= null;
 			logger.info("[setRefference][End]");
 		}
 	}
 	
+	private void setStatusCombo() throws EnjoyException{
+		
+		List<ComboBean> 	comboList		= new ArrayList<ComboBean>();
+		List<ComboBean> 	comboListDb		= null;
+		
+		try{
+			comboListDb = this.dao.getRefuserstatusCombo();
+			
+			comboList.add(new ComboBean("", "ทั้งหมด"));
+			for(ComboBean bean:comboListDb){
+				comboList.add(new ComboBean(bean.getCode(), bean.getDesc()));
+			}
+			
+			this.form.setStatusCombo(comboList);
+			
+		}catch(Exception e){
+			logger.error(e);
+			throw new EnjoyException("setStatusCombo is error");
+		}
+	}	
 	
 	private void onSearchUserDetail() throws EnjoyException{
 		logger.info("[onSearchUserDetail][Begin]");
@@ -170,7 +187,7 @@ public class UserDetailsSearchServlet extends EnjoyStandardSvc {
 			logger.info("[onSearchUserDetail] userId 	 :: " + userDetailsBean.getUserId());
 			logger.info("[onSearchUserDetail] userStatus :: " + userDetailsBean.getUserStatus());
 			
-			listUserprivilege 			= this.dao.getUserprivilege(session);
+			listUserprivilege 			= this.dao.getUserprivilege();
 			for(int i=0;i<listUserprivilege.size();i++){
 				userprivilege			= listUserprivilege.get(i);
 				fUserprivilege.put(userprivilege.getPrivilegeCode() , userprivilege.getPrivilegeName());
@@ -258,6 +275,42 @@ public class UserDetailsSearchServlet extends EnjoyStandardSvc {
 		   logger.info("[lp_getPage][End]");
 	   }
    }
+	
+	private void userFullNameList(){
+		   logger.info("[userFullNameList][Begin]");
+		   
+		   String							userName		= null;
+		   List<ComboBean> 					list 			= null;
+	       JSONArray 						jSONArray 		= null;
+	       JSONObject 						objDetail 		= null;
+	       
+		   try{
+			   userName			= EnjoyUtils.nullToStr(this.request.getParameter("userName"));
+			   jSONArray 		= new JSONArray();
+			   
+			   logger.info("[userFullNameList] userName 			:: " + userName);
+			   
+			   
+			   list 		= this.dao.userFullNameList(userName);
+			   
+			   for(ComboBean bean:list){
+				   objDetail 		= new JSONObject();
+				   
+				   objDetail.put("id"			,bean.getCode());
+				   objDetail.put("value"		,bean.getDesc());
+				   
+				   jSONArray.add(objDetail);
+			   }
+			   
+			   this.enjoyUtil.writeMSG(jSONArray.toString());
+			   
+		   }catch(Exception e){
+			   e.printStackTrace();
+			   logger.info("[userFullNameList] " + e.getMessage());
+		   }finally{
+			   logger.info("[userFullNameList][End]");
+		   }
+	   }
 	
 	
 	

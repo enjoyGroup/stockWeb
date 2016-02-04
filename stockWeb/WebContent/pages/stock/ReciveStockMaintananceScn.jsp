@@ -31,8 +31,7 @@
 		//var gv_checkFormatIdNumber 	= true;
 		
 		$(document).ready(function(){
-			gp_progressBarOn();
-			
+			//gp_progressBarOn();
 			gv_service 		= "service=" + $('#service').val();
 			
 			if($("#pageMode").val()=="EDIT"){
@@ -40,104 +39,6 @@
 			}else{
 				lp_setModeNew();
 			}
-			
-			/*$( "#provinceName" ).autocomplete({ 
-				 source: function(request, response) {
-		            $.ajax({
-		            	async:false,
-			            type: "POST",
-		                url: gv_url,
-		                dataType: "json",
-		                data: gv_service + "&pageAction=p&provinceName=" + gp_trim(request.term),//request,
-		                success: function( data, textStatus, jqXHR) {
-		                    var items = data; 
-		                    response(items);
-		                },
-		                error: function(jqXHR, textStatus, errorThrown){
-		                     alert( textStatus);
-		                }
-		            });
-		          },
-			      minLength: 0,//กี่ตัวอักษรถึงทำงาน
-			      open: function() {
-						//Data return กลับมาแล้วทำไรต่อ
-			      },
-			      close: function() {
-
-			      },
-			      focus:function(event,ui) {
-
-			      },
-			      select: function( event, ui ) {
-			    	//เมื่อเลือก Data แล้ว
-			    	//alert(ui.item.id);
-			      }
-			});
-			
-			
-			$( "#districtName" ).autocomplete({
-				 source: function(request, response) {
-		            $.ajax({
-		            	async:false,
-			            type: "POST",
-		                url: gv_url,
-		                dataType: "json",
-		                data: gv_service + "&pageAction=d&provinceName=" + gp_trim($( "#provinceName" ).val()) + "&districtName=" + gp_trim(request.term),//request,
-		                success: function( data, textStatus, jqXHR) {
-		                    var items = data;
-		                    response(items);
-		                },
-		                error: function(jqXHR, textStatus, errorThrown){
-		                     alert( textStatus);
-		                }
-		            });
-		          },
-			      minLength: 0,//กี่ตัวอักษรถึงทำงาน
-			      open: function() {
-						//Data return กลับมาแล้วทำไรต่อ
-			      },
-			      close: function() {
-
-			      },
-			      focus:function(event,ui) {
-
-			      },
-			      select: function( event, ui ) {
-			    	//เมื่อเลือก Data แล้ว
-			      }
-			});
-			
-			$( "#subdistrictName" ).autocomplete({
-				 source: function(request, response) {
-		            $.ajax({
-		            	async:false,
-			            type: "POST",
-		                url: gv_url,
-		                dataType: "json",
-		                data: gv_service + "&pageAction=s&provinceName=" + gp_trim($( "#provinceName" ).val()) + "&districtName=" + gp_trim($( "#districtName" ).val()) + "&subdistrictName=" + gp_trim(request.term),//request,
-		                success: function( data, textStatus, jqXHR) {
-		                    var items = data;
-		                    response(items);
-		                },
-		                error: function(jqXHR, textStatus, errorThrown){
-		                     alert( textStatus);
-		                }
-		            });
-		          },
-			      minLength: 0,//กี่ตัวอักษรถึงทำงาน
-			      open: function() {
-						//Data return กลับมาแล้วทำไรต่อ
-			      },
-			      close: function() {
-
-			      },
-			      focus:function(event,ui) {
-
-			      },
-			      select: function( event, ui ) {
-			    	//เมื่อเลือก Data แล้ว
-			      }
-			});*/
 			
 			$("input[name=productName]").live("focus",function(){
 				$(this).autocomplete({
@@ -154,7 +55,7 @@
 			                   response(items);
 			               },
 			               error: function(jqXHR, textStatus, errorThrown){
-			                    alert( textStatus);
+			            	   alert( textStatus);
 			               }
 			           });
 			         },
@@ -243,7 +144,7 @@
 			      }
 			});
 			
-			$( "#dialog" ).dialog({
+			/*$( "#dialog" ).dialog({
 		      autoOpen: false,
 		      height: 600,
 		      width: 1050,
@@ -260,7 +161,7 @@
 		    	  $( "#dialog" ).removeClass( "zoom" );
 		        },
 		      dialogClass: 'zoom'
-		    });
+		    });*/
 			
 			$( "#btnZoom" ).live("click", function(event){
 				
@@ -269,7 +170,9 @@
 				
 				try{
 					
-					lo_dialog 	= $( "#dialog" );
+					gp_dialogPopUp("/stockWeb/EnjoyGenericSrv?service=servlet.ProductDetailsLookUpServlet&pageAction=new", "เลือกสินค้า");
+					
+					/*lo_dialog 	= $( "#dialog" );
 					lo_iframe	= $("<iframe />").attr("src", "/stockWeb/EnjoyGenericSrv?service=servlet.ProductDetailsLookUpServlet&pageAction=new")
 												 .attr("width", "100%")
 												 .attr("height", "100%")
@@ -279,13 +182,13 @@
 					lo_dialog.empty();
 					lo_dialog.dialog("option", "title", "เลือกสินค้า");
 					lo_dialog.append(lo_iframe).dialog( "open" );
-					event.preventDefault();
+					event.preventDefault();*/
 				}catch(e){
 					alert("btnZoom :: " + e);
 				}
 		    });
 			
-			gp_progressBarOff();
+			//gp_progressBarOff();
 			
 		});
 		
@@ -315,16 +218,9 @@
 				//subdistrictName		= $("#subdistrictName").val().trim();
 				lv_currReciveStatus = $("#currReciveStatus").val().trim();
 				
-				for(var i=0;i<la_validate.length;i++){
-					la_temp			= la_validate[i].split(":");
-		            lo_obj          = eval('$("#' + la_temp[0] + '")');
-		            
-		            if(gp_trim(lo_obj.val())==""){
-		            	alert("กรุณาระบุ " + la_temp[1]);
-		            	lo_obj.focus();
-		                return false;
-		            }
-		        }
+				if(!gp_validateEmptyObj(la_validate)){
+					return false;
+				}
 				
 				if(lv_currReciveStatus=="3" || lv_currReciveStatus=="4"){
 					return true;
@@ -379,13 +275,19 @@
 				/*Begin Check รายการสินค้า*/
 				for(var i=0;i<la_productName.length;i++){
 					if(la_productName[i].value.trim()==""){
-						alert("กรุณาระบุสินค้า");
-						la_productName[i].focus();
+						alert("กรุณาระบุสินค้า", function() { 
+							la_productName[i].focus();
+		    		    });
+						//alert("กรุณาระบุสินค้า");
+						//la_productName[i].focus();
 						return false;
 					}else{
 						if(la_productCode[i].value.trim()==""){
-							alert("ระบุสินค้าชื่อสินค้าผิดกรุณาตรวจสอบ");
-							la_productName[i].focus();
+							alert("ระบุสินค้าชื่อสินค้าผิดกรุณาตรวจสอบ", function() { 
+								la_productName[i].focus();
+			    		    });
+							//alert("ระบุสินค้าชื่อสินค้าผิดกรุณาตรวจสอบ");
+							//la_productName[i].focus();
 							return false;
 						}
 					}
@@ -467,14 +369,20 @@
 				lo_postCode 			= document.getElementById("postCode");
 				
 				if(gp_number(lo_postCode)==false){
-					alert("กรุณาระบุตัวเลขเท่านั้น");
-					lo_postCode.value = "";
+					alert("กรุณาระบุตัวเลขเท่านั้น", function() { 
+						lo_postCode.value = "";
+	    		    });
+					//alert("กรุณาระบุตัวเลขเท่านั้น");
+					//lo_postCode.value = "";
 					return;
 				}
 				
 				if(gp_trim(lo_postCode.value)!="" && gp_trim(lo_postCode.value).length < 5){
-					alert("ระบุได้รหัสไปรษณ๊ย์ผิด");
-					$('#postCode').focus().select();
+					alert("ระบุได้รหัสไปรษณ๊ย์ผิด", function() { 
+						$('#postCode').focus().select();
+	    		    });
+					//alert("ระบุได้รหัสไปรษณ๊ย์ผิด");
+					//$('#postCode').focus().select();
 					return;
 				}
 				
@@ -531,6 +439,8 @@
 		function lp_setModeNew(){
 			try{
 				$("#reciveStatus").prop("disabled", true);
+				lp_ctrllReciveType();
+				lp_calReciveVat();
 			}catch(e){
 				alert("setModeNew :: " + e);
 			}
@@ -556,17 +466,21 @@
 		            success: function(data){
 		            	var jsonObj 			= null;
 		            	var status				= null;
+		            	var lv_reciveNo			= "";
 		            	
 		            	try{
-		            		gp_progressBarOff();
+		            		//gp_progressBarOff();
 		            		
 		            		jsonObj = JSON.parse(data);
 		            		status	= jsonObj.status;
 		            		
 		            		if(status=="SUCCESS"){
-		            			alert("บันทึกเรียบร้อย");
-		            			//window.location = gv_url + "?service=servlet.UserDetailsMaintananceServlet&pageAction=getUserDetail&userUniqueId=" + userUniqueId;
-		            			lp_reset();
+		            			alert("บันทึกเรียบร้อย", function() { 
+		            				lv_reciveNo = jsonObj.reciveNo;
+		            				window.location = gv_url + "?service=" + $("#service").val() + "&pageAction=getDetail&reciveNo=" + lv_reciveNo;
+		    	    		    });
+		            			//alert("บันทึกเรียบร้อย");
+		            			//lp_reset();
 		            		}else{
 		            			alert(jsonObj.errMsg);
 		            			
@@ -1095,6 +1009,10 @@
 		            			$("#vendorCode").val(jsonObj.vendorCode);
 		            			$("#vendorName").val(jsonObj.vendorName);
 		            			$("#branchName").val(jsonObj.branchName);
+		            			/*$("#tin").val(jsonObj.tin);
+		            			gp_setFormatPin("tin");
+		            			$("#vendorName").val(jsonObj.vendorName);
+		            			$("#branchName").val(jsonObj.branchName);
 		            			$("#buildingName").val(jsonObj.buildingName);
 		            			$("#houseNumber").val(jsonObj.houseNumber);
 		            			$("#mooNumber").val(jsonObj.mooNumber);
@@ -1110,7 +1028,7 @@
 		            			$("#tel").val(jsonObj.tel);
 		            			$("#fax").val(jsonObj.fax);
 		            			$("#email").val(jsonObj.email);
-		            			$("#remark").val(jsonObj.remark);
+		            			$("#remark").val(jsonObj.remark);*/
 		            			
 		            		}else{
 		            			errMsg 	= jsonObj.errMsg;
@@ -1146,13 +1064,20 @@
 							$("#creditDay").attr('class', 'input-disabled');
 							$("#creditExpire").attr('class', 'input-disabled');
 							
+							$('#creditExpire').next("img").hide();
+							//$('#creditExpire').next("button").prop("disabled", true);//ใช้ได้เพราะกรณีเป็น button
+							
 							break;
 						}else{
 							$('#creditDay').attr('readonly', false);
 							$('#creditExpire').attr('readonly', false);
 							
 							$("#creditDay").attr('class', '');
-							$("#creditExpire").attr('class', '');
+							$("#creditExpire").attr('class', 'dateFormat');
+							
+							$('#creditExpire').next("img").show();
+							//$('#creditExpire').next("button").prop("disabled", false);
+							
 							break;
 						}
 					}
@@ -1232,7 +1157,9 @@
 				
 				lv_param = "&productCode=" + lv_productCode + "&productName=" + lv_productName;
 				
-				lo_dialog 	= $( "#dialog" );
+				gp_dialogPopUp("/stockWeb/EnjoyGenericSrv?service=servlet.ComparePriceServlet&pageAction=lookup" + lv_param, "เปรียบเทียบราคา" + lv_productName);
+				
+				/*lo_dialog 	= $( "#dialog" );
 				lo_iframe	= $("<iframe />").attr("src", "/stockWeb/EnjoyGenericSrv?service=servlet.ComparePriceServlet&pageAction=lookup" + lv_param)
 											 .attr("width", "100%")
 											 .attr("height", "100%")
@@ -1244,45 +1171,33 @@
 				lo_dialog.dialog("option", "title", "เปรียบเทียบราคา" + lv_productName);
 				
 				lo_dialog.append(lo_iframe).dialog( "open" );
-				event.preventDefault();
+				event.preventDefault();*/
 			}catch(e){
 				alert("lp_comparePrice :: " + e);
 			}
 		}
 		
-		/*function lp_checkIdNumber(){
+		function lp_showCompVenDetail(){
 			
-			var lv_tin 		= null;
+			var lv_vendorCode = "";
 			
 			try{
-				lv_tin = gp_trim($("#tin").val());
 				
-				$("#inValidSpan").html("");
+				lv_vendorCode = $("#vendorCode").val().trim();
 				
-				if(lv_tin==""){
-					gv_checkFormatIdNumber = true;
+				if(lv_vendorCode==""){
+					alert("ระบุบริษัทหรือสาขาไม่ถูกต้อง", function(){
+						$("#vendorName").focus();
+					});
 					return;
 				}
 				
-				if(!gp_validatePin(lv_tin)){
-					$("#inValidSpan").css("color", "red");
-    				$("#inValidSpan").html("เลขประจำตัวผู้เสียภาษีผิด");
-    				
-    				gv_checkFormatIdNumber = false;
-	                return;
-				}else{
-					gv_checkFormatIdNumber = true;
-				}
-				
-				$("#tin").val(lv_tin);
-				
-				
+				gp_dialogPopUp("/stockWeb/EnjoyGenericSrv?service=servlet.CompanyVendorDisplayServlet&pageAction=getDetail&vendorCode=" + lv_vendorCode, "รายละเอียดผู้จำหน่าย");
 			}catch(e){
-				alert("lp_checkIdNumber :: " + e);
+				alert("lp_showCompVenDetail :: " + e);
 			}
-		}*/
-
-
+		}
+		
 	</script>
 </head>
 <body>
@@ -1330,6 +1245,7 @@
 								        					   maxlength="100" 
 								        					   onblur="lp_getCompanyVendorDetail();"
 								        					   style="width: 220px;" />
+								        				<img alt="รายละเอียดผู้จำหน่าย" title="รายละเอียดผู้จำหน่าย" src="<%=imgURL%>/lookup.png" width="30" height="30" border="0" onclick="lp_showCompVenDetail();" />
 								        			</td>
 								        			<td align="right">
 														สาขา<span style="color: red;"><b>*</b></span> :
@@ -1344,195 +1260,6 @@
 								        					   style="width: 220px;" />
 								        			</td>
 									        	</tr>
-									        	<tr>
-								        			<td align="right">
-														เลขประจำตัวผู้เสียภาษี :
-													</td>
-								        			<td align="left" colspan="5">
-								        				<input  type="text" 
-								        						id="tin" 
-								        						name="tin" 
-								        						class="numberOnly"
-								        						style="width: 200px;"
-								        						disabled="disabled"
-								        						onblur="lp_checkIdNumber();"
-								        						value="<%=companyVendorBean.getTin()%>" 
-								        						maxlength="13"  />
-								        				&nbsp;
-								        				<span id="inValidSpan"></span>
-								        			</td>
-									        	</tr>
-								        		<tr>
-													<td align="right">
-														บ้านเลขที่ :
-													</td>
-													<td align="left">
-														<input  type="text"
-																id="houseNumber" 
-																name="houseNumber"
-																disabled="disabled"
-																value="<%=companyVendorBean.getHouseNumber() %>" />
-													</td>
-													<td align="right">
-														หมู่ที่:
-													</td>
-													<td align="left" colspan="3">
-														<input type="text"
-															   id="mooNumber" 
-															   name="mooNumber"
-															   disabled="disabled"
-															   value="<%=companyVendorBean.getMooNumber() %>" />
-													</td>
-												</tr>
-								        		<tr>
-													<td align="right">
-														อาคาร:
-													</td>
-													<td colspan="5" align="left" >
-														<input  type="text" 
-																id="buildingName" 
-																name="buildingName"
-																disabled="disabled"
-																style="width: 220px;"
-																value="<%=companyVendorBean.getBuildingName()%>"
-														/>
-													</td>													
-												</tr>
-												<tr>
-													<td align="right">
-														ตรอกซอย:
-													</td>
-													<td align="left" >
-														<input  type="text" 
-																id="soiName" 
-																name="soiName"
-																disabled="disabled"
-																style="width: 220px;"
-																value="<%=companyVendorBean.getSoiName() %>"
-														/>
-													</td>
-													<td align="right">
-														ถนน:
-													</td>
-													<td align="left" colspan="3">
-														<input  type="text" 
-																id="streetName" 
-																name="streetName"
-																maxlength="250" 
-																disabled="disabled"
-																style="width: 220px;"
-																value="<%=companyVendorBean.getStreetName() %>"
-														/>
-													</td>
-												</tr>
-												<tr>
-													<td align="right">
-														จังหวัด :
-													</td>
-													<td align="left" >
-														<input  type="text" 
-																id="provinceName" 
-																name="provinceName"
-																placeholder="จังหวัด"
-																disabled="disabled"
-																style="width: 220px;"
-																value="<%=companyVendorBean.getProvinceName() %>"
-														/>
-													</td>
-													<td align="right">
-														อำเภอ/เขต :
-													</td>
-													<td align="left" colspan="3">
-														<input  type="text"
-																id="districtName" 
-																name="districtName"
-																placeholder="อำเภอ"
-																disabled="disabled"
-																style="width: 220px;"
-																value="<%=companyVendorBean.getDistrictName() %>"
-														/>
-													</td>
-												</tr>
-								        		<tr>
-													<td align="right">
-														ตำบล/แขวง :
-													</td>
-													<td align="left" >
-														<input  type="text"
-																	id="subdistrictName" 
-																	name="subdistrictName"
-																	placeholder="ตำบล"
-																	disabled="disabled"
-																	style="width: 220px;"
-																	value="<%=companyVendorBean.getSubdistrictName() %>"
-															/>
-													</td>
-													<td align="right">
-														รหัสไปรษณ๊ย์:
-													</td>
-													<td align="left" colspan="3">
-														<input  type="text" 
-																size="7"
-																id="postCode" 
-																name="postCode"
-																maxlength="5"
-																disabled="disabled"
-																placeholder="รหัสไปรษณ๊ย์"
-																onchange="lp_onBlurPostCode();"
-																value="<%=companyVendorBean.getPostCode() %>"
-														/>
-													</td>
-												</tr>
-								        		<tr>
-								        			<td align="right">
-								        				เบอร์โทร :
-								        			</td>
-								        			<td align="left">
-								        				<input  type="text" 
-								        						id="tel" 
-								        						name="tel" 
-								        						class="telOnly"
-								        						disabled="disabled"
-								        						style="width: 220px;"
-								        						value="<%=companyVendorBean.getTel()%>" 
-								        						maxlength="50"  />
-								        			</td>
-								        			<td align="right">
-								        				เบอร์ Fax :
-								        			</td>
-								        			<td align="left">
-								        				<input  type="text" 
-								        						id="fax" 
-								        						name="fax" 
-								        						class="telOnly"
-								        						disabled="disabled"
-								        						style="width: 220px;"
-								        						value="<%=companyVendorBean.getFax()%>" 
-								        						maxlength="50" />
-								        			</td>
-								        			<td align="right">
-								        				E-mail :
-								        			</td>
-								        			<td align="left">
-								        				<input  type="text" 
-								        						id="email" 
-								        						name="email" 
-								        						disabled="disabled"
-								        						style="width: 220px;"
-								        						value="<%=companyVendorBean.getEmail()%>" 
-								        						maxlength="200"  />
-								        			</td>
-								        		</tr>
-								        		<tr>
-								        			<td align="right">
-								        				หมายเหต :
-								        			</td>
-								        			<td align="left" colspan="5">
-								        				<textarea rows="4" style="width: 500px;" id="remark" name="remark" disabled="disabled" >
-								        					<%=companyVendorBean.getRemark()%>
-								        				</textarea>
-								        			</td>
-								        		</tr>
 								        		<tr>
 								        			<td align="right">
 								        				เลขที่บิล :

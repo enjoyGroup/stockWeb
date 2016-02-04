@@ -26,11 +26,11 @@
 		var gv_jsonGroupSalePriceCombo 	= '<%=relationGroupCustomerForm.getJsonGroupSalePriceCombo()%>';
 		
 		$(document).ready(function(){
-			gp_progressBarOn();
+			//gp_progressBarOn();
 			
 			gv_service 		= "service=" + $('#service').val();
 			
-			gp_progressBarOff();
+			//gp_progressBarOff();
 			
 		});
 		
@@ -47,12 +47,18 @@
 				/*Begin Check รายการสินค้า*/
 				for(var i=0;i<la_cusGroupName.length;i++){
 					if(la_cusGroupName[i].value.trim()==""){
-						alert("กรุณาระบุชื่อกลุ่มลูกค้า");
-						la_cusGroupName[i].focus();
+						alert("กรุณาระบุชื่อกลุ่มลูกค้า", function() { 
+							la_cusGroupName[i].focus();
+		    		    });
+						//alert("กรุณาระบุชื่อกลุ่มลูกค้า");
+						//la_cusGroupName[i].focus();
 						return false;
 					}else if(la_groupSalePrice[i].value.trim()==""){
-						alert("กรุณาระบุใช้ราคาสินค้า");
-						la_groupSalePrice[i].focus();
+						alert("กรุณาระบุใช้ราคาสินค้า", function() { 
+							la_groupSalePrice[i].focus();
+		    		    });
+						//alert("กรุณาระบุใช้ราคาสินค้า");
+						//la_groupSalePrice[i].focus();
 						return false;
 					}
 				}
@@ -89,14 +95,17 @@
 		            	var status				= null;
 		            	
 		            	try{
-		            		gp_progressBarOff();
+		            		//gp_progressBarOff();
 		            		
 		            		jsonObj = JSON.parse(data);
 		            		status	= jsonObj.status;
 		            		
 		            		if(status=="SUCCESS"){
-		            			alert("บันทึกเรียบร้อย");
-		            			lp_reset();
+		            			alert("บันทึกเรียบร้อย", function() { 
+		            				lp_reset();
+				    		    });
+		            			//alert("บันทึกเรียบร้อย");
+		            			//lp_reset();
 		            		}else{
 		            			alert(jsonObj.errMsg);
 		            			

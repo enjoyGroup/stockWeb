@@ -22,11 +22,11 @@
 		var gv_checkFormatIdNumber 	= false;
 		
 		$(document).ready(function(){
-			gp_progressBarOn();
+			//gp_progressBarOn();
 			
 			gv_service 		= "service=" + $('#service').val();
 			
-			gp_progressBarOff();
+			//gp_progressBarOff();
 			
 		});
 		
@@ -39,9 +39,24 @@
 				
 				for(var i=0;i<la_unitName.length;i++){
 					if(gp_trim(la_unitName[i].value)==""){
-		            	alert("กรุณาระบุชื่อหน่วยสินค้า");
-		            	la_unitName[i].focus();
+						alert("กรุณาระบุชื่อหน่วยสินค้า", function() { 
+							la_unitName[i].focus();
+    	    		    });
+						
+		            	//alert("กรุณาระบุชื่อหน่วยสินค้า");
+		            	//la_unitName[i].focus();
 		                return false;
+		            }else{
+		            	for(var j=(i+1);j<la_unitName.length;j++){
+		            		if(gp_trim(la_unitName[i].value)==gp_trim(la_unitName[j].value)){
+		            			alert("ชื่อหน่วยสินค้า \"" + la_unitName[i].value + "\" มีอยู่ในระบบแล้ว", function() { 
+		            				la_unitName[i].focus();
+		    	    		    });
+		            			//alert("ชื่อหน่วยสินค้า \"" + la_unitName[i].value + "\" มีอยู่ในระบบแล้ว");
+				            	//la_unitName[i].focus();
+				                return false;
+		            		}
+		            	}
 		            }
 				}
 				
@@ -228,7 +243,7 @@
 				params 	= "pageAction=save&" + $('#frm').serialize();
 				
 				$.ajax({
-					async:false,
+					async:true,
 		            type: "POST",
 		            url: gv_url,
 		            data: params,
@@ -238,14 +253,17 @@
 		            	var status				= null;
 		            	
 		            	try{
-		            		gp_progressBarOff();
+		            		//gp_progressBarOff();
 		            		
 		            		jsonObj = JSON.parse(data);
 		            		status	= jsonObj.status;
 		            		
 		            		if(status=="SUCCESS"){
-		            			alert("บันทึกเรียบร้อย");
-		            			lp_reset();
+		            			alert("บันทึกเรียบร้อย", function() { 
+		            				lp_reset();
+		    	    		    });
+		            			//alert("บันทึกเรียบร้อย");
+		            			//lp_reset();
 		            		}else{
 		            			alert(jsonObj.errMsg);
 		            			

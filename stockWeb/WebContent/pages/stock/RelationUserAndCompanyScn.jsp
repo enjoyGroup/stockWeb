@@ -22,11 +22,11 @@
 		var gv_url 					= '<%=servURL%>/EnjoyGenericSrv';
 		
 		$(document).ready(function(){
-			gp_progressBarOn();
+			//gp_progressBarOn();
 			
 			gv_service 		= "service=" + $('#service').val();
 			
-			$( "#dialog" ).dialog({
+			/*$( "#dialog" ).dialog({
 		      autoOpen: false,
 		      height: 600,
 		      width: 1050,
@@ -43,16 +43,17 @@
 		    	  $( "#dialog" ).removeClass( "zoom" );
 		        },
 		      dialogClass: 'zoom'
-		    });
+		    });*/
 			
 			$( "#btnZoom" ).live("click", function(event){
 				
-				var lo_dialog = null;
-				var lo_iframe = null;
+				//var lo_dialog = null;
+				//var lo_iframe = null;
 				
 				try{
+					gp_dialogPopUp("/stockWeb/EnjoyGenericSrv?service=servlet.UserDetailsLookUpServlet&pageAction=new", "ค้นหาผู้ใช้งานระบบ");
 					
-					lo_dialog 	= $( "#dialog" );
+					/*lo_dialog 	= $( "#dialog" );
 					lo_iframe	= $("<iframe />").attr("src", "/stockWeb/EnjoyGenericSrv?service=servlet.UserDetailsLookUpServlet&pageAction=new")
 												 .attr("width", "100%")
 												 .attr("height", "100%")
@@ -62,7 +63,7 @@
 					lo_dialog.empty();
 					lo_dialog.dialog("option", "title", "ค้นหาผู้ใช้งานระบบ");
 					lo_dialog.append(lo_iframe).dialog( "open" );
-					event.preventDefault();
+					event.preventDefault();*/
 				}catch(e){
 					alert("btnZoom :: " + e);
 				}
@@ -71,13 +72,16 @@
 			$('#btnSearch').click(function(){ 
 				try{
 					if(gp_trim($("#companyName").val())==""){
-		            	alert("กรุณาระบุชื่อบริษัท");
-		            	$("#companyName").focus();
+						alert("กรุณาระบุชื่อบริษัท", function() { 
+							$("#companyName").focus();
+		    		    });
+		            	//alert("กรุณาระบุชื่อบริษัท");
+		            	//$("#companyName").focus();
 		                return;
 		            }
 					
 					$.ajax({
-						async:false,
+						async:true,
 			            type: "POST",
 			            url: gv_url,
 			            data: gv_service + "&pageAction=search&" + $('#frm').serialize(),
@@ -171,7 +175,7 @@
 			      }
 			});
 				
-			gp_progressBarOff();
+			//gp_progressBarOff();
 				
 		});
 			
@@ -384,7 +388,7 @@
 				params 	= "pageAction=save&" + $('#frm').serialize();
 				
 				$.ajax({
-					async:false,
+					async:true,
 		            type: "POST",
 		            url: gv_url,
 		            data: params,
@@ -394,14 +398,17 @@
 		            	var status				= null;
 		            	
 		            	try{
-		            		gp_progressBarOff();
+		            		//gp_progressBarOff();
 		            		
 		            		jsonObj = JSON.parse(data);
 		            		status	= jsonObj.status;
 		            		
 		            		if(status=="SUCCESS"){
-		            			alert("บันทึกเรียบร้อย");
-		            			lp_reset();
+		            			alert("บันทึกเรียบร้อย", function() { 
+		            				lp_reset();
+				    		    });
+		            			//alert("บันทึกเรียบร้อย");
+		            			//lp_reset();
 		            		}else{
 		            			alert(jsonObj.errMsg);
 		            			

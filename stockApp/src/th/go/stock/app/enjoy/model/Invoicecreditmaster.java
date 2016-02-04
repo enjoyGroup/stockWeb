@@ -19,7 +19,7 @@ public class Invoicecreditmaster implements Serializable {
 
 	private String branchName;
 
-	private int cusCode;
+	private String cusCode;
 
 	private String invoiceCash;
 
@@ -64,11 +64,11 @@ public class Invoicecreditmaster implements Serializable {
 		this.branchName = branchName;
 	}
 
-	public int getCusCode() {
-		return this.cusCode;
+	public String getCusCode() {
+		return cusCode;
 	}
 
-	public void setCusCode(int cusCode) {
+	public void setCusCode(String cusCode) {
 		this.cusCode = cusCode;
 	}
 

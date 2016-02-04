@@ -1,6 +1,7 @@
 package th.go.stock.app.enjoy.model;
 
 import java.io.Serializable;
+
 import javax.persistence.*;
 
 
@@ -14,6 +15,7 @@ public class Relationgroupcustomer implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
+	@GeneratedValue(strategy=GenerationType.AUTO)
 	private int cusGroupCode;
 
 	private String cusGroupName;

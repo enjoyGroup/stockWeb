@@ -28,7 +28,7 @@
 		var gv_checkDupUserId 	= false;
 		
 		$(document).ready(function(){
-			gp_progressBarOn();
+			//gp_progressBarOn();
 			
 			gv_service 		= "service=" + $('#service').val();
 			
@@ -36,17 +36,22 @@
 			
 			if($("#pageMode").val()=="EDIT"){
 				lp_setModeEdit();
+			}else{
+				$("#userStatusDis").prop('disabled', true);
 			}
 			
 			lp_ctrlCommission();
 			
-			gp_progressBarOff();
+			//gp_progressBarOff();
 			
 		});
 		
 		function lp_validate(){
-			var la_idName               = new Array("userName", "userSurname", "userId", "userEmail", "userStatus", "tinCompany");
-		    var la_msg               	= new Array("ชื่อ"	  , "นามสกุล"	 , "User ID", "E-mail", "สถานะ", "บริษัท");
+		    var la_validate             = new Array( "userName:ชื่อ"	
+													, "userSurname:นามสกุล"
+													, "userId:User ID"
+													, "userEmail:E-mail");
+		    
 		    var lo_flagSalesman 		= null;
 			var lo_commission 			= null;
 		    
@@ -55,19 +60,16 @@
 				lo_flagSalesman 	= document.getElementById("flagSalesman");
 				lo_commission 		= document.getElementById("commission");
 				
-				for(var i=0;i<la_idName.length;i++){
-		            lo_obj          = eval('$("#' + la_idName[i] + '")');
-		            
-		            if(gp_trim(lo_obj.val())==""){
-		            	alert("กรุณาระบุ " + la_msg[i]);
-		            	lo_obj.focus();
-		                return false;
-		            }
-		        }
+				if(!gp_validateEmptyObj(la_validate)){
+					return false;
+				}
 				
 				if(gv_checkDupUserId==false){
-					alert("มี userid นี้ในระบบแล้ว");
-					$("#userId").focus();
+					alert("มี userid นี้ในระบบแล้ว", function() { 
+						$("#userId").focus();
+	    		    });
+					//alert("มี userid นี้ในระบบแล้ว");
+					//$("#userId").focus();
 					return false;
 				}
 				
@@ -187,6 +189,11 @@
 			
 			try{
 				
+				if($('input[name="chkUserPrivilege"]:checked').length<=0){
+                    alert("กรุณาเลือกสิทธิ์การใช้ระบบอย่างน้อย 1 รายการ");
+                    return;
+                }
+				
 				la_chkUserPrivilege = document.getElementsByName("chkUserPrivilege");
 				
 				for(var i=0;i<la_chkUserPrivilege.length;i++){
@@ -224,7 +231,7 @@
 			params 	= "pageAction=save&" + $('#frm').serialize();
 			
 			$.ajax({
-				async:false,
+				async:true,
 	            type: "POST",
 	            url: gv_url,
 	            data: params,
@@ -235,17 +242,18 @@
 	            	var userUniqueId		= 0;
 	            	
 	            	try{
-	            		gp_progressBarOff();
+	            		//gp_progressBarOff();
 	            		
 	            		jsonObj = JSON.parse(data);
 	            		status	= jsonObj.status;
 	            		
 	            		if(status=="SUCCESS"){
 	            			userUniqueId = jsonObj.userUniqueId;
-	            			
-	            			alert("บันทึกเรียบร้อย");
-	            			//window.location = gv_url + "?service=servlet.UserDetailsMaintananceServlet&pageAction=getUserDetail&userUniqueId=" + userUniqueId;
-	            			lp_reset();
+	            			alert("บันทึกเรียบร้อย", function() { 
+	            				lp_reset();
+	    	    		    });
+	            			//alert("บันทึกเรียบร้อย");
+	            			//lp_reset();
 	            		}else{
 	            			alert(jsonObj.errMsg);
 	            			
@@ -339,6 +347,14 @@
 			}
 		}
 		
+		function lp_setUserStatus(){
+			try{
+				$("#userStatus").val($("#userStatusDis").val());
+			}catch(e){
+				alert("lp_setUserStatus :: " + e);
+			}
+		}
+		
 	</script>
 </head>
 <body>
@@ -414,23 +430,12 @@
 								        				สถานะ <span style="color: red;"><b>*</b></span> :&nbsp;
 								        			</td>
 								        			<td align="left">
-								        				<select id="userStatus" name="userStatus" style="width: 250px;">
+								        				<select id="userStatusDis" name="userStatusDis" style="width: 250px;" onchange="lp_setUserStatus();">
 								        					<% for(ComboBean comboBean:refuserstatusCombo){ %>
 								        					<option value="<%=comboBean.getCode()%>" <%if(userDetailsBean.getUserStatus().equals(comboBean.getCode())){ %> selected <%} %> ><%=comboBean.getDesc()%></option>
 								        					<%} %>
 								        				</select>
-								        			</td>
-								        		</tr>
-								        		<tr>
-								        			<td align="right">
-								        				บริษัท <span style="color: red;"><b>*</b></span> :&nbsp;
-								        			</td>
-								        			<td align="left">
-								        				<select id="tinCompany" name="tinCompany" style="width: 250px;">
-								        					<% for(ComboBean comboBean:companyCombo){ %>
-								        					<option value="<%=comboBean.getCode()%>" <%if(userDetailsBean.getTinCompany().equals(comboBean.getCode())){ %> selected <%} %> ><%=comboBean.getDesc()%></option>
-								        					<%} %>
-								        				</select>
+								        				<input type="hidden" id="userStatus" name="userStatus" value="<%=userDetailsBean.getUserStatus()%>" />
 								        			</td>
 								        		</tr>
 								        		<tr>
@@ -534,6 +539,7 @@
 		</section>
 		</section>
 		</section>
+		<div id="dialog" title="Look up"></div>
 		<div align="center" class="FreezeScreen" style="display:none;">
         	<center>
         		<img id="imgProgress" valign="center" src="<%=imgURL%>/loading36.gif" alt="" />

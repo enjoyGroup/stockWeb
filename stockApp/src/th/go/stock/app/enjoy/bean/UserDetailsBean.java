@@ -5,7 +5,6 @@ import java.util.ArrayList;
 public class UserDetailsBean {
 	
 	private int 							userUniqueId;
-	private String							tinCompany;
 	private String 							userId;
 	private String 							userName;
 	private String 							userSurname;
@@ -28,7 +27,6 @@ public class UserDetailsBean {
 	
 	public UserDetailsBean(){
 		this.userUniqueId		= 0;
-		this.tinCompany			= "";
 		this.userId				= "";
 		this.userName			= "";
 		this.userSurname		= "";
@@ -208,13 +206,5 @@ public class UserDetailsBean {
 
 	public void setRemark(String remark) {
 		this.remark = remark;
-	}
-
-	public String getTinCompany() {
-		return tinCompany;
-	}
-
-	public void setTinCompany(String tinCompany) {
-		this.tinCompany = tinCompany;
 	}
 }

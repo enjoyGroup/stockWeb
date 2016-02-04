@@ -1,6 +1,8 @@
 package th.go.stock.web.enjoy.servlet;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -11,6 +13,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.json.simple.JSONObject;
 
+import th.go.stock.app.enjoy.bean.ComboBean;
 import th.go.stock.app.enjoy.bean.UserDetailsBean;
 import th.go.stock.app.enjoy.dao.CompanyDetailsDao;
 import th.go.stock.app.enjoy.dao.UserDetailsDao;
@@ -98,7 +101,7 @@ public class UserDetailsMaintananceServlet extends EnjoyStandardSvc {
 		
 		try{
 			
-			this.form.getUserDetailsBean().setUserStatus("1");
+			this.form.getUserDetailsBean().setUserStatus("A");
 			this.setRefference();
 			
 			this.form.setTitlePage("เพิ่มผู้ใช้งานระบบ");
@@ -119,16 +122,10 @@ public class UserDetailsMaintananceServlet extends EnjoyStandardSvc {
 		
 		logger.info("[setRefference][Begin]");
 		
-		SessionFactory 		sessionFactory	= null;
-		Session 			session			= null;
-		
 		try{
-			sessionFactory 	= HibernateUtil.getSessionFactory();
-			session 		= sessionFactory.openSession();
-			
-			this.form.setStatusCombo(this.dao.getRefuserstatusCombo(session));
-			this.form.setUserprivilegeList(this.dao.getUserprivilege(session));
-			this.form.setCompanyCombo(this.companyDetailsDao.getCompanyCombo(session));
+			this.setStatusCombo();
+			this.form.setUserprivilegeList(this.dao.getUserprivilege());
+			this.setCompanyCombo();
 			
 		}catch(EnjoyException e){
 			throw new EnjoyException(e.getMessage());
@@ -136,10 +133,48 @@ public class UserDetailsMaintananceServlet extends EnjoyStandardSvc {
 			logger.info(e.getMessage());
 			throw new EnjoyException("setRefference is error");
 		}finally{
-			session.close();
-			sessionFactory	= null;
-			session			= null;
 			logger.info("[setRefference][End]");
+		}
+	}
+	
+	private void setStatusCombo() throws EnjoyException{
+		
+		List<ComboBean> 	comboList		= new ArrayList<ComboBean>();
+		List<ComboBean> 	comboListDb		= null;
+		
+		try{
+			comboListDb = this.dao.getRefuserstatusCombo();
+			
+			for(ComboBean bean:comboListDb){
+				comboList.add(new ComboBean(bean.getCode(), bean.getDesc()));
+			}
+			
+			this.form.setStatusCombo(comboList);
+			
+		}catch(Exception e){
+			logger.error(e);
+			throw new EnjoyException("setStatusCombo is error");
+		}
+	}
+	
+	private void setCompanyCombo() throws EnjoyException{
+		
+		List<ComboBean> 	comboList		= new ArrayList<ComboBean>();
+		List<ComboBean> 	comboListDb		= null;
+		
+		try{
+			comboListDb = this.companyDetailsDao.getCompanyCombo();
+			
+//			comboList.add(new ComboBean("", "กรุณาระบุ"));
+			for(ComboBean bean:comboListDb){
+				comboList.add(new ComboBean(bean.getCode(), bean.getDesc()));
+			}
+			
+			this.form.setCompanyCombo(comboList);
+			
+		}catch(Exception e){
+			logger.error(e);
+			throw new EnjoyException("setCompanyCombo is error");
 		}
 	}
 	
@@ -248,7 +283,6 @@ public class UserDetailsMaintananceServlet extends EnjoyStandardSvc {
 		
 		String				pageMode			= null;
 		int					userUniqueId		= 0;
-		String				tinCompany			= null;
 		String				userName			= null;
 		String				userSurname			= null;
 		String 				userId 				= null;
@@ -272,7 +306,6 @@ public class UserDetailsMaintananceServlet extends EnjoyStandardSvc {
 		
 		try{
 			pageMode 					= EnjoyUtil.nullToStr(request.getParameter("pageMode"));
-			tinCompany 					= EnjoyUtil.nullToStr(request.getParameter("tinCompany"));
 			userName 					= EnjoyUtil.nullToStr(request.getParameter("userName"));
 			userSurname 				= EnjoyUtil.nullToStr(request.getParameter("userSurname"));
 			userId 						= EnjoyUtil.nullToStr(request.getParameter("userId"));
@@ -293,7 +326,6 @@ public class UserDetailsMaintananceServlet extends EnjoyStandardSvc {
 			sendMail					= new SendMail();
 			
 			logger.info("[onSave] pageMode 				:: " + pageMode);
-			logger.info("[onSave] tinCompany 			:: " + tinCompany);
 			logger.info("[onSave] userName 				:: " + userName);
 			logger.info("[onSave] userSurname 			:: " + userSurname);
 			logger.info("[onSave] userId 				:: " + userId);
@@ -310,7 +342,6 @@ public class UserDetailsMaintananceServlet extends EnjoyStandardSvc {
 			logger.info("[onSave] pwdEncypt 			:: " + pwdEncypt);
 			logger.info("[onSave] userLevel 			:: " + userLevel);
 			
-			userDetailsBean.setTinCompany(tinCompany);
 			userDetailsBean.setUserName(userName);
 			userDetailsBean.setUserSurname(userSurname);
 			userDetailsBean.setUserId(userId);

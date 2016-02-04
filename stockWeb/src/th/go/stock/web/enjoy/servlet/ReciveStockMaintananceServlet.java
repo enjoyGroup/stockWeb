@@ -137,7 +137,11 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 			
 			reciveOrderMasterBean = this.form.getReciveOrderMasterBean();
 			
-			reciveOrderMasterBean.setReciveStatus("1");
+			/*Begin set default value*/
+			reciveOrderMasterBean.setReciveStatus("1");//สร้างใบสั่งซื้อ
+			reciveOrderMasterBean.setReciveType("M");//เงินสด
+			reciveOrderMasterBean.setPriceType("V");//มี VAT
+			/*End set default value*/
 			
 		}catch(EnjoyException e){
 			throw new EnjoyException(e.getMessage());
@@ -290,6 +294,9 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 		int							seqDb						= 1;
 		ProductmasterBean 			productmasterBean 			= null;
 		double						quantity					= 0;
+		ComparePriceBean 			comparePriceBean 			= null;
+		int							cou							= 0;
+		int							comparePriceSeq				= 0;
 		
 		try{
 			pageMode 					= EnjoyUtil.nullToStr(request.getParameter("pageMode"));
@@ -318,7 +325,7 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 			
 			/*Begin Section รายละเอียดใบสั่งซื้อ*/
 			if(pageMode.equals(ReciveStockMaintananceForm.NEW)){
-				reciveNo = String.valueOf(this.dao.genId(session));
+				reciveNo = this.dao.genReciveNo();
 				
 				reciveOrderMasterBean.setReciveNo				(reciveNo);
 				reciveOrderMasterBean.setReciveDate				(EnjoyUtils.dateThaiToDb(reciveDate));
@@ -379,6 +386,24 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 						bean.setSeqDb(String.valueOf(seqDb));
 						this.dao.insertReciveOrdeDetail(session, bean);
 						seqDb++;
+						
+						/*Begin Update เปรียบเทียบราคา*/
+						cou = this.comparePriceDao.couVenderInThisProduct(bean.getProductCode(), vendorCode);
+						
+						if(cou==0){
+							comparePriceBean = new ComparePriceBean();
+							comparePriceSeq = this.comparePriceDao.getNewSeqInThisProduct(bean.getProductCode());
+							
+							comparePriceBean.setProductCode	(bean.getProductCode());
+							comparePriceBean.setSeq			(EnjoyUtil.nullToStr(comparePriceSeq));
+							comparePriceBean.setVendorCode	(vendorCode);
+							comparePriceBean.setQuantity	(bean.getQuantity());
+							comparePriceBean.setPrice		(bean.getPrice());
+							
+							this.comparePriceDao.insertCompareprice(session, comparePriceBean);
+						}
+						/*End Update เปรียบเทียบราคา*/
+						
 					}
 				}
 			}else{
@@ -414,6 +439,7 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 			session.getTransaction().commit();
 			
 			obj.put(STATUS, 			SUCCESS);
+			obj.put("reciveNo", 		reciveNo);
 			
 		}catch(EnjoyException e){
 			session.getTransaction().rollback();
@@ -778,9 +804,9 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 			   companyVendorBean = companyVendorList.get(0);
 			   
 			   obj.put("vendorCode", 		companyVendorBean.getVendorCode());
-			   obj.put("tin", 				companyVendorBean.getTin());
 			   obj.put("vendorName", 		companyVendorBean.getVendorName());
 			   obj.put("branchName", 		companyVendorBean.getBranchName());
+			   /*obj.put("tin", 				companyVendorBean.getTin());
 			   obj.put("buildingName", 		companyVendorBean.getBuildingName());
 			   obj.put("houseNumber", 		companyVendorBean.getHouseNumber());
 			   obj.put("mooNumber", 		companyVendorBean.getMooNumber());
@@ -796,12 +822,12 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 			   obj.put("tel", 				companyVendorBean.getTel());
 			   obj.put("fax", 				companyVendorBean.getFax());
 			   obj.put("email", 			companyVendorBean.getEmail());
-			   obj.put("remark", 			companyVendorBean.getRemark());
+			   obj.put("remark", 			companyVendorBean.getRemark());*/
 		   }else{
 			   obj.put("vendorCode", 		"");
-			   obj.put("tin", 				"");
 			   obj.put("vendorName", 		vendorName);
 			   obj.put("branchName", 		branchName);
+			   /*obj.put("tin", 				"");
 			   obj.put("buildingName", 		"");
 			   obj.put("houseNumber", 		"");
 			   obj.put("mooNumber", 		"");
@@ -817,7 +843,7 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 			   obj.put("tel", 				"");
 			   obj.put("fax", 				"");
 			   obj.put("email", 			"");
-			   obj.put("remark", 			"");
+			   obj.put("remark", 			"");*/
 		   }
 		   
 		   obj.put(STATUS, 		SUCCESS);

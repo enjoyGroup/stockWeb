@@ -7,6 +7,7 @@ import java.util.List;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.type.StringType;
 
 import th.go.stock.app.enjoy.bean.RefconstantcodeBean;
@@ -14,6 +15,7 @@ import th.go.stock.app.enjoy.exception.EnjoyException;
 import th.go.stock.app.enjoy.model.Refconstantcode;
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
 import th.go.stock.app.enjoy.utils.EnjoyUtils;
+import th.go.stock.app.enjoy.utils.HibernateUtil;
 
 public class RefconstantcodeDao {
 	
@@ -42,6 +44,7 @@ public class RefconstantcodeDao {
 			query.addScalar("codeDisplay"	, new StringType());
 			query.addScalar("codeNameTH"	, new StringType());
 			query.addScalar("codeNameEN"	, new StringType());
+			query.addScalar("flagYear"		, new StringType());
 			
 			list		 	= query.list();
 			
@@ -54,11 +57,13 @@ public class RefconstantcodeDao {
 				logger.info("codeDisplay 		:: " + row[1]);
 				logger.info("codeNameTH		 	:: " + row[2]);
 				logger.info("codeNameEN 		:: " + row[3]);
+				logger.info("flagYear	 		:: " + row[4]);
 				
 				bean.setId					(EnjoyUtils.nullToStr(row[0]));
 				bean.setCodeDisplay			(EnjoyUtils.nullToStr(row[1]));
 				bean.setCodeNameTH			(EnjoyUtils.nullToStr(row[2]));
 				bean.setCodeNameEN			(EnjoyUtils.nullToStr(row[3]));
+				bean.setFlagYear			(EnjoyUtils.nullToStr(row[4]));
 				
 				refconstantcodeList.add(bean);
 			}	
@@ -85,16 +90,17 @@ public class RefconstantcodeDao {
 			
 			refconstantcode = new Refconstantcode();
 			
-			refconstantcode.setId(EnjoyUtils.parseInt(refconstantcodeBean.getId()));
-			refconstantcode.setCodeDisplay(refconstantcodeBean.getCodeDisplay());
-			refconstantcode.setCodeNameTH(refconstantcodeBean.getCodeNameTH());
-			refconstantcode.setCodeNameEN(refconstantcodeBean.getCodeNameEN());
+			refconstantcode.setId			(EnjoyUtils.parseInt(refconstantcodeBean.getId()));
+			refconstantcode.setCodeDisplay	(refconstantcodeBean.getCodeDisplay());
+			refconstantcode.setCodeNameTH	(refconstantcodeBean.getCodeNameTH());
+			refconstantcode.setCodeNameEN	(refconstantcodeBean.getCodeNameEN());
+			refconstantcode.setFlagYear		(refconstantcodeBean.getFlagYear());
 			
 			session.saveOrUpdate(refconstantcode);
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			logger.info(e.getMessage());
+			logger.error(e);
 			throw new EnjoyException("Error insertRefconstantcode");
 		}finally{
 			
@@ -113,12 +119,14 @@ public class RefconstantcodeDao {
 			hql				= "update  Refconstantcode set codeDisplay 	= :codeDisplay"
 														+ ", codeNameTH	= :codeNameTH"
 														+ ", codeNameEN	= :codeNameEN"
+														+ ", flagYear	= :flagYear"
 										+ " where id = :id";
 			
 			query = session.createQuery(hql);
 			query.setParameter("codeDisplay"		, refconstantcodeBean.getCodeDisplay());
 			query.setParameter("codeNameTH"			, refconstantcodeBean.getCodeNameTH());
 			query.setParameter("codeNameEN"			, refconstantcodeBean.getCodeNameEN());
+			query.setParameter("flagYear"			, refconstantcodeBean.getFlagYear());
 			query.setParameter("id"					, EnjoyUtils.parseInt(refconstantcodeBean.getId()));
 			query.executeUpdate();
 			
@@ -141,12 +149,13 @@ public class RefconstantcodeDao {
 		Query 							query 								= null;
 		
 		try{
-			hql				= "update  Refconstantcode set codeDisplay 	= :codeDisplay"
+			hql				= "update  Refconstantcode set codeDisplay 	= :codeDisplay, flagYear = :flagYear"
 										+ " where id = :id";
 			
 			query = session.createQuery(hql);
-			query.setParameter("codeDisplay"		, refconstantcodeBean.getCodeDisplay());
-			query.setParameter("id"					, EnjoyUtils.parseInt(refconstantcodeBean.getId()));
+			query.setParameter("codeDisplay"	, refconstantcodeBean.getCodeDisplay());
+			query.setParameter("flagYear"		, refconstantcodeBean.getFlagYear());
+			query.setParameter("id"				, EnjoyUtils.parseInt(refconstantcodeBean.getId()));
 			query.executeUpdate();
 			
 		}catch(Exception e){
@@ -159,6 +168,66 @@ public class RefconstantcodeDao {
 			query 								= null;
 			logger.info("[updateCodeDisplay][End]");
 		}
+	}
+	
+	public String getCodeDisplay(String id) throws EnjoyException{
+		logger.info("[getCodeDisplay][Begin]");
+		
+		String				hql						= null;
+		List<String>		list					= null;
+		SQLQuery 			query 					= null;
+		SessionFactory 		sessionFactory			= null;
+		Session 			session					= null;
+		String				codeDisplay				= null;
+		String				currDate				= "";
+		String				year					= "";
+		
+		try{
+			sessionFactory 	= HibernateUtil.getSessionFactory();
+			session 		= sessionFactory.openSession();
+			currDate		= EnjoyUtils.currDateThai();
+			year			= currDate.substring(2, 4);
+			
+			hql				= "select case"
+							+ "			WHEN flagYear = 'Y' THEN"
+							+ "				CONCAT(codeDisplay, '" + year + "')"
+							+ "			ELSE"
+							+ "				codeDisplay"
+							+ "		  END as codeDisplay"
+							+ "	from refconstantcode"
+							+ "	where id = " + id;
+			
+			query			= session.createSQLQuery(hql);
+			
+			
+			query.addScalar("codeDisplay"			, new StringType());
+			
+			list		 	= query.list();
+			
+			if(list!=null && list.size() > 0){
+				codeDisplay = list.get(0);
+			}
+			
+			logger.info("[getCodeDisplay] codeDisplay 			:: " + codeDisplay);
+			
+			
+			
+		}catch(Exception e){
+			e.printStackTrace();
+			logger.info(e.getMessage());
+			throw new EnjoyException(e.getMessage());
+		}finally{
+			
+			session.close();
+			sessionFactory	= null;
+			session			= null;
+			hql				= null;
+			list			= null;
+			query 			= null;
+			logger.info("[getCodeDisplay][End]");
+		}
+		
+		return codeDisplay;
 	}
 	
 }

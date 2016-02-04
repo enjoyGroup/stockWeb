@@ -71,6 +71,14 @@ public class CompanyVendorDao {
 				}
 			}
 			
+			if(!companyVendorBean.getTel().equals("***")){
+				if(companyVendorBean.getTel().equals("")){
+					hql += " and (a.tel is null or a.tel = '')";
+				}else{
+					hql += " and a.tel like ('" + companyVendorBean.getTel() + "%')";
+				}
+			}
+			
 			logger.info("[searchByCriteria] hql :: " + hql);
 
 			query			= session.createSQLQuery(hql);			
@@ -252,7 +260,7 @@ public class CompanyVendorDao {
 					}
 					
 					bean.setVendorCode			(EnjoyUtils.nullToStr(row[0]));
-					bean.setTin					(EnjoyUtils.nullToStr(row[1]));
+					bean.setTin					(EnjoyUtils.formatPin(row[1]));
 					bean.setVendorName			(EnjoyUtils.nullToStr(row[2]));
 					bean.setBranchName			(EnjoyUtils.nullToStr(row[3]));
 					bean.setBuildingName		(EnjoyUtils.nullToStr(row[4]));

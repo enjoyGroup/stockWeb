@@ -241,7 +241,7 @@ public class InvoiceCashDao {
 			invoiceCashMaster.setInvoiceCode			(invoiceCashMasterBean.getInvoiceCode());
 			invoiceCashMaster.setInvoiceDate			(invoiceCashMasterBean.getInvoiceDate());
 			invoiceCashMaster.setInvoiceType			(invoiceCashMasterBean.getInvoiceType());
-			invoiceCashMaster.setCusCode				(EnjoyUtils.parseInt(invoiceCashMasterBean.getCusCode()));
+			invoiceCashMaster.setCusCode				(invoiceCashMasterBean.getCusCode());
 			invoiceCashMaster.setBranchName				(invoiceCashMasterBean.getBranchName());
 			invoiceCashMaster.setSaleUniqueId			(EnjoyUtils.parseInt(invoiceCashMasterBean.getSaleUniqueId()));
 			invoiceCashMaster.setSaleCommission			(EnjoyUtils.parseBigDecimal(invoiceCashMasterBean.getSaleCommission()));
@@ -293,7 +293,7 @@ public class InvoiceCashDao {
 			query = session.createQuery(hql);
 			query.setParameter("invoiceDate"		, invoiceCashMasterBean.getInvoiceDate());
 			query.setParameter("invoiceType"		, invoiceCashMasterBean.getInvoiceType());
-			query.setParameter("cusCode"			, EnjoyUtils.parseInt(invoiceCashMasterBean.getCusCode()));
+			query.setParameter("cusCode"			, invoiceCashMasterBean.getCusCode());
 			query.setParameter("branchName"			, invoiceCashMasterBean.getBranchName());
 			query.setParameter("saleUniqueId"		, EnjoyUtils.parseInt(invoiceCashMasterBean.getSaleUniqueId()));
 			query.setParameter("saleCommission"		, EnjoyUtils.parseBigDecimal(invoiceCashMasterBean.getSaleCommission()));

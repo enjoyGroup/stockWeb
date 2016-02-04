@@ -11,7 +11,7 @@
 	<!--<frame name="frame_main"  style="border:0px solid gray;" src="/stockWeb/EnjoyGenericSrv?service=servlet.SummaryRevenueOfYearServlet&pageAction=new" />-->
 	<!-- <frame name="frame_main"  style="border:0px solid gray;" src="/stockWeb/pages/menu/menuTest.jsp" /> -->
 	 
-	 <frame name="frame_main"  style="border:0px solid gray;" src="/stockWeb/pages/menu/welcome.jsp" />
+	 <frame name="frame_main" style="border:0px solid gray;" src="/stockWeb/pages/menu/welcome.jsp" />
 	<!--<frame name="frame_main"  style="border:0px solid gray;" src="/stockWeb/pages/stock/testZoom.jsp" />-->
 </FRAMESET>
 </html>

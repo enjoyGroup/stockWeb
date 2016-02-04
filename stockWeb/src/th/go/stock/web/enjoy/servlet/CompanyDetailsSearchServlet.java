@@ -12,7 +12,10 @@ import javax.servlet.http.HttpSession;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
+import th.go.stock.app.enjoy.bean.ComboBean;
 import th.go.stock.app.enjoy.bean.CompanyDetailsBean;
 import th.go.stock.app.enjoy.bean.UserDetailsBean;
 import th.go.stock.app.enjoy.dao.CompanyDetailsDao;
@@ -73,6 +76,10 @@ public class CompanyDetailsSearchServlet extends EnjoyStandardSvc {
  				this.onSearch();
  			}else if(pageAction.equals("getPage")){
 				this.lp_getPage();
+			}else if(pageAction.equals("getCompanyNameList")){
+				this.getCompanyNameList();
+			}else if(pageAction.equals("getTinList")){
+				this.getTinList();
 			}
  			
  			session.setAttribute(FORM_NAME, this.form);
@@ -107,14 +114,38 @@ public class CompanyDetailsSearchServlet extends EnjoyStandardSvc {
 		
 		logger.info("[setRefference][Begin]");
 		
-		SessionFactory 		sessionFactory	= null;
-		Session 			session			= null;
+		try{
+			setStatusCombo();
+			
+		}catch(EnjoyException e){
+			throw new EnjoyException(e.getMessage());
+		}catch(Exception e){
+			e.printStackTrace();
+			logger.info(e.getMessage());
+			throw new EnjoyException("setRefference is error");
+		}finally{
+			
+			logger.info("[setRefference][End]");
+		}
+	}
+	
+	private void setStatusCombo() throws EnjoyException{
+		
+		logger.info("[setRefference][Begin]");
+		
+		List<ComboBean> 			comboList				= new ArrayList<ComboBean>();
+		List<ComboBean> 			comboListDb				= null;
 		
 		try{
-			sessionFactory 	= HibernateUtil.getSessionFactory();
-			session 		= sessionFactory.openSession();
+			comboListDb = this.dao.getCompanystatusCombo();
 			
-			this.form.setStatusCombo(this.dao.getCompanystatusCombo(session));
+			comboList.add(new ComboBean("", "ทั้งหมด"));
+			
+			for(ComboBean bean:comboListDb){
+				comboList.add(new ComboBean(bean.getCode(), bean.getDesc()));
+			}
+			
+			this.form.setStatusCombo(comboList);
 			
 			
 		}catch(EnjoyException e){
@@ -124,13 +155,9 @@ public class CompanyDetailsSearchServlet extends EnjoyStandardSvc {
 			logger.info(e.getMessage());
 			throw new EnjoyException("setRefference is error");
 		}finally{
-			session.close();
-			sessionFactory	= null;
-			session			= null;
 			logger.info("[setRefference][End]");
 		}
-	}
-	
+	}	
 	
 	private void onSearch() throws EnjoyException{
 		logger.info("[onSearch][Begin]");
@@ -242,7 +269,78 @@ public class CompanyDetailsSearchServlet extends EnjoyStandardSvc {
 		   
 	   }
 	
+	private void getCompanyNameList(){
+	   logger.info("[getCompanyNameList][Begin]");
+	   
+	   String							companyName			= null;
+	   List<ComboBean> 					list 					= null;
+       JSONArray 						jSONArray 				= null;
+       JSONObject 						objDetail 				= null;
+       
+	   try{
+		   companyName			= EnjoyUtils.nullToStr(this.request.getParameter("companyName"));
+		   jSONArray 			= new JSONArray();
+		   
+		   logger.info("[getCompanyNameList] companyName 			:: " + companyName);
+		   
+		   
+		   list 		= this.dao.companyNameListForAutoComplete(companyName);
+		   
+		   for(ComboBean bean:list){
+			   objDetail 		= new JSONObject();
+			   
+			   objDetail.put("id"			,bean.getCode());
+			   objDetail.put("value"		,bean.getDesc());
+			   
+			   jSONArray.add(objDetail);
+		   }
+		   
+		   this.enjoyUtil.writeMSG(jSONArray.toString());
+		   
+	   }catch(Exception e){
+		   e.printStackTrace();
+		   logger.info("[getCompanyNameList] " + e.getMessage());
+	   }finally{
+		   logger.info("[getCompanyNameList][End]");
+	   }
+   }
 	
+	private void getTinList(){
+		   logger.info("[getTinList][Begin]");
+		   
+		   String							tin				= null;
+		   List<ComboBean> 					list 			= null;
+	       JSONArray 						jSONArray 		= null;
+	       JSONObject 						objDetail 		= null;
+	       
+		   try{
+			   tin			= EnjoyUtils.nullToStr(this.request.getParameter("tin"));
+			   jSONArray 			= new JSONArray();
+			   
+			   logger.info("[getTinList] tin 			:: " + tin);
+			   
+			   
+			   list 		= this.dao.tinListForAutoComplete(tin);
+			   
+			   for(ComboBean bean:list){
+				   objDetail 		= new JSONObject();
+				   
+				   objDetail.put("id"			,bean.getCode());
+				   objDetail.put("value"		,bean.getDesc());
+				   
+				   jSONArray.add(objDetail);
+			   }
+			   
+			   this.enjoyUtil.writeMSG(jSONArray.toString());
+			   
+		   }catch(Exception e){
+			   e.printStackTrace();
+			   logger.info("[getTinList] " + e.getMessage());
+		   }finally{
+			   logger.info("[getTinList][End]");
+		   }
+	   }
+		
 	
 	
 	

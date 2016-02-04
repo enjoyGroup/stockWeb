@@ -8,6 +8,7 @@ import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 
 import th.go.stock.app.enjoy.bean.ComparePriceBean;
@@ -38,7 +39,8 @@ public class ComparePriceDao {
 									+ "	from compareprice a, productmaster b, companyvendor c"
 									+ "	where b.productCode = a.productCode"
 										+ " AND c.vendorCode = a.vendorCode"
-										+ " AND a.productCode = '" + comparePriceBean.getProductCode() + "'";
+										+ " AND a.productCode = '" + comparePriceBean.getProductCode() + "'"
+									+ " order by a.seq asc";
 			
 			logger.info("[searchByCriteria] hql :: " + hql);
 
@@ -116,6 +118,105 @@ public class ComparePriceDao {
 			pk			 = null;
 			logger.info("[insertCompareprice][End]");
 		}
+	}
+	
+	public int couVenderInThisProduct(String productCode, String vendorCode) throws EnjoyException{
+		logger.info("[couVenderInThisProduct][Begin]");
+		
+		String			hql					= null;
+		SQLQuery 		query 				= null;
+		SessionFactory 	sessionFactory		= null;
+		Session 		session				= null;
+		List<Integer>	list				= null;
+		int				cou					= 0;
+		
+		
+		try{
+			sessionFactory 		= HibernateUtil.getSessionFactory();
+			session 			= sessionFactory.openSession();
+			
+			hql		= "select count(*) cou from compareprice"
+						+ " where productCode	= '" + productCode + "'"
+						+ "		and vendorCode	= '" + vendorCode + "'";
+			
+			query			= session.createSQLQuery(hql);
+			
+			query.addScalar("cou"			, new IntegerType());
+			
+			list		 	= query.list();
+			
+			if(list!=null && list.size() > 0){
+				cou = EnjoyUtils.parseInt(list.get(0));
+			}
+			
+			logger.info("[couVenderInThisProduct] cou 			:: " + cou);
+			
+		}catch(Exception e){
+			e.printStackTrace();
+			logger.info(e.getMessage());
+			throw new EnjoyException("Error couVenderInThisProduct");
+		}finally{
+			session.flush();
+			session.clear();
+			session.close();
+			
+			sessionFactory	= null;
+			session			= null;
+			hql				= null;
+			query 			= null;
+			logger.info("[couVenderInThisProduct][End]");
+		}
+		
+		return cou;
+	}
+	
+	public int getNewSeqInThisProduct(String productCode) throws EnjoyException{
+		logger.info("[getNewSeqInThisProduct][Begin]");
+		
+		String			hql					= null;
+		SQLQuery 		query 				= null;
+		SessionFactory 	sessionFactory		= null;
+		Session 		session				= null;
+		List<Integer>	list				= null;
+		int				newSeq				= 0;
+		
+		
+		try{
+			sessionFactory 		= HibernateUtil.getSessionFactory();
+			session 			= sessionFactory.openSession();
+			
+			hql		= "select (max(seq) + 1) newSeq from compareprice"
+					+ " where productCode	= '" + productCode + "'";
+			
+			query			= session.createSQLQuery(hql);
+			
+			query.addScalar("newSeq"			, new IntegerType());
+			
+			list		 	= query.list();
+			
+			if(list!=null && list.size() > 0){
+				newSeq = EnjoyUtils.parseInt(list.get(0));
+			}
+			
+			logger.info("[getNewSeqInThisProduct] newSeq :: " + newSeq);
+			
+		}catch(Exception e){
+			e.printStackTrace();
+			logger.info(e.getMessage());
+			throw new EnjoyException("Error getNewSeqInThisProduct");
+		}finally{
+			session.flush();
+			session.clear();
+			session.close();
+			
+			sessionFactory	= null;
+			session			= null;
+			hql				= null;
+			query 			= null;
+			logger.info("[getNewSeqInThisProduct][End]");
+		}
+		
+		return newSeq;
 	}
 	
 	public void deleteCompareprice(Session session, String productCode) throws EnjoyException{

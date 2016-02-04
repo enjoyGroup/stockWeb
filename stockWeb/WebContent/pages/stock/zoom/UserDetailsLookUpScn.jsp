@@ -33,7 +33,7 @@
 					
 					if($("#find").val()!=""){
 						if(gp_trim($("#column").val())==""){
-							alert("กรุณาระบุ key ในการค้นหา");
+							alert("กรุณาระบุค้นหาที่");
 							return;
 						}
 					}
@@ -150,16 +150,16 @@
 		<div style="background-color:white;width: 100%;height: 100%;">
 			<table class="user-register-table user-search-table" width="100%" border="0" cellpadding="5" cellspacing="5">
         		<tr>
-        			<td align="right" width="80px;">
-        				Find  : &nbsp;
+        			<td align="right" width="120px;">
+        				คำค้นหา  : &nbsp;
         			</td>
         			<td align="left" width="150px;">
         				<input type='text' id="find" name='find' value="<%=userDetailsLookUpForm.getFind()%>" />
         			</td>
-        			<td align="right" width="80px;">
-        				Column : &nbsp;
+        			<td align="right" width="155px;">
+        				ค้นหาที่ : &nbsp;
         			</td>
-        			<td align="left" width="150px;">
+        			<td align="left" width="140px;">
         				<select id="column" name="column">
         					<%
         						for(ComboBean bean:userDetailsLookUpForm.getColumnList()){
@@ -178,7 +178,7 @@
         		</tr>
         		<tr>
         			<td align="right">
-        				Order By  : &nbsp;
+        				เรียงลำดับตาม  : &nbsp;
         			</td>
         			<td align="left">
         				<select id="orderBy" name="orderBy">
@@ -194,7 +194,7 @@
         				</select>
         			</td>
         			<td align="right">
-        				Sort By : &nbsp;
+        				ประเภทการเรียงลำดับ : &nbsp;
         			</td>
         			<td align="left">
         				<select id="sortBy" name="sortBy">
@@ -270,6 +270,7 @@
 				</tbody>
 			</table>
 		</div>
+		<div id="dialog" title="Look up"></div>
 		<div align="center" class="FreezeScreen" style="display:none;">
 	        <center>
 	        	<img id="imgProgress" valign="center" src="<%=imgURL%>/loading36.gif" alt="" />

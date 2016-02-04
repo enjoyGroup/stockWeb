@@ -24,7 +24,7 @@
 		var gv_url 					= '<%=servURL%>/EnjoyGenericSrv';
 		
 		$(document).ready(function(){
-			gp_progressBarOn();
+			//gp_progressBarOn();
 			
 			gv_service 		= "service=" + $('#service').val();
 			
@@ -138,19 +138,25 @@
 			$('#btnSearch').click(function(){ 
 				try{
 					if($("#productName").val().trim()==""){
-		            	alert("กรุณาระบุสินค้า");
-		            	$("#productName").focus();
+						alert("กรุณาระบุสินค้า", function() { 
+							$("#productName").focus();
+    	    		    });
+		            	//alert("กรุณาระบุสินค้า");
+		            	//$("#productName").focus();
 		                return;
 		            }
 					
 					if($("#productCode").val().trim()==""){
-		            	alert("ระบุชื่อสินค้าผิด");
-		            	$("#productName").focus();
+						alert("ระบุชื่อสินค้าผิด", function() { 
+							$("#productName").focus();
+    	    		    });
+		            	//alert("ระบุชื่อสินค้าผิด");
+		            	//$("#productName").focus();
 		                return;
 		            }
 					
 					$.ajax({
-						async:false,
+						async:true,
 			            type: "POST",
 			            url: gv_url,
 			            data: gv_service + "&pageAction=search&" + $('#frm').serialize(),
@@ -160,7 +166,7 @@
 			            	var status				= null;
 			            	
 			            	try{
-			            		gp_progressBarOff();
+			            		//gp_progressBarOff();
 			            		
 			            		jsonObj = JSON.parse(data);
 			            		status	= jsonObj.status;
@@ -180,7 +186,7 @@
 				}
 			});
 				
-			gp_progressBarOff();
+			//gp_progressBarOff();
 				
 		});
 		
@@ -284,21 +290,41 @@
 				for(var i=0;i < la_vendorName.length;i++){
 					
 					if(la_vendorName[i].value.trim()==""){
-						alert("กรุณาระบุบริษัท");
-						la_vendorName[i].focus();
+						alert("กรุณาระบุบริษัท", function() { 
+							la_vendorName[i].focus();
+    	    		    });
+						//alert("กรุณาระบุบริษัท");
+						//la_vendorName[i].focus();
 						return false;
 					}
 					
 					if(la_branchName[i].value.trim()==""){
-						alert("กรุณาระบุสาขา");
-						la_branchName[i].focus();
+						alert("กรุณาระบุสาขา", function() { 
+							la_branchName[i].focus();
+    	    		    });
+						//alert("กรุณาระบุสาขา");
+						//la_branchName[i].focus();
 						return false;
 					}
 					
 					if(la_vendorCode[i].value.trim()==""){
-						alert("ระบุบริษัทหรือสาขาผิด");
-						la_vendorCode[i].focus();
+						alert("ระบุบริษัทหรือสาขาผิด", function() { 
+							la_vendorCode[i].focus();
+    	    		    });
+						//alert("ระบุบริษัทหรือสาขาผิด");
+						//la_vendorCode[i].focus();
 						return false;
+					}
+				}
+				
+				for(var i=0;i<la_vendorCode.length;i++){
+					for(var j=(i+1);j<la_vendorCode.length;j++){
+						if(la_vendorCode[i].value==la_vendorCode[j].value){
+							alert("บริษัทห้ามซ้ำ", function() { 
+								la_vendorCode[j].focus();
+	    	    		    });
+							return false;
+						}
 					}
 				}
 				
@@ -511,7 +537,7 @@
 				params 	= "pageAction=save&" + $('#frm').serialize();
 				
 				$.ajax({
-					async:false,
+					async:true,
 		            type: "POST",
 		            url: gv_url,
 		            data: params,
@@ -521,14 +547,17 @@
 		            	var status				= null;
 		            	
 		            	try{
-		            		gp_progressBarOff();
+		            		//gp_progressBarOff();
 		            		
 		            		jsonObj = JSON.parse(data);
 		            		status	= jsonObj.status;
 		            		
 		            		if(status=="SUCCESS"){
-		            			alert("บันทึกเรียบร้อย");
-		            			lp_reset();
+		            			alert("บันทึกเรียบร้อย", function() { 
+		            				lp_reset();
+		    	    		    });
+		            			//alert("บันทึกเรียบร้อย");
+		            			//lp_reset();
 		            		}else{
 		            			alert(jsonObj.errMsg);
 		            			

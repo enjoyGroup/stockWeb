@@ -260,6 +260,7 @@ public class ComparePriceServlet extends EnjoyStandardSvc {
 		Session 							session						= null;
 		JSONObject 							obj 						= null;
 		List<ComparePriceBean> 				comparePriceList			= null;
+		int									seq							= 1;
 		
 		try{
 			sessionFactory 				= HibernateUtil.getSessionFactory();
@@ -273,7 +274,9 @@ public class ComparePriceServlet extends EnjoyStandardSvc {
 			
 			for(ComparePriceBean bean:comparePriceList){
 				if(!bean.getRowStatus().equals(ComparePriceForm.DEL)){
+					bean.setSeq(EnjoyUtils.nullToStr(seq));
 					this.dao.insertCompareprice(session, bean);
+					seq++;
 				}
 			}
 			

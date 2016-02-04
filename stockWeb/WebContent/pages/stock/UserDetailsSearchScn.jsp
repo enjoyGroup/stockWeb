@@ -31,17 +31,48 @@
 		var gv_checkDupUserId 	= false;
 		
 		$(document).ready(function(){
-			gp_progressBarOn();
+			//gp_progressBarOn();
 			
 			gv_service 		= "service=" + $('#service').val();
 			
-			gp_progressBarOff();
+			$( "#userName" ).autocomplete({ 
+				 source: function(request, response) {
+		            $.ajax({
+		            	async:false,
+			            type: "POST",
+		                url: gv_url,
+		                dataType: "json",
+		                data: gv_service + "&pageAction=userFullNameList&userName=" + gp_trim(request.term),//request,
+		                success: function( data, textStatus, jqXHR) {
+		                    var items = data; 
+		                    response(items);
+		                },
+		                error: function(jqXHR, textStatus, errorThrown){
+		                     alert( textStatus);
+		                }
+		            });
+		          },
+			      minLength: 3,//กี่ตัวอักษรถึงทำงาน
+			      open: function() {
+						//Data return กลับมาแล้วทำไรต่อ
+			      },
+			      close: function() {
+
+			      },
+			      focus:function(event,ui) {
+
+			      },
+			      select: function( event, ui ) {
+			    	//เมื่อเลือก Data แล้ว
+			    	//alert(ui.item.id);
+			      }
+			});
 			
 			 
 			$('#btnSearch').click(function(){ 
 				try{
 					$.ajax({
-						async:false,
+						async:true,
 			            type: "POST",
 			            url: gv_url,
 			            data: gv_service + "&pageAction=searchUserDetail&" + $('#frm').serialize(),
@@ -67,6 +98,8 @@
 			    	alert("lp_reset_page :: " + e);
 			    }				
 			}); 
+			
+			//gp_progressBarOff();
 			
 		});
 		
@@ -196,10 +229,7 @@
 								        			</td>
 								        		</tr>
 								        		<tr>
-								        			<td align="left" colspan="2">
-								        				<span style="color: red;">*ถ้าต้องการค้นหาทั้งหมดให้ระบุช่องนั้นเป็น ***</span>
-								        			</td>
-								        			<td align="right" colspan="2">
+								        			<td align="right" colspan="4">
 								        				<input type="button" id="btnSearch" class='btn btn-primary pull-right padding-sm' style="margin-right:12px; padding-right:24px; padding-left:24px;" value='ค้นหา'/>
 								        				<input type="button" id="btnReset" class='btn pull-right padding-sm'  style="margin-right:12px" value='เริ่มใหม่' />
 								        			</td>
@@ -276,6 +306,7 @@
 				</section>
 			</section>
 		</section>
+		<div id="dialog" title="Look up"></div>
 		<div align="center" class="FreezeScreen" style="display:none;">
 	        <center>
 	        	<img id="imgProgress" valign="center" src="<%=imgURL%>/loading36.gif" alt="" />

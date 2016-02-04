@@ -23,20 +23,23 @@
 		var gv_url 					= '<%=servURL%>/EnjoyGenericSrv';
 		
 		$(document).ready(function(){
-			gp_progressBarOn();
+			//gp_progressBarOn();
 			
 			gv_service 		= "service=" + $('#service').val();
 			
 			$('#btnSearch').click(function(){ 
 				try{
 					if(gp_trim($("#productName").val())==""){
-		            	alert("กรุณาระบุสินค้า");
-		            	$("#productName").focus();
+						alert("กรุณาระบุสินค้า", function() { 
+							$("#productName").focus();
+		    		    });
+		            	//alert("กรุณาระบุสินค้า");
+		            	//$("#productName").focus();
 		                return;
 		            }
 					
 					$.ajax({
-						async:false,
+						async:true,
 			            type: "POST",
 			            url: gv_url,
 			            data: gv_service + "&pageAction=search&" + $('#frm').serialize(),
@@ -100,7 +103,7 @@
 			
 			lp_calQuantity();
 			
-			gp_progressBarOff();
+			//gp_progressBarOff();
 				
 		});
 			
@@ -122,7 +125,7 @@
 				params 	= "pageAction=save&" + $('#frm').serialize();
 				
 				$.ajax({
-					async:false,
+					async:true,
 		            type: "POST",
 		            url: gv_url,
 		            data: params,
@@ -132,14 +135,17 @@
 		            	var status				= null;
 		            	
 		            	try{
-		            		gp_progressBarOff();
+		            		//gp_progressBarOff();
 		            		
 		            		jsonObj = JSON.parse(data);
 		            		status	= jsonObj.status;
 		            		
 		            		if(status=="SUCCESS"){
-		            			alert("บันทึกเรียบร้อย");
-		            			lp_reset();
+		            			alert("บันทึกเรียบร้อย", function() { 
+		            				lp_reset();
+				    		    });
+		            			//alert("บันทึกเรียบร้อย");
+		            			//lp_reset();
 		            		}else{
 		            			alert(jsonObj.errMsg);
 		            			

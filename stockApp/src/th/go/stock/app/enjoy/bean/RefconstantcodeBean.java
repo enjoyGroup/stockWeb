@@ -7,6 +7,7 @@ public class RefconstantcodeBean {
 	private String codeNameTH;
 	private String codeNameEN;
 	private String rowStatus;
+	private String flagYear;
 	
 	public RefconstantcodeBean(){
 		this.id 				= "";
@@ -14,6 +15,7 @@ public class RefconstantcodeBean {
 		this.codeNameTH			= "";
 		this.codeNameEN 		= "";
 		this.rowStatus			= "";
+		this.flagYear			= "N";
 	}
 
 	public String getId() {
@@ -54,5 +56,13 @@ public class RefconstantcodeBean {
 
 	public void setRowStatus(String rowStatus) {
 		this.rowStatus = rowStatus;
+	}
+
+	public String getFlagYear() {
+		return flagYear;
+	}
+
+	public void setFlagYear(String flagYear) {
+		this.flagYear = flagYear;
 	}
 }

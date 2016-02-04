@@ -768,8 +768,8 @@ public class ProductDetailsDao {
 			productdetail.setId					(id);
 			productdetail.setQuanDiscount		(EnjoyUtils.parseBigDecimal(productdetailBean.getQuanDiscount()));
 			productdetail.setDiscountRate		(EnjoyUtils.parseBigDecimal(productdetailBean.getDiscountRate()));
-			productdetail.setStartDate			(productdetailBean.getStartDate());
-			productdetail.setExpDate			(productdetailBean.getExpDate());
+			productdetail.setStartDate			(EnjoyUtils.dateToThaiDB(productdetailBean.getStartDate()));
+			productdetail.setExpDate			(EnjoyUtils.dateToThaiDB(productdetailBean.getExpDate()));
 			
 			session.saveOrUpdate(productdetail);
 			
@@ -938,6 +938,8 @@ public class ProductDetailsDao {
 					+ "		order by quanDiscount ASC"
 					+ "		LIMIT 1";
 			
+			logger.info("[getQuanDiscount] hql 			:: " + hql);
+			
 			query			= session.createSQLQuery(hql);
 			
 			query.addScalar("discountRate"			, new StringType());
@@ -953,11 +955,13 @@ public class ProductDetailsDao {
 			
 			
 		}catch(Exception e){
-			logger.info(e.getMessage());
+			logger.error(e);
+			e.printStackTrace();
 			throw new EnjoyException(e.getMessage());
 		}finally{
 			session.flush();
 			session.clear();
+			
 			session.close();
 			
 			hql				= null;

@@ -52,51 +52,51 @@ function isBlank(objValue){
 }
 
 $(document).ready(function(){
-	 $(".numberOnly").keypress(function(event){
-	        return onKeyPressNumber(event);
-	    });
-	    $(".numberOnly").keydown(function(event){
-	        return onKeyDownNumber(event);
-	    });
-	    $(".numberOnly").keyup(function(event){
-	        return onKeyUpNumber(event);
-	    });
-	    
-	    $(".moneyOnly").keypress(function(event){
-	        return onKeyUpMoney(event);
-	    });
-	    $(".moneyOnly").keydown(function(event){
-	        return onKeyDownMoney(event);
-	    });
-	    $(".moneyOnly").keyup(function(event){
-	        return onKeyUpMoney(event);
-	    });
-	    
-	    $(".telOnly").keypress(function(event){
-	        return onKeyPressTel(event);
-	    });
-	    $(".telOnly").keydown(function(event){
-	        return onKeyDownTel(event);
-	    });
-	    $(".telOnly").keyup(function(event){
-	        return onKeyUpTel(event);
-	    });
-	    
-	    /*
-	    $(".dateFormat").live("focus", function(){
-		    $(this).datepicker( $.datepicker.regional["th"] );
-		    $(this).datepicker( "option", "defaultDate", +0 );
-		});
-	    
-	    $(".birthDateFormat").live("focus", function(){
-	    	$(this).datepicker( $.datepicker.regional["birthDateTH"] );
-		    $(this).datepicker( "option", "defaultDate", +0 );
-		});*/
-	    
-	    $( ".dateFormat" ).datepicker( $.datepicker.regional["th"] );
-	    $( ".dateFormat" ).datepicker( "option", "defaultDate", +0 );
-	    $( ".birthDateFormat" ).datepicker( $.datepicker.regional["birthDateTH"] );
-	    $( ".birthDateFormat" ).datepicker( "option", "defaultDate", +0 );
+	$(".numberOnly").keypress(function(event){
+        return onKeyPressNumber(event);
+    });
+    $(".numberOnly").keydown(function(event){
+        return onKeyDownNumber(event);
+    });
+    $(".numberOnly").keyup(function(event){
+        return onKeyUpNumber(event);
+    });
+    
+    $(".moneyOnly").keypress(function(event){
+        return onKeyUpMoney(event);
+    });
+    $(".moneyOnly").keydown(function(event){
+        return onKeyDownMoney(event);
+    });
+    $(".moneyOnly").keyup(function(event){
+        return onKeyUpMoney(event);
+    });
+    
+    $(".telOnly").keypress(function(event){
+        return onKeyPressTel(event);
+    });
+    $(".telOnly").keydown(function(event){
+        return onKeyDownTel(event);
+    });
+    $(".telOnly").keyup(function(event){
+        return onKeyUpTel(event);
+    });
+    
+    /*
+    $(".dateFormat").live("focus", function(){
+	    $(this).datepicker( $.datepicker.regional["th"] );
+	    $(this).datepicker( "option", "defaultDate", +0 );
+	});
+    
+    $(".birthDateFormat").live("focus", function(){
+    	$(this).datepicker( $.datepicker.regional["birthDateTH"] );
+	    $(this).datepicker( "option", "defaultDate", +0 );
+	});*/
+    
+    $( ".dateFormat" ).datepicker( $.datepicker.regional["th"] );
+    $( ".dateFormat" ).datepicker( "option", "defaultDate", +0 );
+    $( ".birthDateFormat" ).datepicker( $.datepicker.regional["birthDateTH"] );
+    $( ".birthDateFormat" ).datepicker( "option", "defaultDate", +0 );
 	    
 });
 
@@ -338,17 +338,25 @@ function gp_checkAmtOnly(ao_obj, av_num){
 		}
 		
 		if(gp_format(ao_obj, 2)==false){
-			alert("กรุณาระบุตัวเลขเท่านั้น");
-			ao_obj.value = "0.00";
-			//ao_obj.focus().select();
-			eval("$('#" + ao_obj.id + "').focus().select();");
+			alert("กรุณาระบุตัวเลขเท่านั้น", function() { 
+				ao_obj.value = "0.00";
+				eval("$('#" + ao_obj.id + "').focus().select();");
+		    });
+//			ao_obj.value = "0.00";
+//			//ao_obj.focus().select();
+//			eval("$('#" + ao_obj.id + "').focus().select();");
 			return false;
 		}
 		
 		if(gp_replaceComma(ao_obj.value).length > av_num){
-			alert("ระบุได้สูงสุด " + av_num-1 + " ตัวอักษร");
-			//ao_obj.select();
-			eval("$('#" + ao_obj.id + "').focus().select();");
+			
+			alert("ระบุได้สูงสุด " + av_num-1 + " ตัวอักษร", function() { 
+				eval("$('#" + ao_obj.id + "').focus().select();");
+		    });
+			
+//			alert("ระบุได้สูงสุด " + av_num-1 + " ตัวอักษร");
+//			//ao_obj.select();
+//			eval("$('#" + ao_obj.id + "').focus().select();");
 			return false;
 		}
 		
@@ -360,15 +368,54 @@ function gp_checkAmtOnly(ao_obj, av_num){
 }
 
 function gp_progressBarOn(){
-	var h = $(document).height();
-    
+	var h 		= $(document).height();
+	var x 		= $(document).scrollLeft();
+	var y 		= $(document).scrollTop();
+	
 	$('.FreezeScreen').css('height', h);
     $(".FreezeScreen").fadeIn();
+    
+    $("body").bind("mousewheel", function() {
+        return false;
+    });
+	
+	$("body").bind("keypress", function(evt) {
+		var keyCode = evt.keyCode ? evt.keyCode : evt.which;
+		if(keyCode>=37 && keyCode<=40){
+			return false;
+		}
+		return true;
+    });
+	
+	$("body").bind("keydown", function(evt) {
+		var keyCode = evt.keyCode ? evt.keyCode : evt.which;
+		if(keyCode>=37 && keyCode<=40){
+			return false;
+		}
+		return true;
+    });
+	
+	$("body").bind("keyup", function(evt) {
+		var keyCode = evt.keyCode ? evt.keyCode : evt.which;
+		if(keyCode>=37 && keyCode<=40){
+			return false;
+		}
+		return true;
+    });
+	
+	$(window).scroll(function(event){
+		window.scrollTo(x, y);
+    });
+	
 }
 
 function gp_progressBarOff(){
-	
 	$(".FreezeScreen").fadeOut("slow");
+	$("body").unbind("mousewheel");
+	$("body").unbind("keypress");
+	$("body").unbind("keydown");
+	$("body").unbind("keyup");
+	$(window).unbind("scroll");
 }
 
 function gp_checkDate(ao_obj){
@@ -403,9 +450,15 @@ function gp_checkDate(ao_obj){
 	    }
 
 	    if(errorMsg != "") {
-	      alert(errorMsg);
-	      ao_obj.value = "";
-	      ao_obj.focus();
+	    	
+	    	alert(errorMsg, function() { 
+	    		ao_obj.value = "";
+		    	ao_obj.focus();
+		    });
+	    	
+//	    	alert(errorMsg, ao_obj);
+//	    	ao_obj.value = "";
+//	    	ao_obj.focus();
 	      return false;
 	    }
     }catch(e){
@@ -680,8 +733,12 @@ function gp_validateTime(ao_obj){
 		}
 
 		if(errorMsg != "") {
-		  alert(errorMsg);
-		  //ao_obj.focus();
+			alert(errorMsg, function() { 
+				ao_obj.focus();
+		    });
+		
+//		  alert(errorMsg);
+//		  ao_obj.focus();
 		  return false;
 		}
 
@@ -718,7 +775,7 @@ function gp_checkemail(av_val){
 }
 
 // Verify PIN
-function gp_validatePin(av_pin){
+function gp_validatePin(av_id){
 	/*
 		1. Get the first digit multiples with 13 and the next digit multiples with 12 .. and go on .. the twelve digit will minus with 2
 		2. Sum the result from (1)
@@ -730,13 +787,19 @@ function gp_validatePin(av_pin){
 	*/
 	var sum_unit_pin = 0;
 	var tempMod = 0;
-	var check_digit = "";
-	var unit_pin = new Array(av_pin.length);
-	var multiple_pin = new Array(13,12,11,10,9,8,7,6,5,4,3,2);
-
-	for (var i=0;i<av_pin.length;i++){
-		unit_pin[i] = av_pin.substring(i,i+1);
-		if(i != (av_pin.length-1)){
+	var check_digit 	= "";
+	var lv_pin 			= $("#" + av_id).val().trim().replace(/-/g,"");
+	var unit_pin 		= new Array(lv_pin.length);
+	var multiple_pin 	= new Array(13,12,11,10,9,8,7,6,5,4,3,2);
+	
+	if(lv_pin.length!=13){
+		return false;
+	}
+	
+	
+	for (var i=0;i<lv_pin.length;i++){
+		unit_pin[i] = lv_pin.substring(i,i+1);
+		if(i != (lv_pin.length-1)){
 			unit_pin[i] = unit_pin[i] * multiple_pin[i];
 			sum_unit_pin = sum_unit_pin+unit_pin[i];
 		}
@@ -752,10 +815,36 @@ function gp_validatePin(av_pin){
 							break;
 	}
 
-	if(check_digit == unit_pin[av_pin.length-1]){
+	if(check_digit == unit_pin[lv_pin.length-1]){
+		gp_setFormatPin(av_id);
 		return true;
 	}else{
 		return false;
+	}
+}
+
+function gp_setFormatPin(av_id){
+	var lv_pin 		= "";
+	var lv_newPin 	= "";
+	
+	try{
+		lv_pin = $("#" + av_id).val().trim().replace(/-/g,"");
+		
+		if(lv_pin!="" && lv_pin.length==13){
+			for(var i=0;i<lv_pin.length;i++){
+				
+				if(i==1 || i==5 || i==10 || i==12){
+					lv_newPin += "-" + lv_pin[i];
+				}else{
+					lv_newPin += lv_pin[i];
+				}
+			}
+			//alert(lv_newPin);
+			$("#" + av_id).val(lv_newPin);
+		}
+		
+	}catch(e){
+		alert("gp_setFormatPin :: " + e);
 	}
 }
 
@@ -767,4 +856,159 @@ function gp_parseFloat(av_val){
 }
 
 
+
+function gp_setCookie(cname, cvalue, exdays) {
+    var d = new Date();
+    d.setTime(d.getTime() + (exdays*24*60*60*1000));
+    var expires = "expires="+d.toUTCString();
+    document.cookie = cname + "=" + cvalue + "; " + expires;
+}
+
+function gp_getCookie(cname) {
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for(var i=0; i<ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0)==' ') c = c.substring(1);
+        if (c.indexOf(name) == 0) return c.substring(name.length, c.length);
+    }
+    return "";
+}
+
+function gp_validateEmptyObj(ga_array){
+	var la_temp = null;
+	var lo_obj 	= null;
+	
+	try{
+		for(var i=0;i<ga_array.length;i++){
+			la_temp			= ga_array[i].split(":");
+            lo_obj          = eval('$("#' + la_temp[0] + '")');
+            
+            if(gp_trim(lo_obj.val())==""){
+            	alert("กรุณาระบุ " + la_temp[1], function() { 
+            		lo_obj.focus();
+    		    });
+            	
+//            	alert("กรุณาระบุ " + la_temp[1]);
+//            	lo_obj.focus();
+                return false;
+            }
+        }
+		
+		return true;
+	}catch(e){
+		alert("lp_validateEmptyObj :: " + e);
+		return false;
+	}
+}
+
+window.alert = function(message, successCallback){
+	//var lo_dialog = null;
+	
+	gp_progressBarOn();
+	
+	//$( "#dialog" ).empty();
+	//$( "#dialog" ).dialog('destroy').remove();
+	
+	$(document.createElement('div'))
+	    .html("<p>" + message + "</p>")
+	    .dialog({
+	      autoOpen: true,
+	      height: 175,
+	      width: 400,
+	      show: {
+	        effect: "slide",
+	        direction: "down",
+	        duration: 200
+	      },
+	      hide: {
+	        effect: "slide",
+	        direction: "down",
+	        duration: 200
+	      },
+	      close: function() {
+	    	  gp_progressBarOff();
+	    	  //console.log("successCallback :: " + successCallback);
+	    	  if(successCallback!=null && successCallback != 'undefined'){
+	    		  successCallback();
+	    	  }
+	    	  $( this ).removeClass( "zoom" );
+	        },
+	      title: "การแจ้งเตือน",
+	      draggable: false,
+        buttons: {
+          Ok: function() {
+        	$( this ).dialog( "close" );
+        	  //$(this).dialog('destroy').remove();
+            
+            return;
+          }
+        },
+	      dialogClass: 'zoom'
+	    });
+		
+		/*lo_dialog 	= $( "#dialog" );
+		
+		gp_progressBarOn();
+		lo_dialog.empty();
+		lo_dialog.dialog("option", "title", "การแจ้งเตือน");
+		lo_dialog.append("<p>" + message + "</p>").dialog( "open" );*/
+		//event.preventDefault();
+};
+
+function gp_dialogPopUp(av_path, av_title){
+	
+	//var lo_dialog = null;
+	var lo_iframe = null;
+	
+	try{
+		$( "#dialog" ).empty();
+		
+		lo_iframe	= $("<iframe />").attr("src", av_path)
+									 .attr("width", "100%")
+									 .attr("height", "100%")
+									 .attr("border", "0");
+		
+		gp_progressBarOn();
+		
+		$( "#dialog" )
+		    .html(lo_iframe)
+		    .dialog({
+	      autoOpen: true,
+	      height: 600,
+	      width: 1050,
+	      show: {
+	        effect: "clip",
+	        duration: 500
+	      },
+	      hide: {
+	        effect: "clip",
+	        duration: 500
+	      },
+	      close: function() {
+	    	  gp_progressBarOff();
+	    	  $( "#dialog" ).removeClass( "zoom" );
+	        },
+	      title: av_title,
+	      buttons: null,
+	      draggable: false,
+	      dialogClass: 'zoom'
+	    });
+		
+		/*lo_dialog 	= $( "#dialog" );
+		lo_iframe	= $("<iframe />").attr("src", av_path)
+									 .attr("width", "100%")
+									 .attr("height", "100%")
+									 .attr("border", "0");
+		
+		gp_progressBarOn();
+		lo_dialog.empty();
+		lo_dialog.dialog("option", "title", av_title);
+		lo_dialog.append(lo_iframe).dialog( "open" );
+		event.preventDefault();*/
+		
+	}catch(e){
+		alert("alert :: " + e);
+	}
+}
 

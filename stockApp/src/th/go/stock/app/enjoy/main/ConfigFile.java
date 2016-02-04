@@ -8,8 +8,8 @@ import java.util.Properties;
 import th.go.stock.app.enjoy.utils.EnjoyUtils;
 
 public class ConfigFile {
-	private static final String PADING_SEAT_NO   	= "pading.seatNo";
-	private static final String PADING_VERNUM_ID   	= "pading.verifyNum";
+	private static final String PADING_CUS_CODE   	= "pading.cusCode";
+	private static final String PADING_RECIVE_NO   	= "pading.reciveNo";
 	private static final String PADING_ZONE_ID   	= "pading.fieldZoneId";
 	private static final String PADING_BOOK_PRICE   = "pading.bookingPrices";
 	private static final String PADING_TICKET_ID   	= "pading.ticketId";
@@ -51,12 +51,12 @@ public class ConfigFile {
 		return result;
 	}
 	
-	public static String getPadingSeatNo() {
-		return getText(PADING_SEAT_NO);
+	public static String getPadingCusCode() {
+		return getText(PADING_CUS_CODE);
 	}
 	
-	public static String getVerifyNum() {
-		return getText(PADING_VERNUM_ID);
+	public static String getPadingReciveNo() {
+		return getText(PADING_RECIVE_NO);
 	}
 	
 	public static String getPadingZoneId() {

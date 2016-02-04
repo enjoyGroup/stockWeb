@@ -114,10 +114,16 @@ public class CustomerDetailsMaintananceServlet extends EnjoyStandardSvc {
 	private void onLoad() throws EnjoyException{
 		logger.info("[onLoad][Begin]");
 		
+		CustomerDetailsBean 	customerDetailsBean = null;
+		
 		try{
+			customerDetailsBean = this.form.getCustomerDetailsBean();
 			
 			this.setRefference();
 			this.form.setTitlePage("เพิ่มรายละเอียดลูกค้า");
+			
+			customerDetailsBean.setCusStatus("A");
+			customerDetailsBean.setPoint("0");
 			
 		}catch(EnjoyException e){
 			throw new EnjoyException(e.getMessage());
@@ -137,8 +143,7 @@ public class CustomerDetailsMaintananceServlet extends EnjoyStandardSvc {
 		
 		try{
 			
-			this.form.setStatusCombo(this.dao.getStatusCombo());
-			
+			this.setCusStatus();
 			this.setSexCombo();
 			this.setIdTypeCombo();
 			this.setGroupSalePriceCombo();
@@ -155,9 +160,33 @@ public class CustomerDetailsMaintananceServlet extends EnjoyStandardSvc {
 		}
 	}
 	
+	private void setCusStatus() throws EnjoyException{
+		
+		logger.info("[setCusStatus][Begin]");
+		
+		List<ComboBean> 			comboList				= new ArrayList<ComboBean>();
+		List<ComboBean> 			comboListDb				= null;
+		
+		try{
+			
+			comboListDb = this.dao.getStatusCombo();
+			
+			for(ComboBean bean:comboListDb){
+				comboList.add(new ComboBean(bean.getCode(), bean.getDesc()));
+			}
+			
+			this.form.setStatusCombo(comboList);
+		}
+		catch(Exception e){
+			logger.info(e.getMessage());
+			throw new EnjoyException("setCusStatus is error");
+		}finally{
+			logger.info("[setCusStatus][End]");
+		}
+	}	
 	private void setSexCombo() throws EnjoyException{
 		
-		logger.info("[setSexCombo][Begin]");
+		logger.info("[setCusStatus][Begin]");
 		
 		List<ComboBean>			sexCombo = null;
 		
@@ -433,7 +462,7 @@ public class CustomerDetailsMaintananceServlet extends EnjoyStandardSvc {
 			cusGroupCode 				= EnjoyUtil.nullToStr(request.getParameter("cusGroupCode"));
 			sex 						= EnjoyUtil.nullToStr(request.getParameter("sex"));
 			idType 						= EnjoyUtil.nullToStr(request.getParameter("idType"));
-			idNumber 					= EnjoyUtil.nullToStr(request.getParameter("idNumber"));
+			idNumber 					= EnjoyUtil.nullToStr(request.getParameter("idNumber")).replaceAll("-", "");
 			birthDate 					= EnjoyUtil.nullToStr(request.getParameter("birthDate"));
 			religion 					= EnjoyUtil.nullToStr(request.getParameter("religion"));
 			job 						= EnjoyUtil.nullToStr(request.getParameter("job"));

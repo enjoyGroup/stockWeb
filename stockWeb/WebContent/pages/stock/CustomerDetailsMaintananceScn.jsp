@@ -29,7 +29,7 @@
 		var gv_checkFormatIdNumber 	= true;
 		
 		$(document).ready(function(){
-			gp_progressBarOn();
+			//gp_progressBarOn();
 			
 			gv_service 		= "service=" + $('#service').val();
 			
@@ -37,6 +37,8 @@
 			
 			if($("#pageMode").val()=="EDIT"){
 				lp_setModeEdit();
+			}else{
+				$("#cusStatusDis").prop('disabled', true);
 			}
 			
 			$( "#provinceName" ).autocomplete({ 
@@ -139,52 +141,55 @@
 			
 
 			
-			gp_progressBarOff();
+			//gp_progressBarOff();
 			
 		});
 		
 		function lp_validate(){
 		    var la_validate             = new Array( "cusName:ชื่อ"	
 													, "cusSurname:นามสกุล"
+													, "provinceName:จังหวัด"
+													, "districtName:อำเภอ/เขต"
+													, "subdistrictName:ตำบล/แขวง"
+													, "postCode:รหัสไปรษณ๊ย์"
 													, "cusStatus:สถานะ"
 													, "startDate:วันที่สมัคร"
 													, "cusGroupCode:กลุ่มลูกค้า");
 		    var lv_return				= true;
-		    var provinceName			= "";
-		    var districtName			= "";
-		    var subdistrictName			= "";
+		    //var provinceName			= "";
+		    //var districtName			= "";
+		    //var subdistrictName			= "";
 		    var startDate				= "";
 		    var expDate					= "";
 		    
 			try{
 				
-				provinceName	= gp_trim($("#provinceName").val());
-				districtName	= gp_trim($("#districtName").val());
-				subdistrictName	= gp_trim($("#subdistrictName").val());
+				//provinceName	= gp_trim($("#provinceName").val());
+				//districtName	= gp_trim($("#districtName").val());
+				//subdistrictName	= gp_trim($("#subdistrictName").val());
 				startDate		= gp_trim($("#startDate").val());
 				expDate			= gp_trim($("#expDate").val());
 				
-				for(var i=0;i<la_validate.length;i++){
-					la_temp			= la_validate[i].split(":");
-		            lo_obj          = eval('$("#' + la_temp[0] + '")');
-		            
-		            if(gp_trim(lo_obj.val())==""){
-		            	alert("กรุณาระบุ " + la_temp[1]);
-		            	lo_obj.focus();
-		                return false;
-		            }
-		        }
+				if(!gp_validateEmptyObj(la_validate)){
+					return false;
+				}
 				
 				if($("#idType").val()!="0"){
 					if($("#idNumber").val().trim()==""){
-						alert("กรุณาระบุเลขที่บัตร");
-						$("#idNumber").focus();
+						alert("กรุณาระบุเลขที่บัตร", function() { 
+							$("#idNumber").focus();
+		    		    });
+						//alert("กรุณาระบุเลขที่บัตร");
+						//$("#idNumber").focus();
 		                return false;
 					}
 					
 					if(gv_checkFormatIdNumber==false){
-						alert("เลขที่บัตรผิด");
-						$("#idNumber").focus();
+						alert("เลขที่บัตรผิด", function() { 
+							$("#idNumber").focus();
+		    		    });
+						//alert("เลขที่บัตรผิด");
+						//$("#idNumber").focus();
 		                return false;
 					}
 				}
@@ -197,7 +202,7 @@
 				}
 				
 				
-				if(provinceName=="" && districtName=="" && subdistrictName==""){
+				/*if(provinceName=="" && districtName=="" && subdistrictName==""){
 					$("#provinceCode").val("");
         			$("#districtCode").val("");
         			$("#subdistrictCode").val("");
@@ -207,7 +212,7 @@
 						alert("กรุณาระบุจังหวัด อำเภอ/เขต และตำบล/แขวงให้ครบ");
 						return false;
 					}
-				}
+				}*/
 				
 				$.ajax({
 					async:false,
@@ -271,14 +276,21 @@
 				lo_postCode 			= document.getElementById("postCode");
 				
 				if(gp_number(lo_postCode)==false){
-					alert("กรุณาระบุตัวเลขเท่านั้น");
-					lo_postCode.value = "";
+					alert("กรุณาระบุตัวเลขเท่านั้น", function() { 
+						$('#postCode').val('');
+						$('#postCode').focus().select();
+	    		    });
+					//alert("กรุณาระบุตัวเลขเท่านั้น");
+					//lo_postCode.value = "";
 					return;
 				}
 				
 				if(gp_trim(lo_postCode.value)!="" && gp_trim(lo_postCode.value).length < 5){
-					alert("ระบุได้รหัสไปรษณ๊ย์ผิด");
-					$('#postCode').focus().select();
+					alert("ระบุได้รหัสไปรษณ๊ย์ผิด", function() { 
+						$('#postCode').focus().select();
+	    		    });
+					//alert("ระบุได้รหัสไปรษณ๊ย์ผิด");
+					//$('#postCode').focus().select();
 					return;
 				}
 				
@@ -292,6 +304,7 @@
 			
 			try{
 				gv_checkFormatIdNumber 	= true;
+				gp_setFormatPin("idNumber");
 			}catch(e){
 				alert("lp_setModeEdit :: " + e);
 			}
@@ -320,15 +333,17 @@
 		            	var status				= null;
 		            	
 		            	try{
-		            		gp_progressBarOff();
+		            		//gp_progressBarOff();
 		            		
 		            		jsonObj = JSON.parse(data);
 		            		status	= jsonObj.status;
 		            		
 		            		if(status=="SUCCESS"){
-		            			alert("บันทึกเรียบร้อย");
-		            			//window.location = gv_url + "?service=servlet.UserDetailsMaintananceServlet&pageAction=getUserDetail&userUniqueId=" + userUniqueId;
-		            			lp_reset();
+		            			alert("บันทึกเรียบร้อย", function() { 
+		            				lp_reset();
+		    	    		    });
+		            			//alert("บันทึกเรียบร้อย");
+		            			//lp_reset();
 		            		}else{
 		            			alert(jsonObj.errMsg);
 		            			
@@ -382,7 +397,7 @@
 					return;
 				}
 				
-				if(!gp_validatePin(lv_idNumber)){
+				if(!gp_validatePin("idNumber")){
 					$("#inValidSpan").css("color", "red");
     				$("#inValidSpan").html("เลขที่บัตรผิด");
     				
@@ -392,7 +407,7 @@
 					gv_checkFormatIdNumber = true;
 				}
 				
-				$("#idNumber").val(lv_idNumber);
+				//$("#idNumber").val(lv_idNumber);
 				
 				
 			}catch(e){
@@ -413,7 +428,14 @@
 				alert("lp_ctrlIdType :: " + e);
 			}
 		}
-
+		
+		function lp_setCusStatus(){
+			try{
+				$("#cusStatus").val($("#cusStatusDis").val());
+			}catch(e){
+				alert("lp_setCusStatus :: " + e);
+			}
+		}
 		
 	</script>
 </head>
@@ -518,8 +540,7 @@
 								        						class="numberOnly"
 								        						style="width: 200px;"
 								        						onblur="lp_checkIdNumber();"
-								        						value="<%=customerDetailsBean.getIdNumber()%>" 
-								        						maxlength="13"  />
+								        						value="<%=customerDetailsBean.getIdNumber()%>" />
 								        				&nbsp;
 								        				<span id="inValidSpan"></span>
 								        			</td>
@@ -640,7 +661,7 @@
 												</tr>
 												<tr>
 													<td align="right">
-														จังหวัด :
+														จังหวัด <span style="color: red;"><b>*</b></span> :
 													</td>
 													<td align="left" >
 														<input  type="text" 
@@ -652,7 +673,7 @@
 														/>
 													</td>
 													<td align="right">
-														อำเภอ/เขต :
+														อำเภอ/เขต <span style="color: red;"><b>*</b></span> :
 													</td>
 													<td align="left" colspan="3">
 														<input  type="text"
@@ -666,7 +687,7 @@
 												</tr>
 								        		<tr>
 													<td align="right">
-														ตำบล/แขวง :
+														ตำบล/แขวง <span style="color: red;"><b>*</b></span> :
 													</td>
 													<td align="left" >
 														<input  type="text"
@@ -678,7 +699,7 @@
 															/>
 													</td>
 													<td align="right">
-														รหัสไปรษณ๊ย์:
+														รหัสไปรษณ๊ย์ <span style="color: red;"><b>*</b></span> :
 													</td>
 													<td align="left" colspan="3">
 														<input  type="text" 
@@ -734,11 +755,12 @@
 								        				สถานะ <span style="color: red;"><b>*</b></span> :
 								        			</td>
 								        			<td align="left" colspan="5">
-								        				<select id="cusStatus" name="cusStatus" style="width: 220px;" >
+								        				<select id="cusStatusDis" name="cusStatusDis" style="width: 220px;" onchange="lp_setCusStatus();" >
 								        					<% for(ComboBean comboBean:statusCombo){ %>
 								        					<option value="<%=comboBean.getCode()%>" <%if(customerDetailsBean.getCusStatus().equals(comboBean.getCode())){ %> selected <%} %> ><%=comboBean.getDesc()%></option>
 								        					<%} %>
 								        				</select>
+								        				<input type="hidden" id="cusStatus" name="cusStatus" value="<%=customerDetailsBean.getCusStatus()%>" />
 								        			</td>
 								        		</tr>
 								        		<tr>
@@ -825,6 +847,7 @@
 				</section>
 			</section>
 		</section>
+		<div id="dialog" title="Look up"></div>
 		<div align="center" class="FreezeScreen" style="display:none;">
         	<center>
         		<img id="imgProgress" valign="center" src="<%=imgURL%>/loading36.gif" alt="" />

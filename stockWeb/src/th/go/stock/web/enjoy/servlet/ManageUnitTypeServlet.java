@@ -273,33 +273,33 @@ public class ManageUnitTypeServlet extends EnjoyStandardSvc {
 				bean = unitTypeList.get(i);
 				if(bean.getRowStatus().equals(ManageUnitTypeForm.NEW)){
 					
-					for(int j=(i+1);j<unitTypeList.size();j++){
-						beanTemp = unitTypeList.get(j);
-						if(beanTemp.getRowStatus().equals(ManageUnitTypeForm.NEW) && bean.getUnitName().equals(beanTemp.getUnitName())){
-							throw new EnjoyException("ชื่อหน่วยสินค้าห้ามซ้ำ");
-						}
-					}
-					
-					chk = this.dao.checkDupUnitName(session, bean.getUnitName(), "");
-					
-					logger.info("[onSave] " + bean.getUnitName() + " chk :: " + chk);
-					
-					if(chk > 0){
-						throw new EnjoyException("ชื่อหน่วยสินค้าห้ามซ้ำ");
-					}
+//					for(int j=(i+1);j<unitTypeList.size();j++){
+//						beanTemp = unitTypeList.get(j);
+//						if(beanTemp.getRowStatus().equals(ManageUnitTypeForm.NEW) && bean.getUnitName().equals(beanTemp.getUnitName())){
+//							throw new EnjoyException("ชื่อหน่วยสินค้าห้ามซ้ำ");
+//						}
+//					}
+//					
+//					chk = this.dao.checkDupUnitName(session, bean.getUnitName(), "");
+//					
+//					logger.info("[onSave] " + bean.getUnitName() + " chk :: " + chk);
+//					
+//					if(chk > 0){
+//						throw new EnjoyException("ชื่อหน่วยสินค้าห้ามซ้ำ");
+//					}
 					
 					this.dao.insertUnitType(session, bean);
 				}else if(bean.getRowStatus().equals(ManageUnitTypeForm.UPD) || bean.getRowStatus().equals(ManageUnitTypeForm.DEL)){
 					
-					if(bean.getRowStatus().equals(ManageUnitTypeForm.UPD)){
-						chk = this.dao.checkDupUnitName(session, bean.getUnitName(), bean.getUnitCode());
-						
-						logger.info("[onSave] UPD " + bean.getUnitName() + " chk :: " + chk);
-						
-						if(chk > 0){
-							throw new EnjoyException("ชื่อหน่วยสินค้าห้ามซ้ำ");
-						}
-					}
+//					if(bean.getRowStatus().equals(ManageUnitTypeForm.UPD)){
+//						chk = this.dao.checkDupUnitName(session, bean.getUnitName(), bean.getUnitCode());
+//						
+//						logger.info("[onSave] UPD " + bean.getUnitName() + " chk :: " + chk);
+//						
+//						if(chk > 0){
+//							throw new EnjoyException("ชื่อหน่วยสินค้าห้ามซ้ำ");
+//						}
+//					}
 					
 					this.dao.updateUnitType(session, bean);
 				}
@@ -315,7 +315,7 @@ public class ManageUnitTypeServlet extends EnjoyStandardSvc {
 			obj.put(ERR_MSG, 		e.getMessage());
 		}catch(Exception e){
 			session.getTransaction().rollback();
-			logger.info(e.getMessage());
+			logger.error(e);
 			e.printStackTrace();
 			obj.put(STATUS, 		ERROR);
 			obj.put(ERR_MSG, 		"onSave is error");

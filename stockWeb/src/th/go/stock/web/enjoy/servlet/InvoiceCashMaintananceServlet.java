@@ -21,6 +21,7 @@ import th.go.stock.app.enjoy.bean.InvoiceCashDetailBean;
 import th.go.stock.app.enjoy.bean.InvoiceCashMasterBean;
 import th.go.stock.app.enjoy.bean.ProductmasterBean;
 import th.go.stock.app.enjoy.bean.UserDetailsBean;
+import th.go.stock.app.enjoy.dao.CompanyDetailsDao;
 import th.go.stock.app.enjoy.dao.CustomerDetailsDao;
 import th.go.stock.app.enjoy.dao.InvoiceCashDao;
 import th.go.stock.app.enjoy.dao.ProductDetailsDao;
@@ -54,6 +55,7 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
     private ProductDetailsDao				productDetailsDao			= null;
     private RelationGroupCustomerDao		relationGroupCustomerDao	= null;
     private UserDetailsDao					userDetailsDao				= null;
+    private CompanyDetailsDao				companyDetailsDao			= null;
     
 	@Override
 	public void execute(HttpServletRequest request, HttpServletResponse response)
@@ -80,6 +82,7 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
              this.productDetailsDao			= new ProductDetailsDao();
              this.relationGroupCustomerDao 	= new RelationGroupCustomerDao();
              this.userDetailsDao			= new UserDetailsDao();
+             this.companyDetailsDao			= new CompanyDetailsDao();
  			
              logger.info("[execute] pageAction : " + pageAction );
              
@@ -165,6 +168,7 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 		
 		try{
 			this.setInvoiceStatusCombo();
+			this.setCompanyCombo();
 		}catch(EnjoyException e){
 			throw new EnjoyException(e.getMessage());
 		}catch(Exception e){
@@ -198,6 +202,33 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 			throw new EnjoyException("setInvoiceStatusCombo is error");
 		}finally{
 			logger.info("[setInvoiceStatusCombo][End]");
+		}
+	}
+	
+	private void setCompanyCombo() throws EnjoyException{
+		
+		logger.info("[setCompanyCombo][Begin]");
+		
+		List<ComboBean>			combo 			= null;
+		List<ComboBean>			comboDb 		= null;
+		
+		try{
+			
+			combo 	= new ArrayList<ComboBean>();
+			comboDb	= this.companyDetailsDao.getCompanyCombo();
+			
+			combo.add(new ComboBean(""	, "กรุณาระบุ"));
+			for(ComboBean vo:comboDb){
+				combo.add(new ComboBean(vo.getCode()	, vo.getDesc()));
+			}
+			
+			this.form.setCompanyCombo(combo);
+		}
+		catch(Exception e){
+			logger.error(e);
+			throw new EnjoyException("setCompanyCombo is error");
+		}finally{
+			logger.info("[setCompanyCombo][End]");
 		}
 	}
 	
@@ -779,7 +810,7 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 		   
 		   logger.info("[getSaleNameDetail] saleName 				:: " + saleName);
 		   
-		   listUserprivilege 			= this.userDetailsDao.getUserprivilege(session);
+		   listUserprivilege 			= this.userDetailsDao.getUserprivilege();
 		   for(Userprivilege userprivilege : listUserprivilege){
 			   fUserprivilege.put(userprivilege.getPrivilegeCode() , userprivilege.getPrivilegeName());
 		   }
@@ -908,8 +939,8 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 		
 		try {
 			obj 			= new JSONObject();
-			productCode 	= EnjoyUtils.nullToStr(this.request.getParameter("productCode"));
-			quantity 		= EnjoyUtil.nullToStr(request.getParameter("quantity"));
+			productCode 	= EnjoyUtil.nullToStr(this.request.getParameter("productCode"));
+			quantity 		= EnjoyUtil.replaceComma(request.getParameter("quantity"));
 			
 			discount = this.productDetailsDao.getQuanDiscount(productCode, quantity);
 			
@@ -920,7 +951,7 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 			obj.put(STATUS, ERROR);
 			obj.put(ERR_MSG, "getDiscount is error");
 			e.printStackTrace();
-			logger.info("[getDiscount] " + e.getMessage());
+			logger.error("[getDiscount] " + e);
 		} finally {
 			this.enjoyUtil.writeMSG(obj.toString());
 			logger.info("[getDiscount][End]");

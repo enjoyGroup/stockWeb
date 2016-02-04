@@ -176,12 +176,13 @@ public class RefconstantcodeMaintananceServlet extends EnjoyStandardSvc {
 	private void updateRecord() throws EnjoyException{
 		logger.info("[updateRecord][Begin]");
 		
-		JSONObject 						obj 					= null;
-		String 							id						= null;
-		String 							codeDisplay				= null;
-		String 							codeNameTH				= null;
-		String 							codeNameEN				= null;
-		List<RefconstantcodeBean> 	refconstantcodeList			= null;
+		JSONObject 					obj 					= null;
+		String 						id						= null;
+		String 						codeDisplay				= null;
+		String 						codeNameTH				= null;
+		String 						codeNameEN				= null;
+		String 						flagYear				= null;
+		List<RefconstantcodeBean> 	refconstantcodeList		= null;
 		
 		try{
 			
@@ -190,19 +191,22 @@ public class RefconstantcodeMaintananceServlet extends EnjoyStandardSvc {
 			codeDisplay 			= EnjoyUtil.nullToStr(request.getParameter("codeDisplay"));
 			codeNameTH 				= EnjoyUtil.nullToStr(request.getParameter("codeNameTH"));
 			codeNameEN 				= EnjoyUtil.nullToStr(request.getParameter("codeNameEN"));
+			flagYear 				= EnjoyUtil.chkBoxtoDb(request.getParameter("flagYear"));
 			refconstantcodeList		= this.form.getRefconstantcodeList();
 			
 			logger.info("[updateRecord] id 				:: " + id);
 			logger.info("[updateRecord] codeDisplay 	:: " + codeDisplay);
 			logger.info("[updateRecord] codeNameTH 		:: " + codeNameTH);
 			logger.info("[updateRecord] codeNameEN 		:: " + codeNameEN);
+			logger.info("[updateRecord] flagYear 		:: " + flagYear);
 			
 			for(RefconstantcodeBean bean:refconstantcodeList){
 				if(bean.getId().equals(id) && !bean.getRowStatus().equals(RefconstantcodeMaintananceForm.DEL)){
 					
-					bean.setCodeDisplay(codeDisplay);
-					bean.setCodeNameTH(codeNameTH);
-					bean.setCodeNameEN(codeNameEN);
+					bean.setCodeDisplay	(codeDisplay);
+					bean.setCodeNameTH	(codeNameTH);
+					bean.setCodeNameEN	(codeNameEN);
+					bean.setFlagYear	(flagYear);
 					
 					if(bean.getRowStatus().equals("")){
 						bean.setRowStatus(RefconstantcodeMaintananceForm.EDIT);

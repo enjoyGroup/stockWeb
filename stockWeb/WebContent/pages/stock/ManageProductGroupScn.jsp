@@ -22,20 +22,23 @@
 		var gv_url 					= '<%=servURL%>/EnjoyGenericSrv';
 		
 		$(document).ready(function(){
-			gp_progressBarOn();
+			//gp_progressBarOn();
 			
 			gv_service 		= "service=" + $('#service').val();
 			
 			$('#btnSearch').click(function(){ 
 				try{
 					if(gp_trim($("#productTypeName").val())==""){
-		            	alert("กรุณาระบุหมวดสินค้า");
-		            	$("#productTypeName").focus();
+						alert("กรุณาระบุหมวดสินค้า", function() { 
+							$("#productTypeName").focus();
+		    		    });
+		            	//alert("กรุณาระบุหมวดสินค้า");
+		            	//$("#productTypeName").focus();
 		                return;
 		            }
 					
 					$.ajax({
-						async:false,
+						async:true,
 			            type: "POST",
 			            url: gv_url,
 			            data: gv_service + "&pageAction=search&" + $('#frm').serialize(),
@@ -97,7 +100,7 @@
 			      }
 			});
 				
-			gp_progressBarOff();
+			//gp_progressBarOff();
 				
 		});
 			
@@ -113,16 +116,22 @@
 				
 				for(var i=0;i<la_productGroupCode.length;i++){
 					if(gp_trim(la_productGroupCode[i].value)==""){
-		            	alert("กรุณาระบุรหัสหมู่สินค้า");
-		            	la_productGroupCode[i].focus();
+						alert("กรุณาระบุรหัสหมู่สินค้า", function() { 
+							la_productGroupCode[i].focus();
+		    		    });
+		            	//alert("กรุณาระบุรหัสหมู่สินค้า");
+		            	//la_productGroupCode[i].focus();
 		                return false;
 		            }
 				}
 				
 				for(var i=0;i<la_productGroupName.length;i++){
 					if(gp_trim(la_productGroupName[i].value)==""){
-		            	alert("กรุณาระบุชื่อหมู่สินค้า");
-		            	la_productGroupName[i].focus();
+						alert("กรุณาระบุชื่อหมู่สินค้า", function() { 
+							la_productGroupName[i].focus();
+		    		    });
+		            	//alert("กรุณาระบุชื่อหมู่สินค้า");
+		            	//la_productGroupName[i].focus();
 		                return false;
 		            }
 				}
@@ -344,7 +353,7 @@
 				params 	= "pageAction=save&" + $('#frm').serialize();
 				
 				$.ajax({
-					async:false,
+					async:true,
 		            type: "POST",
 		            url: gv_url,
 		            data: params,
@@ -354,14 +363,17 @@
 		            	var status				= null;
 		            	
 		            	try{
-		            		gp_progressBarOff();
+		            		//gp_progressBarOff();
 		            		
 		            		jsonObj = JSON.parse(data);
 		            		status	= jsonObj.status;
 		            		
 		            		if(status=="SUCCESS"){
-		            			alert("บันทึกเรียบร้อย");
-		            			lp_reset();
+		            			alert("บันทึกเรียบร้อย", function() { 
+		            				lp_reset();
+				    		    });
+		            			//alert("บันทึกเรียบร้อย");
+		            			//lp_reset();
 		            		}else{
 		            			alert(jsonObj.errMsg);
 		            			
@@ -487,6 +499,7 @@
 				</section>
 			</section>
 		</section>
+		<div id="dialog" title="Look up"></div>
 		<div align="center" class="FreezeScreen" style="display:none;">
         	<center>
         		<img id="imgProgress" valign="center" src="<%=imgURL%>/loading36.gif" alt="" />

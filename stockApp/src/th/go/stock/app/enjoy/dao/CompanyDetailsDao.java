@@ -46,20 +46,14 @@ public class CompanyDetailsDao {
 								+ "	from company a, refcompanystatus b"
 								+ "	where b.companyStatusCode = a.companyStatus ";
 			
-			if(!companyDetailsBean.getCompanyName().equals("***")){
-				if(companyDetailsBean.getCompanyName().equals("")){
-					hql += " and (a.companyName is null or a.companyName = '')";
-				}else{
-					hql += " and a.companyName like ('" + companyDetailsBean.getCompanyName() + "%')";
-				}
+			if(!companyDetailsBean.getCompanyName().equals("")){
+				hql += " and a.companyName like ('" + companyDetailsBean.getCompanyName() + "%')";
 			}
-			if(!companyDetailsBean.getTin().equals("***")){
-				if(companyDetailsBean.getTin().equals("")){
-					hql += " and (a.tin is null or a.tin = '')";
-				}else{
-					hql += " and a.tin like ('" + companyDetailsBean.getTin() + "%')";
-				}
+			
+			if(!companyDetailsBean.getTin().equals("")){
+				hql += " and a.tin like ('" + companyDetailsBean.getTin() + "%')";
 			}
+			
 			if(!companyDetailsBean.getCompanyStatus().equals("")){
 				hql += " and a.companyStatus = '" + companyDetailsBean.getCompanyStatus() + "'";
 			}
@@ -255,7 +249,7 @@ public class CompanyDetailsDao {
 		
 	}
 	
-	public List<ComboBean> getCompanystatusCombo(Session session) throws EnjoyException{
+	public List<ComboBean> getCompanystatusCombo() throws EnjoyException{
 		logger.info("[getCompanystatusCombo][Begin]");
 		
 		String						hql						= null;
@@ -263,8 +257,12 @@ public class CompanyDetailsDao {
 		List<Object[]>				list					= null;
 		ComboBean					comboBean				= null;
 		List<ComboBean> 			comboList				= new ArrayList<ComboBean>();
+		SessionFactory 				sessionFactory			= null;
+		Session 					session					= null;
 		
 		try{
+			sessionFactory 	= HibernateUtil.getSessionFactory();
+			session 		= sessionFactory.openSession();
 			
 			hql	= "select * from refcompanystatus";
 
@@ -276,7 +274,7 @@ public class CompanyDetailsDao {
 			
 			list		 	= query.list();
 			
-			comboList.add(new ComboBean("", "กรุณาระบุ"));
+//			comboList.add(new ComboBean("", "กรุณาระบุ"));
 			for(Object[] row:list){
 				comboBean = new ComboBean();
 				
@@ -295,7 +293,10 @@ public class CompanyDetailsDao {
 			logger.info("[getCompanystatusCombo] " + e.getMessage());
 			throw new EnjoyException("Error getCompanystatusCombo");
 		}finally{
-			hql						= null;
+			session.close();
+			sessionFactory	= null;
+			session			= null;
+			hql				= null;
 			logger.info("[getCompanystatusCombo][End]");
 		}
 		
@@ -466,7 +467,7 @@ public class CompanyDetailsDao {
 			
 			query			= session.createSQLQuery(hql);
 			query.addScalar("tin"			, new StringType());
-			query.addScalar("companyName"			, new StringType());
+			query.addScalar("companyName"	, new StringType());
 			
 			list		 	= query.list();
 			
@@ -475,8 +476,8 @@ public class CompanyDetailsDao {
 			for(Object[] row:list){
 				comboBean 	= new ComboBean();
 				
-				logger.info("tin 		:: " + row[0].toString());
-				logger.info("companyName 		:: " + row[1].toString());
+				logger.info("tin 			:: " + row[0].toString());
+				logger.info("companyName 	:: " + row[1].toString());
 				
 				comboBean.setCode				(row[0].toString());
 				comboBean.setDesc				(row[1].toString());
@@ -534,7 +535,7 @@ public class CompanyDetailsDao {
 		return tin;
 	}
 	
-	public List<ComboBean> getCompanyCombo(Session session) throws EnjoyException{
+	public List<ComboBean> getCompanyCombo() throws EnjoyException{
 		logger.info("[getCompanyCombo][Begin]");
 		
 		String						hql						= null;
@@ -542,20 +543,23 @@ public class CompanyDetailsDao {
 		List<Object[]>				list					= null;
 		ComboBean					comboBean				= null;
 		List<ComboBean> 			comboList				= new ArrayList<ComboBean>();
+		SessionFactory 				sessionFactory			= null;
+		Session 					session					= null;
 		
 		try{
 			
 			hql	= "select tin,companyName from company where companyStatus = 'A'";
 
 			logger.info("[getCompanyCombo] hql :: " + hql);
-			
-			query			= session.createSQLQuery(hql);
+			sessionFactory 		= HibernateUtil.getSessionFactory();
+			session 			= sessionFactory.openSession();
+			query				= session.createSQLQuery(hql);
 			query.addScalar("tin"		, new StringType());
 			query.addScalar("companyName"		, new StringType());
 			
 			list		 	= query.list();
 			
-			comboList.add(new ComboBean("", "กรุณาระบุ"));
+//			comboList.add(new ComboBean("", "กรุณาระบุ"));
 			for(Object[] row:list){
 				comboBean = new ComboBean();
 				
@@ -574,12 +578,113 @@ public class CompanyDetailsDao {
 			logger.info("[getCompanyCombo] " + e.getMessage());
 			throw new EnjoyException("Error getCompanyCombo");
 		}finally{
-			hql						= null;
+			session.close();
+			sessionFactory	= null;
+			session			= null;
+			hql				= null;
 			logger.info("[getCompanyCombo][End]");
 		}
 		
 		return comboList;
 		
+	}
+	
+	public List<ComboBean> tinListForAutoComplete(String tin){
+		logger.info("[tinListForAutoComplete][Begin]");
+		
+		String 						hql			 		= null;
+        SessionFactory 				sessionFactory		= null;
+		Session 					session				= null;
+		SQLQuery 					query 				= null;
+		List<String>				list				= null;
+		List<ComboBean>				comboList 			= null;
+		ComboBean					comboBean			= null;
+		
+		try{
+			sessionFactory 		= HibernateUtil.getSessionFactory();
+			session 			= sessionFactory.openSession();
+			comboList			=  new ArrayList<ComboBean>();
+			hql 				= " select distinct tin from company where tin like ('"+tin+"%') order by tin asc limit 10 ";
+			
+			logger.info("[tinListForAutoComplete] hql :: " + hql);
+			
+			query			= session.createSQLQuery(hql);
+			query.addScalar("tin"			, new StringType());
+			
+			list		 	= query.list();
+			
+			logger.info("[tinListForAutoComplete] list.size() :: " + list.size());
+			
+			for(String row:list){
+				comboBean 	= new ComboBean();
+				
+				logger.info("tin 			:: " + row);
+				
+				comboBean.setCode				(row);
+				comboBean.setDesc				(row);
+				
+				comboList.add(comboBean);
+			}	
+			
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally{
+			session.close();
+			sessionFactory	= null;
+			session			= null;
+			logger.info("[tinListForAutoComplete][End]");
+		}
+		
+		return comboList;
+	}
+	
+	public List<ComboBean> companyNameListForAutoComplete(String companyName){
+		logger.info("[companyNameListForAutoComplete][Begin]");
+		
+		String 						hql			 		= null;
+        SessionFactory 				sessionFactory		= null;
+		Session 					session				= null;
+		SQLQuery 					query 				= null;
+		List<String>				list				= null;
+		List<ComboBean>				comboList 			= null;
+		ComboBean					comboBean			= null;
+		
+		try{
+			sessionFactory 		= HibernateUtil.getSessionFactory();
+			session 			= sessionFactory.openSession();
+			comboList			=  new ArrayList<ComboBean>();
+			hql 				= " select distinct companyName from company where companyName like ('"+companyName+"%') order by companyName asc limit 10 ";
+			
+			logger.info("[companyNameListForAutoComplete] hql :: " + hql);
+			
+			query			= session.createSQLQuery(hql);
+			query.addScalar("companyName"	, new StringType());
+			
+			list		 	= query.list();
+			
+			logger.info("[companyNameListForAutoComplete] list.size() :: " + list.size());
+			
+			for(String row:list){
+				comboBean 	= new ComboBean();
+				
+				logger.info("companyName 	:: " + row);
+				
+				comboBean.setCode				(row);
+				comboBean.setDesc				(row);
+				
+				comboList.add(comboBean);
+			}	
+			
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally{
+			session.close();
+			sessionFactory	= null;
+			session			= null;
+			logger.info("[companyNameListForAutoComplete][End]");
+		}
+		
+		return comboList;
 	}
 	
 }

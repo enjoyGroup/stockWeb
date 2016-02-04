@@ -24,7 +24,7 @@
 		var gv_url 					= '<%=servURL%>/EnjoyGenericSrv';
 		
 		$(document).ready(function(){
-			gp_progressBarOn();
+			//gp_progressBarOn();
 			
 			gv_service 		= "service=" + $('#service').val();
 			
@@ -130,7 +130,7 @@
 			      }
 			});
 			
-			gp_progressBarOff();
+			//gp_progressBarOff();
 			
 		});
 		
@@ -161,16 +161,9 @@
 				la_startDate 	= document.getElementsByName("startDate");
 				la_expDate 		= document.getElementsByName("expDate");
 				
-				for(var i=0;i<la_validate.length;i++){
-					la_temp			= la_validate[i].split(":");
-		            lo_obj          = eval('$("#' + la_temp[0] + '")');
-		            
-		            if(gp_trim(lo_obj.val())==""){
-		            	alert("กรุณาระบุ " + la_temp[1]);
-		            	lo_obj.focus();
-		                return false;
-		            }
-		        }
+				if(!gp_validateEmptyObj(la_validate)){
+					return false;
+				}
 				
 				/*if(expDate!=""){
 					if(gp_toDate(startDate) > gp_toDate(expDate)){
@@ -181,26 +174,39 @@
 				
 				for(var i=0;i<la_quanDiscount.length;i++){
 					if(gp_trim(la_quanDiscount[i].value)=="" || gp_trim(la_quanDiscount[i].value)=="0.00"){
-		            	alert("กรุณาระบุปริมาณที่ซื้อ");
-		            	la_quanDiscount[i].focus();
+						alert("กรุณาระบุปริมาณที่ซื้อ", function() { 
+							la_quanDiscount[i].focus();
+		    		    });
+		            	//alert("กรุณาระบุปริมาณที่ซื้อ");
+		            	//la_quanDiscount[i].focus();
 		                return false;
 		            }
 					
 					if(gp_trim(la_discountRate[i].value)=="" || gp_trim(la_discountRate[i].value)=="0.00"){
-		            	alert("กรุณาระบุลดจำนวนเงิน");
-		            	la_discountRate[i].focus();
+						alert("กรุณาระบุลดจำนวนเงิน", function() { 
+							la_discountRate[i].focus();
+		    		    });
+		            	//alert("กรุณาระบุลดจำนวนเงิน");
+		            	//la_discountRate[i].focus();
 		                return false;
 		            }
 					
 					if(gp_trim(la_startDate[i].value)==""){
-		            	alert("กรุณาระบุวันที่มีผล");
-		            	la_startDate[i].focus();
+						alert("กรุณาระบุวันที่มีผล", function() { 
+							la_startDate[i].focus();
+		    		    });
+		            	//alert("กรุณาระบุวันที่มีผล");
+		            	//la_startDate[i].focus();
 		                return false;
 		            }
 					
 					if(la_expDate[i].value.trim()!=""){
 						if(gp_toDate(la_startDate[i].value.trim()) > gp_toDate(la_expDate[i].value.trim())){
-							alert("วันที่สิ้นสุดการใช้งานต้องมากกว่าวันที่มีผล");
+							alert("วันที่สิ้นสุดการใช้งานต้องมากกว่าวันที่มีผล", function() { 
+								la_expDate[i].focus();
+			    		    });
+							//alert("วันที่สิ้นสุดการใช้งานต้องมากกว่าวันที่มีผล");
+							//la_expDate[i].focus();
 			                return false;
 		                }
 					}
@@ -284,15 +290,17 @@
 		            	var status				= null;
 		            	
 		            	try{
-		            		gp_progressBarOff();
+		            		//gp_progressBarOff();
 		            		
 		            		jsonObj = JSON.parse(data);
 		            		status	= jsonObj.status;
 		            		
 		            		if(status=="SUCCESS"){
-		            			alert("บันทึกเรียบร้อย");
-		            			//window.location = gv_url + "?service=servlet.UserDetailsMaintananceServlet&pageAction=getUserDetail&userUniqueId=" + userUniqueId;
-		            			lp_reset();
+		            			alert("บันทึกเรียบร้อย", function() { 
+		            				lp_reset();
+				    		    });
+		            			//alert("บันทึกเรียบร้อย");
+		            			//lp_reset();
 		            		}else{
 		            			alert(jsonObj.errMsg);
 		            			
@@ -728,7 +736,7 @@
 												<tr height="26px;">
 													<th  style="text-align: center;" width="5%" ><B>ลำดับ</B></th>
 													<th  style="text-align: center;" width="20%"><B>ปริมาณที่ซื้อ</B></th>
-													<th  style="text-align: center;" width="20%"><B>ลดจำนวนเงิน</B></th>
+													<th  style="text-align: center;" width="20%"><B>ลดจำนวนเงิน(%)</B></th>
 													<th  style="text-align: center;" width="20%"><B>วันที่มีผล</B></th>
 													<th  style="text-align: center;" width="20%"><B>วันที่สิ้นสุด</B></th>
 													<th style="text-align: center;" width="15%">Action</th>
@@ -766,7 +774,7 @@
 								        					   name='startDate' 
 								        					   placeholder="DD/MM/YYYY"
 								        					   class="dateFormat"
-								        					   onchange="gp_checkDate(this);"
+								        					   onchange="gp_checkDate(this);lp_updateRecord(<%=bean.getSeq()%>);"
 								        					   value="<%=bean.getStartDate() %>" 
 								        					   style="width: 100px;" />
 													</td>
@@ -776,7 +784,7 @@
 								        					   name='expDate' 
 								        					   placeholder="DD/MM/YYYY"
 								        					   class="dateFormat"
-								        					   onchange="gp_checkDate(this);"
+								        					   onchange="gp_checkDate(this);lp_updateRecord(<%=bean.getSeq()%>);"
 								        					   value="<%=bean.getExpDate() %>" 
 								        					   style="width: 100px;" />
 													</td>
@@ -813,6 +821,7 @@
 				</section>
 			</section>
 		</section>
+		<div id="dialog" title="Look up"></div>
 		<div align="center" class="FreezeScreen" style="display:none;">
         	<center>
         		<img id="imgProgress" valign="center" src="<%=imgURL%>/loading36.gif" alt="" />

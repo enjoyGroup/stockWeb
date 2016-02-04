@@ -15,6 +15,7 @@ import th.go.stock.app.enjoy.bean.ComboBean;
 import th.go.stock.app.enjoy.bean.ReciveOrdeDetailBean;
 import th.go.stock.app.enjoy.bean.ReciveOrderMasterBean;
 import th.go.stock.app.enjoy.exception.EnjoyException;
+import th.go.stock.app.enjoy.main.ConfigFile;
 import th.go.stock.app.enjoy.model.Reciveordedetail;
 import th.go.stock.app.enjoy.model.ReciveordedetailPK;
 import th.go.stock.app.enjoy.model.Reciveordermaster;
@@ -208,7 +209,7 @@ public class ReciveStockDao {
 	public void insertReciveordermaster(Session session, ReciveOrderMasterBean 		reciveOrderMasterBean) throws EnjoyException{
 		logger.info("[insertReciveordermaster][Begin]");
 		
-		Reciveordermaster	reciveordermaster						= null;
+		Reciveordermaster	reciveordermaster						= null;//genReciveNo
 		
 		try{
 			
@@ -484,46 +485,46 @@ public class ReciveStockDao {
 		}
 	}
 	
-	public int genId(Session session) throws EnjoyException{
-		logger.info("[genId][Begin]");
-		
-		String							hql									= null;
-		List<Integer>			 		list								= null;
-		SQLQuery 						query 								= null;
-		int 							result								= 0;
-		
-		
-		try{
-			
-			hql				= "select max(reciveNo) lastId from reciveordermaster";
-			query			= session.createSQLQuery(hql);
-			
-			query.addScalar("lastId"			, new IntegerType());
-			
-			list		 	= query.list();
-			
-			if(list!=null && list.size() > 0){
-				result = list.get(0)==null?0:list.get(0);
-			}
-			
-			logger.info("[genId] result 			:: " + result);
-			
-			result++;
-			
-		}catch(Exception e){
-			e.printStackTrace();
-			logger.info(e.getMessage());
-			throw new EnjoyException(e.getMessage());
-		}finally{
-			
-			hql									= null;
-			list								= null;
-			query 								= null;
-			logger.info("[genId][End]");
-		}
-		
-		return result;
-	}
+//	public int genId(Session session) throws EnjoyException{
+//		logger.info("[genId][Begin]");
+//		
+//		String							hql									= null;
+//		List<Integer>			 		list								= null;
+//		SQLQuery 						query 								= null;
+//		int 							result								= 0;
+//		
+//		
+//		try{
+//			
+//			hql				= "select max(reciveNo) lastId from reciveordermaster";
+//			query			= session.createSQLQuery(hql);
+//			
+//			query.addScalar("lastId"			, new IntegerType());
+//			
+//			list		 	= query.list();
+//			
+//			if(list!=null && list.size() > 0){
+//				result = list.get(0)==null?0:list.get(0);
+//			}
+//			
+//			logger.info("[genId] result 			:: " + result);
+//			
+//			result++;
+//			
+//		}catch(Exception e){
+//			e.printStackTrace();
+//			logger.info(e.getMessage());
+//			throw new EnjoyException(e.getMessage());
+//		}finally{
+//			
+//			hql									= null;
+//			list								= null;
+//			query 								= null;
+//			logger.info("[genId][End]");
+//		}
+//		
+//		return result;
+//	}
 	
 	/*ดึงสถานะมาอยู่ใน Combo*/
 	public List<ComboBean> getRefReciveOrderStatusCombo() throws EnjoyException{
@@ -577,6 +578,61 @@ public class ReciveStockDao {
 		
 	}
 	
+	
+	public String genReciveNo() throws EnjoyException{
+		logger.info("[genReciveNo][Begin]");
+		
+		String				hql						= null;
+		List<Integer>		list					= null;
+		SQLQuery 			query 					= null;
+		SessionFactory 		sessionFactory			= null;
+		Session 			session					= null;
+		String				newId					= "";
+		String				codeDisplay				= null;
+		RefconstantcodeDao	refconstantcodeDao		= null;
+		
+		try{
+			sessionFactory 		= HibernateUtil.getSessionFactory();
+			session 			= sessionFactory.openSession();
+			refconstantcodeDao 	= new RefconstantcodeDao();
+			codeDisplay			= refconstantcodeDao.getCodeDisplay("2");
+			
+			hql				= "SELECT (MAX(SUBSTRING_INDEX(reciveNo, '-', -1)) + 1) AS newId"
+							+ "	FROM reciveordermaster"
+							+ "	WHERE"
+							+ "		SUBSTRING_INDEX(reciveNo, '-', 1) = '" + codeDisplay + "'";
+			query			= session.createSQLQuery(hql);
+			
+			
+			query.addScalar("newId"			, new IntegerType());
+			
+			list		 	= query.list();
+			
+			if(list!=null && list.size() > 0){
+				newId = codeDisplay + "-" + String.format(ConfigFile.getPadingReciveNo(), list.get(0));
+			}else{
+				newId = codeDisplay + "-" + String.format(ConfigFile.getPadingReciveNo(), 1);
+			}
+			
+			logger.info("[genReciveNo] newId 			:: " + newId);
+			
+		}catch(Exception e){
+			e.printStackTrace();
+			logger.info(e.getMessage());
+			throw new EnjoyException(e.getMessage());
+		}finally{
+			
+			session.close();
+			sessionFactory	= null;
+			session			= null;
+			hql				= null;
+			list			= null;
+			query 			= null;
+			logger.info("[genReciveNo][End]");
+		}
+		
+		return newId;
+	}
 
 	
 }

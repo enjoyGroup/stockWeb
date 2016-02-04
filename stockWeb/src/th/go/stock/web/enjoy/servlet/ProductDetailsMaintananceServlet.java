@@ -643,8 +643,8 @@ public class ProductDetailsMaintananceServlet extends EnjoyStandardSvc {
 			seq 					= EnjoyUtil.nullToStr(request.getParameter("seq"));
 			quanDiscount 			= EnjoyUtil.nullToStr(request.getParameter("quanDiscount"));
 			discountRate 			= EnjoyUtil.nullToStr(request.getParameter("discountRate"));
-			startDate 				= EnjoyUtils.dateThaiToDb(request.getParameter("startDate"));
-			expDate 				= EnjoyUtils.dateThaiToDb(request.getParameter("expDate"));
+			startDate 				= EnjoyUtils.nullToStr(request.getParameter("startDate"));
+			expDate 				= EnjoyUtils.nullToStr(request.getParameter("expDate"));
 			productdetailList		= this.form.getProductdetailList();
 			
 			logger.info("[updateRecord] seq 			:: " + seq);

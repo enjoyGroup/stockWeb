@@ -14,6 +14,7 @@ import org.hibernate.SessionFactory;
 import org.json.simple.JSONObject;
 
 import th.go.stock.app.enjoy.bean.AddressBean;
+import th.go.stock.app.enjoy.bean.ComboBean;
 import th.go.stock.app.enjoy.bean.CompanyDetailsBean;
 import th.go.stock.app.enjoy.bean.UserDetailsBean;
 import th.go.stock.app.enjoy.dao.AddressDao;
@@ -109,10 +110,16 @@ public class CompanyDetailsMaintananceServlet extends EnjoyStandardSvc {
 	private void onLoad() throws EnjoyException{
 		logger.info("[onLoad][Begin]");
 		
+		CompanyDetailsBean 		companyDetailsBean = null;
+		
 		try{
 			
 			this.setRefference();
 			this.form.setTitlePage("เพิ่มรายละเอียดบริษัท");
+			
+			companyDetailsBean = this.form.getCompanyDetailsBean();
+			
+			companyDetailsBean.setCompanyStatus("A");
 			
 		}catch(EnjoyException e){
 			throw new EnjoyException(e.getMessage());
@@ -130,14 +137,38 @@ public class CompanyDetailsMaintananceServlet extends EnjoyStandardSvc {
 		
 		logger.info("[setRefference][Begin]");
 		
-		SessionFactory 		sessionFactory	= null;
-		Session 			session			= null;
+		try{
+			setStatusCombo();
+			
+		}catch(EnjoyException e){
+			throw new EnjoyException(e.getMessage());
+		}catch(Exception e){
+			e.printStackTrace();
+			logger.info(e.getMessage());
+			throw new EnjoyException("setRefference is error");
+		}finally{
+			
+			logger.info("[setRefference][End]");
+		}
+	}
+	
+	private void setStatusCombo() throws EnjoyException{
+		
+		logger.info("[setRefference][Begin]");
+		
+		List<ComboBean> 			comboList				= new ArrayList<ComboBean>();
+		List<ComboBean> 			comboListDb				= null;
 		
 		try{
-			sessionFactory 	= HibernateUtil.getSessionFactory();
-			session 		= sessionFactory.openSession();
+			comboListDb = this.dao.getCompanystatusCombo();
 			
-			this.form.setStatusCombo(this.dao.getCompanystatusCombo(session));
+//			comboList.add(new ComboBean("", "กรุณาระบุ"));
+			
+			for(ComboBean bean:comboListDb){
+				comboList.add(new ComboBean(bean.getCode(), bean.getDesc()));
+			}
+			
+			this.form.setStatusCombo(comboList);
 			
 			
 		}catch(EnjoyException e){
@@ -147,9 +178,6 @@ public class CompanyDetailsMaintananceServlet extends EnjoyStandardSvc {
 			logger.info(e.getMessage());
 			throw new EnjoyException("setRefference is error");
 		}finally{
-			session.close();
-			sessionFactory	= null;
-			session			= null;
 			logger.info("[setRefference][End]");
 		}
 	}
@@ -219,7 +247,7 @@ public class CompanyDetailsMaintananceServlet extends EnjoyStandardSvc {
 		try{
 			sessionFactory 				= HibernateUtil.getSessionFactory();
 			session 					= sessionFactory.openSession();
-			tin 						= EnjoyUtil.nullToStr(request.getParameter("tin"));
+			tin 						= EnjoyUtil.nullToStr(request.getParameter("tin")).replaceAll("-", "");
 			
 			logger.info("[checkDupTin] tin 		:: " + tin);
 			
@@ -341,7 +369,7 @@ public class CompanyDetailsMaintananceServlet extends EnjoyStandardSvc {
 		
 		try{
 			pageMode 					= EnjoyUtil.nullToStr(request.getParameter("pageMode"));
-			tin 						= EnjoyUtil.nullToStr(request.getParameter("tin"));
+			tin 						= EnjoyUtil.nullToStr(request.getParameter("tin")).replaceAll("-", "");
 			companyName 				= EnjoyUtil.nullToStr(request.getParameter("companyName"));
 			branchName 					= EnjoyUtil.nullToStr(request.getParameter("branchName"));
 			buildingName 				= EnjoyUtil.nullToStr(request.getParameter("buildingName"));

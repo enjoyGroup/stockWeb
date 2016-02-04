@@ -12,10 +12,14 @@ import javax.servlet.http.HttpSession;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 import th.go.stock.app.enjoy.bean.ComboBean;
+import th.go.stock.app.enjoy.bean.CustomerDetailsBean;
 import th.go.stock.app.enjoy.bean.InvoiceCashMasterBean;
 import th.go.stock.app.enjoy.bean.UserDetailsBean;
+import th.go.stock.app.enjoy.dao.CustomerDetailsDao;
 import th.go.stock.app.enjoy.dao.InvoiceCashDao;
 import th.go.stock.app.enjoy.exception.EnjoyException;
 import th.go.stock.app.enjoy.form.InvoiceCashSearchForm;
@@ -39,6 +43,7 @@ public class InvoiceCashSearchServlet extends EnjoyStandardSvc {
     private HttpSession                 session                     = null;
     private UserDetailsBean             userBean                    = null;
     private InvoiceCashDao				dao							= null;
+    private CustomerDetailsDao			customerDetailsDao			= null;
     private InvoiceCashSearchForm		form						= null;
     
 	@Override
@@ -62,6 +67,7 @@ public class InvoiceCashSearchServlet extends EnjoyStandardSvc {
              this.userBean           	= (UserDetailsBean) session.getAttribute("userBean");
              this.form               	= (InvoiceCashSearchForm) session.getAttribute(FORM_NAME);
              this.dao					= new InvoiceCashDao();
+             this.customerDetailsDao	= new CustomerDetailsDao();
  			
              logger.info("[execute] pageAction : " + pageAction );
              
@@ -74,6 +80,8 @@ public class InvoiceCashSearchServlet extends EnjoyStandardSvc {
  				this.onSearch();
  			}else if(pageAction.equals("getPage")){
 				this.lp_getPage();
+			}else if(pageAction.equals("getCusFullName")){
+				this.getCusFullName();
 			}
  			
  			session.setAttribute(FORM_NAME, this.form);
@@ -116,7 +124,7 @@ public class InvoiceCashSearchServlet extends EnjoyStandardSvc {
 			combo.add(new ComboBean(""	, "ทุกสถานะ"));
 			combo.add(new ComboBean("A"	, "ใช้งานอยู่"));
 			combo.add(new ComboBean("C"	, "ยกเลิกการใช้งาน"));
-			combo.add(new ComboBean("W"	, "รอสร้างใบ Invoice"));
+			//combo.add(new ComboBean("W"	, "รอสร้างใบ Invoice"));
 			
 			
 			this.form.setInvoiceStatusCombo(combo);
@@ -232,7 +240,6 @@ public class InvoiceCashSearchServlet extends EnjoyStandardSvc {
 		
 	}
 	
-	
 	private void lp_getPage(){
 		   logger.info("[lp_getPage][Begin]");
 		   
@@ -254,6 +261,45 @@ public class InvoiceCashSearchServlet extends EnjoyStandardSvc {
 		   }
 		   
 	   }
+	
+	private void getCusFullName(){
+	   logger.info("[getCusFullName][Begin]");
+	   
+	   String						cusFullName			= null;
+	   List<CustomerDetailsBean> 	list 				= null;
+       JSONArray 					jSONArray 			= null;
+       JSONObject 					objDetail 			= null;
+       CustomerDetailsBean 			customerDetailsBean	= null;
+       
+	   try{
+		   cusFullName			= EnjoyUtils.nullToStr(this.request.getParameter("cusFullName"));
+		   jSONArray 			= new JSONArray();
+		   customerDetailsBean	= new CustomerDetailsBean();
+		   
+		   logger.info("[getCusFullName] cusFullName 			:: " + cusFullName);
+		   
+		   customerDetailsBean.setFullName(cusFullName);
+		   
+		   list 		= this.customerDetailsDao.getCusFullName(customerDetailsBean);
+		   
+		   for(CustomerDetailsBean bean:list){
+			   objDetail 		= new JSONObject();
+			   
+			   objDetail.put("id"			,bean.getCusCode());
+			   objDetail.put("value"		,bean.getFullName());
+			   
+			   jSONArray.add(objDetail);
+		   }
+		   
+		   this.enjoyUtil.writeMSG(jSONArray.toString());
+		   
+	   }catch(Exception e){
+		   e.printStackTrace();
+		   logger.error(e);
+	   }finally{
+		   logger.info("[getCusFullName][End]");
+	   }
+	}	
 	
 	
 	

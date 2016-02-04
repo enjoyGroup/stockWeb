@@ -109,7 +109,7 @@
 			      }
 			});
 			
-			$( "#dialog" ).dialog({
+			/*$( "#dialog" ).dialog({
 		      autoOpen: false,
 		      height: 600,
 		      width: 1050,
@@ -126,16 +126,18 @@
 		    	  $( "#dialog" ).removeClass( "zoom" );
 		        },
 		      dialogClass: 'zoom'
-		    });
+		    });*/
 			
 			$( "#btnZoom" ).live("click", function(event){
 				
-				var lo_dialog = null;
-				var lo_iframe = null;
+				//var lo_dialog = null;
+				//var lo_iframe = null;
 				
 				try{
 					
-					lo_dialog 	= $( "#dialog" );
+					gp_dialogPopUp("/stockWeb/EnjoyGenericSrv?service=servlet.ProductDetailsLookUpServlet&pageAction=new", "เลือกสินค้า");
+					
+					/*lo_dialog 	= $( "#dialog" );
 					lo_iframe	= $("<iframe />").attr("src", "/stockWeb/EnjoyGenericSrv?service=servlet.ProductDetailsLookUpServlet&pageAction=new")
 												 .attr("width", "100%")
 												 .attr("height", "100%")
@@ -145,7 +147,7 @@
 					lo_dialog.empty();
 					lo_dialog.dialog("option", "title", "เลือกสินค้า");
 					lo_dialog.append(lo_iframe).dialog( "open" );
-					event.preventDefault();
+					event.preventDefault();*/
 				}catch(e){
 					alert("btnZoom :: " + e);
 				}
@@ -183,29 +185,28 @@
 				la_productName		= document.getElementsByName("productName");
 				la_productCode		= document.getElementsByName("productCode");
 				
-				for(var i=0;i<la_validate.length;i++){
-					la_temp			= la_validate[i].split(":");
-		            lo_obj          = eval('$("#' + la_temp[0] + '")');
-		            
-		            if(gp_trim(lo_obj.val())==""){
-		            	alert("กรุณาระบุ " + la_temp[1]);
-		            	lo_obj.focus();
-		                return false;
-		            }
-		        }
+				if(!gp_validateEmptyObj(la_validate)){
+					return false;
+				}
 				
 				/*Begin รหัสลูกค้า*/
 				if($("#cusCode").val().trim()=="" && $("#cusCodeDis").val().trim()!=""){ 
-					alert("ระบุรหัสลูกค้าผิด");
-					$("#cusCodeDis").focus();
+					alert("ระบุรหัสลูกค้าผิด", function() { 
+						$("#cusCodeDis").focus();
+	    		    });
+					//alert("ระบุรหัสลูกค้าผิด");
+					//$("#cusCodeDis").focus();
 	                return false;
 				}
 				/*End รหัสลูกค้า*/
 				
 				/*Begin พนักงานขาย*/
 				if($("#saleUniqueId").val().trim()=="" && $("#saleName").val().trim()!=""){ 
-					alert("ระบุพนักงานขายผิด");
-					$("#saleName").focus();
+					alert("ระบุพนักงานขายผิด", function() { 
+						$("#saleName").focus();
+	    		    });
+					//alert("ระบุพนักงานขายผิด");
+					//$("#saleName").focus();
 	                return false;
 				}
 				/*End พนักงานขาย*/
@@ -213,13 +214,19 @@
 				/*Begin Check รายการสินค้า*/
 				for(var i=0;i<la_productName.length;i++){
 					if(la_productName[i].value.trim()==""){
-						alert("กรุณาระบุสินค้า");
-						la_productName[i].focus();
+						alert("กรุณาระบุสินค้า", function() { 
+							la_productName[i].focus();
+		    		    });
+						//alert("กรุณาระบุสินค้า");
+						//la_productName[i].focus();
 						return false;
 					}else{
 						if(la_productCode[i].value.trim()==""){
-							alert("ระบุสินค้าชื่อสินค้าผิดกรุณาตรวจสอบ");
-							la_productName[i].focus();
+							alert("ระบุสินค้าชื่อสินค้าผิดกรุณาตรวจสอบ", function() { 
+								la_productName[i].focus();
+			    		    });
+							//alert("ระบุสินค้าชื่อสินค้าผิดกรุณาตรวจสอบ");
+							//la_productName[i].focus();
 							return false;
 						}
 					}
@@ -255,6 +262,7 @@
 		function lp_setModeNew(){
 			try{
 				$("#invoiceStatus").prop("disabled", true);
+				lp_setSaleCommission();
 			}catch(e){
 				alert("setModeNew :: " + e);
 			}
@@ -282,14 +290,17 @@
 		            	var status				= null;
 		            	
 		            	try{
-		            		gp_progressBarOff();
+		            		//gp_progressBarOff();
 		            		
 		            		jsonObj = JSON.parse(data);
 		            		status	= jsonObj.status;
 		            		
 		            		if(status=="SUCCESS"){
-		            			alert("บันทึกเรียบร้อย");//alert(jsonObj.invoiceCode);
-		            			window.location = gv_url + "?service=" + $("#service").val() + "&pageAction=getDetail&invoiceCode=" + jsonObj.invoiceCode;
+		            			alert("บันทึกเรียบร้อย", function() { 
+		            				window.location = gv_url + "?service=" + $("#service").val() + "&pageAction=getDetail&invoiceCode=" + jsonObj.invoiceCode;
+				    		    });
+		            			//alert("บันทึกเรียบร้อย");//alert(jsonObj.invoiceCode);
+		            			//window.location = gv_url + "?service=" + $("#service").val() + "&pageAction=getDetail&invoiceCode=" + jsonObj.invoiceCode;
 		            		}else{
 		            			alert(jsonObj.errMsg);
 		            			
@@ -333,8 +344,11 @@
 		            		status	= jsonObj.status;
 		            		
 		            		if(status=="SUCCESS"){
-		            			alert("ยกเลิกเรียบร้อย");
-		            			window.location = gv_url + "?service=" + $("#service").val() + "&pageAction=getDetail&invoiceCode=" + jsonObj.invoiceCode;
+		            			alert("ยกเลิกเรียบร้อย", function() { 
+		            				window.location = gv_url + "?service=" + $("#service").val() + "&pageAction=getDetail&invoiceCode=" + jsonObj.invoiceCode;
+				    		    });
+		            			//alert("ยกเลิกเรียบร้อย");
+		            			//window.location = gv_url + "?service=" + $("#service").val() + "&pageAction=getDetail&invoiceCode=" + jsonObj.invoiceCode;
 		            		}else{
 		            			alert(jsonObj.errMsg);
 		            			
@@ -682,10 +696,10 @@
 			try{
 				lv_quantity 		= gp_parseFloat($("#quantity" + av_seq).val());
 				lv_pricePerUnit		= gp_parseFloat($("#pricePerUnit" + av_seq).val());
-				lv_discount 		= gp_parseFloat($("#discount" + av_seq).val());
+				lv_discount 		= 100 - gp_parseFloat($("#discount" + av_seq).val());
 				
 				if(lv_quantity > 0){
-					lv_price = (lv_quantity * lv_pricePerUnit) - lv_discount;
+					lv_price = ((lv_quantity * lv_pricePerUnit) * lv_discount) / 100;
 				}
 				
 				
@@ -864,23 +878,10 @@
 		}
 		
 		function lp_lookUpCusDetail(){
-			var lo_dialog 			= null;
-			var lo_iframe 			= null;
 			
 			try{
-				lo_dialog 	= $( "#dialog" );
-				lo_iframe	= $("<iframe />").attr("src", "/stockWeb/EnjoyGenericSrv?service=servlet.CustomerDetailsLookUpServlet&pageAction=new")
-											 .attr("width", "100%")
-											 .attr("height", "100%")
-											 .attr("border", "0");
 				
-				gp_progressBarOn();
-				lo_dialog.empty();
-				
-				lo_dialog.dialog("option", "title", "ค้นหาลุกค้า");
-				
-				lo_dialog.append(lo_iframe).dialog( "open" );
-				event.preventDefault();
+				gp_dialogPopUp("/stockWeb/EnjoyGenericSrv?service=servlet.CustomerDetailsLookUpServlet&pageAction=new", "ค้นหาลุกค้า");
 			}catch(e){
 				alert("lp_lookUpCusDetail :: " + e);
 			}
@@ -998,6 +999,7 @@
 				
 				if(saleName==""){
 					$("#saleUniqueId").val('');
+					lp_setSaleCommission();
 					return true;
 				}
 				
@@ -1022,6 +1024,8 @@
 		            			}else{
 		            				$("#saleUniqueId").val("");
 		            			}
+		            			
+		            			lp_setSaleCommission();
 		            		}else{
 		            			errMsg 	= jsonObj.errMsg;
 		            			alert(errMsg);
@@ -1038,40 +1042,48 @@
 		}
 		
 		function lp_lookUpSaleName(){
-			var lo_dialog 			= null;
-			var lo_iframe 			= null;
-			
 			try{
-				
-				lo_dialog 	= $( "#dialog" );
-				lo_iframe	= $("<iframe />").attr("src", "/stockWeb/EnjoyGenericSrv?service=servlet.UserDetailsLookUpServlet&pageAction=new")
-											 .attr("width", "100%")
-											 .attr("height", "100%")
-											 .attr("border", "0");
-				
-				gp_progressBarOn();
-				lo_dialog.empty();
-				
-				lo_dialog.dialog("option", "title", "ค้นหาพนักงานขาย");
-				
-				lo_dialog.append(lo_iframe).dialog( "open" );
-				event.preventDefault();
+				gp_dialogPopUp("/stockWeb/EnjoyGenericSrv?service=servlet.UserDetailsLookUpServlet&pageAction=new", "ค้นหาพนักงานขาย");
 			}catch(e){
-				alert("lp_lookUpCusDetail :: " + e);
+				alert("lp_lookUpSaleName :: " + e);
 			}
 		}
 		
 		function lp_returnData(av_userUniqueId, av_userFullName, av_userId, av_userStatus, av_userStatusName){
 			
 			try{
-				
 				$("#saleUniqueId").val(av_userUniqueId);
 				$("#saleName").val(av_userFullName);
 				$( "#dialog" ).dialog( "close" );
+				lp_setSaleCommission();
 			}catch(e){
 				alert("lp_returnData :: " + e);
 			}
 			
+		}
+		
+		function lp_setSaleCommission(){
+			
+			var lv_saleName = "";
+			
+			try{
+				lv_saleName = $("#saleName").val().trim();
+				
+				if(lv_saleName==""){
+					$('#saleCommission').prop("readonly", true)
+										.val('0.00')
+										.removeClass("moneyOnly")
+										.addClass("moneyOnly-disabled");
+				}else{
+					$('#saleCommission').prop("readonly", false)
+										.val('0.00')
+										.removeClass("moneyOnly-disabled")
+										.addClass("moneyOnly");
+				}
+				
+			}catch(e){
+				alert("lp_setSaleCommission :: " + e);
+			}
 		}
 		
 		function readBarcode(event) {
@@ -1100,9 +1112,13 @@
 				}
 				
 				if(letters.test(lv_productCodeDis)){
-					alert("รหัสสินค้าห้ามเป็นภาษาไทย");
-					$("#productCodeDis").val('');
-        			$("#productCodeDis").focus();
+					alert("รหัสสินค้าห้ามเป็นภาษาไทย", function() { 
+						$("#productCodeDis").val('');
+	        			$("#productCodeDis").focus();
+	    		    });
+					//alert("รหัสสินค้าห้ามเป็นภาษาไทย");
+					//$("#productCodeDis").val('');
+        			//$("#productCodeDis").focus();
 					return;
 				}
 				
@@ -1127,9 +1143,13 @@
 		            			if(jsonObj.productCode!=""){
 		            				lp_newRecord(document.getElementById("btnAdd"), jsonObj);
 		            			}else{
-		            				alert("รหัสสินค้า "+ lv_productCodeDis + " ไม่มีอยู่ในระบบ");
-		            				$("#productCodeDis").val('');
-			            			$("#productCodeDis").focus();
+		            				alert("รหัสสินค้า "+ lv_productCodeDis + " ไม่มีอยู่ในระบบ", function() { 
+		            					$("#productCodeDis").val('');
+				            			$("#productCodeDis").focus();
+		        	    		    });
+		            				//alert("รหัสสินค้า "+ lv_productCodeDis + " ไม่มีอยู่ในระบบ");
+		            				//$("#productCodeDis").val('');
+			            			//$("#productCodeDis").focus();
 		            			}
 		            		}else{
 		            			errMsg 	= jsonObj.errMsg;
@@ -1338,7 +1358,7 @@
 													<th  style="text-align: center;" width="12%"><B>ปริมาณ</B><span style="color: red;"><b>*</b></span></th>
 													<th  style="text-align: center;" width="12%"><B>หน่วย</B></th>
 													<th  style="text-align: center;" width="12%"><B>ราคาต่อหน่วย</B><span style="color: red;"><b>*</b></span></th>
-													<th  style="text-align: center;" width="12%"><B>ส่วนลด</B><span style="color: red;"><b>*</b></span></th>
+													<th  style="text-align: center;" width="12%"><B>ส่วนลด(%)</B><span style="color: red;"><b>*</b></span></th>
 													<th  style="text-align: center;" width="12%"><B>ราคาขาย</B><span style="color: red;"><b>*</b></span></th>
 													<th style="text-align: center;" width="9%">Action</th>
 												</tr> 
