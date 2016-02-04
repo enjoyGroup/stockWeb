@@ -295,7 +295,7 @@ public class UserDetailsDao {
 					logger.info("[getListUserdetail] remark 			:: " + row[12]);
 					logger.info("[getListUserdetail] userStatusName 	:: " + row[13]);
 					
-					arrPrivilegeCode	= EnjoyUtils.nullToStr(row[6]).split("\\,");
+					arrPrivilegeCode	= EnjoyUtils.nullToStr(row[5]).split("\\,");
 					for(int j=0;j<arrPrivilegeCode.length;j++){
 						if (! privilegeName.equals("")) privilegeName = privilegeName + "<br>";
 						privilegeName   = privilegeName + "- " +fUserprivilege.get(arrPrivilegeCode[j]);
@@ -305,8 +305,8 @@ public class UserDetailsDao {
 					userDetailsBean.setUserName				(EnjoyUtils.nullToStr(row[2]) + "  " + EnjoyUtils.nullToStr(row[3]));
 					userDetailsBean.setUserEmail			(EnjoyUtils.nullToStr(row[4]));
 					userDetailsBean.setUserPrivilege		(privilegeName);
-					userDetailsBean.setUserLevel			(EnjoyUtils.nullToStr(row[5]));
-					userDetailsBean.setUserStatus			(EnjoyUtils.nullToStr(row[6]));
+					userDetailsBean.setUserLevel			(EnjoyUtils.nullToStr(row[6]));
+					userDetailsBean.setUserStatus			(EnjoyUtils.nullToStr(row[7]));
 					userDetailsBean.setFlagChangePassword	(EnjoyUtils.chkBoxtoDb(row[8]));
 					userDetailsBean.setFlagAlertStock		(EnjoyUtils.chkBoxtoDb(row[9]));
 					userDetailsBean.setFlagSalesman			(EnjoyUtils.chkBoxtoDb(row[10]));
