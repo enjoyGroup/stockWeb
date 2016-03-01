@@ -44,6 +44,8 @@ public class Reciveordermaster implements Serializable {
 	private int userUniqueId;
 
 	private int vendorCode;
+	
+	private String tin;
 
 	public Reciveordermaster() {
 	}
@@ -166,6 +168,14 @@ public class Reciveordermaster implements Serializable {
 
 	public void setVendorCode(int vendorCode) {
 		this.vendorCode = vendorCode;
+	}
+
+	public String getTin() {
+		return tin;
+	}
+
+	public void setTin(String tin) {
+		this.tin = tin;
 	}
 
 }

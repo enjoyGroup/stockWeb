@@ -15,6 +15,7 @@
 	String						titlePage				= reciveStockMaintananceForm.getTitlePage();
 	CompanyVendorBean 			companyVendorBean 		= reciveStockMaintananceForm.getCompanyVendorBean();
 	List<ReciveOrdeDetailBean> 	reciveOrdeDetailList 	= reciveStockMaintananceForm.getReciveOrdeDetailList();
+	List<ComboBean> 			companyCombo 			= reciveStockMaintananceForm.getCompanyCombo();
 
 
 %>
@@ -195,6 +196,7 @@
 		function lp_validate(){
 			var la_validate             = new Array( "vendorName:บริษัท"	
 													, "branchName:สาขา"
+													, "tin:บริษัทที่สังกัด"
 													, "reciveDate:วันที่สั่งซื้อ");
 		    var lv_return				= true;
 		    var la_reciveType			= null;
@@ -727,15 +729,18 @@
 			var params 		= "";
 			var vendorCode 	= null;
 			var quantity	= null;
+			var tin			= null;
 			
 			try{
 				vendorCode 	= $("#vendorCode").val().trim();
 				quantity	= $("#quantity" + av_seq).val().trim();
+				tin 		= $("#tin").val().trim();
 				
 				params = "&pageAction=getProductDetailByName" 
 						+ "&productName=" + av_productName.trim()
 						+ "&vendorCode=" + vendorCode
-						+ "&quantity=" + quantity;
+						+ "&quantity=" + quantity
+						+ "&tin=" + tin;
 				
 				$.ajax({
 					async:false,
@@ -950,7 +955,7 @@
 						async:false,
 			            type: "POST",
 			            url: gv_url,
-			            data: gv_service + "&pageAction=getProductDetailByName&productName=" + obj.productName.trim(),
+			            data: gv_service + "&pageAction=getProductDetailByName&productName=" + obj.productName.trim() + "&tin=" + $("#tin").val().trim(),
 			            beforeSend: "",
 			            success: function(data){
 			            	var jsonObj 			= null;
@@ -1271,6 +1276,23 @@
 								        						style="width: 220px;"
 								        						value="<%=reciveOrderMasterBean.getBillNo()%>" 
 								        						maxlength="50" />
+								        			</td>
+								        		</tr>
+									        </table>
+									        <div id="seasonTitle" class="padding-sm round-sm season-title-head2">
+												<h6 class="panel-title" style="font-size:1.0em">รายละเอียดผู้ใช้งาน</h6>
+											</div>
+											<table class="table user-register-table" style="border-bottom-color: white;">
+												<tr>
+								        			<td align="right" width="120">
+														บริษัทที่สังกัด<span style="color: red;"><b>*</b></span> :
+													</td>
+								        			<td align="left" colspan="3">
+								        				<select id="tin" name="tin" style="width: 220px;" >
+								        					<% for(ComboBean comboBean:companyCombo){ %>
+								        					<option value="<%=comboBean.getCode()%>" <%if(reciveOrderMasterBean.getTin().equals(comboBean.getCode())){ %> selected <%} %> ><%=comboBean.getDesc()%></option>
+								        					<%} %>
+								        				</select>
 								        			</td>
 								        		</tr>
 									        </table>

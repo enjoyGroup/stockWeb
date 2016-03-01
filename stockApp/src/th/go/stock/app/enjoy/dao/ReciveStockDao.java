@@ -147,6 +147,7 @@ public class ReciveStockDao {
 			query.addScalar("reciveDiscount"	, new StringType());
 			query.addScalar("reciveVat"			, new StringType());
 			query.addScalar("reciveTotal"		, new StringType());
+			query.addScalar("tin"				, new StringType());
 			
 			list		 	= query.list();
 			
@@ -171,6 +172,7 @@ public class ReciveStockDao {
 					logger.info("reciveDiscount 		:: " + row[12]);
 					logger.info("reciveVat 				:: " + row[13]);
 					logger.info("reciveTotal 			:: " + row[14]);
+					logger.info("tin 					:: " + row[15]);
 					
 					bean.setReciveNo				(EnjoyUtils.nullToStr(row[0]));
 					bean.setReciveDate				(EnjoyUtils.dateToThaiDisplay(row[1]));
@@ -187,6 +189,7 @@ public class ReciveStockDao {
 					bean.setReciveDiscount			(EnjoyUtils.convertFloatToDisplay(row[12], 2));
 					bean.setReciveVat				(EnjoyUtils.convertFloatToDisplay(row[13], 2));
 					bean.setReciveTotal				(EnjoyUtils.convertFloatToDisplay(row[14], 2));
+					bean.setTin						(EnjoyUtils.nullToStr(row[15]));
 					
 				}	
 			}
@@ -230,6 +233,7 @@ public class ReciveStockDao {
 			reciveordermaster.setReciveDiscount			(EnjoyUtils.parseBigDecimal(reciveOrderMasterBean.getReciveDiscount()));
 			reciveordermaster.setReciveVat				(EnjoyUtils.parseBigDecimal(reciveOrderMasterBean.getReciveVat()));
 			reciveordermaster.setReciveTotal			(EnjoyUtils.parseBigDecimal(reciveOrderMasterBean.getReciveTotal()));
+			reciveordermaster.setTin					(reciveOrderMasterBean.getTin());
 			
 			session.saveOrUpdate(reciveordermaster);
 			
@@ -265,6 +269,7 @@ public class ReciveStockDao {
 												+ ", reciveDiscount 		= :reciveDiscount"
 												+ ", reciveVat 				= :reciveVat"
 												+ ", reciveTotal 			= :reciveTotal"
+												+ ", tin 					= :tin"
 										+ " where reciveNo = :reciveNo";
 			
 			query = session.createQuery(hql);
@@ -282,6 +287,7 @@ public class ReciveStockDao {
 			query.setParameter("reciveDiscount"		, EnjoyUtils.parseBigDecimal(reciveOrderMasterBean.getReciveDiscount()));
 			query.setParameter("reciveVat"			, EnjoyUtils.parseBigDecimal(reciveOrderMasterBean.getReciveVat()));
 			query.setParameter("reciveTotal"		, EnjoyUtils.parseBigDecimal(reciveOrderMasterBean.getReciveTotal()));
+			query.setParameter("tin"				, reciveOrderMasterBean.getTin());
 			query.setParameter("reciveNo"			, reciveOrderMasterBean.getReciveNo());
 			
 			query.executeUpdate();
@@ -346,18 +352,20 @@ public class ReciveStockDao {
 									+ "	, a.seq"
 									+ "	, a.productCode"
 									+ "	, b.productName"
-									+ "	, b.quantity as inventory"
+									+ "	, e.quantity as inventory"
 									+ "	, a.quantity"
 									+ "	, b.unitCode"
 									+ "	, c.unitName"
 									+ "	, a.price"
 									+ "	, a.discountRate"
 									+ "	, a.costPrice"
-								+ "	from reciveordedetail a, productmaster b, unittype c"
+								+ "	from reciveordedetail a"
+									+ "	inner JOIN productmaster b on b.productCode 	= a.productCode"
+									+ "	inner JOIN unittype c on  b.unitCode 	= c.unitCode"
+									+ "	LEFT JOIN reciveordermaster d on a.reciveNo = d.reciveNo"
+									+ "	LEFT JOIN productquantity e on a.productCode = e.productCode AND d.tin = e.tin"
 								+ "	where"
-									+ "	b.productCode 	= a.productCode"
-									+ "	and c.unitCode 	= b.unitCode"
-									+ "	and a.reciveNo 	= '" + reciveOrdeDetailBean.getReciveNo() + "'"
+									+ " a.reciveNo 	= '" + reciveOrdeDetailBean.getReciveNo() + "'"
 								+ "	order by a.seq asc";
 			
 			logger.info("[getReciveOrdeDetailList] hql :: " + hql);
@@ -577,7 +585,6 @@ public class ReciveStockDao {
 		return comboList;
 		
 	}
-	
 	
 	public String genReciveNo() throws EnjoyException{
 		logger.info("[genReciveNo][Begin]");

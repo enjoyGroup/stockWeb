@@ -170,6 +170,7 @@ public class InvoiceCashDao {
 			query.addScalar("userUniqueId"		, new StringType());
 			query.addScalar("invoiceCredit"		, new StringType());
 			query.addScalar("invoiceStatus"		, new StringType());
+			query.addScalar("tin"				, new StringType());
 			
 			list		 	= query.list();
 			
@@ -194,6 +195,7 @@ public class InvoiceCashDao {
 					logger.info("userUniqueId 				:: " + row[12]);
 					logger.info("invoiceCredit 				:: " + row[13]);
 					logger.info("invoiceStatus 				:: " + row[14]);
+					logger.info("tin 						:: " + row[15]);
 					
 					bean.setInvoiceCode				(EnjoyUtils.nullToStr(row[0]));
 					bean.setInvoiceDate				(EnjoyUtils.dateToThaiDisplay(row[1]));
@@ -210,6 +212,7 @@ public class InvoiceCashDao {
 					bean.setUserUniqueId			(EnjoyUtils.nullToStr(row[12]));
 					bean.setInvoiceCredit			(EnjoyUtils.nullToStr(row[13]));
 					bean.setInvoiceStatus			(EnjoyUtils.nullToStr(row[14]));
+					bean.setTin						(EnjoyUtils.nullToStr(row[15]));
 					
 				}	
 			}
@@ -253,6 +256,7 @@ public class InvoiceCashDao {
 			invoiceCashMaster.setUserUniqueId			(EnjoyUtils.parseInt(invoiceCashMasterBean.getUserUniqueId()));
 			invoiceCashMaster.setInvoiceCredit			(invoiceCashMasterBean.getInvoiceCredit());
 			invoiceCashMaster.setInvoiceStatus			(invoiceCashMasterBean.getInvoiceStatus());
+			invoiceCashMaster.setTin					(invoiceCashMasterBean.getTin());
 			
 			session.saveOrUpdate(invoiceCashMaster);
 			
@@ -288,6 +292,7 @@ public class InvoiceCashDao {
 												+ ", userUniqueId 			= :userUniqueId"
 												+ ", invoiceCredit 			= :invoiceCredit"
 												+ ", invoiceStatus 			= :invoiceStatus"
+												+ ", tin 					= :tin"
 										+ " where invoiceCode = :invoiceCode";
 			
 			query = session.createQuery(hql);
@@ -305,6 +310,7 @@ public class InvoiceCashDao {
 			query.setParameter("userUniqueId"		, EnjoyUtils.parseInt(invoiceCashMasterBean.getUserUniqueId()));
 			query.setParameter("invoiceCredit"		, invoiceCashMasterBean.getInvoiceCredit());
 			query.setParameter("invoiceStatus"		, invoiceCashMasterBean.getInvoiceStatus());
+			query.setParameter("tin"				, invoiceCashMasterBean.getTin());
 			query.setParameter("invoiceCode"		, invoiceCashMasterBean.getInvoiceCode());
 			
 			query.executeUpdate();
@@ -363,13 +369,15 @@ public class InvoiceCashDao {
 		try{	
 			hql					= "select a.*"
 									+ "	, b.productName"
-									+ "	, b.quantity as inventory"
+									+ "	, e.quantity as inventory"
 									+ "	, b.unitCode"
 									+ "	, c.unitName"
-									+ "	from invoicecashdetail a, productmaster b, unittype c"
-									+ "	where b.productCode 	= a.productCode"
-									+ "		and c.unitCode 		= b.unitCode"
-									+ "		and a.invoiceCode 	= '" + invoiceCashDetailBean.getInvoiceCode() + "'"
+									+ "	from invoicecashdetail a"
+									+ "		INNER JOIN productmaster b on b.productCode 	= a.productCode"
+									+ "		INNER JOIN unittype c on c.unitCode 		= b.unitCode"
+									+ "		LEFT  JOIN invoicecashmaster d ON a.invoiceCode = d.invoiceCode"
+									+ "		LEFT JOIN	productquantity e ON d.tin = e.tin"
+									+ "	where a.invoiceCode 	= '" + invoiceCashDetailBean.getInvoiceCode() + "'"
 									+ "	order by a.seq asc";
 			
 			logger.info("[getInvoiceCashDetailList] hql :: " + hql);

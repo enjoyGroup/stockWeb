@@ -21,7 +21,7 @@ public class ProductmasterBean {
 	private String salePrice5;
 //	private String startDate;
 //	private String expDate;
-	private String quantity;
+//	private String quantity;
 //	private String productStatus;
 	/*Begin สำหรับหน้า Search*/
 	private String chkBox;
@@ -46,7 +46,7 @@ public class ProductmasterBean {
 		this.salePrice5 		= "0.00";
 //		this.startDate 			= "";
 //		this.expDate 			= "";
-		this.quantity 			= "0";
+//		this.quantity 			= "0";
 //		this.productStatus 		= "";
 		this.chkBox 			= "N";
 		this.chkBoxSeq 			= "0";
@@ -172,13 +172,13 @@ public class ProductmasterBean {
 		this.salePrice5 = salePrice5;
 	}
 
-	public String getQuantity() {
-		return quantity;
-	}
-
-	public void setQuantity(String quantity) {
-		this.quantity = quantity;
-	}
+//	public String getQuantity() {
+//		return quantity;
+//	}
+//
+//	public void setQuantity(String quantity) {
+//		this.quantity = quantity;
+//	}
 
 	public String getChkBox() {
 		return chkBox;

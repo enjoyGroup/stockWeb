@@ -11,6 +11,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 
+import th.go.stock.app.enjoy.bean.ComboBean;
 import th.go.stock.app.enjoy.bean.RelationUserAndCompanyBean;
 import th.go.stock.app.enjoy.exception.EnjoyException;
 import th.go.stock.app.enjoy.model.Relationuserncompany;
@@ -231,6 +232,54 @@ public class RelationUserAndCompanyDao {
 		}
 		
 		return result;
+	}
+	public List<ComboBean> getCompanyList(int userUniqueId) throws EnjoyException{
+		logger.info("[getCompanyList][Begin]");
+		
+		String				hql						= null;
+		List<Object[]>		list					= null;
+		SQLQuery 			query 					= null;
+		SessionFactory 		sessionFactory			= null;
+		Session 			session					= null;
+		List<ComboBean>		comboList				= new ArrayList<ComboBean>();
+		
+		try{
+			sessionFactory 		= HibernateUtil.getSessionFactory();
+			session 			= sessionFactory.openSession();
+			
+			hql				= "select a.tin, b.companyName"
+							+ "	from relationuserncompany a"
+							+ "		INNER JOIN company b on a.tin = b.tin"
+							+ "	where a.userUniqueId = " + userUniqueId;
+			query			= session.createSQLQuery(hql);
+			
+			
+			query.addScalar("tin"			, new StringType());
+			query.addScalar("companyName"	, new StringType());
+			
+			list		 	= query.list();
+			
+			for(Object row[]:list){
+				comboList.add(new ComboBean(EnjoyUtils.nullToStr(row[0]), EnjoyUtils.nullToStr(row[1])));
+			}
+			
+			
+		}catch(Exception e){
+			e.printStackTrace();
+			logger.error(e);
+			throw new EnjoyException(e.getMessage());
+		}finally{
+			
+			session.close();
+			sessionFactory	= null;
+			session			= null;
+			hql				= null;
+			list			= null;
+			query 			= null;
+			logger.info("[getCompanyList][End]");
+		}
+		
+		return comboList;
 	}
 	
 }

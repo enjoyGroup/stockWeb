@@ -218,51 +218,54 @@
 				}
 				
 				if($("#pageMode").val()=="NEW"){
-					if(!confirm("Password จะถูกส่งไปที่ E-mail ที่คุณกรอก คุณกรอก E-mail ถูกต้องแล้วใช่หรือไม่ ?")){
+					
+					confirm("Password จะถูกส่งไปที่ E-mail ที่คุณกรอก คุณกรอก E-mail ถูกต้องแล้วใช่หรือไม่ ?", function(){
+						params 	= "pageAction=save&" + $('#frm').serialize();
+						
+						$.ajax({
+							async:true,
+				            type: "POST",
+				            url: gv_url,
+				            data: params,
+				            beforeSend: gp_progressBarOn(),
+				            success: function(data){
+				            	var jsonObj 			= null;
+				            	var status				= null;
+				            	var userUniqueId		= 0;
+				            	
+				            	try{
+				            		//gp_progressBarOff();
+				            		
+				            		jsonObj = JSON.parse(data);
+				            		status	= jsonObj.status;
+				            		
+				            		if(status=="SUCCESS"){
+				            			userUniqueId = jsonObj.userUniqueId;
+				            			alert("บันทึกเรียบร้อย", function() { 
+				            				lp_reset();
+				    	    		    });
+				            			//alert("บันทึกเรียบร้อย");
+				            			//lp_reset();
+				            		}else{
+				            			alert(jsonObj.errMsg);
+				            			
+				            		}
+				            	}catch(e){
+				            		alert("in lp_save :: " + e);
+				            	}
+				            }
+				        });
+					},function(){
 						$('#userEmail').focus();
 						return;
-					}
+					});
 				}
 				
 			}catch(e){
 				alert("lp_save :: " + e);
 			}
 			
-			params 	= "pageAction=save&" + $('#frm').serialize();
 			
-			$.ajax({
-				async:true,
-	            type: "POST",
-	            url: gv_url,
-	            data: params,
-	            beforeSend: gp_progressBarOn(),
-	            success: function(data){
-	            	var jsonObj 			= null;
-	            	var status				= null;
-	            	var userUniqueId		= 0;
-	            	
-	            	try{
-	            		//gp_progressBarOff();
-	            		
-	            		jsonObj = JSON.parse(data);
-	            		status	= jsonObj.status;
-	            		
-	            		if(status=="SUCCESS"){
-	            			userUniqueId = jsonObj.userUniqueId;
-	            			alert("บันทึกเรียบร้อย", function() { 
-	            				lp_reset();
-	    	    		    });
-	            			//alert("บันทึกเรียบร้อย");
-	            			//lp_reset();
-	            		}else{
-	            			alert(jsonObj.errMsg);
-	            			
-	            		}
-	            	}catch(e){
-	            		alert("in lp_save :: " + e);
-	            	}
-	            }
-	        });
 		}
 		
 		function lp_reset(){

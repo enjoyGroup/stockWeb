@@ -63,6 +63,10 @@
 		<mapping class="th.go.stock.app.enjoy.model.Unittype" />
 		<mapping class="th.go.stock.app.enjoy.model.Userdetail" />
 		<mapping class="th.go.stock.app.enjoy.model.Userprivilege" />
+		
+		<mapping class="th.go.stock.app.enjoy.model.Productquantity" />
+		<mapping class="th.go.stock.app.enjoy.model.ProductquantityPK" />
+		
 		<!-- End Entity zone -->
 	</session-factory>
 </hibernate-configuration>

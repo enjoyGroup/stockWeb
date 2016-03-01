@@ -1,6 +1,6 @@
 <%@ include file="/pages/include/checkLogin.jsp"%>
 <%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
-<%@ page import="th.go.stock.app.enjoy.bean.AdjustStockBean"%>
+<%@ page import="th.go.stock.app.enjoy.bean.AdjustStockBean, th.go.stock.app.enjoy.bean.ComboBean"%>
 <%@ page import="java.util.*"%>
 <jsp:useBean id="adjustStockForm" class="th.go.stock.app.enjoy.form.AdjustStockForm" scope="session"/>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -10,6 +10,7 @@
 	List<AdjustStockBean> 		adjustHistoryListList		= adjustStockForm.getAdjustHistoryListList();
 	boolean						chk							= adjustStockForm.isChk();
 	AdjustStockBean 			adjustStockBean				= adjustStockForm.getAdjustStockBean();
+	List<ComboBean> 			companyCombo 				= adjustStockForm.getCompanyCombo();
 %>
 
 <html>
@@ -28,15 +29,13 @@
 			gv_service 		= "service=" + $('#service').val();
 			
 			$('#btnSearch').click(function(){ 
+				var la_validate             = new Array( "productName:สินค้า", "tin:บริษัทที่สังกัด");
+				
 				try{
-					if(gp_trim($("#productName").val())==""){
-						alert("กรุณาระบุสินค้า", function() { 
-							$("#productName").focus();
-		    		    });
-		            	//alert("กรุณาระบุสินค้า");
-		            	//$("#productName").focus();
-		                return;
-		            }
+					
+					if(!gp_validateEmptyObj(la_validate)){
+						return false;
+					}
 					
 					$.ajax({
 						async:true,
@@ -295,6 +294,16 @@
 									<table width="100%" border="0" cellpadding="5" cellspacing="5">
 						        		<tr>
 						        			<td align="right" width="10%">
+												บริษัทที่สังกัด<span style="color: red;"><b>*</b></span> :
+											</td>
+						        			<td align="left" colspan="3">
+						        				<select id="tin" name="tin" style="width: 220px;" >
+						        					<% for(ComboBean comboBean:companyCombo){ %>
+						        					<option value="<%=comboBean.getCode()%>"><%=comboBean.getDesc()%></option>
+						        					<%} %>
+						        				</select>
+						        			</td>
+						        			<td align="right" width="10%">
 						        				สินค้า <span style="color: red;"><b>*</b></span> : &nbsp;
 						        			</td>
 						        			<td align="left">
@@ -302,7 +311,7 @@
 						        					   id="productName" 
 						        					   name='productName'
 						        					   placeholder="สินค้า"  
-						        					   size="40"
+						        					   size="25"
 						        					   maxlength="255" 
 						        					   <%if(chk==false){%> onkeypress="return lp_enterToSearch(event);"<%}%>
 						        					   value="<%=adjustStockBean.getProductName()%>" 

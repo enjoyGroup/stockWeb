@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import th.go.stock.app.enjoy.bean.AdjustStockBean;
+import th.go.stock.app.enjoy.bean.ComboBean;
 
 public class AdjustStockForm {
 	
@@ -16,12 +17,14 @@ public class AdjustStockForm {
 	private List<AdjustStockBean> 		adjustHistoryListList;
 	private boolean						chk;
 	private boolean						limitAdjustHistoryFlag;
+	private List<ComboBean> 			companyCombo;
 	
 	public AdjustStockForm(){
 		this.adjustStockBean				= new AdjustStockBean();
 		this.adjustHistoryListList			= new ArrayList<AdjustStockBean>();
 		this.chk							= false;
 		this.limitAdjustHistoryFlag			= false;
+		this.companyCombo					= new ArrayList<ComboBean>();
 	}
 
 	public AdjustStockBean getAdjustStockBean() {
@@ -54,5 +57,13 @@ public class AdjustStockForm {
 
 	public void setLimitAdjustHistoryFlag(boolean limitAdjustHistoryFlag) {
 		this.limitAdjustHistoryFlag = limitAdjustHistoryFlag;
+	}
+
+	public List<ComboBean> getCompanyCombo() {
+		return companyCombo;
+	}
+
+	public void setCompanyCombo(List<ComboBean> companyCombo) {
+		this.companyCombo = companyCombo;
 	}
 }

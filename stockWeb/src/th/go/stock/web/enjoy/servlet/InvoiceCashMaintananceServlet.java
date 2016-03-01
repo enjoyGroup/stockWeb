@@ -20,12 +20,14 @@ import th.go.stock.app.enjoy.bean.CustomerDetailsBean;
 import th.go.stock.app.enjoy.bean.InvoiceCashDetailBean;
 import th.go.stock.app.enjoy.bean.InvoiceCashMasterBean;
 import th.go.stock.app.enjoy.bean.ProductmasterBean;
+import th.go.stock.app.enjoy.bean.ProductquantityBean;
 import th.go.stock.app.enjoy.bean.UserDetailsBean;
 import th.go.stock.app.enjoy.dao.CompanyDetailsDao;
 import th.go.stock.app.enjoy.dao.CustomerDetailsDao;
 import th.go.stock.app.enjoy.dao.InvoiceCashDao;
 import th.go.stock.app.enjoy.dao.ProductDetailsDao;
-import th.go.stock.app.enjoy.dao.RelationGroupCustomerDao;
+import th.go.stock.app.enjoy.dao.ProductquantityDao;
+import th.go.stock.app.enjoy.dao.RelationUserAndCompanyDao;
 import th.go.stock.app.enjoy.dao.UserDetailsDao;
 import th.go.stock.app.enjoy.exception.EnjoyException;
 import th.go.stock.app.enjoy.form.InvoiceCashMaintananceForm;
@@ -53,9 +55,10 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
     private InvoiceCashMaintananceForm		form						= null;
     private CustomerDetailsDao				customerDetailsDao			= null;
     private ProductDetailsDao				productDetailsDao			= null;
-    private RelationGroupCustomerDao		relationGroupCustomerDao	= null;
     private UserDetailsDao					userDetailsDao				= null;
     private CompanyDetailsDao				companyDetailsDao			= null;
+    private ProductquantityDao				productquantityDao			= null;
+    private RelationUserAndCompanyDao		relationUserAndCompanyDao	= null;
     
 	@Override
 	public void execute(HttpServletRequest request, HttpServletResponse response)
@@ -80,9 +83,10 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
              this.dao						= new InvoiceCashDao();
              this.customerDetailsDao		= new CustomerDetailsDao();
              this.productDetailsDao			= new ProductDetailsDao();
-             this.relationGroupCustomerDao 	= new RelationGroupCustomerDao();
              this.userDetailsDao			= new UserDetailsDao();
              this.companyDetailsDao			= new CompanyDetailsDao();
+             this.productquantityDao		= new ProductquantityDao();
+             this.relationUserAndCompanyDao = new RelationUserAndCompanyDao();
  			
              logger.info("[execute] pageAction : " + pageAction );
              
@@ -209,20 +213,17 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 		
 		logger.info("[setCompanyCombo][Begin]");
 		
-		List<ComboBean>			combo 			= null;
-		List<ComboBean>			comboDb 		= null;
+		List<ComboBean>			companyCombo 		= null;
 		
 		try{
 			
-			combo 	= new ArrayList<ComboBean>();
-			comboDb	= this.companyDetailsDao.getCompanyCombo();
+			companyCombo = this.relationUserAndCompanyDao.getCompanyList(this.userBean.getUserUniqueId());
 			
-			combo.add(new ComboBean(""	, "กรุณาระบุ"));
-			for(ComboBean vo:comboDb){
-				combo.add(new ComboBean(vo.getCode()	, vo.getDesc()));
+			if(companyCombo.size() > 1){
+				companyCombo.add(0, new ComboBean("", "กรุณาระบุ"));
 			}
 			
-			this.form.setCompanyCombo(combo);
+			this.form.setCompanyCombo(companyCombo);
 		}
 		catch(Exception e){
 			logger.error(e);
@@ -328,8 +329,8 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 		String				 		invoiceDeposit				= null;
 		String				 		invoiceVat					= null;
 		String				 		invoiceTotal				= null;
-		String				 		invoiceCredit				= null;
-		String						invoiceStatus				= null;
+//		String				 		invoiceCredit				= null;
+//		String						invoiceStatus				= null;
 		SessionFactory 				sessionFactory				= null;
 		Session 					session						= null;
 		JSONObject 					obj 						= null;
@@ -337,8 +338,10 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 		List<InvoiceCashDetailBean> invoiceCashDetailList		= null;
 		InvoiceCashDetailBean		bean						= null;
 		int							seqDb						= 1;
-		ProductmasterBean 			productmasterBean 			= null;
 		double						quantity					= 0;
+		ProductquantityBean			productquantityBean			= null;
+		String						tin							= null;
+		String						quantityDb					= null;
 		
 		try{
 			invoiceCode 				= EnjoyUtil.nullToStr(request.getParameter("invoiceCode"));
@@ -353,8 +356,9 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 			invoiceDeposit 				= EnjoyUtil.nullToStr(request.getParameter("invoiceDeposit"));
 			invoiceVat 					= EnjoyUtil.nullToStr(request.getParameter("invoiceVat"));
 			invoiceTotal 				= EnjoyUtil.nullToStr(request.getParameter("invoiceTotal"));
-			invoiceCredit 				= EnjoyUtil.nullToStr(request.getParameter("invoiceCredit"));
-			invoiceStatus 				= EnjoyUtil.nullToStr(request.getParameter("invoiceStatus"));
+//			invoiceCredit 				= EnjoyUtil.nullToStr(request.getParameter("invoiceCredit"));
+//			invoiceStatus 				= EnjoyUtil.nullToStr(request.getParameter("invoiceStatus"));
+			tin 						= EnjoyUtil.nullToStr(request.getParameter("tin"));
 			sessionFactory 				= HibernateUtil.getSessionFactory();
 			session 					= sessionFactory.openSession();
 			obj 						= new JSONObject();
@@ -381,6 +385,7 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 			invoiceCashMasterBean.setInvoiceCredit			("");
 			invoiceCashMasterBean.setUserUniqueId			(String.valueOf(this.userBean.getUserUniqueId()));
 			invoiceCashMasterBean.setInvoiceStatus			("A");
+			invoiceCashMasterBean.setTin					(tin);
 			
 			this.dao.insertInvoiceCashMaster(session, invoiceCashMasterBean);
 			
@@ -395,13 +400,21 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 					seqDb++;
 					
 					/*Begin Section รายการสินค้า*/
-					productmasterBean 	= new ProductmasterBean();
-					quantity			= EnjoyUtils.parseDouble(this.productDetailsDao.getInventory(bean.getProductCode())) -  EnjoyUtils.parseDouble(bean.getQuantity());
+					productquantityBean = new ProductquantityBean();
 					
-					productmasterBean.setProductCode(bean.getProductCode());
-					productmasterBean.setQuantity(String.valueOf(quantity));
+					productquantityBean.setProductCode(bean.getProductCode());
+					productquantityBean.setTin(tin);
 					
-					this.productDetailsDao.updateProductQuantity(session, productmasterBean);
+					quantityDb = this.productquantityDao.getProductquantity(productquantityBean);
+					
+					if(quantityDb==null){
+						productquantityBean.setQuantity("0.00");
+						this.productquantityDao.insertProductquantity(session, productquantityBean);
+					}else{
+						quantity = EnjoyUtils.parseDouble(quantityDb) - EnjoyUtils.parseDouble(bean.getQuantity());
+						productquantityBean.setQuantity(String.valueOf(quantity));
+						this.productquantityDao.updateProductquantity(session, productquantityBean);
+					}
 					/*End Section รายการสินค้า*/
 					
 				}
@@ -637,18 +650,22 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 	   ProductmasterBean				productmasterBean		= null;
 	   String							pricePerUnit			= "";
 	   String							discount				= "";
+	   String							tin						= null;
+	   ProductquantityBean				productquantityBean		= null;
+	   String							inventory				= "0.00";
 	
 	   try{
 		   obj 				= new JSONObject();
 		   productName		= EnjoyUtils.nullToStr(this.request.getParameter("productName"));
 		   groupSalePrice 	= EnjoyUtil.nullToStr(request.getParameter("groupSalePrice"));
+		   tin				= EnjoyUtils.nullToStr(this.request.getParameter("tin"));
 		   
 		   logger.info("[getProductDetailByName] productName 				:: " + productName);
 		   logger.info("[getProductDetailByName] groupSalePrice 			:: " + groupSalePrice);
 		   
 		   productmasterBean 		= this.productDetailsDao.getProductDetailByName(productName);
 		   
-		   if(productmasterBean!=null){
+		   if(productmasterBean!=null && !tin.equals("")){
 			   
 			   if(groupSalePrice.equals("2")){
 				   pricePerUnit = productmasterBean.getSalePrice2();
@@ -667,7 +684,13 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 			   obj.put("productCode"	,productmasterBean.getProductCode());
 			   obj.put("productName"	,productmasterBean.getProductName());
 			   obj.put("pricePerUnit"	,pricePerUnit);
-			   obj.put("inventory"		,productmasterBean.getQuantity());
+			   
+			   productquantityBean = new ProductquantityBean();
+			   productquantityBean.setTin(tin);
+			   productquantityBean.setProductCode(productmasterBean.getProductCode());
+			   inventory = EnjoyUtils.convertFloatToDisplay(this.productquantityDao.getProductquantity(productquantityBean), 2);
+			   
+			   obj.put("inventory"		,inventory);
 			   obj.put("unitCode"		,productmasterBean.getUnitCode());
 			   obj.put("unitName"		,productmasterBean.getUnitName());
 			   obj.put("discount"		,discount);
@@ -675,7 +698,7 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 			   obj.put("productCode"	,"");
 			   obj.put("productName"	,"");
 			   obj.put("pricePerUnit"	,"");
-			   obj.put("inventory"		,"");
+			   obj.put("inventory"		,inventory);
 			   obj.put("unitCode"		,"");
 			   obj.put("unitName"		,"");
 			   obj.put("discount"		,"0.00");
@@ -863,6 +886,9 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 	   SessionFactory 			sessionFactory			= null;
 	   Session 					session					= null;
 	   String					discount				= "";
+	   String					tin						= null;
+	   ProductquantityBean		productquantityBean		= null;
+	   String					inventory				= "0.00";
 	
 	   try{
 		   obj 				= new JSONObject();
@@ -870,6 +896,7 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 		   groupSalePrice 	= EnjoyUtil.nullToStr(request.getParameter("groupSalePrice"));
 		   sessionFactory 	= HibernateUtil.getSessionFactory();
 		   session 			= sessionFactory.openSession();
+		   tin				= EnjoyUtils.nullToStr(this.request.getParameter("tin"));
 		   
 		   logger.info("[getProductDetailByCode] productCode 				:: " + productCode);
 		   logger.info("[getProductDetailByCode] groupSalePrice 			:: " + groupSalePrice);
@@ -879,7 +906,7 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 		   
 		   productmasterBeanDb 		= this.productDetailsDao.getProductDetail(session, productmasterBean);
 		   
-		   if(productmasterBeanDb!=null){
+		   if(productmasterBeanDb!=null && !tin.equals("")){
 			   
 			   if(groupSalePrice.equals("2")){
 				   pricePerUnit = productmasterBeanDb.getSalePrice2();
@@ -898,7 +925,13 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 			   obj.put("productCode"	,productmasterBeanDb.getProductCode());
 			   obj.put("productName"	,productmasterBeanDb.getProductName());
 			   obj.put("pricePerUnit"	,pricePerUnit);
-			   obj.put("inventory"		,productmasterBeanDb.getQuantity());
+			   
+			   productquantityBean = new ProductquantityBean();
+			   productquantityBean.setTin(tin);
+			   productquantityBean.setProductCode(productmasterBean.getProductCode());
+			   inventory = EnjoyUtils.convertFloatToDisplay(this.productquantityDao.getProductquantity(productquantityBean), 2);
+			   
+			   obj.put("inventory"		,inventory);
 			   obj.put("unitCode"		,productmasterBeanDb.getUnitCode());
 			   obj.put("unitName"		,productmasterBeanDb.getUnitName());
 			   obj.put("discount"		,discount);
@@ -907,7 +940,7 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 			   obj.put("productCode"	,"");
 			   obj.put("productName"	,"");
 			   obj.put("pricePerUnit"	,"");
-			   obj.put("inventory"		,"");
+			   obj.put("inventory"		,inventory);
 			   obj.put("unitCode"		,"");
 			   obj.put("unitName"		,"");
 			   obj.put("discount"		,"0.00");
@@ -968,8 +1001,10 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 		InvoiceCashMasterBean  		invoiceCashMasterBean		= null;
 		List<InvoiceCashDetailBean> invoiceCashDetailList		= null;
 		InvoiceCashDetailBean		bean						= null;
-		ProductmasterBean 			productmasterBean 			= null;
 		double						quantity					= 0;
+		ProductquantityBean			productquantityBean			= null;
+		String						tin							= null;
+		String						quantityDb					= null;
 		
 		try{
 			sessionFactory 				= HibernateUtil.getSessionFactory();
@@ -977,6 +1012,7 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 			obj 						= new JSONObject();
 			invoiceCashDetailList		= this.form.getInvoiceCashDetailList();
 			invoiceCode 				= EnjoyUtils.nullToStr(this.request.getParameter("invoiceCode"));
+			tin 						= EnjoyUtil.nullToStr(request.getParameter("tin"));
 			
 			session.beginTransaction();
 			
@@ -993,13 +1029,21 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 					if(!bean.getRowStatus().equals(InvoiceCashMaintananceForm.DEL)){
 						
 						/*Begin Section รายการสินค้า*/
-						productmasterBean 	= new ProductmasterBean();
-						quantity			= EnjoyUtils.parseDouble(this.productDetailsDao.getInventory(bean.getProductCode())) +  EnjoyUtils.parseDouble(bean.getQuantity());
+						productquantityBean = new ProductquantityBean();
 						
-						productmasterBean.setProductCode(bean.getProductCode());
-						productmasterBean.setQuantity(String.valueOf(quantity));
+						productquantityBean.setProductCode(bean.getProductCode());
+						productquantityBean.setTin(tin);
 						
-						this.productDetailsDao.updateProductQuantity(session, productmasterBean);
+						quantityDb = this.productquantityDao.getProductquantity(productquantityBean);
+						
+						if(quantityDb==null){
+							productquantityBean.setQuantity("0.00");
+							this.productquantityDao.insertProductquantity(session, productquantityBean);
+						}else{
+							quantity			= EnjoyUtils.parseDouble(quantityDb) +  EnjoyUtils.parseDouble(bean.getQuantity());
+							productquantityBean.setQuantity(String.valueOf(quantity));
+							this.productquantityDao.updateProductquantity(session, productquantityBean);
+						}
 						/*End Section รายการสินค้า*/
 						
 					}

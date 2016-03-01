@@ -27,8 +27,6 @@ public class Productmaster implements Serializable {
 
 	private String productType;
 
-	private BigDecimal quantity;
-
 	private BigDecimal salePrice1;
 
 	private BigDecimal salePrice2;
@@ -90,14 +88,6 @@ public class Productmaster implements Serializable {
 
 	public void setProductType(String productType) {
 		this.productType = productType;
-	}
-
-	public BigDecimal getQuantity() {
-		return this.quantity;
-	}
-
-	public void setQuantity(BigDecimal quantity) {
-		this.quantity = quantity;
 	}
 
 	public BigDecimal getSalePrice1() {

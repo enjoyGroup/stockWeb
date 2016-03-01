@@ -15,7 +15,7 @@
 	String							titlePage				= invoiceCashMaintananceForm.getTitlePage();
 	CustomerDetailsBean 			customerDetailsBean 	= invoiceCashMaintananceForm.getCustomerDetailsBean();
 	List<InvoiceCashDetailBean> 	invoiceCashDetailList 	= invoiceCashMaintananceForm.getInvoiceCashDetailList();
-
+	List<ComboBean> 				companyCombo 			= invoiceCashMaintananceForm.getCompanyCombo();
 
 %>
 
@@ -176,14 +176,19 @@
 		});
 		
 		function lp_validate(){
-			var la_validate             = new Array( "invoiceDate:วันที่ขาย");
+			var la_validate             = new Array( "invoiceDate:วันที่ขาย", "tin:บริษัทที่สังกัด");
 		    var lv_return				= true;
 		    var la_productName			= null;
 		    var la_productCode			= null;
+		    var la_inventory			= null;
+		    var la_quantity				= null;
+		    var lv_inventory			= 0.00;
 		    
 			try{
 				la_productName		= document.getElementsByName("productName");
 				la_productCode		= document.getElementsByName("productCode");
+				la_inventory		= document.getElementsByName("inventory");
+				la_quantity			= document.getElementsByName("quantity");
 				
 				if(!gp_validateEmptyObj(la_validate)){
 					return false;
@@ -228,6 +233,15 @@
 							//alert("ระบุสินค้าชื่อสินค้าผิดกรุณาตรวจสอบ");
 							//la_productName[i].focus();
 							return false;
+						}else{
+							lv_inventory = gp_parseFloat(la_inventory[i].value) - gp_parseFloat(la_quantity[i].value);
+							
+							if(lv_inventory < 0){
+								alert(la_productName[i].value + "เหลือไม่เพียงพอจำหน่าย", function() { 
+									la_productName[i].focus();
+				    		    });
+								return false;
+							}
 						}
 					}
 				}
@@ -325,7 +339,7 @@
 					return;
 				}
 				
-				params 	= "&pageAction=cancel&invoiceCode=" + $('#invoiceCode').val().trim();
+				params 	= "&pageAction=cancel&invoiceCode=" + $('#invoiceCode').val().trim() + "&tin=" + $('#tin').val().trim();
 				
 				$.ajax({
 					async:true,
@@ -598,7 +612,7 @@
 					async:false,
 		            type: "POST",
 		            url: gv_url,
-		            data: gv_service + "&pageAction=getProductDetailByName&productName=" + av_productName.trim() + "&groupSalePrice=" + $("#groupSalePrice").val().trim(),
+		            data: gv_service + "&pageAction=getProductDetailByName&productName=" + av_productName.trim() + "&groupSalePrice=" + $("#groupSalePrice").val().trim() + "&tin=" + $("#tin").val().trim(),
 		            beforeSend: "",
 		            success: function(data){
 		            	var jsonObj 			= null;
@@ -654,7 +668,7 @@
 					async:false,
 		            type: "POST",
 		            url: gv_url,
-		            data: gv_service + "&pageAction=getProductDetailByCode&productCode=" + av_productCode.trim() + "&groupSalePrice=" + $("#groupSalePrice").val().trim(),
+		            data: gv_service + "&pageAction=getProductDetailByCode&productCode=" + av_productCode.trim() + "&groupSalePrice=" + $("#groupSalePrice").val().trim() + "&tin=" + $("#tin").val().trim(),
 		            beforeSend: "",
 		            success: function(data){
 		            	var jsonObj 			= null;
@@ -848,7 +862,7 @@
 						async:false,
 			            type: "POST",
 			            url: gv_url,
-			            data: gv_service + "&pageAction=getProductDetailByName&productName=" + obj.productName.trim(),
+			            data: gv_service + "&pageAction=getProductDetailByName&productName=" + obj.productName.trim() + "&tin=" + $("#tin").val().trim(),
 			            beforeSend: "",
 			            success: function(data){
 			            	var jsonObj 			= null;
@@ -1122,7 +1136,7 @@
 					return;
 				}
 				
-				params = "&productCode=" + lv_productCodeDis + "&groupSalePrice=" + $("#groupSalePrice").val().trim();
+				params = "&productCode=" + lv_productCodeDis + "&groupSalePrice=" + $("#groupSalePrice").val().trim() + "&tin=" + $("#tin").val().trim();
 				
 				$.ajax({
 					async:false,
@@ -1297,6 +1311,18 @@
 								        					   style="width: 220px;" />
 								        			</td>
 									        	</tr>
+									        	<tr>
+								        			<td align="right">
+														บริษัทที่สังกัด<span style="color: red;"><b>*</b></span> :
+													</td>
+								        			<td align="left" colspan="3">
+								        				<select id="tin" name="tin" style="width: 220px;" >
+								        					<% for(ComboBean comboBean:companyCombo){ %>
+								        					<option value="<%=comboBean.getCode()%>" <%if(invoiceCashMasterBean.getTin().equals(comboBean.getCode())){ %> selected <%} %> ><%=comboBean.getDesc()%></option>
+								        					<%} %>
+								        				</select>
+								        			</td>
+								        		</tr>
 								        		<tr>
 									        		<td align="right">
 														ประเภทราคา <span style="color: red;"><b>*</b></span> :

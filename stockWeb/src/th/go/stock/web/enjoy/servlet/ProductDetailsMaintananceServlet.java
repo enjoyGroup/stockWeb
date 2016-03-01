@@ -353,7 +353,7 @@ public class ProductDetailsMaintananceServlet extends EnjoyStandardSvc {
 		String						productTypeCode			= null;
 		String						productGroupCode		= null;
 		String						unitCode				= null;
-		String						quantity				= null;
+//		String						quantity				= null;
 		String						minQuan					= null;
 		String						costPrice				= null;
 		String						salePrice1				= null;
@@ -379,7 +379,7 @@ public class ProductDetailsMaintananceServlet extends EnjoyStandardSvc {
 			productTypeCode 			= EnjoyUtil.nullToStr(request.getParameter("productTypeCode"));
 			productGroupCode 			= EnjoyUtil.nullToStr(request.getParameter("productGroupCode"));
 			unitCode 					= EnjoyUtil.nullToStr(request.getParameter("unitCode"));
-			quantity 					= EnjoyUtil.nullToStr(request.getParameter("quantity"));
+//			quantity 					= EnjoyUtil.nullToStr(request.getParameter("quantity"));
 			minQuan 					= EnjoyUtil.nullToStr(request.getParameter("minQuan"));
 			costPrice 					= EnjoyUtil.nullToStr(request.getParameter("costPrice"));
 			salePrice1 					= EnjoyUtil.nullToStr(request.getParameter("salePrice1"));
@@ -402,7 +402,7 @@ public class ProductDetailsMaintananceServlet extends EnjoyStandardSvc {
 			logger.info("[onSave] productTypeCode 		:: " + productTypeCode);
 			logger.info("[onSave] productGroupCode 		:: " + productGroupCode);
 			logger.info("[onSave] unitCode 				:: " + unitCode);
-			logger.info("[onSave] quantity 				:: " + quantity);
+//			logger.info("[onSave] quantity 				:: " + quantity);
 			logger.info("[onSave] minQuan 				:: " + minQuan);
 			logger.info("[onSave] costPrice 			:: " + costPrice);
 			logger.info("[onSave] salePrice1 			:: " + salePrice1);
@@ -419,7 +419,7 @@ public class ProductDetailsMaintananceServlet extends EnjoyStandardSvc {
 			productmasterBean.setProductTypeCode(productTypeCode);
 			productmasterBean.setProductGroupCode(productGroupCode);
 			productmasterBean.setUnitCode(unitCode);
-			productmasterBean.setQuantity(quantity);
+//			productmasterBean.setQuantity(quantity);
 			productmasterBean.setMinQuan(minQuan);
 			productmasterBean.setCostPrice(costPrice);
 			productmasterBean.setSalePrice1(salePrice1);

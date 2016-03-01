@@ -1,7 +1,9 @@
 package th.go.stock.app.enjoy.model;
 
 import java.io.Serializable;
+
 import javax.persistence.*;
+
 import java.math.BigDecimal;
 
 
@@ -44,6 +46,8 @@ public class Invoicecashmaster implements Serializable {
 	private int saleUniqueId;
 
 	private int userUniqueId;
+	
+	private String tin;
 
 	public Invoicecashmaster() {
 	}
@@ -166,6 +170,14 @@ public class Invoicecashmaster implements Serializable {
 
 	public void setUserUniqueId(int userUniqueId) {
 		this.userUniqueId = userUniqueId;
+	}
+
+	public String getTin() {
+		return tin;
+	}
+
+	public void setTin(String tin) {
+		this.tin = tin;
 	}
 
 }

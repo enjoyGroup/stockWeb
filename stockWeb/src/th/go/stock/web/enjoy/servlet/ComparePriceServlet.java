@@ -60,16 +60,16 @@ public class ComparePriceServlet extends EnjoyStandardSvc {
          String pageAction = null; 
  		
  		try{
- 			 pageAction 				= EnjoyUtil.nullToStr(request.getParameter("pageAction"));
- 			 this.enjoyUtil 			= new EnjoyUtil(request, response);
- 			 this.request            	= request;
-             this.response           	= response;
-             this.session            	= request.getSession(false);
-             this.userBean           	= (UserDetailsBean)session.getAttribute("userBean");
-             this.form               	= (ComparePriceForm)session.getAttribute(FORM_NAME);
-             this.dao					= new ComparePriceDao();
-             this.companyVendorDao		= new CompanyVendorDao();
-             this.productDetailsDao		= new ProductDetailsDao();
+ 			 pageAction 					= EnjoyUtil.nullToStr(request.getParameter("pageAction"));
+ 			 this.enjoyUtil 				= new EnjoyUtil(request, response);
+ 			 this.request            		= request;
+             this.response           		= response;
+             this.session            		= request.getSession(false);
+             this.userBean           		= (UserDetailsBean)session.getAttribute("userBean");
+             this.form               		= (ComparePriceForm)session.getAttribute(FORM_NAME);
+             this.dao						= new ComparePriceDao();
+             this.companyVendorDao			= new CompanyVendorDao();
+             this.productDetailsDao			= new ProductDetailsDao();
  			
              logger.info("[execute] pageAction : " + pageAction );
              
@@ -501,16 +501,16 @@ public class ComparePriceServlet extends EnjoyStandardSvc {
 		   
 		   if(productmasterBean!=null){
 			   obj.put("productCode"	,productmasterBean.getProductCode());
-			   obj.put("productName"	,productmasterBean.getProductName());
-			   obj.put("inventory"		,productmasterBean.getQuantity());
-			   obj.put("unitCode"		,productmasterBean.getUnitCode());
-			   obj.put("unitName"		,productmasterBean.getUnitName());
+//			   obj.put("productName"	,productmasterBean.getProductName());
+//			   obj.put("inventory"		,productmasterBean.getQuantity());
+//			   obj.put("unitCode"		,productmasterBean.getUnitCode());
+//			   obj.put("unitName"		,productmasterBean.getUnitName());
 		   }else{
 			   obj.put("productCode"	,"");
-			   obj.put("productName"	,"");
-			   obj.put("inventory"		,"");
-			   obj.put("unitCode"		,"");
-			   obj.put("unitName"		,"");
+//			   obj.put("productName"	,"");
+//			   obj.put("inventory"		,"");
+//			   obj.put("unitCode"		,"");
+//			   obj.put("unitName"		,"");
 		   }
 		   
 		   obj.put(STATUS, 		SUCCESS);

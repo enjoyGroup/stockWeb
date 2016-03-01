@@ -140,7 +140,7 @@
 													, "productTypeName:หมวดสินค้า"
 													, "productGroupName:หมู่สินค้า"
 													, "unitName:หน่วยสินค้า"
-													, "quantity:ปริมาณสินค้า"
+													//, "quantity:ปริมาณสินค้า"
 													, "minQuan:ยอดต่ำสุดที่ต้องแจ้งเตือน"
 													, "costPrice:ราคาทุน"
 													, "salePrice1:ราคาขาย 1");
@@ -609,20 +609,6 @@
 								        					   maxlength="200" 
 								        					   style="width: 220px;" />
 								        				<input type="hidden" id="unitCode" name="unitCode" value="<%=productmasterBean.getUnitCode()%>" />
-								        			</td>
-									        	</tr>
-									        	<tr>
-									        		<td align="right">
-														ปริมาณสินค้า <span style="color: red;"><b>*</b></span> :
-													</td>
-								        			<td align="left">
-								        				<input type='text' 
-								        					   id="quantity" 
-								        					   name='quantity' 
-								        					   value="<%=productmasterBean.getQuantity()%>" 
-								        					   class="moneyOnly"
-								        					   onblur="gp_checkAmtOnly(this, 9);"
-								        					   style="width: 220px;" />
 								        			</td>
 									        	</tr>
 									        	<tr>

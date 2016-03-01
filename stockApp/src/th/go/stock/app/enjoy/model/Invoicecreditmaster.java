@@ -44,6 +44,8 @@ public class Invoicecreditmaster implements Serializable {
 	private int saleUniqueId;
 
 	private int userUniqueId;
+	
+	private String tin;
 
 	public Invoicecreditmaster() {
 	}
@@ -166,6 +168,14 @@ public class Invoicecreditmaster implements Serializable {
 
 	public void setUserUniqueId(int userUniqueId) {
 		this.userUniqueId = userUniqueId;
+	}
+
+	public String getTin() {
+		return tin;
+	}
+
+	public void setTin(String tin) {
+		this.tin = tin;
 	}
 
 }

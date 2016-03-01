@@ -956,7 +956,7 @@ window.alert = function(message, successCallback){
 		//event.preventDefault();
 };
 
-window.confirm = function(message, successCallback){
+window.confirm = function(message, successCallback, nonSuccessCallback){
 	
 	gp_progressBarOn();
 	
@@ -991,6 +991,9 @@ window.confirm = function(message, successCallback){
 	    	  return;
           },
           No: function() {
+        	  if(nonSuccessCallback!=null && nonSuccessCallback != 'undefined'){
+        		  nonSuccessCallback();
+	    	  }
 	    	  $( this ).dialog( "close" );
 	    	  return;
           }

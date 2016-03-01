@@ -18,13 +18,16 @@ import th.go.stock.app.enjoy.bean.ComboBean;
 import th.go.stock.app.enjoy.bean.CompanyVendorBean;
 import th.go.stock.app.enjoy.bean.ComparePriceBean;
 import th.go.stock.app.enjoy.bean.ProductmasterBean;
+import th.go.stock.app.enjoy.bean.ProductquantityBean;
 import th.go.stock.app.enjoy.bean.ReciveOrdeDetailBean;
 import th.go.stock.app.enjoy.bean.ReciveOrderMasterBean;
 import th.go.stock.app.enjoy.bean.UserDetailsBean;
 import th.go.stock.app.enjoy.dao.CompanyVendorDao;
 import th.go.stock.app.enjoy.dao.ComparePriceDao;
 import th.go.stock.app.enjoy.dao.ProductDetailsDao;
+import th.go.stock.app.enjoy.dao.ProductquantityDao;
 import th.go.stock.app.enjoy.dao.ReciveStockDao;
+import th.go.stock.app.enjoy.dao.RelationUserAndCompanyDao;
 import th.go.stock.app.enjoy.exception.EnjoyException;
 import th.go.stock.app.enjoy.form.ReciveStockMaintananceForm;
 import th.go.stock.app.enjoy.main.Constants;
@@ -51,6 +54,8 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
     private CompanyVendorDao				companyVendorDao			= null;
     private ProductDetailsDao				productDetailsDao			= null;
     private ComparePriceDao					comparePriceDao				= null;
+    private ProductquantityDao				productquantityDao			= null;
+    private RelationUserAndCompanyDao		relationUserAndCompanyDao	= null;
     
 	@Override
 	public void execute(HttpServletRequest request, HttpServletResponse response)
@@ -65,17 +70,19 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
          String pageAction = null; 
  		
  		try{
- 			 pageAction 				= EnjoyUtil.nullToStr(request.getParameter("pageAction"));
- 			 this.enjoyUtil 			= new EnjoyUtil(request, response);
- 			 this.request            	= request;
-             this.response           	= response;
-             this.session            	= request.getSession(false);
-             this.userBean           	= (UserDetailsBean)session.getAttribute("userBean");
-             this.form               	= (ReciveStockMaintananceForm)session.getAttribute(FORM_NAME);
-             this.dao					= new ReciveStockDao();
-             this.companyVendorDao		= new CompanyVendorDao();
-             this.productDetailsDao		= new ProductDetailsDao();
-             this.comparePriceDao		= new ComparePriceDao();
+ 			 pageAction 					= EnjoyUtil.nullToStr(request.getParameter("pageAction"));
+ 			 this.enjoyUtil 				= new EnjoyUtil(request, response);
+ 			 this.request            		= request;
+             this.response           		= response;
+             this.session            		= request.getSession(false);
+             this.userBean           		= (UserDetailsBean)session.getAttribute("userBean");
+             this.form               		= (ReciveStockMaintananceForm)session.getAttribute(FORM_NAME);
+             this.dao						= new ReciveStockDao();
+             this.companyVendorDao			= new CompanyVendorDao();
+             this.productDetailsDao			= new ProductDetailsDao();
+             this.comparePriceDao			= new ComparePriceDao();
+             this.productquantityDao		= new ProductquantityDao();
+             this.relationUserAndCompanyDao = new RelationUserAndCompanyDao();
  			
              logger.info("[execute] pageAction : " + pageAction );
              
@@ -146,7 +153,7 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 		}catch(EnjoyException e){
 			throw new EnjoyException(e.getMessage());
 		}catch(Exception e){
-			logger.info(e.getMessage());
+			logger.error(e);
 			throw new EnjoyException("onLoad is error");
 		}finally{
 			
@@ -161,11 +168,12 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 		
 		try{
 			this.setStatusCombo();
+			this.setCompanyCombo();
 		}catch(EnjoyException e){
 			throw new EnjoyException(e.getMessage());
 		}catch(Exception e){
 			e.printStackTrace();
-			logger.info(e.getMessage());
+			logger.error(e);
 		}finally{
 			logger.info("[setRefference][End]");
 		}
@@ -188,6 +196,30 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 			throw new EnjoyException("setStatusCombo is error");
 		}finally{
 			logger.info("[setStatusCombo][End]");
+		}
+	}
+	
+	private void setCompanyCombo() throws EnjoyException{
+		
+		logger.info("[setCompanyCombo][Begin]");
+		
+		List<ComboBean>			companyCombo 		= null;
+		
+		try{
+			
+			companyCombo = this.relationUserAndCompanyDao.getCompanyList(this.userBean.getUserUniqueId());
+			
+			if(companyCombo.size() > 1){
+				companyCombo.add(0, new ComboBean("", "กรุณาระบุ"));
+			}
+			
+			this.form.setCompanyCombo(companyCombo);
+		}
+		catch(Exception e){
+			logger.error(e);
+			throw new EnjoyException("setCompanyCombo is error");
+		}finally{
+			logger.info("[setCompanyCombo][End]");
 		}
 	}
 	
@@ -292,11 +324,13 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 		List<ReciveOrdeDetailBean> 	reciveOrdeDetailList		= null;
 		ReciveOrdeDetailBean		bean						= null;
 		int							seqDb						= 1;
-		ProductmasterBean 			productmasterBean 			= null;
 		double						quantity					= 0;
 		ComparePriceBean 			comparePriceBean 			= null;
 		int							cou							= 0;
 		int							comparePriceSeq				= 0;
+		ProductquantityBean			productquantityBean			= null;
+		String						tin							= null;
+		String						quantityDb					= null;
 		
 		try{
 			pageMode 					= EnjoyUtil.nullToStr(request.getParameter("pageMode"));
@@ -315,6 +349,7 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 			reciveVat 					= EnjoyUtil.nullToStr(request.getParameter("reciveVat"));
 			reciveTotal 				= EnjoyUtil.nullToStr(request.getParameter("reciveTotal"));
 			currReciveStatus 			= EnjoyUtil.nullToStr(request.getParameter("currReciveStatus"));
+			tin 						= EnjoyUtil.nullToStr(request.getParameter("tin"));
 			sessionFactory 				= HibernateUtil.getSessionFactory();
 			session 					= sessionFactory.openSession();
 			obj 						= new JSONObject();
@@ -342,6 +377,7 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 				reciveOrderMasterBean.setReciveDiscount			(reciveDiscount);
 				reciveOrderMasterBean.setReciveVat				(reciveVat);
 				reciveOrderMasterBean.setReciveTotal			(reciveTotal);
+				reciveOrderMasterBean.setTin					(tin);
 				
 				this.dao.insertReciveordermaster(session, reciveOrderMasterBean);
 			}else{
@@ -362,6 +398,7 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 					reciveOrderMasterBean.setReciveDiscount			(reciveDiscount);
 					reciveOrderMasterBean.setReciveVat				(reciveVat);
 					reciveOrderMasterBean.setReciveTotal			(reciveTotal);
+					reciveOrderMasterBean.setTin					(tin);
 					
 					this.dao.updateReciveOrderMaster(session, reciveOrderMasterBean);
 				}else{
@@ -414,23 +451,38 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 				
 				for(ReciveOrdeDetailBean beanTemp:reciveOrdeDetailList){
 					if(reciveStatus.equals("3")){
-						productmasterBean 	= new ProductmasterBean();
-						quantity			=  EnjoyUtils.parseDouble(this.productDetailsDao.getInventory(beanTemp.getProductCode())) +  EnjoyUtils.parseDouble(beanTemp.getQuantity());
+						productquantityBean = new ProductquantityBean();
 						
-						productmasterBean.setProductCode(beanTemp.getProductCode());
-						productmasterBean.setQuantity(String.valueOf(quantity));
+						productquantityBean.setProductCode(beanTemp.getProductCode());
+						productquantityBean.setTin(tin);
 						
-						this.productDetailsDao.updateProductQuantity(session, productmasterBean);
+						quantityDb = this.productquantityDao.getProductquantity(productquantityBean);
 						
+						if(quantityDb==null){
+							productquantityBean.setQuantity("0.00");
+							this.productquantityDao.insertProductquantity(session, productquantityBean);
+						}else{
+							quantity =  EnjoyUtils.parseDouble(quantityDb) +  EnjoyUtils.parseDouble(beanTemp.getQuantity());
+							productquantityBean.setQuantity(String.valueOf(quantity));
+							this.productquantityDao.updateProductquantity(session, productquantityBean);
+						}
 						
 					}else if(currReciveStatus.equals("3") && reciveStatus.equals("4")){
-						productmasterBean 	= new ProductmasterBean();
-						quantity			=  EnjoyUtils.parseDouble(this.productDetailsDao.getInventory(beanTemp.getProductCode())) -  EnjoyUtils.parseDouble(beanTemp.getQuantity());
+						productquantityBean = new ProductquantityBean();
 						
-						productmasterBean.setProductCode(beanTemp.getProductCode());
-						productmasterBean.setQuantity(String.valueOf(quantity));
+						productquantityBean.setProductCode(beanTemp.getProductCode());
+						productquantityBean.setTin(tin);
 						
-						this.productDetailsDao.updateProductQuantity(session, productmasterBean);
+						quantityDb = this.productquantityDao.getProductquantity(productquantityBean);
+						
+						if(quantityDb==null){
+							productquantityBean.setQuantity("0.00");
+							this.productquantityDao.insertProductquantity(session, productquantityBean);
+						}else{
+							quantity	=  EnjoyUtils.parseDouble(quantityDb) -  EnjoyUtils.parseDouble(beanTemp.getQuantity());
+							productquantityBean.setQuantity(String.valueOf(quantity));
+							this.productquantityDao.updateProductquantity(session, productquantityBean);
+						}
 					}
 				}
 			}
@@ -447,7 +499,7 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 			obj.put(ERR_MSG, 		e.getMessage());
 		}catch(Exception e){
 			session.getTransaction().rollback();
-			logger.info(e.getMessage());
+			logger.error(e);
 			e.printStackTrace();
 			obj.put(STATUS, 		ERROR);
 			obj.put(ERR_MSG, 		"onSave is error");
@@ -490,7 +542,7 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 			obj.put(STATUS, 		SUCCESS);
 			
 		}catch(Exception e){
-			logger.info(e.getMessage());
+			logger.error(e);
 			
 			obj.put(STATUS, 		ERROR);
 			obj.put(ERR_MSG, 		"newRecord is error");
@@ -563,7 +615,7 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 			obj.put(STATUS, 		SUCCESS);
 			
 		}catch(Exception e){
-			logger.info(e.getMessage());
+			logger.error(e);
 			
 			obj.put(STATUS, 		ERROR);
 			obj.put(ERR_MSG, 		"updateRecord is error");
@@ -604,7 +656,7 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 			obj.put(STATUS, 		SUCCESS);
 			
 		}catch(Exception e){
-			logger.info(e.getMessage());
+			logger.error(e);
 			
 			obj.put(STATUS, 		ERROR);
 			obj.put(ERR_MSG, 		"deleteRecord is error");
@@ -644,7 +696,7 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 		   
 	   }catch(Exception e){
 		   e.printStackTrace();
-		   logger.info("[getProductNameList] " + e.getMessage());
+		   logger.error(e);
 	   }finally{
 		   logger.info("[getProductNameList][End]");
 	   }
@@ -660,18 +712,22 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 	   ComparePriceBean 				comparePriceBean 		= null;
 	   String							vendorCode				= null;
 	   String							quantity				= null;
+	   String							tin						= null;
+	   ProductquantityBean				productquantityBean		= null;
+	   String							inventory				= "";
 	
 	   try{
 		   obj 				= new JSONObject();
 		   productName		= EnjoyUtils.nullToStr(this.request.getParameter("productName"));
 		   vendorCode		= EnjoyUtils.nullToStr(this.request.getParameter("vendorCode"));
 		   quantity			= EnjoyUtils.nullToStr(this.request.getParameter("quantity"));
+		   tin				= EnjoyUtils.nullToStr(this.request.getParameter("tin"));
 		   
 		   logger.info("[getProductDetailByName] productName 				:: " + productName);
 		   
 		   productmasterBean 		= this.productDetailsDao.getProductDetailByName(productName);
 		   
-		   if(productmasterBean!=null){
+		   if(productmasterBean!=null && !tin.equals("")){
 			   comparePriceBean = new ComparePriceBean();
 			   comparePriceBean.setProductCode(productmasterBean.getProductCode());
 			   comparePriceBean.setVendorCode(vendorCode);
@@ -682,14 +738,20 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 			   obj.put("productCode"	,productmasterBean.getProductCode());
 			   obj.put("productName"	,productmasterBean.getProductName());
 			   obj.put("price"			,price);
-			   obj.put("inventory"		,productmasterBean.getQuantity());
+			   
+			   productquantityBean = new ProductquantityBean();
+			   productquantityBean.setTin(tin);
+			   productquantityBean.setProductCode(productmasterBean.getProductCode());
+			   inventory = EnjoyUtils.convertFloatToDisplay(this.productquantityDao.getProductquantity(productquantityBean), 2);
+			   
+			   obj.put("inventory"		,inventory);
 			   obj.put("unitCode"		,productmasterBean.getUnitCode());
 			   obj.put("unitName"		,productmasterBean.getUnitName());
 		   }else{
 			   obj.put("productCode"	,"");
 			   obj.put("productName"	,"");
 			   obj.put("price"			,price);
-			   obj.put("inventory"		,"");
+			   obj.put("inventory"		,inventory);
 			   obj.put("unitCode"		,"");
 			   obj.put("unitName"		,"");
 		   }
@@ -700,7 +762,7 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 		   obj.put(STATUS, 		ERROR);
 		   obj.put(ERR_MSG, 	"getProductDetailByName is error");
 		   e.printStackTrace();
-		   logger.info("[getProductDetailByName] " + e.getMessage());
+		   logger.error(e);
 	   }finally{
 		   this.enjoyUtil.writeMSG(obj.toString());
 		   logger.info("[getProductDetailByName][End]");
@@ -736,7 +798,7 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 		   
 	   }catch(Exception e){
 		   e.printStackTrace();
-		   logger.info("[getVendorNameList] " + e.getMessage());
+		   logger.error(e);
 	   }finally{
 		   logger.info("[getVendorNameList][End]");
 	   }
@@ -774,7 +836,7 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 		   
 	   }catch(Exception e){
 		   e.printStackTrace();
-		   logger.info("[branchNameList] " + e.getMessage());
+		   logger.error(e);
 	   }finally{
 		   logger.info("[branchNameList][End]");
 	   }
@@ -852,7 +914,7 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 		   obj.put(STATUS, 		ERROR);
 		   obj.put(ERR_MSG, 	"getCompanyVendorDetail is error");
 		   e.printStackTrace();
-		   logger.info("[getCompanyVendorDetail] " + e.getMessage());
+		   logger.error(e);
 	   }finally{
 		   this.enjoyUtil.writeMSG(obj.toString());
 		   logger.info("[getCompanyVendorDetail][End]");
@@ -882,7 +944,7 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 		   obj.put(STATUS, 		ERROR);
 		   obj.put(ERR_MSG, 	"ctrlCreditDay is error");
 		   e.printStackTrace();
-		   logger.info("[ctrlCreditDay] " + e.getMessage());
+		   logger.error(e);
 	   }finally{
 		   this.enjoyUtil.writeMSG(obj.toString());
 		   logger.info("[ctrlCreditDay][End]");
@@ -919,7 +981,7 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 			obj.put(STATUS, ERROR);
 			obj.put(ERR_MSG, "getPrice is error");
 			e.printStackTrace();
-			logger.info("[getPrice] " + e.getMessage());
+			logger.error(e);
 		} finally {
 			this.enjoyUtil.writeMSG(obj.toString());
 			logger.info("[getPrice][End]");

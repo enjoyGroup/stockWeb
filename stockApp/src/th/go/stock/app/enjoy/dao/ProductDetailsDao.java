@@ -71,7 +71,7 @@ public class ProductDetailsDao {
 			query.addScalar("productGroup"		, new StringType());
 			query.addScalar("productName"		, new StringType());
 			query.addScalar("unitCode"			, new StringType());
-			query.addScalar("quantity"			, new StringType());
+//			query.addScalar("quantity"			, new StringType());
 			query.addScalar("minQuan"			, new StringType());
 			query.addScalar("costPrice"			, new StringType());
 			query.addScalar("salePrice1"		, new StringType());
@@ -98,39 +98,39 @@ public class ProductDetailsDao {
 				logger.info("productGroup 			:: " + row[2]);
 				logger.info("productName 			:: " + row[3]);
 				logger.info("unitCode 				:: " + row[4]);
-				logger.info("quantity 				:: " + row[5]);
-				logger.info("minQuan 				:: " + row[6]);
-				logger.info("costPrice 				:: " + row[7]);
-				logger.info("salePrice1 			:: " + row[8]);
-				logger.info("salePrice2 			:: " + row[9]);
-				logger.info("salePrice3 			:: " + row[10]);
-				logger.info("salePrice4 			:: " + row[11]);
-				logger.info("salePrice5 			:: " + row[12]);
+//				logger.info("quantity 				:: " + row[5]);
+				logger.info("minQuan 				:: " + row[5]);
+				logger.info("costPrice 				:: " + row[6]);
+				logger.info("salePrice1 			:: " + row[7]);
+				logger.info("salePrice2 			:: " + row[8]);
+				logger.info("salePrice3 			:: " + row[9]);
+				logger.info("salePrice4 			:: " + row[10]);
+				logger.info("salePrice5 			:: " + row[11]);
 //				logger.info("startDate 				:: " + row[8]);
 //				logger.info("expDate 				:: " + row[9]);
 //				logger.info("quantity 				:: " + row[10]);
 //				logger.info("productStatus 			:: " + row[11]);
-				logger.info("productTypeName 		:: " + row[13]);
-				logger.info("productGroupName 		:: " + row[14]);
+				logger.info("productTypeName 		:: " + row[12]);
+				logger.info("productGroupName 		:: " + row[13]);
 				
 				bean.setProductCode				(EnjoyUtils.nullToStr(row[0]));
 				bean.setProductTypeCode			(EnjoyUtils.nullToStr(row[1]));
 				bean.setProductGroupCode		(EnjoyUtils.nullToStr(row[2]));
 				bean.setProductName				(EnjoyUtils.nullToStr(row[3]));
 				bean.setUnitCode				(EnjoyUtils.nullToStr(row[4]));
-				bean.setQuantity				(EnjoyUtils.convertFloatToDisplay(row[5], 2));
-				bean.setMinQuan					(EnjoyUtils.convertFloatToDisplay(row[6], 2));
-				bean.setCostPrice				(EnjoyUtils.convertFloatToDisplay(row[7], 2));
-				bean.setSalePrice1				(EnjoyUtils.convertFloatToDisplay(row[8], 2));
-				bean.setSalePrice2				(EnjoyUtils.convertFloatToDisplay(row[9], 2));
-				bean.setSalePrice3				(EnjoyUtils.convertFloatToDisplay(row[10], 2));
-				bean.setSalePrice4				(EnjoyUtils.convertFloatToDisplay(row[11], 2));
-				bean.setSalePrice5				(EnjoyUtils.convertFloatToDisplay(row[12], 2));
+//				bean.setQuantity				(EnjoyUtils.convertFloatToDisplay(row[5], 2));
+				bean.setMinQuan					(EnjoyUtils.convertFloatToDisplay(row[5], 2));
+				bean.setCostPrice				(EnjoyUtils.convertFloatToDisplay(row[6], 2));
+				bean.setSalePrice1				(EnjoyUtils.convertFloatToDisplay(row[7], 2));
+				bean.setSalePrice2				(EnjoyUtils.convertFloatToDisplay(row[8], 2));
+				bean.setSalePrice3				(EnjoyUtils.convertFloatToDisplay(row[9], 2));
+				bean.setSalePrice4				(EnjoyUtils.convertFloatToDisplay(row[10], 2));
+				bean.setSalePrice5				(EnjoyUtils.convertFloatToDisplay(row[11], 2));
 //				bean.setStartDate				(EnjoyUtils.dateFormat(row[8], "yyyyMMdd", "dd/MM/yyyy"));
 //				bean.setExpDate					(EnjoyUtils.dateFormat(row[9], "yyyyMMdd", "dd/MM/yyyy"));
 //				bean.setProductStatus			(row[11]);
-				bean.setProductTypeName			(EnjoyUtils.nullToStr(row[13]));
-				bean.setProductGroupName		(EnjoyUtils.nullToStr(row[14]));
+				bean.setProductTypeName			(EnjoyUtils.nullToStr(row[12]));
+				bean.setProductGroupName		(EnjoyUtils.nullToStr(row[13]));
 				bean.setChkBoxSeq				(String.valueOf(chkBoxSeq));
 				
 				productDetailsList.add(bean);
@@ -179,7 +179,7 @@ public class ProductDetailsDao {
 			query.addScalar("productName"		, new StringType());
 			query.addScalar("unitCode"			, new StringType());
 			query.addScalar("minQuan"			, new StringType());
-			query.addScalar("quantity"			, new StringType());
+//			query.addScalar("quantity"			, new StringType());
 			query.addScalar("costPrice"			, new StringType());
 			query.addScalar("salePrice1"		, new StringType());
 			query.addScalar("salePrice2"		, new StringType());
@@ -204,16 +204,16 @@ public class ProductDetailsDao {
 					logger.info("productName 			:: " + row[3]);
 					logger.info("unitCode 				:: " + row[4]);
 					logger.info("minQuan 				:: " + row[5]);
-					logger.info("quantity 				:: " + row[6]);
-					logger.info("costPrice 				:: " + row[7]);
-					logger.info("salePrice1 			:: " + row[8]);
-					logger.info("salePrice2 			:: " + row[9]);
-					logger.info("salePrice3 			:: " + row[10]);
-					logger.info("salePrice4 			:: " + row[11]);
-					logger.info("salePrice5 			:: " + row[12]);
-					logger.info("productTypeName 		:: " + row[13]);
-					logger.info("productGroupName 		:: " + row[14]);
-					logger.info("unitName 				:: " + row[15]);
+//					logger.info("quantity 				:: " + row[6]);
+					logger.info("costPrice 				:: " + row[6]);
+					logger.info("salePrice1 			:: " + row[7]);
+					logger.info("salePrice2 			:: " + row[8]);
+					logger.info("salePrice3 			:: " + row[9]);
+					logger.info("salePrice4 			:: " + row[10]);
+					logger.info("salePrice5 			:: " + row[11]);
+					logger.info("productTypeName 		:: " + row[12]);
+					logger.info("productGroupName 		:: " + row[13]);
+					logger.info("unitName 				:: " + row[14]);
 					
 					bean.setProductCode				(EnjoyUtils.nullToStr(row[0]));
 					bean.setProductTypeCode			(EnjoyUtils.nullToStr(row[1]));
@@ -221,16 +221,16 @@ public class ProductDetailsDao {
 					bean.setProductName				(EnjoyUtils.nullToStr(row[3]));
 					bean.setUnitCode				(EnjoyUtils.nullToStr(row[4]));
 					bean.setMinQuan					(EnjoyUtils.convertFloatToDisplay(row[5], 2));
-					bean.setQuantity				(EnjoyUtils.convertFloatToDisplay(row[6], 2));
-					bean.setCostPrice				(EnjoyUtils.convertFloatToDisplay(row[7], 2));
-					bean.setSalePrice1				(EnjoyUtils.convertFloatToDisplay(row[8], 2));
-					bean.setSalePrice2				(EnjoyUtils.convertFloatToDisplay(row[9], 2));
-					bean.setSalePrice3				(EnjoyUtils.convertFloatToDisplay(row[10], 2));
-					bean.setSalePrice4				(EnjoyUtils.convertFloatToDisplay(row[11], 2));
-					bean.setSalePrice5				(EnjoyUtils.convertFloatToDisplay(row[12], 2));
-					bean.setProductTypeName			(EnjoyUtils.nullToStr(row[13]));
-					bean.setProductGroupName		(EnjoyUtils.nullToStr(row[14]));
-					bean.setUnitName				(EnjoyUtils.nullToStr(row[15]));
+//					bean.setQuantity				(EnjoyUtils.convertFloatToDisplay(row[6], 2));
+					bean.setCostPrice				(EnjoyUtils.convertFloatToDisplay(row[6], 2));
+					bean.setSalePrice1				(EnjoyUtils.convertFloatToDisplay(row[7], 2));
+					bean.setSalePrice2				(EnjoyUtils.convertFloatToDisplay(row[8], 2));
+					bean.setSalePrice3				(EnjoyUtils.convertFloatToDisplay(row[9], 2));
+					bean.setSalePrice4				(EnjoyUtils.convertFloatToDisplay(row[10], 2));
+					bean.setSalePrice5				(EnjoyUtils.convertFloatToDisplay(row[11], 2));
+					bean.setProductTypeName			(EnjoyUtils.nullToStr(row[12]));
+					bean.setProductGroupName		(EnjoyUtils.nullToStr(row[13]));
+					bean.setUnitName				(EnjoyUtils.nullToStr(row[14]));
 					
 				}	
 			}
@@ -264,7 +264,7 @@ public class ProductDetailsDao {
 			productmaster.setProductGroup			(productmasterBean.getProductGroupCode());
 			productmaster.setProductName			(productmasterBean.getProductName());
 			productmaster.setUnitCode				(EnjoyUtils.parseInt(productmasterBean.getUnitCode()));
-			productmaster.setQuantity				(EnjoyUtils.parseBigDecimal(productmasterBean.getQuantity()));
+//			productmaster.setQuantity				(EnjoyUtils.parseBigDecimal(productmasterBean.getQuantity()));
 			productmaster.setMinQuan				(EnjoyUtils.parseBigDecimal(productmasterBean.getMinQuan()));
 			productmaster.setCostPrice				(EnjoyUtils.parseBigDecimal(productmasterBean.getCostPrice()));
 			productmaster.setSalePrice1				(EnjoyUtils.parseBigDecimal(productmasterBean.getSalePrice1()));
@@ -284,7 +284,7 @@ public class ProductDetailsDao {
 			throw new EnjoyException("Error insertProductmaster");
 		}finally{
 			
-//			product = null;
+			productmaster = null;
 			logger.info("[insertProductmaster][End]");
 		}
 	}
@@ -300,7 +300,7 @@ public class ProductDetailsDao {
 												+ ", productGroup		= :productGroup"
 												+ ", productName		= :productName"
 												+ ", unitCode			= :unitCode"
-												+ ", quantity 			= :quantity"
+//												+ ", quantity 			= :quantity"
 												+ ", minQuan			= :minQuan"
 												+ ", costPrice			= :costPrice"
 												+ ", salePrice1 			= :salePrice1"
@@ -315,7 +315,7 @@ public class ProductDetailsDao {
 			query.setParameter("productGroup"		, productmasterBean.getProductGroupCode());
 			query.setParameter("productName"		, productmasterBean.getProductName());
 			query.setParameter("unitCode"			, EnjoyUtils.parseInt(productmasterBean.getUnitCode()));
-			query.setParameter("quantity"			, EnjoyUtils.parseBigDecimal(productmasterBean.getQuantity()));
+//			query.setParameter("quantity"			, EnjoyUtils.parseBigDecimal(productmasterBean.getQuantity()));
 			query.setParameter("minQuan"			, EnjoyUtils.parseBigDecimal(productmasterBean.getMinQuan()));
 			query.setParameter("costPrice"			, EnjoyUtils.parseBigDecimal(productmasterBean.getCostPrice()));
 			query.setParameter("salePrice1"			, EnjoyUtils.parseBigDecimal(productmasterBean.getSalePrice1()));
@@ -339,34 +339,34 @@ public class ProductDetailsDao {
 		}
 	}
 	
-	public void updateProductQuantity(Session session, ProductmasterBean 		productmasterBean) throws EnjoyException{
-		logger.info("[updateProductQuantity][Begin]");
-		
-		String							hql									= null;
-		Query 							query 								= null;
-		
-		try{
-			hql				= "update  Productmaster set quantity 			= :quantity"
-										+ " where productCode = :productCode";
-			
-			query = session.createQuery(hql);
-			
-			query.setParameter("quantity"			, EnjoyUtils.parseBigDecimal(productmasterBean.getQuantity()));
-			query.setParameter("productCode"		, productmasterBean.getProductCode());
-			
-			query.executeUpdate();
-			
-		}catch(Exception e){
-			e.printStackTrace();
-			logger.info(e.getMessage());
-			throw new EnjoyException("Error updateProductQuantity");
-		}finally{
-			
-			hql									= null;
-			query 								= null;
-			logger.info("[updateProductQuantity][End]");
-		}
-	}
+//	public void updateProductQuantity(Session session, ProductmasterBean 		productmasterBean) throws EnjoyException{
+//		logger.info("[updateProductQuantity][Begin]");
+//		
+//		String							hql									= null;
+//		Query 							query 								= null;
+//		
+//		try{
+//			hql				= "update  Productmaster set quantity 			= :quantity"
+//										+ " where productCode = :productCode";
+//			
+//			query = session.createQuery(hql);
+//			
+//			query.setParameter("quantity"			, EnjoyUtils.parseBigDecimal(productmasterBean.getQuantity()));
+//			query.setParameter("productCode"		, productmasterBean.getProductCode());
+//			
+//			query.executeUpdate();
+//			
+//		}catch(Exception e){
+//			e.printStackTrace();
+//			logger.info(e.getMessage());
+//			throw new EnjoyException("Error updateProductQuantity");
+//		}finally{
+//			
+//			hql									= null;
+//			query 								= null;
+//			logger.info("[updateProductQuantity][End]");
+//		}
+//	}
 	
 	public int checkDupProductCode(Session session, String productCode) throws EnjoyException{
 		logger.info("[checkDupProductCode][Begin]");
@@ -843,7 +843,7 @@ public class ProductDetailsDao {
 			query.addScalar("productName"		, new StringType());
 			query.addScalar("unitCode"			, new StringType());
 			query.addScalar("minQuan"			, new StringType());
-			query.addScalar("quantity"			, new StringType());
+//			query.addScalar("quantity"			, new StringType());
 			query.addScalar("costPrice"			, new StringType());
 			query.addScalar("salePrice1"		, new StringType());
 			query.addScalar("salePrice2"		, new StringType());
@@ -868,16 +868,16 @@ public class ProductDetailsDao {
 					logger.info("productName 			:: " + row[3]);
 					logger.info("unitCode 				:: " + row[4]);
 					logger.info("minQuan 				:: " + row[5]);
-					logger.info("quantity 				:: " + row[6]);
-					logger.info("costPrice 				:: " + row[7]);
-					logger.info("salePrice1 			:: " + row[8]);
-					logger.info("salePrice2 			:: " + row[9]);
-					logger.info("salePrice3 			:: " + row[10]);
-					logger.info("salePrice4 			:: " + row[11]);
-					logger.info("salePrice5 			:: " + row[12]);
-					logger.info("productTypeName 		:: " + row[13]);
-					logger.info("productGroupName 		:: " + row[14]);
-					logger.info("unitName 				:: " + row[15]);
+//					logger.info("quantity 				:: " + row[6]);
+					logger.info("costPrice 				:: " + row[6]);
+					logger.info("salePrice1 			:: " + row[7]);
+					logger.info("salePrice2 			:: " + row[8]);
+					logger.info("salePrice3 			:: " + row[9]);
+					logger.info("salePrice4 			:: " + row[10]);
+					logger.info("salePrice5 			:: " + row[11]);
+					logger.info("productTypeName 		:: " + row[12]);
+					logger.info("productGroupName 		:: " + row[13]);
+					logger.info("unitName 				:: " + row[14]);
 					
 					bean.setProductCode				(EnjoyUtils.nullToStr(row[0]));
 					bean.setProductTypeCode			(EnjoyUtils.nullToStr(row[1]));
@@ -885,16 +885,16 @@ public class ProductDetailsDao {
 					bean.setProductName				(EnjoyUtils.nullToStr(row[3]));
 					bean.setUnitCode				(EnjoyUtils.nullToStr(row[4]));
 					bean.setMinQuan					(EnjoyUtils.convertFloatToDisplay(row[5], 2));
-					bean.setQuantity				(EnjoyUtils.convertFloatToDisplay(row[6], 2));
-					bean.setCostPrice				(EnjoyUtils.convertFloatToDisplay(row[7], 2));
-					bean.setSalePrice1				(EnjoyUtils.convertFloatToDisplay(row[8], 2));
-					bean.setSalePrice2				(EnjoyUtils.convertFloatToDisplay(row[9], 2));
-					bean.setSalePrice3				(EnjoyUtils.convertFloatToDisplay(row[10], 2));
-					bean.setSalePrice4				(EnjoyUtils.convertFloatToDisplay(row[11], 2));
-					bean.setSalePrice5				(EnjoyUtils.convertFloatToDisplay(row[12], 2));
-					bean.setProductTypeName			(EnjoyUtils.nullToStr(row[13]));
-					bean.setProductGroupName		(EnjoyUtils.nullToStr(row[14]));
-					bean.setUnitName				(EnjoyUtils.nullToStr(row[15]));
+//					bean.setQuantity				(EnjoyUtils.convertFloatToDisplay(row[6], 2));
+					bean.setCostPrice				(EnjoyUtils.convertFloatToDisplay(row[6], 2));
+					bean.setSalePrice1				(EnjoyUtils.convertFloatToDisplay(row[7], 2));
+					bean.setSalePrice2				(EnjoyUtils.convertFloatToDisplay(row[8], 2));
+					bean.setSalePrice3				(EnjoyUtils.convertFloatToDisplay(row[9], 2));
+					bean.setSalePrice4				(EnjoyUtils.convertFloatToDisplay(row[10], 2));
+					bean.setSalePrice5				(EnjoyUtils.convertFloatToDisplay(row[11], 2));
+					bean.setProductTypeName			(EnjoyUtils.nullToStr(row[12]));
+					bean.setProductGroupName		(EnjoyUtils.nullToStr(row[13]));
+					bean.setUnitName				(EnjoyUtils.nullToStr(row[14]));
 					
 				}	
 			}
@@ -975,54 +975,54 @@ public class ProductDetailsDao {
 		return discountRate;
 	}
 	
-	public String getInventory(String productCode) throws EnjoyException{
-		logger.info("[getQuanDiscount][Begin]");
-		
-		String			hql							= null;
-		List<String>	list						= null;
-		SQLQuery 		query 						= null;
-		String 			inventory					= "0.00";
-		SessionFactory 	sessionFactory				= null;
-		Session 		session						= null;
-		
-		
-		try{
-			sessionFactory 				= HibernateUtil.getSessionFactory();
-			session 					= sessionFactory.openSession();
-			
-			hql		= "select quantity from productmaster where productCode = '" + productCode + "'";
-			
-			query			= session.createSQLQuery(hql);
-			
-			query.addScalar("quantity"			, new StringType());
-			
-			list		 	= query.list();
-			
-			if(list!=null && list.size() > 0){
-				inventory = EnjoyUtils.convertFloatToDisplay(list.get(0), 2);
-			}
-			
-			logger.info("[getInventory] inventory 			:: " + inventory);
-			
-			
-			
-		}catch(Exception e){
-			logger.info(e.getMessage());
-			throw new EnjoyException(e.getMessage());
-		}finally{
-			session.flush();
-			session.clear();
-			session.close();
-			
-			hql				= null;
-			list			= null;
-			query 			= null;
-			sessionFactory	= null;
-			session			= null;
-			logger.info("[getInventory][End]");
-		}
-		
-		return inventory;
-	}
+//	public String getInventory(String productCode) throws EnjoyException{
+//		logger.info("[getInventory][Begin]");
+//		
+//		String			hql							= null;
+//		List<String>	list						= null;
+//		SQLQuery 		query 						= null;
+//		String 			inventory					= "0.00";
+//		SessionFactory 	sessionFactory				= null;
+//		Session 		session						= null;
+//		
+//		
+//		try{
+//			sessionFactory 				= HibernateUtil.getSessionFactory();
+//			session 					= sessionFactory.openSession();
+//			
+//			hql		= "select quantity from productmaster where productCode = '" + productCode + "'";
+//			
+//			query			= session.createSQLQuery(hql);
+//			
+//			query.addScalar("quantity"			, new StringType());
+//			
+//			list		 	= query.list();
+//			
+//			if(list!=null && list.size() > 0){
+//				inventory = EnjoyUtils.convertFloatToDisplay(list.get(0), 2);
+//			}
+//			
+//			logger.info("[getInventory] inventory 			:: " + inventory);
+//			
+//			
+//			
+//		}catch(Exception e){
+//			logger.error(e);
+//			throw new EnjoyException(e.getMessage());
+//		}finally{
+//			session.flush();
+//			session.clear();
+//			session.close();
+//			
+//			hql				= null;
+//			list			= null;
+//			query 			= null;
+//			sessionFactory	= null;
+//			session			= null;
+//			logger.info("[getInventory][End]");
+//		}
+//		
+//		return inventory;
+//	}
 	
 }
