@@ -45,6 +45,7 @@ public class RefconstantcodeDao {
 			query.addScalar("codeNameTH"	, new StringType());
 			query.addScalar("codeNameEN"	, new StringType());
 			query.addScalar("flagYear"		, new StringType());
+			query.addScalar("flagEdit"		, new StringType());
 			
 			list		 	= query.list();
 			
@@ -58,12 +59,14 @@ public class RefconstantcodeDao {
 				logger.info("codeNameTH		 	:: " + row[2]);
 				logger.info("codeNameEN 		:: " + row[3]);
 				logger.info("flagYear	 		:: " + row[4]);
+				logger.info("flagEdit	 		:: " + row[5]);
 				
 				bean.setId					(EnjoyUtils.nullToStr(row[0]));
 				bean.setCodeDisplay			(EnjoyUtils.nullToStr(row[1]));
 				bean.setCodeNameTH			(EnjoyUtils.nullToStr(row[2]));
 				bean.setCodeNameEN			(EnjoyUtils.nullToStr(row[3]));
 				bean.setFlagYear			(EnjoyUtils.nullToStr(row[4]));
+				bean.setFlagEdit			(EnjoyUtils.nullToStr(row[5]));
 				
 				refconstantcodeList.add(bean);
 			}	
@@ -95,6 +98,7 @@ public class RefconstantcodeDao {
 			refconstantcode.setCodeNameTH	(refconstantcodeBean.getCodeNameTH());
 			refconstantcode.setCodeNameEN	(refconstantcodeBean.getCodeNameEN());
 			refconstantcode.setFlagYear		(refconstantcodeBean.getFlagYear());
+			refconstantcode.setFlagEdit		(refconstantcodeBean.getFlagEdit());
 			
 			session.saveOrUpdate(refconstantcode);
 			
@@ -120,6 +124,7 @@ public class RefconstantcodeDao {
 														+ ", codeNameTH	= :codeNameTH"
 														+ ", codeNameEN	= :codeNameEN"
 														+ ", flagYear	= :flagYear"
+														+ ", flagEdit	= :flagEdit"
 										+ " where id = :id";
 			
 			query = session.createQuery(hql);
@@ -127,6 +132,7 @@ public class RefconstantcodeDao {
 			query.setParameter("codeNameTH"			, refconstantcodeBean.getCodeNameTH());
 			query.setParameter("codeNameEN"			, refconstantcodeBean.getCodeNameEN());
 			query.setParameter("flagYear"			, refconstantcodeBean.getFlagYear());
+			query.setParameter("flagEdit"			, refconstantcodeBean.getFlagEdit());
 			query.setParameter("id"					, EnjoyUtils.parseInt(refconstantcodeBean.getId()));
 			query.executeUpdate();
 			

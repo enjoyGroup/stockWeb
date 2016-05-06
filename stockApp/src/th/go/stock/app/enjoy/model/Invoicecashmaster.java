@@ -48,6 +48,8 @@ public class Invoicecashmaster implements Serializable {
 	private int userUniqueId;
 	
 	private String tin;
+	
+	private String remark;
 
 	public Invoicecashmaster() {
 	}
@@ -178,6 +180,14 @@ public class Invoicecashmaster implements Serializable {
 
 	public void setTin(String tin) {
 		this.tin = tin;
+	}
+
+	public String getRemark() {
+		return remark;
+	}
+
+	public void setRemark(String remark) {
+		this.remark = remark;
 	}
 
 }

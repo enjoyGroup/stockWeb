@@ -189,8 +189,8 @@
 									        <table class="table sim-panel-result-table" id="resultData">
 												<tr height="26px;">
 													<th  style="text-align: center;" width="5%" ><B>ลำดับ</B></th>
-													<th  style="text-align: center;" width="5%"><B>มีปีนำหน้า</B></th>
-													<th  style="text-align: center;" width="25%"><B>รหัสเอกสาร</B></th>
+													<th  style="text-align: center;" width="10%"><B>มีปีนำหน้า</B></th>
+													<th  style="text-align: center;" width="20%"><B>รหัสเอกสาร</B></th>
 													<th  style="text-align: center;" width="35%"><B>ชื่อเอกสาร(ไทย)</B></th>
 													<th  style="text-align: center;" width="30%"><B>ชื่อเอกสาร(อังกฤษ)</B></th>
 												</tr> 
@@ -204,12 +204,22 @@
 														<%=seq%>
 													</td>
 													<td style="text-align:center">
-														<input type="checkbox" 
-															   id="flagYear<%=bean.getId()%>" 
-															   name="flagYear" 
-															   <%if(bean.getFlagYear().equals("Y")){%>checked="checked"<%}%>
-															   onclick="lp_updateRecord('<%=bean.getId()%>');"
-															   value="Y" />
+														<%if(bean.getFlagEdit().equals("Y")){%>
+															<input type="checkbox" 
+																   id="flagYear<%=bean.getId()%>" 
+																   name="flagYear" 
+																   <%if(bean.getFlagYear().equals("Y")){%>checked="checked"<%}%>
+																   onclick="lp_updateRecord('<%=bean.getId()%>');"
+																   value="Y" />
+														<%}else{%>
+															<input type="checkbox" 
+																   id="flagYear<%=bean.getId()%>" 
+																   name="flagYear" 
+																   <%if(bean.getFlagYear().equals("Y")){%>checked="checked"<%}%>
+																   disabled="disabled"
+																   value="Y" />
+														<%}%>
+														
 													</td>
 													<td align="left">
 														<input type="text" 

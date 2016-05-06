@@ -13,28 +13,18 @@ import javax.persistence.*;
 public class Relationuserncompany implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	@Id
-	private int userUniqueId;
-
-	private String tin;
+	@EmbeddedId
+	private RelationuserncompanyPK id;
 
 	public Relationuserncompany() {
 	}
 
-	public int getUserUniqueId() {
-		return this.userUniqueId;
+	public RelationuserncompanyPK getId() {
+		return this.id;
 	}
 
-	public void setUserUniqueId(int userUniqueId) {
-		this.userUniqueId = userUniqueId;
-	}
-
-	public String getTin() {
-		return this.tin;
-	}
-
-	public void setTin(String tin) {
-		this.tin = tin;
+	public void setId(RelationuserncompanyPK id) {
+		this.id = id;
 	}
 
 }

@@ -99,7 +99,7 @@ public class InvoiceCashSearchServlet extends EnjoyStandardSvc {
 		logger.info("[onLoad][Begin]");
 		
 		try{		
-			this.form.setTitlePage("ค้นหารายละเอียดการขาย");
+			this.form.setTitlePage("ค้นหารายละเอียดการขายเงินสด");
 			this.setRefference();
 			
 		}catch(Exception e){

@@ -59,11 +59,11 @@
 		<mapping class="th.go.stock.app.enjoy.model.Refuserstatus" />
 		<mapping class="th.go.stock.app.enjoy.model.Relationgroupcustomer" />
 		<mapping class="th.go.stock.app.enjoy.model.Relationuserncompany" />
+		<mapping class="th.go.stock.app.enjoy.model.RelationuserncompanyPK" />
 		<mapping class="th.go.stock.app.enjoy.model.Subdistrict" />
 		<mapping class="th.go.stock.app.enjoy.model.Unittype" />
 		<mapping class="th.go.stock.app.enjoy.model.Userdetail" />
 		<mapping class="th.go.stock.app.enjoy.model.Userprivilege" />
-		
 		<mapping class="th.go.stock.app.enjoy.model.Productquantity" />
 		<mapping class="th.go.stock.app.enjoy.model.ProductquantityPK" />
 		

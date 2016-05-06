@@ -272,22 +272,16 @@ public class CustomerDetailsMaintananceServlet extends EnjoyStandardSvc {
 		
 		CustomerDetailsBean 	customerDetailsBean		= null;
 		CustomerDetailsBean 	customerDetailsBeanDb	= null;
-		SessionFactory 			sessionFactory			= null;
-		Session 				session					= null;
 		
 		try{
-			sessionFactory 				= HibernateUtil.getSessionFactory();
-			session 					= sessionFactory.openSession();
 			cusCode						= cusCode.equals("0")?EnjoyUtil.nullToStr(request.getParameter("cusCode")):cusCode;
-			
-			session.beginTransaction();
 			
 			logger.info("[getDetail] cusCode :: " + cusCode);
 			
 			customerDetailsBean = new CustomerDetailsBean();
 			customerDetailsBean.setCusCode(cusCode);
 			
-			customerDetailsBeanDb				= this.dao.getCustomerDetail(session, customerDetailsBean);
+			customerDetailsBeanDb				= this.dao.getCustomerDetail(customerDetailsBean);
 			
 			this.form.setTitlePage("แก้ไขรายละเอียดลูกค้า");
 			this.form.setPageMode(CustomerDetailsMaintananceForm.EDIT);
@@ -306,12 +300,7 @@ public class CustomerDetailsMaintananceServlet extends EnjoyStandardSvc {
 			logger.info(e.getMessage());
 			throw new EnjoyException("getDetail is error");
 		}finally{
-			session.close();
-			
 			this.setRefference();
-			
-			sessionFactory	= null;
-			session			= null;
 			logger.info("[getDetail][End]");
 		}
 		

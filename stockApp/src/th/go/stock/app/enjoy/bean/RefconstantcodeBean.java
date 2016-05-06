@@ -8,6 +8,7 @@ public class RefconstantcodeBean {
 	private String codeNameEN;
 	private String rowStatus;
 	private String flagYear;
+	private String flagEdit;
 	
 	public RefconstantcodeBean(){
 		this.id 				= "";
@@ -16,6 +17,7 @@ public class RefconstantcodeBean {
 		this.codeNameEN 		= "";
 		this.rowStatus			= "";
 		this.flagYear			= "N";
+		this.flagEdit			= "N";
 	}
 
 	public String getId() {
@@ -64,5 +66,13 @@ public class RefconstantcodeBean {
 
 	public void setFlagYear(String flagYear) {
 		this.flagYear = flagYear;
+	}
+
+	public String getFlagEdit() {
+		return flagEdit;
+	}
+
+	public void setFlagEdit(String flagEdit) {
+		this.flagEdit = flagEdit;
 	}
 }

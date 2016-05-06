@@ -288,7 +288,7 @@ public class EnjoyUtils {
         String[] GetNum   = { "หนึ่ง","สอง","สาม","สี่","ห้า","หก","เจ็ด","แปด","เก้า","ยี่","เอ็ด" };
         String[] GetDigit = { "","สิบ","ร้อย","พัน","หมื่น","แสน","ล้าน"};
 
-        CurText = amt;
+        CurText = amt!=null||!"".equals(amt)?amt.replaceAll(",", ""):"";
         Digit = 0;
         for ( idx = CurText.length() ; idx >= 1 ;idx-- )
         {

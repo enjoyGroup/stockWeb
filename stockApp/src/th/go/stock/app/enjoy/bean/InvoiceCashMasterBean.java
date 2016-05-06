@@ -24,6 +24,7 @@ public class InvoiceCashMasterBean {
 	private String cusFullName;
 	private String invoiceTypeDesc;
 	private String tin;
+	private String remark;
 
 	
 	public InvoiceCashMasterBean(){
@@ -43,12 +44,13 @@ public class InvoiceCashMasterBean {
 		this.invoiceVat 		= "0.00";
 		this.invoiceTotal 		= "0.00";
 		this.userUniqueId 		= "";
-		this.invoiceCredit 		= "0.00";
+		this.invoiceCredit 		= "";
 		this.invoiceStatus 		= "";
 		this.invoiceStatusDesc	= "";
 		this.cusFullName		= "";
 		this.invoiceTypeDesc	= "";
 		this.tin				= "";
+		this.remark				= "";
 	}
 
 	public String getInvoiceCode() {
@@ -225,5 +227,13 @@ public class InvoiceCashMasterBean {
 
 	public void setTin(String tin) {
 		this.tin = tin;
+	}
+
+	public String getRemark() {
+		return remark;
+	}
+
+	public void setRemark(String remark) {
+		this.remark = remark;
 	}
 }

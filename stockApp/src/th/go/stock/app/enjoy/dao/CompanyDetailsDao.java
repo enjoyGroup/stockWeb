@@ -142,8 +142,7 @@ public class CompanyDetailsDao {
 	}
 
 	
-	public CompanyDetailsBean getCompanyDetail(	Session 					session, 
-												CompanyDetailsBean 			companyDetailsBean) throws EnjoyException{
+	public CompanyDetailsBean getCompanyDetail(	CompanyDetailsBean 			companyDetailsBean) throws EnjoyException{
 		logger.info("[getCompanyDetail][Begin]");
 		
 		String						hql						= null;
@@ -157,8 +156,12 @@ public class CompanyDetailsDao {
 		String						provinceName			= null;
 		String						districtName			= null;
 		String						subdistrictName			= null;
+		SessionFactory 				sessionFactory			= null;
+		Session 					session					= null;
 		
 		try{		
+			sessionFactory 		= HibernateUtil.getSessionFactory();
+			session 			= sessionFactory.openSession();
 			addressDao 			= new AddressDao();
 			hql					= "select * "
 								+ "	from company"
@@ -241,7 +244,11 @@ public class CompanyDetailsDao {
 			e.printStackTrace();
 			throw new EnjoyException("error getCompanyDetail");
 		}finally{
-			hql						= null;
+			session.close();
+			
+			sessionFactory	= null;
+			session			= null;
+			hql				= null;
 			logger.info("[getCompanyDetail][End]");
 		}
 		

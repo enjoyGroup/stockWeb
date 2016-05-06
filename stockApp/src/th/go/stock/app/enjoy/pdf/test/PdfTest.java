@@ -1,76 +1,65 @@
 package th.go.stock.app.enjoy.pdf.test;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.InputStream;
+import java.util.List;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 
+import th.go.stock.app.enjoy.bean.CompanyDetailsBean;
+import th.go.stock.app.enjoy.bean.CustomerDetailsBean;
+import th.go.stock.app.enjoy.bean.HistoryPurchasedByDealerReportBean;
+import th.go.stock.app.enjoy.bean.InvoiceCashDetailBean;
+import th.go.stock.app.enjoy.bean.InvoiceCashMasterBean;
+import th.go.stock.app.enjoy.dao.CompanyDetailsDao;
+import th.go.stock.app.enjoy.dao.CustomerDetailsDao;
+import th.go.stock.app.enjoy.dao.HistoryPurchasedByDealerReportDao;
+import th.go.stock.app.enjoy.dao.InvoiceCashDao;
 import th.go.stock.app.enjoy.pdf.utils.PdfFormService;
 
 import com.lowagie.text.Document;
-import com.lowagie.text.Rectangle;
-import com.lowagie.text.pdf.AcroFields;
-import com.lowagie.text.pdf.PdfReader;
-import com.lowagie.text.pdf.PdfStamper;
+import com.lowagie.text.PageSize;
 import com.lowagie.text.pdf.PdfWriter;
 
 public class PdfTest {
 
 	public static void main(String[] args) {
 		try {
-//			writePDFFromFile("D:/motor/PDF/TicketPdfForm_1.pdf");
-			writePDF("TicketPdfForm", "D:/motor/JSON/ticket.json", "D:/motor/PDF/TicketPdfForm.pdf");
-//			writePDF("SlipPdfTypeTwoForm", "D:/motor/JSON/motor.json", "D:/motor/PDF/SlipPdfTypeTwoForm.pdf");
-//			writePDF("SummarySalePdfForm", "D:/motor/JSON/motor.json", "D:/motor/PDF/SummarySalePdfForm.pdf");
+//			writePDF("ProductBarcodePdfForm", createJsonObjForProductBarcode(), "D:/motor/PDF/ProductBarcodePdfForm.pdf");
+//			writePDF("FullSlipCashPdfForm", createJsonObjForFullSlip(), "D:/motor/PDF/FullSlipCashPdfForm.pdf");
+			writePDF("HistoryPurchasedByDealerPdfForm", createJsonObjForHistoryPurchasedByDealer(), "D:/motor/PDF/HistoryPurchasedByDealerPdfForm.pdf");
 
-//			writeSlipPdfFormPDFFormDB("SlipPdfForm", "PT58/0008", "D:/SlipPdfForm.pdf");
-//			writeSlipPdfTypeTwoFormPDFFormDB("SlipPdfTypeTwoForm", "5700000002", "D:/SlipPdfTypeTwoForm.pdf");
-//			writeSummarySalePDFFormDB("SummarySalePdfForm", "D:/SummarySalePdfForm.pdf");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 	}
 	
-	public static void writePDF(String formName, String filePath, String pdfPath) throws Exception{
+	public static void writePDF(String formName, JSONObject jsonObject, String pdfPath) throws Exception{
 	    String 				formClass					= null;
-	    JSONParser 			parser 						= null;
 		Document 			document					= null;
 		File 				f 							= null;
 		FileOutputStream 	fos 						= null;
 		PdfWriter 			writer 						= null;
 		PdfFormService 		pdfForm 					= null;
-		Object 				obj 						= null;
-		JSONObject 			jsonObject 					= null;
-		Rectangle 			pagesize 					= null;
 		
 		try{
 			System.out.println("formName :: " + formName);
 			
-			formClass					= "th.go.ticket.app.enjoy.pdf."+formName;
-//			document 					= new Document(PageSize.A4);
-//			document 					= new Document(pagesize, 36f, 72f, 108f, 180f);
-			pagesize 					= new Rectangle(173, 432);
-			document 					= new Document(pagesize, 5f, 5f, 5f, 5f);
-			parser 						= new JSONParser();
+			formClass					= "th.go.stock.app.enjoy.pdf."+formName;
+			document 					= new Document(PageSize.A4);
 			f 							= new File(pdfPath);
 			fos            				= new FileOutputStream(f.getAbsolutePath());			
 			writer 						= PdfWriter.getInstance( document,fos  );
 	
-			document.addTitle("Ticket Form");
+			document.addTitle("Strock Form");
 			System.out.println(formClass);
 	
 			Class c 					= 	Class.forName(formClass);
 			pdfForm 	        		= 	(PdfFormService) c.newInstance();
 		
 			document.open();
-			
-			obj 						= parser.parse(new FileReader(filePath));
-			jsonObject 					= (JSONObject) obj;
 			
 			pdfForm.setJSONObject(writer, jsonObject);
 			pdfForm.createForm(document);
@@ -83,185 +72,259 @@ public class PdfTest {
 		}
 	}
 	
-	public static void writePDFFromFile(String pdfPath) throws Exception{
-		File 				f 							= null;
-		FileOutputStream 	fos 						= null;
-        PdfStamper 			stamp 						= null;
-        InputStream 		inputStream 				= null;
-        PdfReader 			reader 						= null;
-        AcroFields 			form 						= null;
-		
+//	public static void writePDFFromFile(String pdfPath) throws Exception{
+//		File 				f 							= null;
+//		FileOutputStream 	fos 						= null;
+//        PdfStamper 			stamp 						= null;
+//        InputStream 		inputStream 				= null;
+//        PdfReader 			reader 						= null;
+//        AcroFields 			form 						= null;
+//		
+//		try{
+//			
+//			inputStream 				= (InputStream) new FileInputStream("D://motor//ticket_1.pdf");
+//            reader 						= new PdfReader(inputStream);
+//            f 							= new File(pdfPath);
+//			fos            				= new FileOutputStream(f.getAbsolutePath());
+//			stamp 						= new PdfStamper(reader, fos);
+//			form 						= stamp.getAcroFields();
+//			
+//			form.setField("gate", "1");
+//			
+//			stamp.close();
+//			
+//			
+//		}catch(Exception e){
+//			e.printStackTrace();
+//		}finally{
+//			
+//		}
+//	}
+	
+	private static JSONObject createJsonObjForProductBarcode(){
+		JSONObject 			jsonObject 					= new JSONObject();
+		JSONArray 			jSONArray 					= new JSONArray();
+	    JSONObject 			objDetail 					= null;
+	    
+		try{
+			objDetail 		= new JSONObject();
+		    objDetail.put("productCode"		,"001");
+		    objDetail.put("productName"		,"เครื่องดูดฝุ่น 1");
+		    jSONArray.add(objDetail);
+		    
+		    objDetail 		= new JSONObject();
+		    objDetail.put("productCode"		,"002");
+		    objDetail.put("productName"		,"เครื่องดูดฝุ่น 2");
+		    jSONArray.add(objDetail);
+		    
+		    objDetail 		= new JSONObject();
+		    objDetail.put("productCode"		,"003");
+		    objDetail.put("productName"		,"เครื่องดูดฝุ่น 3");
+		    jSONArray.add(objDetail);
+		    
+		    jsonObject.put("status", "SUCCESS");
+		    jsonObject.put("radPrint", "S");
+		    jsonObject.put("detailList", jSONArray);
+		    
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return jsonObject;
+	}
+	
+	private static JSONObject createJsonObjForFullSlip(){
+		JSONObject 					jsonObject 				= new JSONObject();
+		JSONArray 					jSONArray 				= new JSONArray();
+	    JSONObject 					objDetail 				= null;
+	    CompanyDetailsBean 			companyDetailsBean		= new CompanyDetailsBean();
+	    CompanyDetailsBean 			companyDetailsDb		= null;
+	    CompanyDetailsDao			companyDetailsDao		= new CompanyDetailsDao();
+	    CustomerDetailsBean 		customerDetailsBean		= new CustomerDetailsBean();
+	    CustomerDetailsBean 		customerDetailsDb		= null;
+	    CustomerDetailsDao			customerDetailsDao		= new CustomerDetailsDao();
+	    InvoiceCashDao				invoiceCashDao			= new InvoiceCashDao();
+	    InvoiceCashMasterBean 		invoiceCashMasterBean 	= new InvoiceCashMasterBean();
+	    InvoiceCashMasterBean 		invoiceCashMasterDb 	= null;
+	    String						cusCode					= null;
+	    String						tin						= null;
+	    String						invoiceCode				= null;
+	    InvoiceCashDetailBean 		invoiceCashDetailBean	= new InvoiceCashDetailBean();
+	    List<InvoiceCashDetailBean> invoiceCashDetailList 	= null;
+	    
+		try{
+			invoiceCode = "1";
+			
+			/*Begin รายละเอียดใบกำกับภาษี*/
+			invoiceCashMasterBean.setInvoiceCode(invoiceCode);
+			invoiceCashMasterDb = invoiceCashDao.getInvoiceCashMaster(invoiceCashMasterBean);
+			objDetail = new JSONObject();
+			objDetail.put("invoiceCode"		, invoiceCashMasterDb.getInvoiceCode());
+			objDetail.put("invoiceDate"		, invoiceCashMasterDb.getInvoiceDate());
+			objDetail.put("invoiceType"		, invoiceCashMasterDb.getInvoiceType());
+			
+			cusCode = invoiceCashMasterDb.getCusCode();
+			objDetail.put("cusCode"			, cusCode);
+			objDetail.put("branchName"		, invoiceCashMasterDb.getBranchName());
+			objDetail.put("saleUniqueId"	, invoiceCashMasterDb.getSaleUniqueId());
+			objDetail.put("saleName"		, invoiceCashMasterDb.getSaleName());
+			objDetail.put("saleCommission"	, invoiceCashMasterDb.getSaleCommission());
+			objDetail.put("invoicePrice"	, invoiceCashMasterDb.getInvoicePrice());
+			objDetail.put("invoicediscount"	, invoiceCashMasterDb.getInvoicediscount());
+			objDetail.put("invoiceDeposit"	, invoiceCashMasterDb.getInvoiceDeposit());
+			objDetail.put("invoiceVat"		, invoiceCashMasterDb.getInvoiceVat());
+			objDetail.put("invoiceTotal"	, invoiceCashMasterDb.getInvoiceTotal());
+			objDetail.put("userUniqueId"	, invoiceCashMasterDb.getUserUniqueId());
+			objDetail.put("invoiceCredit"	, invoiceCashMasterDb.getInvoiceCredit());
+			objDetail.put("invoiceStatus"	, invoiceCashMasterDb.getInvoiceStatus());
+			objDetail.put("invoiceTypeDesc"	, invoiceCashMasterDb.getInvoiceTypeDesc());
+			objDetail.put("remark"			, invoiceCashMasterDb.getRemark());
+			
+			tin = invoiceCashMasterDb.getTin();
+			objDetail.put("tin"			, tin);
+			
+			jsonObject.put("invoiceCashMaster"	,objDetail);
+			/*End รายละเอียดใบกำกับภาษี*/
+			
+			/*Begin รายละเอียดรายการที่ขาย*/
+			invoiceCashDetailBean.setInvoiceCode(invoiceCode);
+			invoiceCashDetailList = invoiceCashDao.getInvoiceCashDetailList(invoiceCashDetailBean);
+			for(InvoiceCashDetailBean vo:invoiceCashDetailList){
+				objDetail = new JSONObject();
+				objDetail.put("invoiceCode"		, vo.getInvoiceCode());
+				objDetail.put("seq"				, vo.getSeq());
+				objDetail.put("productCode"		, vo.getProductCode());
+				objDetail.put("productName"		, vo.getProductName());
+				objDetail.put("quantity"		, vo.getQuantity());
+				objDetail.put("pricePerUnit"	, vo.getPricePerUnit());
+				objDetail.put("price"			, vo.getPrice());
+				objDetail.put("unitCode"		, vo.getUnitCode());
+				objDetail.put("unitName"		, vo.getUnitName());
+				
+				jSONArray.add(objDetail);
+			}
+			
+			jsonObject.put("invoiceCashDetailList"	,jSONArray);
+			/*End รายละเอียดรายการที่ขาย*/
+			
+			
+			/*Begin รายละเอียดบริษัท*/
+			if(tin!=null && !"".equals(tin)){
+				companyDetailsBean.setTin(tin);
+				companyDetailsDb = companyDetailsDao.getCompanyDetail(companyDetailsBean);
+				objDetail = new JSONObject();
+				objDetail.put("tin"			, companyDetailsDb.getTin());
+				objDetail.put("companyName"	, companyDetailsDb.getCompanyName());
+				objDetail.put("address"		, companyDetailsDb.getAddress());
+				objDetail.put("tel"			, companyDetailsDb.getTel());
+				objDetail.put("fax"			, companyDetailsDb.getFax());
+				objDetail.put("email"		, companyDetailsDb.getEmail());
+				objDetail.put("remark"		, companyDetailsDb.getRemark());
+				
+				jsonObject.put("companyDetails"	,objDetail);
+			}
+			/*ENd รายละเอียดบริษัท*/
+			
+			/*Begin รายละเอียดลูกค้า*/
+			if(cusCode!=null && !"".equals(cusCode)){
+				customerDetailsBean.setCusCode("CS-00001");
+				customerDetailsDb = customerDetailsDao.getCustomerDetail(customerDetailsBean);
+				objDetail = new JSONObject();
+				objDetail.put("cusCode"		, customerDetailsDb.getCusCode());
+				objDetail.put("cusName"		, customerDetailsDb.getCusName());
+				objDetail.put("cusSurname"	, customerDetailsDb.getCusSurname());
+				objDetail.put("branchName"	, customerDetailsDb.getBranchName());
+				objDetail.put("sex"			, customerDetailsDb.getSex());
+				objDetail.put("idType"		, customerDetailsDb.getIdType());
+				objDetail.put("idNumber"	, customerDetailsDb.getIdNumber());
+				objDetail.put("birthDate"	, customerDetailsDb.getBirthDate());
+				objDetail.put("religion"	, customerDetailsDb.getReligion());
+				objDetail.put("job"			, customerDetailsDb.getJob());
+				objDetail.put("address"		, customerDetailsDb.getAddress());
+				objDetail.put("tel"			, customerDetailsDb.getTel());
+				objDetail.put("fax"			, customerDetailsDb.getFax());
+				objDetail.put("email"		, customerDetailsDb.getEmail());
+				
+				jsonObject.put("customerDetails",	objDetail);
+			}
+			/*End รายละเอียดลูกค้า*/
+		    
+		    
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return jsonObject;
+	}
+	
+	private static JSONObject createJsonObjForHistoryPurchasedByDealer(){
+		JSONObject 									jsonObject 						= new JSONObject();
+		JSONArray 									jSONArray 						= new JSONArray();
+	    JSONObject 									objDetail 						= null;
+	    HistoryPurchasedByDealerReportDao			dao								= new HistoryPurchasedByDealerReportDao();
+	    HistoryPurchasedByDealerReportBean 			bean							= new HistoryPurchasedByDealerReportBean();
+	    List<HistoryPurchasedByDealerReportBean> 	historyPurchasedByDealerList 	= null;
+	    String										tin								= "";
+	    String										reciveDateFrom					= "";
+	    String										reciveDateTo					= "";
+	    CompanyDetailsBean 							companyDetailsBean				= new CompanyDetailsBean();
+	    CompanyDetailsBean 							companyDetailsDb				= null;
+	    CompanyDetailsDao							companyDetailsDao				= new CompanyDetailsDao();
+	    
 		try{
 			
-			inputStream 				= (InputStream) new FileInputStream("D://motor//ticket_1.pdf");
-            reader 						= new PdfReader(inputStream);
-            f 							= new File(pdfPath);
-			fos            				= new FileOutputStream(f.getAbsolutePath());
-			stamp 						= new PdfStamper(reader, fos);
-			form 						= stamp.getAcroFields();
+			tin 			= "3100201067114";
+			reciveDateFrom 	= "01/03/2559";
+			reciveDateTo 	= "31/03/2559";
 			
-			form.setField("gate", "1");
+			jsonObject.put("tin"			,tin);
+			jsonObject.put("reciveDateFrom"	,reciveDateFrom);
+			jsonObject.put("reciveDateTo"	,reciveDateTo);
 			
-			stamp.close();
 			
+			/*Begin รายละเอียดบริษัท*/
+			if(tin!=null && !"".equals(tin)){
+				companyDetailsBean.setTin(tin);
+				companyDetailsDb = companyDetailsDao.getCompanyDetail(companyDetailsBean);
+				objDetail = new JSONObject();
+				objDetail.put("tin"			, companyDetailsDb.getTin());
+				objDetail.put("companyName"	, companyDetailsDb.getCompanyName());
+				objDetail.put("address"		, companyDetailsDb.getAddress());
+				objDetail.put("tel"			, companyDetailsDb.getTel());
+				objDetail.put("fax"			, companyDetailsDb.getFax());
+				objDetail.put("email"		, companyDetailsDb.getEmail());
+				objDetail.put("remark"		, companyDetailsDb.getRemark());
+				
+				jsonObject.put("companyDetails"	,objDetail);
+			}
+			/*ENd รายละเอียดบริษัท*/
+			
+			/*Begin รายละเอียดรายงาน*/
+			bean.setTin(tin);
+			bean.setReciveDateFrom(reciveDateFrom);
+			bean.setReciveDateTo(reciveDateTo);
+			
+			historyPurchasedByDealerList = dao.searchByCriteria(bean);
+			
+			if(historyPurchasedByDealerList!=null){
+				for(HistoryPurchasedByDealerReportBean vo:historyPurchasedByDealerList){
+					objDetail = new JSONObject();
+					
+					objDetail.put("vendorName"		,vo.getVendorName());
+					objDetail.put("reciveNo"		,vo.getReciveNo());
+					objDetail.put("reciveDate"		,vo.getReciveDate());
+					objDetail.put("reciveTotal"	,vo.getReciveTotal());
+					objDetail.put("reciveDiscount"	,vo.getReciveDiscount());
+					
+					jSONArray.add(objDetail);
+				}
+			}
+			
+			jsonObject.put("historyPurchasedByDealerReportList"	,jSONArray);
+			/*End รายละเอียดรายงาน*/
 			
 		}catch(Exception e){
 			e.printStackTrace();
-		}finally{
-			
 		}
+		return jsonObject;
 	}
 	
-//	public static void writeSlipPdfFormPDFFormDB(String formName, String invoiceId, String pdfPath) throws Exception{
-//	    String 				formClass					= null;
-//		Document 			document					= null;
-//		File 				f 							= null;
-//		FileOutputStream 	fos 						= null;
-//		PdfWriter 			writer 						= null;
-//		PdfFormService 		pdfForm 					= null;
-////		JSONParser 			parser 						= null;
-////		Object 				obj 						= null;
-//		JSONObject 			jsonObject 					= null;
-//		InvoicedetailsDao   invoicedetailsDao			= null;
-//		UserDetailsBean 	userBean					= null;
-//		try{
-//			System.out.println("formName :: " + formName);
-//			
-//			formClass					= "th.go.motorcycles.app.enjoy.pdf."+formName;
-////			document 					= new Document(PageSize.A5, 36, 36, 36, 70);
-//			document 					= new Document(PageSize.A5, 20, 20, 5, 20);
-//			//parser 						= new JSONParser();
-//			f 							= new File(pdfPath);
-//			fos            				= new FileOutputStream(f.getAbsolutePath());			
-//			writer 						= PdfWriter.getInstance( document,fos  );
-//	
-//			document.addTitle("Motor shop Form");
-//			System.out.println(formClass);
-//	
-//			Class c 					= 	Class.forName(formClass);
-//			pdfForm 	        		= 	(PdfFormService) c.newInstance();
-//		
-//			document.open();
-//			
-//			// สร้าง json Object มาจาก DB
-//			invoicedetailsDao			= new InvoicedetailsDao();
-//			userBean					= new UserDetailsBean();
-//			userBean.setCompanyName("บริษัท สหมอเตอร์ไซด์ จำกัด (สำนักงานใหญ่)");
-//			userBean.setTel("02-5215365");
-//			userBean.setCompanyAddress("10/102-104 ม.4 ถ.นนทบุรี-ปทุมธานี ต.บางขะแยง อ.เมือง จ.ปทุมธานี 12000");
-//			userBean.setBranchName("สำนักงานใหญ่");
-//			userBean.setTin("0135552000683");
-//			jsonObject 					= invoicedetailsDao.InvoiceSalePDF(invoiceId,userBean);
-//					
-//			pdfForm.setJSONObject(writer, jsonObject);
-//			pdfForm.createForm(document);
-//	
-//			document.close();
-//		}catch(Exception e){
-//			e.printStackTrace();
-//		}finally{
-//			
-//		}
-//	}
-//	
-//	public static void writeSlipPdfTypeTwoFormPDFFormDB(String formName, String invoiceId, String pdfPath) throws Exception{
-//	    String 				formClass					= null;
-//		Document 			document					= null;
-//		File 				f 							= null;
-//		FileOutputStream 	fos 						= null;
-//		PdfWriter 			writer 						= null;
-//		PdfFormService 		pdfForm 					= null;
-////		JSONParser 			parser 						= null;
-////		Object 				obj 						= null;
-//		JSONObject 			jsonObject 					= null;
-//		InvoicedetailsDao   invoicedetailsDao			= null;
-//		UserDetailsBean 	userBean					= null;
-//		try{
-//			System.out.println("formName :: " + formName);
-//			
-//			formClass					= "th.go.motorcycles.app.enjoy.pdf."+formName;
-//			document 					= new Document(PageSize.A5.rotate());
-//			//parser 						= new JSONParser();
-//			f 							= new File(pdfPath);
-//			fos            				= new FileOutputStream(f.getAbsolutePath());			
-//			writer 						= PdfWriter.getInstance( document,fos  );
-//	
-//			document.addTitle("Motor shop Form");
-//			System.out.println(formClass);
-//	
-//			Class c 					= 	Class.forName(formClass);
-//			pdfForm 	        		= 	(PdfFormService) c.newInstance();
-//		
-//			document.open();
-//			
-//			// สร้าง json Object มาจาก DB
-//			invoicedetailsDao			= new InvoicedetailsDao();
-//			userBean					= new UserDetailsBean();
-//			userBean.setCompanyName("บริษัท สหมอเตอร์ไซด์ จำกัด (สำนักงานใหญ่)");
-//			userBean.setTel("02-5215365");
-//			userBean.setCompanyAddress("10/102-104 ม.4 ถ.นนทบุรี-ปทุมธานี ต.บางขะแยง อ.เมือง จ.ปทุมธานี 12000");
-//			userBean.setBranchName("สำนักงานใหญ่");
-//			userBean.setTin("0135552000683");
-//			jsonObject 					= invoicedetailsDao.InvoiceSalePDF(invoiceId,userBean);
-//					
-//			pdfForm.setJSONObject(writer, jsonObject);
-//			pdfForm.createForm(document);
-//	
-//			document.close();
-//		}catch(Exception e){
-//			e.printStackTrace();
-//		}finally{
-//			
-//		}
-//	}
-//		
-//	public static void writeSummarySalePDFFormDB(String formName, String pdfPath) throws Exception{
-//	    String 				formClass					= null;
-//		Document 			document					= null;
-//		File 				f 							= null;
-//		FileOutputStream 	fos 						= null;
-//		PdfWriter 			writer 						= null;
-//		PdfFormService 		pdfForm 					= null;
-////		JSONParser 			parser 						= null;
-////		Object 				obj 						= null;
-//		JSONObject 			jsonObject 					= null;
-//		InvoicedetailsDao   invoicedetailsDao			= null;
-//		UserDetailsBean 	userBean					= null;
-//		try{
-//			System.out.println("formName :: " + formName);
-//			
-//			formClass					= "th.go.motorcycles.app.enjoy.pdf."+formName;
-//			document 				= new Document(PageSize.A4.rotate());
-//			//parser 						= new JSONParser();
-//			f 							= new File(pdfPath);
-//			fos            				= new FileOutputStream(f.getAbsolutePath());			
-//			writer 						= PdfWriter.getInstance( document,fos  );
-//	
-//			document.addTitle("Motor shop Form");
-//			System.out.println(formClass);
-//	
-//			Class c 					= 	Class.forName(formClass);
-//			pdfForm 	        		= 	(PdfFormService) c.newInstance();
-//		
-//			document.open();
-//			
-//			// สร้าง json Object มาจาก DB
-//			invoicedetailsDao			= new InvoicedetailsDao();
-//			userBean					= new UserDetailsBean();
-//			userBean.setCompanyName("บริษัท สหมอเตอร์ไซด์ จำกัด (สำนักงานใหญ่)");
-//			userBean.setCompanyAddress("10/102-104 ม.4 ถ.นนทบุรี-ปทุมธานี ต.บางขะแยง อ.เมือง จ.ปทุมธานี 12000");
-//			userBean.setBranchName("สำนักงานใหญ่");
-//			userBean.setTin("0135552000683");
-//			jsonObject 					= invoicedetailsDao.SummarySalePDF("", "", "" , "","","",userBean);
-//					
-//			pdfForm.setJSONObject(writer, jsonObject);
-//			pdfForm.createForm(document);
-//	
-//			document.close();
-//		}catch(Exception e){
-//			e.printStackTrace();
-//		}finally{
-//			
-//		}
-//	}
 }

@@ -23,6 +23,8 @@ public class Refconstantcode implements Serializable {
 	private String codeNameTH;
 	
 	private String flagYear;
+	
+	private String flagEdit;
 
 	public Refconstantcode() {
 	}
@@ -65,6 +67,14 @@ public class Refconstantcode implements Serializable {
 
 	public void setFlagYear(String flagYear) {
 		this.flagYear = flagYear;
+	}
+
+	public String getFlagEdit() {
+		return flagEdit;
+	}
+
+	public void setFlagEdit(String flagEdit) {
+		this.flagEdit = flagEdit;
 	}
 
 }

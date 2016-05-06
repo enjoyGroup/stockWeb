@@ -94,6 +94,9 @@ public class UserDetailsDao {
 				userDetailsBean.setPwd					(passWord);
 				userDetailsBean.setUserName				(EnjoyUtils.nullToStr(row[2]));
 				userDetailsBean.setUserSurname			(EnjoyUtils.nullToStr(row[3]));
+				
+				userDetailsBean.setUserFullName(userDetailsBean.getUserName().concat(" ").concat(userDetailsBean.getUserSurname()));
+				
 				userDetailsBean.setUserEmail			(EnjoyUtils.nullToStr(row[4]));
 				userDetailsBean.setUserPrivilege		(EnjoyUtils.nullToStr(row[5]));
 				userDetailsBean.setUserLevel			(EnjoyUtils.nullToStr(row[6]));

@@ -7,6 +7,7 @@ import java.util.List;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 
@@ -18,6 +19,7 @@ import th.go.stock.app.enjoy.model.InvoicecashdetailPK;
 import th.go.stock.app.enjoy.model.Invoicecashmaster;
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
 import th.go.stock.app.enjoy.utils.EnjoyUtils;
+import th.go.stock.app.enjoy.utils.HibernateUtil;
 
 public class InvoiceCashDao {
 	
@@ -138,16 +140,19 @@ public class InvoiceCashDao {
 		
 	}
 	
-	public InvoiceCashMasterBean getInvoiceCashMaster(	Session 				session, 
-														InvoiceCashMasterBean 	invoiceCashMasterBean) throws EnjoyException{
+	public InvoiceCashMasterBean getInvoiceCashMaster(InvoiceCashMasterBean 	invoiceCashMasterBean) throws EnjoyException{
 		logger.info("[getInvoiceCashMaster][Begin]");
 		
 		String						hql						= null;
 		SQLQuery 					query 					= null;
 		List<Object[]>				list					= null;
 		InvoiceCashMasterBean		bean					= null;
+		SessionFactory 				sessionFactory			= null;
+		Session 					session					= null;
 		
-		try{		
+		try{	
+			sessionFactory 		= HibernateUtil.getSessionFactory();
+			session 			= sessionFactory.openSession();
 			hql		= "select *"
 					+ "	from invoicecashmaster"
 					+ "	where invoiceCode 	= '" + invoiceCashMasterBean.getInvoiceCode() + "'";
@@ -171,6 +176,7 @@ public class InvoiceCashDao {
 			query.addScalar("invoiceCredit"		, new StringType());
 			query.addScalar("invoiceStatus"		, new StringType());
 			query.addScalar("tin"				, new StringType());
+			query.addScalar("remark"			, new StringType());
 			
 			list		 	= query.list();
 			
@@ -196,6 +202,7 @@ public class InvoiceCashDao {
 					logger.info("invoiceCredit 				:: " + row[13]);
 					logger.info("invoiceStatus 				:: " + row[14]);
 					logger.info("tin 						:: " + row[15]);
+					logger.info("remark 					:: " + row[16]);
 					
 					bean.setInvoiceCode				(EnjoyUtils.nullToStr(row[0]));
 					bean.setInvoiceDate				(EnjoyUtils.dateToThaiDisplay(row[1]));
@@ -213,18 +220,21 @@ public class InvoiceCashDao {
 					bean.setInvoiceCredit			(EnjoyUtils.nullToStr(row[13]));
 					bean.setInvoiceStatus			(EnjoyUtils.nullToStr(row[14]));
 					bean.setTin						(EnjoyUtils.nullToStr(row[15]));
+					bean.setRemark					(EnjoyUtils.nullToStr(row[16]));
 					
 				}	
 			}
-			
-			
 			
 		}catch(Exception e){
 			logger.info("[getInvoiceCashMaster] " + e.getMessage());
 			e.printStackTrace();
 			throw new EnjoyException("error getInvoiceCashMaster");
 		}finally{
-			hql						= null;
+			session.close();
+			
+			sessionFactory	= null;
+			session			= null;
+			hql				= null;
 			logger.info("[getInvoiceCashMaster][End]");
 		}
 		
@@ -257,6 +267,7 @@ public class InvoiceCashDao {
 			invoiceCashMaster.setInvoiceCredit			(invoiceCashMasterBean.getInvoiceCredit());
 			invoiceCashMaster.setInvoiceStatus			(invoiceCashMasterBean.getInvoiceStatus());
 			invoiceCashMaster.setTin					(invoiceCashMasterBean.getTin());
+			invoiceCashMaster.setRemark					(invoiceCashMasterBean.getRemark());
 			
 			session.saveOrUpdate(invoiceCashMaster);
 			
@@ -293,6 +304,7 @@ public class InvoiceCashDao {
 												+ ", invoiceCredit 			= :invoiceCredit"
 												+ ", invoiceStatus 			= :invoiceStatus"
 												+ ", tin 					= :tin"
+												+ ", remark 				= :remark"
 										+ " where invoiceCode = :invoiceCode";
 			
 			query = session.createQuery(hql);
@@ -312,6 +324,7 @@ public class InvoiceCashDao {
 			query.setParameter("invoiceStatus"		, invoiceCashMasterBean.getInvoiceStatus());
 			query.setParameter("tin"				, invoiceCashMasterBean.getTin());
 			query.setParameter("invoiceCode"		, invoiceCashMasterBean.getInvoiceCode());
+			query.setParameter("remark"				, invoiceCashMasterBean.getRemark());
 			
 			query.executeUpdate();
 			
@@ -355,8 +368,7 @@ public class InvoiceCashDao {
 		}
 	}
 	
-	public List<InvoiceCashDetailBean> getInvoiceCashDetailList( Session 				session
-															  	,InvoiceCashDetailBean 	invoiceCashDetailBean) throws EnjoyException{
+	public List<InvoiceCashDetailBean> getInvoiceCashDetailList(InvoiceCashDetailBean 	invoiceCashDetailBean) throws EnjoyException{
 		logger.info("[getInvoiceCashDetailList][Begin]");
 		
 		String						hql							= null;
@@ -365,8 +377,12 @@ public class InvoiceCashDao {
 		InvoiceCashDetailBean		bean						= null;
 		List<InvoiceCashDetailBean> invoiceCashDetailList 		= new ArrayList<InvoiceCashDetailBean>();
 		int							seq							= 0;
+		SessionFactory 				sessionFactory				= null;
+		Session 					session						= null;
 		
 		try{	
+			sessionFactory 		= HibernateUtil.getSessionFactory();
+			session 			= sessionFactory.openSession();
 			hql					= "select a.*"
 									+ "	, b.productName"
 									+ "	, e.quantity as inventory"
@@ -438,7 +454,11 @@ public class InvoiceCashDao {
 			e.printStackTrace();
 			throw new EnjoyException("error getInvoiceCashDetailList");
 		}finally{
-			hql						= null;
+			session.close();
+			
+			sessionFactory	= null;
+			session			= null;
+			hql				= null;
 			logger.info("[getInvoiceCashDetailList][End]");
 		}
 		

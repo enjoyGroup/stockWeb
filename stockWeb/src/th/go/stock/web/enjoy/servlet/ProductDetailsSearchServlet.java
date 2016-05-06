@@ -1,5 +1,8 @@
 package th.go.stock.web.enjoy.servlet;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutput;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,6 +27,7 @@ import th.go.stock.app.enjoy.dao.ProductDetailsDao;
 import th.go.stock.app.enjoy.exception.EnjoyException;
 import th.go.stock.app.enjoy.form.ProductDetailsSearchForm;
 import th.go.stock.app.enjoy.main.Constants;
+import th.go.stock.app.enjoy.pdf.ViewPdfMainForm;
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
 import th.go.stock.app.enjoy.utils.EnjoyUtils;
 import th.go.stock.app.enjoy.utils.HibernateUtil;
@@ -92,6 +96,8 @@ public class ProductDetailsSearchServlet extends EnjoyStandardSvc {
 				this.setForPrint();
 			}else if(pageAction.equals("checkForPrint")){
 				this.checkForPrint();
+			}else if(pageAction.equals("print")){
+				this.print();
 			}
  			
  			session.setAttribute(FORM_NAME, this.form);
@@ -428,7 +434,6 @@ public class ProductDetailsSearchServlet extends EnjoyStandardSvc {
 			obj.put(STATUS, 		ERROR);
 			obj.put(ERR_MSG, 		"setForPrint is error");
 		}finally{
-			
 			this.enjoyUtil.writeMSG(obj.toString());
 			logger.info("[setForPrint][End]");
 		}
@@ -437,16 +442,13 @@ public class ProductDetailsSearchServlet extends EnjoyStandardSvc {
 	private void checkForPrint(){
 	   logger.info("[checkForPrint][Begin]");
 	   
-	   List<ComboBean> 				list 				= null;
 	   JSONObject 					obj 				= null;
-	   JSONArray 					detailJSONArray 	= null;
-	   JSONObject 					objDetail 			= null;
 	   List<ProductmasterBean> 		dataList			= null;
 	   HashMap						hashTable			= null;
+	   int							checkRecord			= 0;
  
 	   try{
 		   obj 				= new JSONObject();
-		   detailJSONArray 	= new JSONArray();
 		   hashTable		= this.form.getHashTable();
 		   
 		   obj.put(STATUS, 			SUCCESS);
@@ -456,20 +458,17 @@ public class ProductDetailsSearchServlet extends EnjoyStandardSvc {
 			   
 			   for(ProductmasterBean bean:dataList){
 				   if(bean.getChkBox().equals("Y")){
-					   objDetail 		= new JSONObject();
-					   objDetail.put("productCode"			,bean.getProductCode());
-					   
-					   detailJSONArray.add(objDetail);
+					   checkRecord++;
+					   break;
 				   }
 			   }
 		   }
 		   
-		   obj.put("productCodeList", 			detailJSONArray);
-		   
+		   obj.put("checkRecord" , checkRecord);
 		   
 	   }catch(Exception e){
-		   obj.put(STATUS, 			ERROR);
-		   obj.put(ERR_MSG, 		"checkForPrint is Error");
+		   obj.put(STATUS	, ERROR);
+		   obj.put(ERR_MSG	, "checkForPrint is error");
 		   e.printStackTrace();
 		   logger.info("[checkForPrint] " + e.getMessage());
 	   }finally{
@@ -477,6 +476,65 @@ public class ProductDetailsSearchServlet extends EnjoyStandardSvc {
 		   logger.info("[checkForPrint][End]");
 	   }
 	}
+	
+	private void print(){
+		   logger.info("[print][Begin]");
+		   
+		   JSONObject 					obj 				= null;
+		   JSONArray 					detailJSONArray 	= null;
+		   JSONObject 					objDetail 			= null;
+		   List<ProductmasterBean> 		dataList			= null;
+		   HashMap						hashTable			= null;
+		   DataOutput 					output 				= null;
+		   ByteArrayOutputStream		buffer				= null;
+		   byte[] 						bytes				= null;
+		   ViewPdfMainForm				viewPdfMainForm		= null;
+	 
+		   try{
+			   obj 				= new JSONObject();
+			   detailJSONArray 	= new JSONArray();
+			   hashTable		= this.form.getHashTable();
+			   viewPdfMainForm	= new ViewPdfMainForm();
+			   
+			   obj.put(STATUS, 			SUCCESS);
+			   
+			   for (Object key : hashTable.keySet()) {
+				   dataList = (List<ProductmasterBean>) hashTable.get(key);
+				   
+				   for(ProductmasterBean bean:dataList){
+					   if(bean.getChkBox().equals("Y")){
+						   objDetail 		= new JSONObject();
+						   objDetail.put("productCode"			,bean.getProductCode());
+						   objDetail.put("productName"			,bean.getProductName());
+						   
+						   detailJSONArray.add(objDetail);
+					   }
+				   }
+			   }
+			   
+			   obj.put("printType"	, EnjoyUtils.nullToStr(this.request.getParameter("printType")));
+			   obj.put("detailList" , detailJSONArray);
+			   
+			   logger.info("[print] obj.toString() :: " + obj.toString());
+			   
+			   buffer = viewPdfMainForm.writeTicketPDF("ProductBarcodePdfForm", obj);
+				
+			   response.setContentType( "application/pdf" );
+			   output 	= new DataOutputStream( this.response.getOutputStream() );
+			   bytes 	= buffer.toByteArray();
+				
+			   this.response.setContentLength(bytes.length);
+			   for( int i = 0; i < bytes.length; i++ ) { 
+				   output.writeByte( bytes[i] ); 
+			   }
+			   
+		   }catch(Exception e){
+			   e.printStackTrace();
+			   logger.info("[print] " + e.getMessage());
+		   }finally{
+			   logger.info("[print][End]");
+		   }
+		}
 
 	
 	

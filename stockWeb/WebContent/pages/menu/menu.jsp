@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=utf-8"	pageEncoding="utf-8"%>
 <%@ page import="th.go.stock.app.enjoy.bean.UserDetailsBean,th.go.stock.app.enjoy.bean.UserPrivilegeBean,th.go.stock.app.enjoy.bean.PagesDetailBean,th.go.stock.app.enjoy.main.Constants"%>
 <%
-	final String servURL1		= Constants.SERV_URL;
+	//final String servURL1		= Constants.SERV_URL;
 	UserDetailsBean userDeatil 	= (UserDetailsBean) request.getSession().getAttribute("userBean");
 %>
 	<style>
@@ -58,7 +58,7 @@
 			$('#logOut').click(function(){ 
 				try{
 					confirm("ต้องการออกจากระบบ?", function(){
-						window.location.replace('<%=servURL1%>'); 
+						window.location.replace('<%=Constants.LOGOUT_URL%>'); 
 					});
 				}catch(err){
 					alert("logOut :: " + err);
@@ -70,11 +70,11 @@
 <div class="headwrap" id="headwrap">
 	<div class="row" style="position: relative;">
     	<div class="brand span4" style="position: absolute;left:10px;" align="left">
-        	<img src="<%=servURL1%>/images/logo.png" />
+        	<img src="<%=Constants.SERV_URL%>/images/logo.png" />
         </div>
         
         <div class="span8 user"  style="position: absolute;margin-right: 0px;width: 95%;">
-        	<div class="font14"><img src="<%=servURL1%>/images/icon-user.png" alt="">ชื่อผู้ใช้งาน <span class="text_white"><%=userDeatil.getUserName() %>&nbsp;&nbsp;<%=userDeatil.getUserSurname() %></span></div>
+        	<div class="font14"><img src="<%=Constants.SERV_URL%>/images/icon-user.png" alt="">ชื่อผู้ใช้งาน <span class="text_white"><%=userDeatil.getUserName() %>&nbsp;&nbsp;<%=userDeatil.getUserSurname() %></span></div>
             <div style="height: 5px;"></div>
             <div style="width: 100%;" align="right">
 	            <div id="xx" align="center">
@@ -89,7 +89,7 @@
   <ul id="menu1" <%if(userDeatil.getFlagChkCompany().equals("Y")){ %> style="visibility: hidden;"<%}%> >
   	<li><a href="javascript:void(0);" id="logOut" name="logOut" >ออกจากระบบ</a></li>
 	<%if(!userDeatil.getUserId().equals(Constants.ADMIN)){ %>
-	<li><a href="<%=servURL1%>/EnjoyGenericSrv?service=servlet.ChangePasswordServlet&pageAction=new">เปลี่ยนรหัสผ่าน</a></li>
+	<li><a href="<%=Constants.SERV_URL%>/EnjoyGenericSrv?service=servlet.ChangePasswordServlet&pageAction=new">เปลี่ยนรหัสผ่าน</a></li>
  	<%} %>
 	<%
 		UserPrivilegeBean 			userPrivilegeBean 		= null;

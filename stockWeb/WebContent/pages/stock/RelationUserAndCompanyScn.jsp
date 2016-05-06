@@ -181,10 +181,29 @@
 			
 		function lp_validate(){
 		    var lv_return				= true;
+		    var la_userUniqueId			= null;
+		    var lv_currUserUniqueId		= "";
+		    var lv_nextUserUniqueId		= "";
+		    var la_userFullName			= null;
 		    
 			try{
+				la_userUniqueId = document.getElementsByName("userUniqueId");
+				la_userFullName	= document.getElementsByName("userFullName");
 				
-				$.ajax({
+				for(var i=0;i<la_userUniqueId.length;i++){
+					lv_currUserUniqueId = la_userUniqueId[i].value;
+					for(var j=(i+1);j<la_userUniqueId.length;j++){
+						lv_nextUserUniqueId = la_userUniqueId[j].value;
+						
+						if(lv_currUserUniqueId==lv_nextUserUniqueId){
+							alert(la_userFullName[i].value + "มีสังกัดแล้ว", function() { 
+								return false;
+			    		    });
+						}
+					}
+				}
+				
+				/*$.ajax({
 					async:false,
 		            type: "POST",
 		            url: gv_url,
@@ -212,7 +231,7 @@
 		            		lv_return = false;
 		            	}
 		            }
-		        });
+		        });*/
 				
 			}catch(e){
 				alert("lp_validate :: " + e);

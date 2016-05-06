@@ -440,7 +440,7 @@ public class ComparePriceServlet extends EnjoyStandardSvc {
 		   
 	   }catch(Exception e){
 		   e.printStackTrace();
-		   logger.info("[getVendorNameList] " + e.getMessage());
+		   logger.error(e);
 	   }finally{
 		   logger.info("[getVendorNameList][End]");
 	   }

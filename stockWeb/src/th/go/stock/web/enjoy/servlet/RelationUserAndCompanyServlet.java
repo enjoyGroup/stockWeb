@@ -85,9 +85,11 @@ public class RelationUserAndCompanyServlet extends EnjoyStandardSvc {
  				this.onSearch();
  			}else if(pageAction.equals("getCompanyName")){
 				this.getCompanyName();
-			}else if(pageAction.equals("validate")){
-				this.lp_validate();
-			}else if(pageAction.equals("getUserFullName")){
+			}
+// 			else if(pageAction.equals("validate")){
+//				this.lp_validate();
+//			}
+ 			else if(pageAction.equals("getUserFullName")){
 				this.getUserFullName();
 			}
  			
@@ -205,67 +207,67 @@ public class RelationUserAndCompanyServlet extends EnjoyStandardSvc {
 		}
 	}
 	
-	private void lp_validate(){
-	   logger.info("[lp_validate][Begin]");
-	   
-	   JSONObject 							obj 						= new JSONObject();
-	   List<RelationUserAndCompanyBean> 	relationUserAndCompanyList	= null;
-	   RelationUserAndCompanyBean			bean						= null;
-	   RelationUserAndCompanyBean			beanTemp					= null;
-	   String								notInUserUniqueId			= "";
-	   int									cou							= 0;
-	   
-	   try{
-		   relationUserAndCompanyList		= this.form.getRelationUserAndCompanyList();
-		   
-		   /*Begin Check ภายในบริษัทตัวเองว่ามี User ซ้ำมั้ย*/
-		   for(int i=0;i<relationUserAndCompanyList.size();i++){
-				bean = relationUserAndCompanyList.get(i);
-				if(!bean.getRowStatus().equals(RelationUserAndCompanyForm.DEL)){
-					for(int j=(i+1);j<relationUserAndCompanyList.size();j++){
-						beanTemp = relationUserAndCompanyList.get(j);
-						
-						if(!beanTemp.getRowStatus().equals(RelationUserAndCompanyForm.DEL) && bean.getUserUniqueId().equals(beanTemp.getUserUniqueId())){
-							throw new EnjoyException(bean.getUserFullName() + " มีบริษัทสังกัดแล้ว");
-						}
-					}
-				}else{
-					if(notInUserUniqueId.equals("")){
-						notInUserUniqueId = bean.getUserUniqueId();
-					}else{
-						notInUserUniqueId += "," + bean.getUserUniqueId();
-					}
-				}
-		   }
-		   /*End Check ภายในบริษัทตัวเองว่ามี User ซ้ำมั้ย*/
-		   
-		   /*Begin Check ใน table ว่ามี User ซ้ำมั้ย*/
-		   for(int i=0;i<relationUserAndCompanyList.size();i++){
-			   bean = relationUserAndCompanyList.get(i);
-			   if(!bean.getRowStatus().equals(RelationUserAndCompanyForm.DEL)){
-				   cou = this.dao.checkDupUser(bean.getUserUniqueId(), notInUserUniqueId);
-				   if(cou > 0){
-					   throw new EnjoyException(bean.getUserFullName() + " มีบริษัทสังกัดแล้ว");
-				   }
-			   }
-		   }
-		   /*End Check ใน table ว่ามี User ซ้ำมั้ย*/
-		   
-		   obj.put(STATUS				, SUCCESS);
-		   
-	   }catch(EnjoyException e){
-		   obj.put(STATUS, 				ERROR);
-		   obj.put(ERR_MSG, 			e.getMessage());
-	   }catch(Exception e){
-			obj.put(STATUS, 			ERROR);
-			obj.put(ERR_MSG, 			"เกิดข้อผิดพลาดในการตรวจสอบข้อมูล");
-			logger.info(e.getMessage());
-			e.printStackTrace();
-	   }finally{
-		   this.enjoyUtil.writeMSG(obj.toString());
-		   logger.info("[lp_validate][End]");
-	   }
-	}
+//	private void lp_validate(){
+//	   logger.info("[lp_validate][Begin]");
+//	   
+//	   JSONObject 							obj 						= new JSONObject();
+//	   List<RelationUserAndCompanyBean> 	relationUserAndCompanyList	= null;
+//	   RelationUserAndCompanyBean			bean						= null;
+//	   RelationUserAndCompanyBean			beanTemp					= null;
+//	   String								notInUserUniqueId			= "";
+//	   int									cou							= 0;
+//	   
+//	   try{
+//		   relationUserAndCompanyList		= this.form.getRelationUserAndCompanyList();
+//		   
+//		   /*Begin Check ภายในบริษัทตัวเองว่ามี User ซ้ำมั้ย*/
+//		   for(int i=0;i<relationUserAndCompanyList.size();i++){
+//				bean = relationUserAndCompanyList.get(i);
+//				if(!bean.getRowStatus().equals(RelationUserAndCompanyForm.DEL)){
+//					for(int j=(i+1);j<relationUserAndCompanyList.size();j++){
+//						beanTemp = relationUserAndCompanyList.get(j);
+//						
+//						if(!beanTemp.getRowStatus().equals(RelationUserAndCompanyForm.DEL) && bean.getUserUniqueId().equals(beanTemp.getUserUniqueId())){
+//							throw new EnjoyException(bean.getUserFullName() + " มีบริษัทสังกัดแล้ว");
+//						}
+//					}
+//				}else{
+//					if(notInUserUniqueId.equals("")){
+//						notInUserUniqueId = bean.getUserUniqueId();
+//					}else{
+//						notInUserUniqueId += "," + bean.getUserUniqueId();
+//					}
+//				}
+//		   }
+//		   /*End Check ภายในบริษัทตัวเองว่ามี User ซ้ำมั้ย*/
+//		   
+//		   /*Begin Check ใน table ว่ามี User ซ้ำมั้ย*/
+//		   for(int i=0;i<relationUserAndCompanyList.size();i++){
+//			   bean = relationUserAndCompanyList.get(i);
+//			   if(!bean.getRowStatus().equals(RelationUserAndCompanyForm.DEL)){
+//				   cou = this.dao.checkDupUser(bean.getUserUniqueId(), notInUserUniqueId);
+//				   if(cou > 0){
+//					   throw new EnjoyException(bean.getUserFullName() + " มีบริษัทสังกัดแล้ว");
+//				   }
+//			   }
+//		   }
+//		   /*End Check ใน table ว่ามี User ซ้ำมั้ย*/
+//		   
+//		   obj.put(STATUS				, SUCCESS);
+//		   
+//	   }catch(EnjoyException e){
+//		   obj.put(STATUS, 				ERROR);
+//		   obj.put(ERR_MSG, 			e.getMessage());
+//	   }catch(Exception e){
+//			obj.put(STATUS, 			ERROR);
+//			obj.put(ERR_MSG, 			"เกิดข้อผิดพลาดในการตรวจสอบข้อมูล");
+//			logger.info(e.getMessage());
+//			e.printStackTrace();
+//	   }finally{
+//		   this.enjoyUtil.writeMSG(obj.toString());
+//		   logger.info("[lp_validate][End]");
+//	   }
+//	}
 	
 	private void onSave() throws EnjoyException{
 		logger.info("[onSave][Begin]");

@@ -211,8 +211,7 @@ public class CustomerDetailsDao {
 		
 	}
 	
-	public CustomerDetailsBean getCustomerDetail(	Session 					session, 
-													CustomerDetailsBean 		customerDetailsBean) throws EnjoyException{
+	public CustomerDetailsBean getCustomerDetail(CustomerDetailsBean 		customerDetailsBean) throws EnjoyException{
 		logger.info("[getCustomerDetail][Begin]");
 		
 		String						hql						= null;
@@ -227,8 +226,12 @@ public class CustomerDetailsDao {
 		String						districtName			= null;
 		String						subdistrictName			= null;
 		String						fullName				= "";
+		SessionFactory 				sessionFactory			= null;
+		Session 					session					= null;
 		
 		try{		
+			sessionFactory 		= HibernateUtil.getSessionFactory();
+			session 			= sessionFactory.openSession();
 			addressDao 			= new AddressDao();
 			hql					= "select a.*, b.groupSalePrice"
 									+ " from customer a LEFT JOIN relationgroupcustomer b"
@@ -337,7 +340,11 @@ public class CustomerDetailsDao {
 			e.printStackTrace();
 			throw new EnjoyException("error getCustomerDetail");
 		}finally{
-			hql						= null;
+			session.close();
+			
+			sessionFactory	= null;
+			session			= null;
+			hql				= null;
 			logger.info("[getCustomerDetail][End]");
 		}
 		

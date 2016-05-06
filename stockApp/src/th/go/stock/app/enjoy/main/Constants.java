@@ -9,6 +9,7 @@ public class Constants {
 	private static final String EJ_WEB_ROOT 		= "/stockWeb";
 	private static final String ERR_PAGE			= "/enjoyErrorPage.jsp";
 	private static final String LOGIN_FAIL			= "/loginFailScn.jsp";
+	private static final String LOGOUT_FAIL			= "/logOut.jsp";
 	
 	public static final String MAIN_PACKAGE 		= "th.go.stock.web.enjoy.";
 	public static final String SERV_URL 			= EJ_WEB_ROOT;
@@ -19,6 +20,7 @@ public class Constants {
 	public static final String THEME_URL 			= EJ_WEB_ROOT+"/theme";
 	public static final String ERR_PAGE_URL			= EJ_WEB_ROOT+"/pages/error" + ERR_PAGE;
 	public static final String LOGIN_FAIL_URL		= EJ_WEB_ROOT+"/pages/error" + LOGIN_FAIL;
+	public static final String LOGOUT_URL			= EJ_WEB_ROOT+"/pages/main" + LOGOUT_FAIL;
 	
 	/*JSON status*/
 	public static final String STATUS 				= "status";

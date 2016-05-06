@@ -174,25 +174,14 @@
 			      }
 			});
 			
-			$('#btnPrint').click(function(){ 
-				
-				var la_radPrint 	= null;
-				var lv_printType	= "";
+			$('#btnPrint').click(function(){
 				
 				try{
-					la_radPrint = document.getElementsByName("radPrint");
 					
-					for(var i=0;i<la_radPrint.length;i++){
-						if(la_radPrint[i].checked==true){
-							lv_printType = la_radPrint[i].value;
-							break;
-						}
-					}
-					//alert(lv_printType);
-					if(lv_printType==""){
+					if($('input[name="radPrint"]:checked').length<=0){
 						alert("กรุณาระบุประเภทในการพิมพ์");
 						return;
-					}
+	                }
 					
 					$.ajax({
 		            	async:false,
@@ -204,8 +193,7 @@
 			            	var jsonObj 			= null;
 			            	var status				= null;
 			            	var errMsg				= null;
-			            	var sizeList			= 0;
-			            	var productCodeList		= null;
+			            	var checkRecord			= 0;
 			            	
 			            	try{
 			            		
@@ -213,14 +201,10 @@
 			            		status	= jsonObj.status;
 			            		//alert(status);
 			            		if(status=="SUCCESS"){
-			            			productCodeList = jsonObj.productCodeList;
-			            			sizeList 		= parseInt(productCodeList.length);
+			            			checkRecord 		= parseInt(jsonObj.checkRecord);
 			            			
-			            			//alert(sizeList);
-			            			if(sizeList > 0){
-			            				$.each(productCodeList, function(idx, obj) {
-			            					alert(obj.productCode);
-				            			});
+			            			if(checkRecord > 0){
+			            				lp_print();
 			            			}else{
 			            				alert("กรุณาข้อมูลอย่างน้อย 1 รายการ");
 			            			}
@@ -240,7 +224,35 @@
 				
 			});
 			
+			$('#printSection').load(function(){
+				var lo_pdf = document.getElementById("printSection");
+				lo_pdf.focus();
+				lo_pdf.contentWindow.print();
+				return false;
+			});
+			
 		});
+		
+		function lp_print(){
+			var la_radPrint 	= null;
+			var lv_printType	= "";
+			
+			try{
+				la_radPrint = document.getElementsByName("radPrint");
+				
+				for(var i=0;i<la_radPrint.length;i++){
+					if(la_radPrint[i].checked==true){
+						lv_printType = la_radPrint[i].value;
+						break;
+					}
+				}
+				
+				$('#printSection').attr('src', gv_url + "?" + gv_service + "&pageAction=print&printType=" + lv_printType);
+				
+			}catch(e){
+				alert("lp_print :: " + e);
+			}
+		}
 		
 		function lp_sendEditPage(av_val){
 			try{
@@ -528,6 +540,14 @@
 				</section>
 			</section>
 		</section>
+		<iframe name="printSection" 
+				id="printSection"
+				src="" 
+				scrolling="yes"  
+				frameborder="0" 
+				width="0" 
+				height="0">
+		</iframe>
 		<div id="dialog" title="Look up"></div>
 		<div align="center" class="FreezeScreen" style="display:none;">
 	        <center>

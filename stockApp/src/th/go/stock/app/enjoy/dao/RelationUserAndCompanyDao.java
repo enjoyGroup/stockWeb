@@ -15,6 +15,7 @@ import th.go.stock.app.enjoy.bean.ComboBean;
 import th.go.stock.app.enjoy.bean.RelationUserAndCompanyBean;
 import th.go.stock.app.enjoy.exception.EnjoyException;
 import th.go.stock.app.enjoy.model.Relationuserncompany;
+import th.go.stock.app.enjoy.model.RelationuserncompanyPK;
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
 import th.go.stock.app.enjoy.utils.EnjoyUtils;
 import th.go.stock.app.enjoy.utils.HibernateUtil;
@@ -140,13 +141,16 @@ public class RelationUserAndCompanyDao {
 		logger.info("[insertRelationUserAndCompany][Begin]");
 		
 		Relationuserncompany	relationuserncompany	= null;
+		RelationuserncompanyPK	id						= null;
 		
 		try{
+			id						= new RelationuserncompanyPK();
+			relationuserncompany 	= new Relationuserncompany();
 			
-			relationuserncompany = new Relationuserncompany();
+			id.setTin			(relationUserAndCompanyBean.getTin());
+			id.setUserUniqueId	(EnjoyUtils.parseInt(relationUserAndCompanyBean.getUserUniqueId()));
 			
-			relationuserncompany.setTin				(relationUserAndCompanyBean.getTin());
-			relationuserncompany.setUserUniqueId	(EnjoyUtils.parseInt(relationUserAndCompanyBean.getUserUniqueId()));
+			relationuserncompany.setId(id);
 			
 			session.saveOrUpdate(relationuserncompany);
 			
@@ -167,15 +171,17 @@ public class RelationUserAndCompanyDao {
 		Query 							query 								= null;
 		
 		try{
+			logger.info("[deleteRelationUserAndCompany] tin :: " + tin);
+			
 			hql				= "delete Relationuserncompany t"
-							+ " where t.tin	 = '" + tin + "'";
+							+ " where t.id.tin	 = '" + tin + "'";
 			
 			query = session.createQuery(hql);
 			
 			query.executeUpdate();			
 		}catch(Exception e){
 			e.printStackTrace();
-			logger.info(e.getMessage());
+			logger.error(e);
 			throw new EnjoyException("เกิดข้อผิดพลาดในการลบข้อมูล");
 		}finally{
 			

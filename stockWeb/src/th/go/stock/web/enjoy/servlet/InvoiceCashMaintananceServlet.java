@@ -1,5 +1,8 @@
 package th.go.stock.web.enjoy.servlet;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutput;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -16,6 +19,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import th.go.stock.app.enjoy.bean.ComboBean;
+import th.go.stock.app.enjoy.bean.CompanyDetailsBean;
 import th.go.stock.app.enjoy.bean.CustomerDetailsBean;
 import th.go.stock.app.enjoy.bean.InvoiceCashDetailBean;
 import th.go.stock.app.enjoy.bean.InvoiceCashMasterBean;
@@ -33,6 +37,7 @@ import th.go.stock.app.enjoy.exception.EnjoyException;
 import th.go.stock.app.enjoy.form.InvoiceCashMaintananceForm;
 import th.go.stock.app.enjoy.main.Constants;
 import th.go.stock.app.enjoy.model.Userprivilege;
+import th.go.stock.app.enjoy.pdf.ViewPdfMainForm;
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
 import th.go.stock.app.enjoy.utils.EnjoyUtils;
 import th.go.stock.app.enjoy.utils.HibernateUtil;
@@ -122,6 +127,8 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 				this.getDiscount();
 			}else if(pageAction.equals("cancel")){
 				this.onCancel();
+			}else if(pageAction.equals("print")){
+				this.print();
 			}
  			
  			session.setAttribute(FORM_NAME, this.form);
@@ -141,7 +148,7 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 		logger.info("[onLoad][Begin]");
 		
 		
-		InvoiceCashMasterBean 		invoiceCashMasterBean = null;;
+		InvoiceCashMasterBean 		invoiceCashMasterBean = null;
 		
 		try{
 			
@@ -152,6 +159,8 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 			invoiceCashMasterBean.setInvoiceDate(EnjoyUtils.dateToThaiDisplay(EnjoyUtils.currDateThai()));
 			invoiceCashMasterBean.setInvoiceType("N");
 			invoiceCashMasterBean.setInvoiceStatus("A");
+			invoiceCashMasterBean.setSaleName(this.userBean.getUserFullName());
+			invoiceCashMasterBean.setSaleUniqueId(String.valueOf(this.userBean.getUserUniqueId()));
 			
 			this.setRefference();
 			
@@ -238,8 +247,6 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 		
 		InvoiceCashMasterBean 			invoiceCashMasterBean		= null;
 		InvoiceCashMasterBean 			invoiceCashMasterBeanDb		= null;
-		SessionFactory 					sessionFactory				= null;
-		Session 						session						= null;
 		String							seqTemp						= null;
 		CustomerDetailsBean 			customerDetailsBean			= null;
 		CustomerDetailsBean 			customerDetailsBeanDb		= null;
@@ -247,18 +254,14 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 		List<InvoiceCashDetailBean> 	invoiceCashDetailList		= null;
 		
 		try{
-			sessionFactory 				= HibernateUtil.getSessionFactory();
-			session 					= sessionFactory.openSession();
 			invoiceCode					= invoiceCode.equals("0")?EnjoyUtil.nullToStr(request.getParameter("invoiceCode")):invoiceCode;
-			
-			session.beginTransaction();
 			
 			logger.info("[getDetail] invoiceCode :: " + invoiceCode);
 			
 			invoiceCashMasterBean = new InvoiceCashMasterBean();
 			invoiceCashMasterBean.setInvoiceCode(invoiceCode);
 			
-			invoiceCashMasterBeanDb				= this.dao.getInvoiceCashMaster(session, invoiceCashMasterBean);
+			invoiceCashMasterBeanDb				= this.dao.getInvoiceCashMaster(invoiceCashMasterBean);
 			
 			this.form.setPageMode(InvoiceCashMaintananceForm.EDIT);
 			this.form.setTitlePage("แก้ไขรายการการขายเงินสด");
@@ -269,7 +272,7 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 				invoiceCashDetailBean = new InvoiceCashDetailBean();
 				
 				invoiceCashDetailBean.setInvoiceCode(invoiceCode);
-				invoiceCashDetailList = this.dao.getInvoiceCashDetailList(session, invoiceCashDetailBean);
+				invoiceCashDetailList = this.dao.getInvoiceCashDetailList(invoiceCashDetailBean);
 				
 				for(InvoiceCashDetailBean bean:invoiceCashDetailList){
 					seqTemp = bean.getSeq();
@@ -282,7 +285,7 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 				if(!EnjoyUtil.nullToStr(invoiceCashMasterBeanDb.getCusCode()).equals("")){
 					customerDetailsBean = new CustomerDetailsBean();
 					customerDetailsBean.setCusCode(invoiceCashMasterBeanDb.getCusCode());
-					customerDetailsBeanDb		= this.customerDetailsDao.getCustomerDetail(session, customerDetailsBean);
+					customerDetailsBeanDb		= this.customerDetailsDao.getCustomerDetail(customerDetailsBean);
 					
 				}
 				
@@ -303,12 +306,7 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 			logger.info(e.getMessage());
 			throw new EnjoyException("getDetail is error");
 		}finally{
-			session.close();
-			
 			this.setRefference();
-			
-			sessionFactory	= null;
-			session			= null;
 			logger.info("[getDetail][End]");
 		}
 		
@@ -341,6 +339,7 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 		double						quantity					= 0;
 		ProductquantityBean			productquantityBean			= null;
 		String						tin							= null;
+		String						remark						= null;
 		String						quantityDb					= null;
 		
 		try{
@@ -359,6 +358,7 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 //			invoiceCredit 				= EnjoyUtil.nullToStr(request.getParameter("invoiceCredit"));
 //			invoiceStatus 				= EnjoyUtil.nullToStr(request.getParameter("invoiceStatus"));
 			tin 						= EnjoyUtil.nullToStr(request.getParameter("tin"));
+			remark 						= EnjoyUtil.nullToStr(request.getParameter("remark"));
 			sessionFactory 				= HibernateUtil.getSessionFactory();
 			session 					= sessionFactory.openSession();
 			obj 						= new JSONObject();
@@ -386,6 +386,7 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 			invoiceCashMasterBean.setUserUniqueId			(String.valueOf(this.userBean.getUserUniqueId()));
 			invoiceCashMasterBean.setInvoiceStatus			("A");
 			invoiceCashMasterBean.setTin					(tin);
+			invoiceCashMasterBean.setRemark					(remark);
 			
 			this.dao.insertInvoiceCashMaster(session, invoiceCashMasterBean);
 			
@@ -724,13 +725,9 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 	   JSONObject 						obj		 				= null;
 	   CustomerDetailsBean				customerDetailsBean		= null;
 	   CustomerDetailsBean				customerDetailsBeanDb	= null;
-	   SessionFactory 					sessionFactory			= null;
-	   Session 							session					= null;
 	
 	   try{
 		   obj 				= new JSONObject();
-		   sessionFactory 	= HibernateUtil.getSessionFactory();
-		   session 			= sessionFactory.openSession();
 		   cusCode			= EnjoyUtils.nullToStr(this.request.getParameter("cusCode"));
 		   
 		   logger.info("[getCustomerDetail] cusCode 				:: " + cusCode);
@@ -738,7 +735,7 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 		   customerDetailsBean = new CustomerDetailsBean();
 		   customerDetailsBean.setCusCode	(cusCode);
 		   
-		   customerDetailsBeanDb 		= this.customerDetailsDao.getCustomerDetail(session, customerDetailsBean);
+		   customerDetailsBeanDb 		= this.customerDetailsDao.getCustomerDetail(customerDetailsBean);
 		   
 		   if(customerDetailsBeanDb!=null){
 			   obj.put("fullName"		,customerDetailsBeanDb.getFullName());
@@ -761,14 +758,7 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 		   e.printStackTrace();
 		   logger.error(e);
 	   }finally{
-		   session.flush();
-		   session.clear();
-		   session.close();
-		   
 		   this.enjoyUtil.writeMSG(obj.toString());
-		   
-		   sessionFactory	= null;
-		   session			= null;
 		   logger.info("[getCustomerDetail][End]");
 	   }
 	}
@@ -1080,6 +1070,149 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 			logger.info("[onCancel][End]");
 		}
 	}	
+	
+	private void print(){
+		logger.info("[print][Begin]");
+		   
+	   	JSONObject 					jsonObject 				= new JSONObject();
+		JSONArray 					jSONArray 				= new JSONArray();
+		JSONObject 					objDetail 				= null;
+		CompanyDetailsBean 			companyDetailsBean		= new CompanyDetailsBean();
+		CompanyDetailsBean 			companyDetailsDb		= null;
+		CustomerDetailsBean 		customerDetailsBean		= new CustomerDetailsBean();
+		CustomerDetailsBean 		customerDetailsDb		= null;
+		InvoiceCashMasterBean 		invoiceCashMasterBean 	= new InvoiceCashMasterBean();
+		InvoiceCashMasterBean 		invoiceCashMasterDb 	= null;
+		String						cusCode					= null;
+		String						tin						= null;
+		String						invoiceCode				= null;
+		InvoiceCashDetailBean 		invoiceCashDetailBean	= new InvoiceCashDetailBean();
+		List<InvoiceCashDetailBean> invoiceCashDetailList 	= null;
+		ViewPdfMainForm				viewPdfMainForm			= null;
+		DataOutput 					output 					= null;
+		ByteArrayOutputStream		buffer					= null;
+		byte[] 						bytes					= null;
+	 
+		try{
+			invoiceCode 		= EnjoyUtils.nullToStr(this.request.getParameter("invoiceCode"));
+			viewPdfMainForm	= new ViewPdfMainForm();
+   
+		    /*Begin รายละเอียดใบกำกับภาษี*/
+			invoiceCashMasterBean.setInvoiceCode(invoiceCode);
+			invoiceCashMasterDb = dao.getInvoiceCashMaster(invoiceCashMasterBean);
+			objDetail = new JSONObject();
+			objDetail.put("invoiceCode"		, invoiceCashMasterDb.getInvoiceCode());
+			objDetail.put("invoiceDate"		, invoiceCashMasterDb.getInvoiceDate());
+			objDetail.put("invoiceType"		, invoiceCashMasterDb.getInvoiceType());
+			
+			cusCode = invoiceCashMasterDb.getCusCode();
+			objDetail.put("cusCode"			, cusCode);
+			objDetail.put("branchName"		, invoiceCashMasterDb.getBranchName());
+			objDetail.put("saleUniqueId"	, invoiceCashMasterDb.getSaleUniqueId());
+			objDetail.put("saleName"		, invoiceCashMasterDb.getSaleName());
+			objDetail.put("saleCommission"	, invoiceCashMasterDb.getSaleCommission());
+			objDetail.put("invoicePrice"	, invoiceCashMasterDb.getInvoicePrice());
+			objDetail.put("invoicediscount"	, invoiceCashMasterDb.getInvoicediscount());
+			objDetail.put("invoiceDeposit"	, invoiceCashMasterDb.getInvoiceDeposit());
+			objDetail.put("invoiceVat"		, invoiceCashMasterDb.getInvoiceVat());
+			objDetail.put("invoiceTotal"	, invoiceCashMasterDb.getInvoiceTotal());
+			objDetail.put("userUniqueId"	, invoiceCashMasterDb.getUserUniqueId());
+			objDetail.put("invoiceCredit"	, invoiceCashMasterDb.getInvoiceCredit());
+			objDetail.put("invoiceStatus"	, invoiceCashMasterDb.getInvoiceStatus());
+			objDetail.put("invoiceTypeDesc"	, invoiceCashMasterDb.getInvoiceTypeDesc());
+			objDetail.put("remark"			, invoiceCashMasterDb.getRemark());
+			
+			tin = invoiceCashMasterDb.getTin();
+			objDetail.put("tin"			, tin);
+			
+			jsonObject.put("invoiceCashMaster"	,objDetail);
+			/*End รายละเอียดใบกำกับภาษี*/
+	
+			/*Begin รายละเอียดรายการที่ขาย*/
+			invoiceCashDetailBean.setInvoiceCode(invoiceCode);
+			invoiceCashDetailList = dao.getInvoiceCashDetailList(invoiceCashDetailBean);
+			for(InvoiceCashDetailBean vo:invoiceCashDetailList){
+				objDetail = new JSONObject();
+				objDetail.put("invoiceCode"		, vo.getInvoiceCode());
+				objDetail.put("seq"				, vo.getSeq());
+				objDetail.put("productCode"		, vo.getProductCode());
+				objDetail.put("productName"		, vo.getProductName());
+				objDetail.put("quantity"		, vo.getQuantity());
+				objDetail.put("pricePerUnit"	, vo.getPricePerUnit());
+				objDetail.put("price"			, vo.getPrice());
+				objDetail.put("unitCode"		, vo.getUnitCode());
+				objDetail.put("unitName"		, vo.getUnitName());
+				
+				jSONArray.add(objDetail);
+			}
+			
+			jsonObject.put("invoiceCashDetailList"	,jSONArray);
+			/*End รายละเอียดรายการที่ขาย*/
+	
+	
+			/*Begin รายละเอียดบริษัท*/
+			if(tin!=null && !"".equals(tin)){
+				companyDetailsBean.setTin(tin);
+				companyDetailsDb = companyDetailsDao.getCompanyDetail(companyDetailsBean);
+				objDetail = new JSONObject();
+				objDetail.put("tin"			, companyDetailsDb.getTin());
+				objDetail.put("companyName"	, companyDetailsDb.getCompanyName());
+				objDetail.put("address"		, companyDetailsDb.getAddress());
+				objDetail.put("tel"			, companyDetailsDb.getTel());
+				objDetail.put("fax"			, companyDetailsDb.getFax());
+				objDetail.put("email"		, companyDetailsDb.getEmail());
+				objDetail.put("remark"		, companyDetailsDb.getRemark());
+				
+				jsonObject.put("companyDetails"	,objDetail);
+			}
+			/*ENd รายละเอียดบริษัท*/
+	
+			/*Begin รายละเอียดลูกค้า*/
+			if(cusCode!=null && !"".equals(cusCode)){
+				customerDetailsBean.setCusCode(cusCode);
+				customerDetailsDb = customerDetailsDao.getCustomerDetail(customerDetailsBean);
+				objDetail = new JSONObject();
+				objDetail.put("cusCode"		, customerDetailsDb.getCusCode());
+				objDetail.put("cusName"		, customerDetailsDb.getCusName());
+				objDetail.put("cusSurname"	, customerDetailsDb.getCusSurname());
+				objDetail.put("branchName"	, customerDetailsDb.getBranchName());
+				objDetail.put("sex"			, customerDetailsDb.getSex());
+				objDetail.put("idType"		, customerDetailsDb.getIdType());
+				objDetail.put("idNumber"	, customerDetailsDb.getIdNumber());
+				objDetail.put("birthDate"	, customerDetailsDb.getBirthDate());
+				objDetail.put("religion"	, customerDetailsDb.getReligion());
+				objDetail.put("job"			, customerDetailsDb.getJob());
+				objDetail.put("address"		, customerDetailsDb.getAddress());
+				objDetail.put("tel"			, customerDetailsDb.getTel());
+				objDetail.put("fax"			, customerDetailsDb.getFax());
+				objDetail.put("email"		, customerDetailsDb.getEmail());
+				
+				jsonObject.put("customerDetails",	objDetail);
+			}
+			/*End รายละเอียดลูกค้า*/
+	
+			jsonObject.put(STATUS, 			SUCCESS);
+   
+			logger.info("[print] obj.toString() :: " + jsonObject.toString());
+   
+			buffer = viewPdfMainForm.writeTicketPDF("FullSlipCashPdfForm", jsonObject);
+	
+			response.setContentType( "application/pdf" );
+			output 	= new DataOutputStream( this.response.getOutputStream() );
+			bytes 	= buffer.toByteArray();
+	
+			this.response.setContentLength(bytes.length);
+			for( int i = 0; i < bytes.length; i++ ) { 
+				output.writeByte( bytes[i] ); 
+			}
+	   
+		}catch(Exception e){
+			e.printStackTrace();
+			logger.info("[print] " + e.getMessage());
+		}finally{
+			logger.info("[print][End]");
+		}
+	}
 	
 }
 

@@ -170,6 +170,13 @@
 			    
 			});
 			
+			$('#printSection').load(function(){
+				var lo_pdf = document.getElementById("printSection");
+				lo_pdf.focus();
+				lo_pdf.contentWindow.print();
+				return false;
+			});
+			
 			//gp_progressBarOff();
 			$("#productCodeDis").focus();
 			
@@ -261,6 +268,7 @@
 				$("form").each(function(){
 				    //$(this).find(':input').attr('readonly', true).attr('class', 'input-disabled');
 					$(this).find('input:visible').prop("disabled", true);
+					$(this).find('textarea:visible').prop("disabled", true);
 				    
 				});
 				
@@ -1192,6 +1200,17 @@
 			}
 		}
 		
+		function lp_print(){
+			
+			try{
+				
+				$('#printSection').attr('src', gv_url + "?" + gv_service + "&pageAction=print&invoiceCode=" + $("#invoiceCode").val());
+				
+			}catch(e){
+				alert("lp_print :: " + e);
+			}
+		}
+		
 	</script>
 </head>
 <body onkeydown="lp_focusBarCodeTxt(event);">
@@ -1551,6 +1570,20 @@
 								        				<span>&nbsp;บาท</span>
 													</td>
 								        		</tr>
+								        		<tr>
+									        		<td align="left">
+									        			<table border="0" width="100%">
+									        				<tr>
+									        					<td width="10%" align="right" valign="top">หมายเหต :</td>
+									        					<td width="90%" align="left">
+									        						<textarea rows="3" style="width: 100%;" id="remark" name="remark">
+											        					<%=invoiceCashMasterBean.getRemark()%>
+											        				</textarea>
+									        					</td>
+									        				</tr>
+									        			</table>
+													</td>
+								        		</tr>
 							        			<tr>
 								        			<td align="right">
 								        				<br/>
@@ -1558,7 +1591,7 @@
 								        				<input type="button" id="btnSave" class="btn btn-sm btn-warning" value='บันทึก' onclick="lp_save();" />&nbsp;&nbsp;&nbsp;
 				   										<input type="button" id="btnReset" onclick="lp_reset();" class="btn btn-sm btn-danger" value='เริ่มใหม่' />
 				   										<%}else{%>
-				   										<input type="button" id="btnPrint" name="btnPrint" class="btn btn-sm btn-warning" value='พิมพ์' onclick="" />&nbsp;&nbsp;&nbsp;
+				   										<input type="button" id="btnPrint" name="btnPrint" class="btn btn-sm btn-warning" value='พิมพ์' onclick="lp_print();" />&nbsp;&nbsp;&nbsp;
 				   										<input type="button" id="btnCancel" name="btnCancel" onclick="lp_cancel();" class="btn btn-sm btn-danger" value='ยกเลิก' />
 				   										<%}%>
 								        			</td>
@@ -1574,6 +1607,14 @@
 				</section>
 			</section>
 		</section>
+		<iframe name="printSection" 
+				id="printSection"
+				src="" 
+				scrolling="yes"  
+				frameborder="0" 
+				width="0" 
+				height="0">
+		</iframe>
 		<div id="dialog" title="Look up"></div>
 		<div align="center" class="FreezeScreen" style="display:none;">
         	<center>

@@ -1,7 +1,10 @@
 package th.go.stock.app.enjoy.pdf.utils;
 
+import org.json.simple.JSONObject;
+
 import com.lowagie.text.Font;
 import com.lowagie.text.FontFactory;
+import com.lowagie.text.Image;
 import com.lowagie.text.Paragraph;
 import com.lowagie.text.Phrase;
 import com.lowagie.text.pdf.BaseFont;
@@ -148,6 +151,17 @@ public class EnjoyItext {
 		return cell;
 	}
 	
+	public PdfPCell setCell(Image image, int colSpans, int rowSpans, int align, boolean noWarp){
+		PdfPCell cell = new PdfPCell(image);
+
+		cell.setColspan(colSpans);
+		cell.setRowspan(rowSpans);
+		cell.setHorizontalAlignment(align);
+		cell.setPaddingBottom(5);
+		cell.setNoWrap(noWarp);
+		return cell;
+	}
+	
 	public PdfPCell setCellWithBorder(Phrase myPhrase, int colSpans, int align, int border) {
 		PdfPCell cell = new PdfPCell(myPhrase);
 
@@ -212,6 +226,23 @@ public class EnjoyItext {
 		return cell;
 	}
 	
+	public PdfPCell setCellWB(Image image, int colSpans,int align, int border, boolean space ,boolean noWrap) {
+		PdfPCell cell = new PdfPCell(image);
+		cell.setColspan(colSpans);
+		cell.setHorizontalAlignment(align);
+		cell.setUseBorderPadding(true);
+		cell.setNoWrap(noWrap);
+		if (space) {
+			cell.setPaddingBottom(5); // ��ͧ��ҧ��ҹ...
+		}
+		if (border == 0) {
+			cell.setBorder(border);
+		} else {
+			cell.setBorder(border + 1);
+		}
+		return cell;
+	}
+	
 	public PdfPCell setCellWB(Paragraph Paragraph, int colSpans, int rowSpans, int align, int border, boolean space, boolean noWrap){
 		PdfPCell cell = new PdfPCell(Paragraph);
 		cell.setColspan(colSpans);
@@ -230,6 +261,20 @@ public class EnjoyItext {
 		}
 		return cell;
 	}
+	
+	public String getText(JSONObject obj, String field){
+		String ret = "-";
+		String txt = (String) obj.get(field);
+		
+		if(txt!=null && !txt.equals("")){
+			ret = txt;
+		}
+		
+		return ret;
+		
+	}
+	
+	
 	public static EnjoyItext getInstance() {
 		return instance;
 	}
