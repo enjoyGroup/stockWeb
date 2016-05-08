@@ -1058,3 +1058,54 @@ function gp_dialogPopUp(av_path, av_title){
 	}
 }
 
+function gp_checkMonth(ao_obj){
+    var minYear 	= 2200;
+    var errorMsg 	= "";
+    var field 		= gp_trim(ao_obj.value);
+    var la_str		= null;
+
+    try{
+	    if(field != '') {
+	    	
+	    	if(field.length!=6 && field.length!=7){
+	    		errorMsg = "กรอกรูปแบบเดือน/ปีผิด";
+	    	}else{
+	    		if(field.length==6 && field.indexOf("/") < 0){
+		    		field 			= field.substring(0, 2) + "/" + field.substring(2, 6);
+		    		ao_obj.value 	= field;
+		    		la_str			= field.split("/");
+		    	}else{
+		    		if(field.length==7 && field.indexOf("/") >= 0){
+		    			la_str			= field.split("/");
+		    		}else{
+		    			errorMsg = "กรอกรูปแบบเดือน/ปีผิด";
+		    		}
+		    	}
+	    	}
+	    	
+	    	if(la_str!=null){
+	    		if(la_str[0] < 1 || la_str[0] > 12) {
+	  	          errorMsg = "กรอกเดือนผิด: " + la_str[0];
+	  	        }else if(la_str[1] < minYear) {
+	  	          errorMsg = "กรอกปีผิด: " + la_str[1] + " ต้องเป็น พ.ศ. เท่านั้น";
+		        }
+	    	}
+	    }
+			
+	    if(errorMsg != "") {
+	    	
+	    	alert(errorMsg, function() { 
+	    		ao_obj.value = "";
+		    	ao_obj.focus();
+		    });
+	    	
+	    }
+    }catch(e){
+    	alert("gp_checkMonth :: " + e);
+    	return false;
+    }
+
+    return true;
+  }
+
+

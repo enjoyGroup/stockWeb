@@ -16,14 +16,13 @@ import org.json.simple.JSONObject;
 
 import th.go.stock.app.enjoy.bean.ComboBean;
 import th.go.stock.app.enjoy.bean.CompanyDetailsBean;
-import th.go.stock.app.enjoy.bean.SummarySaleByProductReportBean;
+import th.go.stock.app.enjoy.bean.SummarySaleByMonthReportBean;
 import th.go.stock.app.enjoy.bean.UserDetailsBean;
 import th.go.stock.app.enjoy.dao.CompanyDetailsDao;
-import th.go.stock.app.enjoy.dao.ProductDetailsDao;
 import th.go.stock.app.enjoy.dao.RelationUserAndCompanyDao;
-import th.go.stock.app.enjoy.dao.SummarySaleByProductReportDao;
+import th.go.stock.app.enjoy.dao.SummarySaleByMonthReportDao;
 import th.go.stock.app.enjoy.exception.EnjoyException;
-import th.go.stock.app.enjoy.form.SummarySaleByProductReportForm;
+import th.go.stock.app.enjoy.form.SummarySaleByMonthReportForm;
 import th.go.stock.app.enjoy.main.Constants;
 import th.go.stock.app.enjoy.pdf.ViewPdfMainForm;
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
@@ -31,23 +30,22 @@ import th.go.stock.app.enjoy.utils.EnjoyUtils;
 import th.go.stock.web.enjoy.common.EnjoyStandardSvc;
 import th.go.stock.web.enjoy.utils.EnjoyUtil;
 
-public class SummarySaleByProductReportServlet extends EnjoyStandardSvc {
+public class SummarySaleByMonthReportServlet extends EnjoyStandardSvc {
 	 
 	static final long serialVersionUID = 1L;
-	private static final EnjoyLogger logger = EnjoyLogger.getLogger(SummarySaleByProductReportServlet.class);
+	private static final EnjoyLogger logger = EnjoyLogger.getLogger(SummarySaleByMonthReportServlet.class);
 	
-    private static final String FORM_NAME = "summarySaleByProductReportForm";
+    private static final String FORM_NAME = "summarySaleByMonthReportForm";
     
     private EnjoyUtil               			enjoyUtil                   = null;
     private HttpServletRequest          		request                     = null;
     private HttpServletResponse         		response                    = null;
     private HttpSession                 		session                     = null;
     private UserDetailsBean             		userBean                    = null;
-    private SummarySaleByProductReportDao		dao							= null;
+    private SummarySaleByMonthReportDao			dao							= null;
     private CompanyDetailsDao					companyDetailsDao			= null;
     private RelationUserAndCompanyDao			relationUserAndCompanyDao	= null;
-    private ProductDetailsDao					productDetailsDao			= null;
-    private SummarySaleByProductReportForm		form						= null;
+    private SummarySaleByMonthReportForm		form						= null;
     
 	@Override
 	public void execute(HttpServletRequest request, HttpServletResponse response)
@@ -68,24 +66,21 @@ public class SummarySaleByProductReportServlet extends EnjoyStandardSvc {
              this.response           		= response;
              this.session            		= request.getSession(false);
              this.userBean           		= (UserDetailsBean) session.getAttribute("userBean");
-             this.form               		= (SummarySaleByProductReportForm) session.getAttribute(FORM_NAME);
-             this.dao						= new SummarySaleByProductReportDao();
+             this.form               		= (SummarySaleByMonthReportForm) session.getAttribute(FORM_NAME);
+             this.dao						= new SummarySaleByMonthReportDao();
              this.relationUserAndCompanyDao = new RelationUserAndCompanyDao();
-             this.productDetailsDao			= new ProductDetailsDao();
              this.companyDetailsDao			= new CompanyDetailsDao();
  			
              logger.info("[execute] pageAction : " + pageAction );
              
- 			if(this.form == null || pageAction.equals("new")) this.form = new SummarySaleByProductReportForm();
+ 			if(this.form == null || pageAction.equals("new")) this.form = new SummarySaleByMonthReportForm();
  			
  			if( pageAction.equals("") || pageAction.equals("new") ){
  				this.onLoad();
-				request.setAttribute("target", Constants.PAGE_URL +"/SummarySaleByProductReport.jsp");
+				request.setAttribute("target", Constants.PAGE_URL +"/SummarySaleByMonthReport.jsp");
  			}else if(pageAction.equals("showData")){
  				this.showData();
- 			}else if(pageAction.equals("getProductNameList")){
-				this.getProductNameList();
-			}
+ 			}
  			
  			session.setAttribute(FORM_NAME, this.form);
  		}catch(EnjoyException e){
@@ -103,7 +98,7 @@ public class SummarySaleByProductReportServlet extends EnjoyStandardSvc {
 		logger.info("[onLoad][Begin]");
 		
 		try{		
-			this.form.setTitlePage("รายงานสรุปยอดขายตามกลุ่มสินค้า");
+			this.form.setTitlePage("รายงานสรุปยอดขายประจำเดือน");
 			this.setRefference();
 			
 		}catch(Exception e){
@@ -161,12 +156,12 @@ public class SummarySaleByProductReportServlet extends EnjoyStandardSvc {
 		JSONObject 									jsonObject 						= new JSONObject();
 		JSONArray 									jSONArray 						= new JSONArray();
 	    JSONObject 									objDetail 						= null;
-	    SummarySaleByProductReportBean 				bean							= new SummarySaleByProductReportBean();
-	    List<SummarySaleByProductReportBean> 		resultList 						= null;
+	    SummarySaleByMonthReportBean 				bean							= new SummarySaleByMonthReportBean();
+	    List<SummarySaleByMonthReportBean> 			resultList 						= null;
 	    String										tin								= "";
+	    String										invoiceMonth					= "";
 	    String										invoiceDateFrom					= "";
 	    String										invoiceDateTo					= "";
-	    String										productName						= "";
 	    CompanyDetailsBean 							companyDetailsBean				= new CompanyDetailsBean();
 	    CompanyDetailsBean 							companyDetailsDb				= null;
 		ViewPdfMainForm								viewPdfMainForm					= null;
@@ -176,15 +171,14 @@ public class SummarySaleByProductReportServlet extends EnjoyStandardSvc {
 
 		try{
 			tin 			= EnjoyUtils.nullToStr(this.request.getParameter("tin"));
-			invoiceDateFrom = EnjoyUtils.nullToStr(this.request.getParameter("invoiceDateFrom"));
-			invoiceDateTo 	= EnjoyUtils.nullToStr(this.request.getParameter("invoiceDateTo"));
-			productName 	= EnjoyUtils.nullToStr(this.request.getParameter("productName"));
+			invoiceMonth 	= EnjoyUtils.nullToStr(this.request.getParameter("invoiceMonth"));
+			invoiceDateFrom = "01/" + invoiceMonth;
+			invoiceDateTo 	= EnjoyUtils.getLastDateOfMonth(invoiceDateFrom);
 			viewPdfMainForm	= new ViewPdfMainForm();
 			
-			jsonObject.put("tin"			,tin);
-			jsonObject.put("invoiceDateFrom",invoiceDateFrom);
-			jsonObject.put("invoiceDateTo"	,invoiceDateTo);
-			jsonObject.put("productName"	,productName);
+			jsonObject.put("tin"				,tin);
+			jsonObject.put("invoiceDateFrom"	,invoiceDateFrom);
+			jsonObject.put("invoiceDateTo"		,invoiceDateTo);
 			
 			/*Begin รายละเอียดบริษัท*/
 			if(tin!=null && !"".equals(tin)){
@@ -207,15 +201,13 @@ public class SummarySaleByProductReportServlet extends EnjoyStandardSvc {
 			bean.setTin(tin);
 			bean.setInvoiceDateFrom(invoiceDateFrom);
 			bean.setInvoiceDateTo(invoiceDateTo);
-			bean.setProductName(productName);
 			
 			resultList = dao.searchByCriteria(bean);
 			
 			if(resultList!=null){
-				for(SummarySaleByProductReportBean vo:resultList){
+				for(SummarySaleByMonthReportBean vo:resultList){
 					objDetail = new JSONObject();
 					
-					objDetail.put("invoiceDate"	,vo.getInvoiceDate());
 					objDetail.put("cusName"		,vo.getCusName());
 					objDetail.put("productName"	,vo.getProductName());
 					objDetail.put("quantity"	,vo.getQuantity());
@@ -232,7 +224,7 @@ public class SummarySaleByProductReportServlet extends EnjoyStandardSvc {
    
 			logger.info("[print] obj.toString() :: " + jsonObject.toString());
    
-			buffer = viewPdfMainForm.writeTicketPDF("SummarySaleByProductPdfForm", jsonObject);
+			buffer = viewPdfMainForm.writeTicketPDF("SummarySaleByMonthPdfForm", jsonObject);
 	
 			response.setContentType( "application/pdf" );
 			output 	= new DataOutputStream( this.response.getOutputStream() );
@@ -253,45 +245,6 @@ public class SummarySaleByProductReportServlet extends EnjoyStandardSvc {
 		}
 		
 	}
-	
-	private void getProductNameList(){
-	   logger.info("[getProductNameList][Begin]");
-	   
-	   String							productName				= null;
-	   List<ComboBean> 					list 					= null;
-	   JSONArray 						jSONArray 				= null;
-	   JSONObject 						objDetail 				= null;
-	
-	   try{
-		   jSONArray 				= new JSONArray();
-		   productName				= EnjoyUtils.nullToStr(this.request.getParameter("productName"));
-		   
-		   logger.info("[getProductNameList] productName 				:: " + productName);
-		   
-		   list 		= this.productDetailsDao.productNameList(productName, null, null, true);
-		   
-		   for(ComboBean bean:list){
-			   objDetail 		= new JSONObject();
-			   
-			   objDetail.put("id"			,bean.getCode());
-			   objDetail.put("value"		,bean.getDesc());
-			   
-			   jSONArray.add(objDetail);
-		   }
-		   
-		   this.enjoyUtil.writeMSG(jSONArray.toString());
-		   
-	   }catch(Exception e){
-		   e.printStackTrace();
-		   logger.error(e);
-	   }finally{
-		   logger.info("[getProductNameList][End]");
-	   }
-	}
-
-	
-	
-	
 	
 	
 }

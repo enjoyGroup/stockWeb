@@ -14,7 +14,9 @@ import java.util.Random;
 public class EnjoyUtils {
 	
 	public static void main(String[] args) {
-        
+		
+//		System.out.println(getLastDayOfMonth("01/03/2559"));
+		
 //		currDateThai();
 //		System.out.println(dateToStringThai(date));
 //		genPassword();
@@ -680,6 +682,35 @@ public class EnjoyUtils {
     	return lv_newPin;
     }
 
+    public static String getLastDateOfMonth(String sdate){
+    	Calendar 			c 				= null;
+    	SimpleDateFormat 	formatter 		= new SimpleDateFormat("dd/MM/yyyy", Locale.US);
+    	int 				lastDayOfMonth 	= 28;//Calendar.getInstance(Locale.US).getActualMaximum(Calendar.DAY_OF_MONTH);
+    	String[]			sdateArray		= null;
+    	String				sdateNew		= "";
+    	Date 				date 			= null;
+    	String				dateRet			= "";
+    	
+    	try{
+    		sdateArray 	= sdate.split("/");
+    		sdateNew	= sdateArray[0] + "/" + sdateArray[1] + "/" + (Integer.parseInt(sdateArray[2])-543);
+    		date 		= formatter.parse(sdateNew);
+    		
+    		c = Calendar.getInstance(Locale.US); 
+    		c.setTime(date);
+    		
+    		lastDayOfMonth = c.getActualMaximum(Calendar.DAY_OF_MONTH);
+    		
+    		System.out.println(lastDayOfMonth);
+    		
+    		dateRet = lastDayOfMonth + "/" + sdateArray[1] + "/" + sdateArray[2];
+    		
+    	}catch (Exception e) {
+            e.printStackTrace();
+        }
+    	
+    	return dateRet;
+    }
      
 	
 }
