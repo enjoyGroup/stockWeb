@@ -105,7 +105,7 @@
 								        	<table width="100%" border="0" cellpadding="5" cellspacing="5">
 								        		<tr>
 								        			<td align="right" width="150px;">
-								        				บริษัทที่สังกัด  : &nbsp;
+								        				บริษัทที่สังกัด <span style="color: red;"><b>*</b></span> : &nbsp;
 								        			</td>
 								        			<td align="left">
 								        				<select id="tin" name="tin" style="width: 220px;" >
@@ -113,10 +113,9 @@
 								        					<option value="<%=comboBean.getCode()%>" <%if(summarySaleByDayReportBean.getTin().equals(comboBean.getCode())){ %> selected <%} %> ><%=comboBean.getDesc()%></option>
 								        					<%} %>
 								        				</select>
-								        				<span style="color: red;"><b>*</b></span>
 								        			</td>
 								        			<td align="right">
-								        				วันที่ขาย :&nbsp;
+								        				วันที่ขาย <span style="color: red;"><b>*</b></span> :&nbsp;
 								        			</td>
 								        			<td align="left">
 								        				<input type='text' 
@@ -127,7 +126,6 @@
 								        					   onchange="gp_checkDate(this);"
 								        					   style="width: 100px;"
 								        					   value="<%=summarySaleByDayReportBean.getInvoiceDateFrom()%>"  />
-								        				<span style="color: red;"><b>*</b></span>
 								        				&nbsp;-&nbsp;
 								        				<input type='text' 
 								        					   id="invoiceDateTo" 
@@ -137,7 +135,6 @@
 								        					   onchange="gp_checkDate(this);"
 								        					   style="width: 100px;"
 								        					   value="<%=summarySaleByDayReportBean.getInvoiceDateTo()%>"  />
-								        				<span style="color: red;"><b>*</b></span>
 								        			</td>
 								        		</tr>
 								        		<tr>

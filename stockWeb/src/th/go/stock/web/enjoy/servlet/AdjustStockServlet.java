@@ -277,7 +277,7 @@ public class AdjustStockServlet extends EnjoyStandardSvc {
 				throw new EnjoyException("ระบุชื่อสินค้าผิดกรุณาตรวจสอบ");
 			}
 			
-			
+			adjustStockBean.setTin(tin);
 			adjustStockBean.setProductCode(productmasterBean.getProductCode());
 			adjustStockBean.setProductName(productmasterBean.getProductName());
 			

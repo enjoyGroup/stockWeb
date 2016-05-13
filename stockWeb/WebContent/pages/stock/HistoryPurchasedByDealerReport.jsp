@@ -142,7 +142,7 @@
 								        	<table width="100%" border="0" cellpadding="5" cellspacing="5">
 								        		<tr>
 								        			<td align="right" width="150px;">
-								        				บริษัทที่สังกัด  : &nbsp;
+								        				บริษัทที่สังกัด <span style="color: red;"><b>*</b></span> : &nbsp;
 								        			</td>
 								        			<td align="left">
 								        				<select id="tin" name="tin" style="width: 220px;" >
@@ -150,7 +150,6 @@
 								        					<option value="<%=comboBean.getCode()%>" <%if(historyPurchasedByDealerReportBean.getTin().equals(comboBean.getCode())){ %> selected <%} %> ><%=comboBean.getDesc()%></option>
 								        					<%} %>
 								        				</select>
-								        				<span style="color: red;"><b>*</b></span>
 								        			</td>
 								        			<td align="right">
 								        				บริษัทที่สั่งซื้อ :&nbsp;
@@ -165,7 +164,7 @@
 								        		</tr>
 								        		<tr>
 								        			<td align="right">
-								        				วันที่สั่งของ :&nbsp;
+								        				วันที่สั่งของ <span style="color: red;"><b>*</b></span> :&nbsp;
 								        			</td>
 								        			<td align="left" colspan="5">
 								        				<input type='text' 
@@ -176,7 +175,6 @@
 								        					   onchange="gp_checkDate(this);"
 								        					   style="width: 100px;"
 								        					   value="<%=historyPurchasedByDealerReportBean.getReciveDateFrom()%>"  />
-								        				<span style="color: red;"><b>*</b></span>
 								        				&nbsp;-&nbsp;
 								        				<input type='text' 
 								        					   id="reciveDateTo" 
@@ -186,7 +184,6 @@
 								        					   onchange="gp_checkDate(this);"
 								        					   style="width: 100px;"
 								        					   value="<%=historyPurchasedByDealerReportBean.getReciveDateTo()%>"  />
-								        				<span style="color: red;"><b>*</b></span>
 								        			</td>
 								        		</tr>
 								        		<tr>

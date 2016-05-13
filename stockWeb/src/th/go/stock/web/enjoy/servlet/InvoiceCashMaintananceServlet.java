@@ -23,12 +23,14 @@ import th.go.stock.app.enjoy.bean.CompanyDetailsBean;
 import th.go.stock.app.enjoy.bean.CustomerDetailsBean;
 import th.go.stock.app.enjoy.bean.InvoiceCashDetailBean;
 import th.go.stock.app.enjoy.bean.InvoiceCashMasterBean;
+import th.go.stock.app.enjoy.bean.InvoiceCreditMasterBean;
 import th.go.stock.app.enjoy.bean.ProductmasterBean;
 import th.go.stock.app.enjoy.bean.ProductquantityBean;
 import th.go.stock.app.enjoy.bean.UserDetailsBean;
 import th.go.stock.app.enjoy.dao.CompanyDetailsDao;
 import th.go.stock.app.enjoy.dao.CustomerDetailsDao;
 import th.go.stock.app.enjoy.dao.InvoiceCashDao;
+import th.go.stock.app.enjoy.dao.InvoiceCreditDao;
 import th.go.stock.app.enjoy.dao.ProductDetailsDao;
 import th.go.stock.app.enjoy.dao.ProductquantityDao;
 import th.go.stock.app.enjoy.dao.RelationUserAndCompanyDao;
@@ -56,7 +58,8 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
     private HttpServletResponse         	response                    = null;
     private HttpSession                 	session                     = null;
     private UserDetailsBean             	userBean                    = null;
-    private InvoiceCashDao					dao							= null;
+    private InvoiceCashDao					invoiceCashDao				= null;
+    private InvoiceCreditDao				invoiceCreditDao			= null;
     private InvoiceCashMaintananceForm		form						= null;
     private CustomerDetailsDao				customerDetailsDao			= null;
     private ProductDetailsDao				productDetailsDao			= null;
@@ -85,13 +88,14 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
              this.session            		= request.getSession(false);
              this.userBean           		= (UserDetailsBean)session.getAttribute("userBean");
              this.form               		= (InvoiceCashMaintananceForm)session.getAttribute(FORM_NAME);
-             this.dao						= new InvoiceCashDao();
+             this.invoiceCashDao			= new InvoiceCashDao();
              this.customerDetailsDao		= new CustomerDetailsDao();
              this.productDetailsDao			= new ProductDetailsDao();
              this.userDetailsDao			= new UserDetailsDao();
              this.companyDetailsDao			= new CompanyDetailsDao();
              this.productquantityDao		= new ProductquantityDao();
              this.relationUserAndCompanyDao = new RelationUserAndCompanyDao();
+             this.invoiceCreditDao 			= new InvoiceCreditDao();
  			
              logger.info("[execute] pageAction : " + pageAction );
              
@@ -129,6 +133,10 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 				this.onCancel();
 			}else if(pageAction.equals("print")){
 				this.print();
+			}else if(pageAction.equals("getInventoryForProduct")){
+				this.getInventoryForProduct();
+			}else if(pageAction.equals("updateCredit")){
+				this.updateCredit();
 			}
  			
  			session.setAttribute(FORM_NAME, this.form);
@@ -252,19 +260,29 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 		CustomerDetailsBean 			customerDetailsBeanDb		= null;
 		InvoiceCashDetailBean			invoiceCashDetailBean		= null;
 		List<InvoiceCashDetailBean> 	invoiceCashDetailList		= null;
+		String							updateCredit				= "";
 		
 		try{
 			invoiceCode					= invoiceCode.equals("0")?EnjoyUtil.nullToStr(request.getParameter("invoiceCode")):invoiceCode;
+			updateCredit				= EnjoyUtil.nullToStr(request.getParameter("updateCredit"));
 			
-			logger.info("[getDetail] invoiceCode :: " + invoiceCode);
+			logger.info("[getDetail] invoiceCode  :: " + invoiceCode);
+			logger.info("[getDetail] updateCredit :: " + updateCredit);
 			
 			invoiceCashMasterBean = new InvoiceCashMasterBean();
 			invoiceCashMasterBean.setInvoiceCode(invoiceCode);
 			
-			invoiceCashMasterBeanDb				= this.dao.getInvoiceCashMaster(invoiceCashMasterBean);
+			invoiceCashMasterBeanDb				= this.invoiceCashDao.getInvoiceCashMaster(invoiceCashMasterBean);
 			
 			this.form.setPageMode(InvoiceCashMaintananceForm.EDIT);
-			this.form.setTitlePage("แก้ไขรายการการขายเงินสด");
+			
+			if(updateCredit.equals("Y")){
+				this.form.setTitlePage("ปรับปรุงงบการขายเงินเชื่อ");
+			}else{
+				this.form.setTitlePage("แก้ไขรายการการขายเงินสด");
+			}
+			
+			this.form.setUpdateCredit(updateCredit);
 			
 			logger.info("[getDetail] invoiceCashMasterBeanDb :: " + invoiceCashMasterBeanDb);
 			
@@ -272,7 +290,7 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 				invoiceCashDetailBean = new InvoiceCashDetailBean();
 				
 				invoiceCashDetailBean.setInvoiceCode(invoiceCode);
-				invoiceCashDetailList = this.dao.getInvoiceCashDetailList(invoiceCashDetailBean);
+				invoiceCashDetailList = this.invoiceCashDao.getInvoiceCashDetailList(invoiceCashDetailBean);
 				
 				for(InvoiceCashDetailBean bean:invoiceCashDetailList){
 					seqTemp = bean.getSeq();
@@ -368,7 +386,7 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 			session.beginTransaction();
 			
 			/*Begin Section รายละเอียดใบสั่งซื้อ*/
-			invoiceCode = String.valueOf(this.dao.genId(session));
+			invoiceCode = String.valueOf(this.invoiceCashDao.genId(invoiceType));
 			
 			invoiceCashMasterBean.setInvoiceCode			(invoiceCode);
 			invoiceCashMasterBean.setInvoiceDate			(EnjoyUtils.dateThaiToDb(invoiceDate));
@@ -388,16 +406,16 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 			invoiceCashMasterBean.setTin					(tin);
 			invoiceCashMasterBean.setRemark					(remark);
 			
-			this.dao.insertInvoiceCashMaster(session, invoiceCashMasterBean);
+			this.invoiceCashDao.insertInvoiceCashMaster(session, invoiceCashMasterBean);
 			
 			/*Begin manage รายการสินค้า*/
-			this.dao.deleteInvoiceCashDetail(session, invoiceCode);
+			this.invoiceCashDao.deleteInvoiceCashDetail(session, invoiceCode);
 			for(int i=0;i<invoiceCashDetailList.size();i++){
 				bean = invoiceCashDetailList.get(i);
 				if(!bean.getRowStatus().equals(InvoiceCashMaintananceForm.DEL)){
 					bean.setInvoiceCode(invoiceCode);
 					bean.setSeqDb(String.valueOf(seqDb));
-					this.dao.insertInvoiceCashDetail(session, bean);
+					this.invoiceCashDao.insertInvoiceCashDetail(session, bean);
 					seqDb++;
 					
 					/*Begin Section รายการสินค้า*/
@@ -435,7 +453,7 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 			obj.put(ERR_MSG, 		e.getMessage());
 		}catch(Exception e){
 			session.getTransaction().rollback();
-			logger.info(e.getMessage());
+			logger.error(e);
 			e.printStackTrace();
 			obj.put(STATUS, 		ERROR);
 			obj.put(ERR_MSG, 		"onSave is error");
@@ -831,8 +849,8 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 		   userDetailsBean				= new UserDetailsBean();
 			
 		   userDetailsBean.setUserName	(saleName);
-		   userDetailsBean.setUserId	("***");
-		   userDetailsBean.setUserStatus("***");
+//		   userDetailsBean.setUserId	("***");
+//		   userDetailsBean.setUserStatus("***");
 		   
 		   userDetailsList	 		= this.userDetailsDao.getListUserdetail(session, userDetailsBean, fUserprivilege);
 		   
@@ -995,6 +1013,8 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 		ProductquantityBean			productquantityBean			= null;
 		String						tin							= null;
 		String						quantityDb					= null;
+		String						invoiceCredit				= null;
+		InvoiceCreditMasterBean  	invoiceCreditMasterBean		= null;
 		
 		try{
 			sessionFactory 				= HibernateUtil.getSessionFactory();
@@ -1002,7 +1022,8 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 			obj 						= new JSONObject();
 			invoiceCashDetailList		= this.form.getInvoiceCashDetailList();
 			invoiceCode 				= EnjoyUtils.nullToStr(this.request.getParameter("invoiceCode"));
-			tin 						= EnjoyUtil.nullToStr(request.getParameter("tin"));
+			tin 						= EnjoyUtils.nullToStr(this.request.getParameter("tin"));
+			invoiceCredit 				= EnjoyUtils.nullToStr(this.request.getParameter("invoiceCredit"));
 			
 			session.beginTransaction();
 			
@@ -1011,7 +1032,7 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 				invoiceCashMasterBean.setInvoiceStatus			("C");
 				invoiceCashMasterBean.setInvoiceCode			(invoiceCode);
 				
-				this.dao.updateInvoiceCashMasterStatus(session, invoiceCashMasterBean);
+				this.invoiceCashDao.updateInvoiceCashMasterStatus(session, invoiceCashMasterBean);
 				
 				/*Begin manage รายการสินค้า*/
 				for(int i=0;i<invoiceCashDetailList.size();i++){
@@ -1039,6 +1060,15 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 					}
 				}
 				/*End manage รายการสินค้า*/
+				
+				if(!invoiceCredit.equals("")){
+					invoiceCreditMasterBean		= new InvoiceCreditMasterBean();
+					invoiceCreditMasterBean.setInvoiceStatus		("C");
+					invoiceCreditMasterBean.setInvoiceCode			(invoiceCredit);
+					
+					this.invoiceCreditDao.updateInvoiceCreditMasterStatus(session, invoiceCreditMasterBean);
+				}
+				
 			}
 			
 			session.getTransaction().commit();
@@ -1099,7 +1129,7 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
    
 		    /*Begin รายละเอียดใบกำกับภาษี*/
 			invoiceCashMasterBean.setInvoiceCode(invoiceCode);
-			invoiceCashMasterDb = dao.getInvoiceCashMaster(invoiceCashMasterBean);
+			invoiceCashMasterDb = invoiceCashDao.getInvoiceCashMaster(invoiceCashMasterBean);
 			objDetail = new JSONObject();
 			objDetail.put("invoiceCode"		, invoiceCashMasterDb.getInvoiceCode());
 			objDetail.put("invoiceDate"		, invoiceCashMasterDb.getInvoiceDate());
@@ -1130,7 +1160,7 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 	
 			/*Begin รายละเอียดรายการที่ขาย*/
 			invoiceCashDetailBean.setInvoiceCode(invoiceCode);
-			invoiceCashDetailList = dao.getInvoiceCashDetailList(invoiceCashDetailBean);
+			invoiceCashDetailList = invoiceCashDao.getInvoiceCashDetailList(invoiceCashDetailBean);
 			for(InvoiceCashDetailBean vo:invoiceCashDetailList){
 				objDetail = new JSONObject();
 				objDetail.put("invoiceCode"		, vo.getInvoiceCode());
@@ -1213,6 +1243,119 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 			logger.info("[print][End]");
 		}
 	}
+	
+	private void getInventoryForProduct(){
+	   logger.info("[getInventoryForProduct][Begin]");
+	   
+	   JSONObject 						obj		 				= new JSONObject();
+	   JSONObject 						objDetail		 		= null;
+	   JSONArray						jsonArray				= new JSONArray();
+	   String							tin						= null;
+	   ProductquantityBean				productquantityBean		= null;
+	   String							inventory				= "0.00";
+	   String[]							productCodeArray		= null;
+	
+	   try{
+		   productCodeArray	= this.request.getParameterValues("productCode");
+		   tin				= EnjoyUtils.nullToStr(this.request.getParameter("tin"));
+		   
+		   if(productCodeArray!=null && productCodeArray.length>0){
+			   for(String productCode:productCodeArray){
+				   productquantityBean 	= new ProductquantityBean();
+				   objDetail			= new JSONObject();
+				   productquantityBean.setTin(tin);
+				   productquantityBean.setProductCode(productCode);
+				   inventory = EnjoyUtils.convertFloatToDisplay(this.productquantityDao.getProductquantity(productquantityBean), 2);
+				   
+				   objDetail.put("productCode"	, productCode);
+				   objDetail.put("inventory"	, inventory);
+				   
+				   jsonArray.add(objDetail);
+				   
+			   }
+			   
+			   obj.put("flag"			,"Y");
+			   obj.put("inventoryList"	,jsonArray);
+		   }else{
+			   obj.put("flag"			,"N");
+		   }
+		   
+		   obj.put(STATUS, 		SUCCESS);
+		   
+	   }catch(Exception e){
+		   obj.put(STATUS, 		ERROR);
+		   obj.put(ERR_MSG, 	"getInventoryForProduct is error");
+		   e.printStackTrace();
+		   logger.error(e);
+	   }finally{
+		   this.enjoyUtil.writeMSG(obj.toString());
+		   logger.info("[getInventoryForProduct][End]");
+	   }
+	}
+	   
+	private void updateCredit() throws EnjoyException{
+		logger.info("[updateCredit][Begin]");
+		
+		String				 		invoiceCode					= null;
+		String				 		invoiceCredit				= null;
+		SessionFactory 				sessionFactory				= null;
+		Session 					session						= null;
+		JSONObject 					obj 						= null;
+		InvoiceCashMasterBean  		invoiceCashMasterBean		= null;
+		InvoiceCreditMasterBean		invoiceCreditMasterBean		= null;
+		
+		try{
+			invoiceCode 				= EnjoyUtil.nullToStr(request.getParameter("invoiceCode"));
+			invoiceCredit 				= EnjoyUtil.nullToStr(request.getParameter("invoiceCredit"));
+			sessionFactory 				= HibernateUtil.getSessionFactory();
+			session 					= sessionFactory.openSession();
+			obj 						= new JSONObject();
+			
+			session.beginTransaction();
+			
+			invoiceCashMasterBean		= new InvoiceCashMasterBean();
+			invoiceCashMasterBean.setInvoiceCode			(invoiceCode);
+			invoiceCashMasterBean.setInvoiceStatus			("A");
+			
+			this.invoiceCashDao.updateInvoiceCashMasterStatus(session, invoiceCashMasterBean);
+			
+			invoiceCreditMasterBean = new InvoiceCreditMasterBean();
+			invoiceCreditMasterBean.setInvoiceCode			(invoiceCredit);
+			invoiceCreditMasterBean.setInvoiceStatus		("S");
+			
+			this.invoiceCreditDao.updateInvoiceCreditMasterStatus(session, invoiceCreditMasterBean);
+			
+			
+			session.getTransaction().commit();
+			
+			obj.put(STATUS			,SUCCESS);
+			obj.put("invoiceCode"	,invoiceCode);
+			
+		}catch(EnjoyException e){
+			session.getTransaction().rollback();
+			obj.put(STATUS, 		ERROR);
+			obj.put(ERR_MSG, 		e.getMessage());
+		}catch(Exception e){
+			session.getTransaction().rollback();
+			logger.error(e);
+			e.printStackTrace();
+			obj.put(STATUS, 		ERROR);
+			obj.put(ERR_MSG, 		"updateCredit is error");
+		}finally{
+			
+			session.flush();
+			session.clear();
+			session.close();
+			
+			this.enjoyUtil.writeMSG(obj.toString());
+			
+			sessionFactory	= null;
+			session			= null;
+			
+			logger.info("[updateCredit][End]");
+		}
+	}	
+
 	
 }
 

@@ -193,7 +193,7 @@
 								        	<table width="100%" border="0" cellpadding="5" cellspacing="5">
 								        		<tr>
 								        			<td align="right" width="150px;">
-								        				ลูกค้า  : &nbsp;
+								        				ลูกค้า <span style="color: red;"><b>*</b></span> : &nbsp;
 								        			</td>
 								        			<td align="left">
 								        				<input type='text' 
@@ -205,7 +205,6 @@
 								        					   value="<%=summarySaleByCustomerReportBean.getCusName() %>" />
 								        				<img alt="lookUp" title="lookUp" style="cursor: pointer;" src="<%=imgURL%>/lookup.png" width="30px" height="30px" border="0" onclick="lp_lookUpCusDetail();" />
 								        				<input type="hidden" id="cusCode" name="cusCode" value="<%=summarySaleByCustomerReportBean.getCusCode() %>" />
-								        				<span style="color: red;"><b>*</b></span>
 								        			</td>
 								        			<td align="right">
 								        				สินค้า :&nbsp;
@@ -220,7 +219,7 @@
 								        		</tr>
 								        		<tr>
 								        			<td align="right">
-								        				ช่วงวันที่ :&nbsp;
+								        				ช่วงวันที่ <span style="color: red;"><b>*</b></span> :&nbsp;
 								        			</td>
 								        			<td align="left" colspan="5">
 								        				<input type='text' 
@@ -231,7 +230,6 @@
 								        					   onchange="gp_checkDate(this);"
 								        					   style="width: 100px;"
 								        					   value="<%=summarySaleByCustomerReportBean.getInvoiceDateFrom()%>"  />
-								        				<span style="color: red;"><b>*</b></span>
 								        				&nbsp;-&nbsp;
 								        				<input type='text' 
 								        					   id="invoiceDateTo" 
@@ -241,7 +239,6 @@
 								        					   onchange="gp_checkDate(this);"
 								        					   style="width: 100px;"
 								        					   value="<%=summarySaleByCustomerReportBean.getInvoiceDateTo()%>"  />
-								        				<span style="color: red;"><b>*</b></span>
 								        			</td>
 								        		</tr>
 								        		<tr>

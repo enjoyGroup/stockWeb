@@ -14,6 +14,7 @@ import org.hibernate.type.StringType;
 import th.go.stock.app.enjoy.bean.InvoiceCashDetailBean;
 import th.go.stock.app.enjoy.bean.InvoiceCashMasterBean;
 import th.go.stock.app.enjoy.exception.EnjoyException;
+import th.go.stock.app.enjoy.main.ConfigFile;
 import th.go.stock.app.enjoy.model.Invoicecashdetail;
 import th.go.stock.app.enjoy.model.InvoicecashdetailPK;
 import th.go.stock.app.enjoy.model.Invoicecashmaster;
@@ -77,6 +78,8 @@ public class InvoiceCashDao {
 			
 			if(!invoiceCashMasterBean.getInvoiceStatus().equals("")){
 				hql += " and a.invoiceStatus = '" + invoiceCashMasterBean.getInvoiceStatus() + "'";
+			}else{
+				hql += " and a.invoiceStatus not in ('W')";
 			}
 			
 			logger.info("[searchByCriteria] hql :: " + hql);
@@ -153,9 +156,10 @@ public class InvoiceCashDao {
 		try{	
 			sessionFactory 		= HibernateUtil.getSessionFactory();
 			session 			= sessionFactory.openSession();
-			hql		= "select *"
-					+ "	from invoicecashmaster"
-					+ "	where invoiceCode 	= '" + invoiceCashMasterBean.getInvoiceCode() + "'";
+			hql		= "select t.*, CONCAT(a.userName,' ',a.userSurname) saleName"
+					+ "	from invoicecashmaster t"
+					+ "	left join userdetails a on t.saleUniqueId = a.userUniqueId"
+					+ "	where t.invoiceCode = '" + invoiceCashMasterBean.getInvoiceCode() + "'";
 			
 			logger.info("[getReciveOrderMaster] hql :: " + hql);
 
@@ -177,6 +181,7 @@ public class InvoiceCashDao {
 			query.addScalar("invoiceStatus"		, new StringType());
 			query.addScalar("tin"				, new StringType());
 			query.addScalar("remark"			, new StringType());
+			query.addScalar("saleName"			, new StringType());
 			
 			list		 	= query.list();
 			
@@ -203,6 +208,7 @@ public class InvoiceCashDao {
 					logger.info("invoiceStatus 				:: " + row[14]);
 					logger.info("tin 						:: " + row[15]);
 					logger.info("remark 					:: " + row[16]);
+					logger.info("saleName 					:: " + row[17]);
 					
 					bean.setInvoiceCode				(EnjoyUtils.nullToStr(row[0]));
 					bean.setInvoiceDate				(EnjoyUtils.dateToThaiDisplay(row[1]));
@@ -221,6 +227,7 @@ public class InvoiceCashDao {
 					bean.setInvoiceStatus			(EnjoyUtils.nullToStr(row[14]));
 					bean.setTin						(EnjoyUtils.nullToStr(row[15]));
 					bean.setRemark					(EnjoyUtils.nullToStr(row[16]));
+					bean.setSaleName				(EnjoyUtils.nullToStr(row[17]));
 					
 				}	
 			}
@@ -392,7 +399,7 @@ public class InvoiceCashDao {
 									+ "		INNER JOIN productmaster b on b.productCode 	= a.productCode"
 									+ "		INNER JOIN unittype c on c.unitCode 		= b.unitCode"
 									+ "		LEFT  JOIN invoicecashmaster d ON a.invoiceCode = d.invoiceCode"
-									+ "		LEFT JOIN	productquantity e ON d.tin = e.tin"
+									+ "		LEFT JOIN	productquantity e ON d.tin = e.tin and e.productCode = a.productCode"
 									+ "	where a.invoiceCode 	= '" + invoiceCashDetailBean.getInvoiceCode() + "'"
 									+ "	order by a.seq asc";
 			
@@ -525,31 +532,50 @@ public class InvoiceCashDao {
 		}
 	}
 	
-	public int genId(Session session) throws EnjoyException{
+	
+	public String genId(String invoiceType) throws EnjoyException{
 		logger.info("[genId][Begin]");
 		
-		String							hql									= null;
-		List<Integer>			 		list								= null;
-		SQLQuery 						query 								= null;
-		int 							result								= 0;
-		
+		String				hql						= null;
+		List<Integer>		list					= null;
+		SQLQuery 			query 					= null;
+		SessionFactory 		sessionFactory			= null;
+		Session 			session					= null;
+		String				newId					= "";
+		String				codeDisplay				= null;
+		RefconstantcodeDao	refconstantcodeDao		= null;
+		String				id						= null;
 		
 		try{
 			
-			hql				= "select max(invoiceCode) lastId from invoicecashmaster";
+			logger.info("[genId] invoiceType :: " + invoiceType);
+			
+			sessionFactory 		= HibernateUtil.getSessionFactory();
+			session 			= sessionFactory.openSession();
+			refconstantcodeDao 	= new RefconstantcodeDao();
+			id					= invoiceType.equals("V")?"3":"4";
+			codeDisplay			= refconstantcodeDao.getCodeDisplay(id);
+			
+			hql				= "SELECT (MAX(SUBSTRING_INDEX(invoiceCode, '-', -1)) + 1) AS newId"
+							+ "	FROM invoicecashmaster"
+							+ "	WHERE"
+							+ "		SUBSTRING_INDEX(invoiceCode, '-', 1) = '" + codeDisplay + "'";
 			query			= session.createSQLQuery(hql);
 			
-			query.addScalar("lastId"			, new IntegerType());
+			
+			query.addScalar("newId"			, new IntegerType());
 			
 			list		 	= query.list();
 			
-			if(list!=null && list.size() > 0){
-				result = list.get(0)==null?0:list.get(0);
+			logger.info("[genId] PadingInvoiceCode 			:: " + ConfigFile.getPadingInvoiceCode());
+			
+			if(list!=null && list.size() > 0 && list.get(0)!=null){
+				newId = codeDisplay + "-" + String.format(ConfigFile.getPadingInvoiceCode(), list.get(0));
+			}else{
+				newId = codeDisplay + "-" + String.format(ConfigFile.getPadingInvoiceCode(), 1);
 			}
 			
-			logger.info("[genId] result 			:: " + result);
-			
-			result++;
+			logger.info("[genId] newId 			:: " + newId);
 			
 		}catch(Exception e){
 			e.printStackTrace();
@@ -557,12 +583,16 @@ public class InvoiceCashDao {
 			throw new EnjoyException(e.getMessage());
 		}finally{
 			
-			hql									= null;
-			list								= null;
-			query 								= null;
+			session.close();
+			sessionFactory	= null;
+			session			= null;
+			hql				= null;
+			list			= null;
+			query 			= null;
 			logger.info("[genId][End]");
 		}
 		
-		return result;
+		return newId;
 	}
+
 }

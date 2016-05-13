@@ -108,7 +108,7 @@ public class StockBalanceReportServlet extends EnjoyStandardSvc {
 		logger.info("[onLoad][Begin]");
 		
 		try{		
-			this.form.setTitlePage("รายงานสรุปยอดขายตามกลุ่มสินค้า");
+			this.form.setTitlePage("รายงานยอด Stock คงเหลือ");
 			this.setRefference();
 			
 		}catch(Exception e){

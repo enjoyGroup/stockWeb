@@ -10,12 +10,7 @@ import th.go.stock.app.enjoy.utils.EnjoyUtils;
 public class ConfigFile {
 	private static final String PADING_CUS_CODE   	= "pading.cusCode";
 	private static final String PADING_RECIVE_NO   	= "pading.reciveNo";
-	private static final String PADING_ZONE_ID   	= "pading.fieldZoneId";
-	private static final String PADING_BOOK_PRICE   = "pading.bookingPrices";
-	private static final String PADING_TICKET_ID   	= "pading.ticketId";
-	private static final String FILE_PATH   		= "file.path";
-	private static final String FILE_NAME   		= "file.name";
-	private static final String FILE_EXT   			= "file.extends";
+	private static final String PADING_INVOICE_CODE = "pading.invoiceCode";
 	private static final String PATH_LOG   			= "path.log";
 	private static final String OPEN_LOG   			= "open.log";
 	private static final String VAT   				= "system.vat";
@@ -59,28 +54,8 @@ public class ConfigFile {
 		return getText(PADING_RECIVE_NO);
 	}
 	
-	public static String getPadingZoneId() {
-		return getText(PADING_ZONE_ID);
-	}
-	
-	public static String getPadingBookPrice() {
-		return getText(PADING_BOOK_PRICE);
-	}
-	
-	public static String getPadingTicketId() {
-		return getText(PADING_TICKET_ID);
-	}
-	
-	public static String getFilePath() {
-		return getText(FILE_PATH);
-	}
-	
-	public static String getFileName() {
-		return getText(FILE_NAME);
-	}
-	
-	public static String getFileExt() {
-		return getText(FILE_EXT);
+	public static String getPadingInvoiceCode() {
+		return getText(PADING_INVOICE_CODE);
 	}
 	
 	public static String getPathLog() {

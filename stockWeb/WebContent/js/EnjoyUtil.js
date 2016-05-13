@@ -416,6 +416,24 @@ function gp_progressBarOff(){
 	$("body").unbind("keydown");
 	$("body").unbind("keyup");
 	$(window).unbind("scroll");
+	
+	$(window).scroll(function(){
+		gp_controlMenu();
+		
+    });
+	
+}
+
+function gp_controlMenu(){
+	var h = $(document).height();
+    if(document.documentElement.scrollTop || jQuery(this).scrollTop() > 10){
+    	document.getElementById("m1").className 			= "fixs";
+    	document.getElementById("headwrap").style.display 	= "none";
+    }else{
+    	document.getElementById("m1").className 			= "";
+    	document.getElementById("headwrap").style.display 	= "block";
+    }
+    $('body').css('height', h);
 }
 
 function gp_checkDate(ao_obj){

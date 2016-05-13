@@ -13,6 +13,7 @@ public class AdjustStockBean {
 	private String balanceVolume;
 	private String unitName;
 	private int lastOrder;
+	private String tin;
 	
 	public AdjustStockBean(){
 		this.adjustNo 			= "";
@@ -26,6 +27,7 @@ public class AdjustStockBean {
 		this.balanceVolume 		= "0.00";
 		this.unitName			= "";
 		this.lastOrder			= 0;
+		this.tin				= "";
 	}
 
 	public String getAdjustNo() {
@@ -114,6 +116,14 @@ public class AdjustStockBean {
 
 	public void setLastOrder(int lastOrder) {
 		this.lastOrder = lastOrder;
+	}
+
+	public String getTin() {
+		return tin;
+	}
+
+	public void setTin(String tin) {
+		this.tin = tin;
 	}
 
 }

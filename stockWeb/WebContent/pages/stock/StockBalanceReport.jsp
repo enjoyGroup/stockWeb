@@ -171,7 +171,7 @@
 								        	<table width="100%" border="0" cellpadding="5" cellspacing="5">
 								        		<tr>
 								        			<td align="right" width="150px;">
-								        				บริษัทที่สังกัด  : &nbsp;
+								        				บริษัทที่สังกัด <span style="color: red;"><b>*</b></span> : &nbsp;
 								        			</td>
 								        			<td align="left">
 								        				<select id="tin" name="tin" style="width: 220px;" >
@@ -179,7 +179,6 @@
 								        					<option value="<%=comboBean.getCode()%>" <%if(stockBalanceReportBean.getTin().equals(comboBean.getCode())){ %> selected <%} %> ><%=comboBean.getDesc()%></option>
 								        					<%} %>
 								        				</select>
-								        				<span style="color: red;"><b>*</b></span>
 								        			</td>
 								        			<td align="right">
 								        				หมวดสินค้า :&nbsp;

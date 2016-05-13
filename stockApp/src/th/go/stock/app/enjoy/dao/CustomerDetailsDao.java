@@ -569,7 +569,7 @@ public class CustomerDetailsDao {
 			
 			list		 	= query.list();
 			
-			if(list!=null && list.size() > 0){
+			if(list!=null && list.size() > 0 && list.get(0)!=null){
 				newId = codeDisplay + "-" + String.format(ConfigFile.getPadingCusCode(), list.get(0));
 			}else{
 				newId = codeDisplay + "-" + String.format(ConfigFile.getPadingCusCode(), 1);

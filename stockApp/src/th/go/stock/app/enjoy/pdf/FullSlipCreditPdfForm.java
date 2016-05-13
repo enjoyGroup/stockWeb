@@ -6,6 +6,7 @@ import java.net.MalformedURLException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import th.go.stock.app.enjoy.main.ConfigFile;
 import th.go.stock.app.enjoy.pdf.utils.EnjoyItext;
 import th.go.stock.app.enjoy.pdf.utils.PdfFormService;
 import th.go.stock.app.enjoy.utils.EnjoyUtils;
@@ -175,11 +176,12 @@ public class FullSlipCreditPdfForm extends EnjoyItext implements PdfFormService 
 		PdfPTable 	tableSub 			= new PdfPTable(sub_w);
 		JSONObject 	jsonObjectMain  	= this.formDataObj;
 		JSONObject  invoiceCreditMaster	= (JSONObject) jsonObjectMain.get("invoiceCreditMaster");
+		String		vat					= ConfigFile.getVat() + "%";
 		
 		table.addCell(setCellWB("รวมจำรวนเงิน ", getFont8Bold(), 3, Element.ALIGN_RIGHT, 0));
 		table.addCell(setCellWB(getText(invoiceCreditMaster, "invoicePrice"), getFont8(), 1, Element.ALIGN_RIGHT, 0));
 		
-		table.addCell(setCellWB("ภาษีมูลค่าเพิ่ม 7% ", getFont8Bold(), 3, Element.ALIGN_RIGHT, 0));
+		table.addCell(setCellWB("ภาษีมูลค่าเพิ่ม " + vat + " ", getFont8Bold(), 3, Element.ALIGN_RIGHT, 0));
 		table.addCell(setCellWB(getText(invoiceCreditMaster, "invoiceVat"), getFont8(), 1, Element.ALIGN_RIGHT, 0));
 		
 		tableSub.addCell(setCell(EnjoyUtils.displayAmountThai(getText(invoiceCreditMaster, "invoiceTotal")), getFont7(), 1, 1, Element.ALIGN_CENTER));

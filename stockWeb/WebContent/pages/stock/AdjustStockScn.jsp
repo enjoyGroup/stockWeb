@@ -299,7 +299,9 @@
 						        			<td align="left" colspan="3">
 						        				<select id="tin" name="tin" style="width: 220px;" >
 						        					<% for(ComboBean comboBean:companyCombo){ %>
-						        					<option value="<%=comboBean.getCode()%>"><%=comboBean.getDesc()%></option>
+						        					<option value="<%=comboBean.getCode()%>" <%if(adjustStockBean.getTin().equals(comboBean.getCode())){%>selected<%}%>>
+						        						<%=comboBean.getDesc()%>
+						        					</option>
 						        					<%} %>
 						        				</select>
 						        			</td>

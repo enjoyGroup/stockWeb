@@ -615,7 +615,7 @@ public class ReciveStockDao {
 			
 			list		 	= query.list();
 			
-			if(list!=null && list.size() > 0){
+			if(list!=null && list.size() > 0 && list.get(0)!=null){
 				newId = codeDisplay + "-" + String.format(ConfigFile.getPadingReciveNo(), list.get(0));
 			}else{
 				newId = codeDisplay + "-" + String.format(ConfigFile.getPadingReciveNo(), 1);

@@ -11,9 +11,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 
+import th.go.stock.app.enjoy.main.ConfigFile;
+
 public class EnjoyUtils {
 	
 	public static void main(String[] args) {
+		System.out.println(String.format("%09d", 1));
 		
 //		System.out.println(getLastDayOfMonth("01/03/2559"));
 		

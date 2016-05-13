@@ -14,6 +14,7 @@ import org.hibernate.type.StringType;
 import th.go.stock.app.enjoy.bean.InvoiceCreditDetailBean;
 import th.go.stock.app.enjoy.bean.InvoiceCreditMasterBean;
 import th.go.stock.app.enjoy.exception.EnjoyException;
+import th.go.stock.app.enjoy.main.ConfigFile;
 import th.go.stock.app.enjoy.model.Invoicecreditdetail;
 import th.go.stock.app.enjoy.model.InvoicecreditdetailPK;
 import th.go.stock.app.enjoy.model.Invoicecreditmaster;
@@ -77,6 +78,8 @@ public class InvoiceCreditDao {
 			
 			if(!invoiceCreditMasterBean.getInvoiceStatus().equals("")){
 				hql += " and a.invoiceStatus = '" + invoiceCreditMasterBean.getInvoiceStatus() + "'";
+			}else{
+				hql += " and a.invoiceStatus not in ('S')";
 			}
 			
 			logger.info("[searchByCriteria] hql :: " + hql);
@@ -392,7 +395,7 @@ public class InvoiceCreditDao {
 									+ "		INNER JOIN productmaster b on b.productCode 	= a.productCode"
 									+ "		INNER JOIN unittype c on c.unitCode 		= b.unitCode"
 									+ "		LEFT  JOIN invoicecreditmaster d ON a.invoiceCode = d.invoiceCode"
-									+ "		LEFT JOIN	productquantity e ON d.tin = e.tin"
+									+ "		LEFT JOIN	productquantity e ON d.tin = e.tin and e.productCode = a.productCode"
 									+ "	where a.invoiceCode 	= '" + invoiceCreditDetailBean.getInvoiceCode() + "'"
 									+ "	order by a.seq asc";
 			
@@ -525,31 +528,49 @@ public class InvoiceCreditDao {
 		}
 	}
 	
-	public int genId(Session session) throws EnjoyException{
+	public String genId(String invoiceType) throws EnjoyException{
 		logger.info("[genId][Begin]");
 		
-		String							hql									= null;
-		List<Integer>			 		list								= null;
-		SQLQuery 						query 								= null;
-		int 							result								= 0;
-		
+		String				hql						= null;
+		List<Integer>		list					= null;
+		SQLQuery 			query 					= null;
+		SessionFactory 		sessionFactory			= null;
+		Session 			session					= null;
+		String				newId					= "";
+		String				codeDisplay				= null;
+		RefconstantcodeDao	refconstantcodeDao		= null;
+		String				id						= null;
 		
 		try{
 			
-			hql				= "select max(invoiceCode) lastId from invoicecreditmaster";
+			logger.info("[genId] invoiceType :: " + invoiceType);
+			
+			sessionFactory 		= HibernateUtil.getSessionFactory();
+			session 			= sessionFactory.openSession();
+			refconstantcodeDao 	= new RefconstantcodeDao();
+			id					= invoiceType.equals("V")?"5":"6";
+			codeDisplay			= refconstantcodeDao.getCodeDisplay(id);
+			
+			hql				= "SELECT (MAX(SUBSTRING_INDEX(invoiceCode, '-', -1)) + 1) AS newId"
+							+ "	FROM invoicecreditmaster"
+							+ "	WHERE"
+							+ "		SUBSTRING_INDEX(invoiceCode, '-', 1) = '" + codeDisplay + "'";
 			query			= session.createSQLQuery(hql);
 			
-			query.addScalar("lastId"			, new IntegerType());
+			
+			query.addScalar("newId"			, new IntegerType());
 			
 			list		 	= query.list();
 			
-			if(list!=null && list.size() > 0){
-				result = list.get(0)==null?0:list.get(0);
+			logger.info("[genId] PadingInvoiceCode 			:: " + ConfigFile.getPadingInvoiceCode());
+			
+			if(list!=null && list.size() > 0 && list.get(0)!=null){
+				newId = codeDisplay + "-" + String.format(ConfigFile.getPadingInvoiceCode(), list.get(0));
+			}else{
+				newId = codeDisplay + "-" + String.format(ConfigFile.getPadingInvoiceCode(), 1);
 			}
 			
-			logger.info("[genId] result 			:: " + result);
-			
-			result++;
+			logger.info("[genId] newId 			:: " + newId);
 			
 		}catch(Exception e){
 			e.printStackTrace();
@@ -557,12 +578,122 @@ public class InvoiceCreditDao {
 			throw new EnjoyException(e.getMessage());
 		}finally{
 			
-			hql									= null;
-			list								= null;
-			query 								= null;
+			session.close();
+			sessionFactory	= null;
+			session			= null;
+			hql				= null;
+			list			= null;
+			query 			= null;
 			logger.info("[genId][End]");
 		}
 		
-		return result;
+		return newId;
 	}
+	
+	public List<InvoiceCreditMasterBean> searchByCriteriaForCredit( Session 				session, 
+																	InvoiceCreditMasterBean invoiceCreditMasterBean) throws EnjoyException{
+		logger.info("[searchByCriteriaForCredit][Begin]");
+		
+		String							hql						= null;
+		SQLQuery 						query 					= null;
+		List<Object[]>					list					= null;
+		InvoiceCreditMasterBean			bean					= null;
+		List<InvoiceCreditMasterBean> 	invoiceCreditMasterList = new ArrayList<InvoiceCreditMasterBean>();
+		String 							invoiceDateForm			= null;
+		String 							invoiceDateTo			= null;
+		String							invoiceTypeDesc			= "";
+		
+		try{	
+			
+			invoiceDateForm 	= EnjoyUtils.dateThaiToDb(invoiceCreditMasterBean.getInvoiceDateForm());
+			invoiceDateTo		= EnjoyUtils.dateThaiToDb(invoiceCreditMasterBean.getInvoiceDateTo());
+			
+			hql					= "select a.invoiceCode"
+										+ ", a.invoiceType"
+										+ ", a.invoiceDate"
+										+ ", a.invoiceTotal"
+										+ ", a.remark"
+										+ ", concat(b.cusName, ' ', b.cusSurname) cusFullName"
+										+ ", a.invoiceCash"
+									+ " from invoicecreditmaster a  "
+									+ " 	INNER JOIN customer b on a.cusCode = b.cusCode"
+									+ "	where a.invoiceStatus 	= 'A'";
+			
+			if(!invoiceCreditMasterBean.getInvoiceCode().equals("***")){
+				if(invoiceCreditMasterBean.getInvoiceCode().equals("")){
+					hql += " and (a.invoiceCode is null or a.invoiceCode = '')";
+				}else{
+					hql += " and a.invoiceCode like ('" + invoiceCreditMasterBean.getInvoiceCode() + "%')";
+				}
+			}
+			
+			if(!invoiceDateForm.equals("")){
+				hql += " and a.invoiceDate >= STR_TO_DATE('" + invoiceDateForm + "', '%Y%m%d')";
+			}
+			
+			if(!invoiceDateTo.equals("")){
+				hql += " and a.invoiceDate <= STR_TO_DATE('" + invoiceDateTo + "', '%Y%m%d')";
+			}
+			
+			if(!invoiceCreditMasterBean.getCusFullName().equals("***")){
+				if(invoiceCreditMasterBean.getCusFullName().equals("")){
+					hql += " and CONCAT(b.cusName, ' ', b.cusSurname) = ''";
+				}else{
+					hql += " and CONCAT(b.cusName, ' ', b.cusSurname) like ('" + invoiceCreditMasterBean.getCusFullName() + "%')";
+				}
+			}
+			
+			logger.info("[searchByCriteriaForCredit] hql :: " + hql);
+
+			query			= session.createSQLQuery(hql);			
+			query.addScalar("invoiceCode"	, new StringType());
+			query.addScalar("invoiceType"	, new StringType());
+			query.addScalar("cusFullName"	, new StringType());
+			query.addScalar("invoiceDate"	, new StringType());
+			query.addScalar("invoiceTotal"	, new StringType());
+			query.addScalar("remark"		, new StringType());
+			query.addScalar("invoiceCash"	, new StringType());
+			
+			list		 	= query.list();
+			
+			logger.info("[searchByCriteriaForCredit] list.size() :: " + list.size());
+			
+			for(Object[] row:list){
+				bean 	= new InvoiceCreditMasterBean();
+				
+				logger.info("invoiceCode 		:: " + row[0]);
+				logger.info("invoiceType 		:: " + row[1]);
+				logger.info("cusFullName 		:: " + row[2]);
+				logger.info("invoiceDate 		:: " + row[3]);
+				logger.info("invoiceTotal 		:: " + row[4]);
+				logger.info("remark 			:: " + row[5]);
+				logger.info("invoiceCash 		:: " + row[6]);
+				
+				invoiceTypeDesc = EnjoyUtils.nullToStr(row[1]).equals("V")?"มี VAT":"ไม่มี VAT";
+				
+				bean.setInvoiceCode		(EnjoyUtils.nullToStr(row[0]));
+				bean.setInvoiceType		(EnjoyUtils.nullToStr(row[1]));
+				bean.setInvoiceTypeDesc	(invoiceTypeDesc);
+				bean.setCusFullName		(EnjoyUtils.nullToStr(row[2]));
+				bean.setInvoiceDate		(EnjoyUtils.dateToThaiDisplay(row[3]));
+				bean.setInvoiceTotal	(EnjoyUtils.convertFloatToDisplay(row[4], 2));
+				bean.setRemark			(EnjoyUtils.nullToStr(row[5]));
+				bean.setInvoiceCash		(EnjoyUtils.nullToStr(row[6]));
+				
+				invoiceCreditMasterList.add(bean);
+			}	
+			
+		}catch(Exception e){
+			logger.error(e);
+			e.printStackTrace();
+			throw new EnjoyException("error searchByCriteriaForCredit");
+		}finally{
+			hql						= null;
+			logger.info("[searchByCriteriaForCredit][End]");
+		}
+		
+		return invoiceCreditMasterList;
+		
+	}
+
 }

@@ -34,12 +34,6 @@
 			
 			gv_service 		= "service=" + $('#service').val();
 			
-			if($("#pageMode").val()=="EDIT"){
-				lp_setModeEdit();
-			}else{
-				lp_setModeNew();
-			}
-			
 			$("input[name=productName]").live("focus",function(){
 				$(this).autocomplete({
 					 
@@ -135,6 +129,10 @@
 				
 				try{
 					
+					if(!gp_validateEmptyObj(new Array( "tin:บริษัทที่สังกัด"))){
+						return false;
+					}
+					
 					gp_dialogPopUp("/stockWeb/EnjoyGenericSrv?service=servlet.ProductDetailsLookUpServlet&pageAction=new", "เลือกสินค้า");
 					
 					/*lo_dialog 	= $( "#dialog" );
@@ -177,19 +175,23 @@
 				return false;
 			});
 			
-			//gp_progressBarOff();
-			$("#productCodeDis").focus();
+			if($("#pageMode").val()=="EDIT"){
+				lp_setModeEdit();
+			}else{
+				lp_setModeNew();
+			}
 			
 		});
 		
 		function lp_validate(){
-			var la_validate             = new Array( "invoiceDate:วันที่ขาย", "tin:บริษัทที่สังกัด");
+			var la_validate             = new Array( "invoiceDate:วันที่ขาย", "tin:บริษัทที่สังกัด", "cusCodeDis:รหัสลูกค้า");
 		    var lv_return				= true;
 		    var la_productName			= null;
 		    var la_productCode			= null;
 		    var la_inventory			= null;
 		    var la_quantity				= null;
 		    var lv_inventory			= 0.00;
+		    var lv_quantity				= 0.00;
 		    
 			try{
 				la_productName		= document.getElementsByName("productName");
@@ -241,6 +243,14 @@
 							//la_productName[i].focus();
 							return false;
 						}else{
+							lv_quantity = gp_parseFloat(la_quantity[i].value);
+							if(lv_quantity < 1){
+								alert(la_productName[i].value + "กรุณาระบุปริมาณอย่างน้อย 1", function() { 
+									la_quantity[i].focus();
+				    		    });
+								return false;
+							}
+							
 							lv_inventory = gp_parseFloat(la_inventory[i].value) - gp_parseFloat(la_quantity[i].value);
 							
 							if(lv_inventory < 0){
@@ -269,6 +279,7 @@
 				    //$(this).find(':input').attr('readonly', true).attr('class', 'input-disabled');
 					$(this).find('input:visible').prop("disabled", true);
 					$(this).find('textarea:visible').prop("disabled", true);
+					$(this).find('select:visible').prop("disabled", true);
 				    
 				});
 				
@@ -285,6 +296,14 @@
 			try{
 				$("#invoiceStatus").prop("disabled", true);
 				lp_setSaleCommission();
+				
+				$("#cusCodeDis").focus();
+				$("body").scrollTop(0);
+				
+				/*if($('#tin').val()!=""){
+					$("#productCodeDis").focus();
+				}*/
+				
 			}catch(e){
 				alert("setModeNew :: " + e);
 			}
@@ -343,43 +362,42 @@
 			var params				= "";
 			
 			try{
-				if(!confirm("คุณแน่ใจว่าต้องการยกเลิกรายการนี้")){
-					return;
-				}
-				
-				params 	= "&pageAction=cancel&invoiceCode=" + $('#invoiceCode').val().trim() + "&tin=" + $('#tin').val().trim();
-				
-				$.ajax({
-					async:true,
-		            type: "POST",
-		            url: gv_url,
-		            data: gv_service + params,
-		            beforeSend: gp_progressBarOn(),
-		            success: function(data){
-		            	var jsonObj 			= null;
-		            	var status				= null;
-		            	
-		            	try{
-		            		gp_progressBarOff();
-		            		//alert(data);
-		            		jsonObj = JSON.parse(data);
-		            		status	= jsonObj.status;
-		            		
-		            		if(status=="SUCCESS"){
-		            			alert("ยกเลิกเรียบร้อย", function() { 
-		            				window.location = gv_url + "?service=" + $("#service").val() + "&pageAction=getDetail&invoiceCode=" + jsonObj.invoiceCode;
-				    		    });
-		            			//alert("ยกเลิกเรียบร้อย");
-		            			//window.location = gv_url + "?service=" + $("#service").val() + "&pageAction=getDetail&invoiceCode=" + jsonObj.invoiceCode;
-		            		}else{
-		            			alert(jsonObj.errMsg);
-		            			
-		            		}
-		            	}catch(e){
-		            		alert("in lp_cancel :: " + e);
-		            	}
-		            }
-		        });
+				confirm("คุณแน่ใจว่าต้องการยกเลิกรายการนี้", function(){
+					//params 	= "&pageAction=cancel&invoiceCode=" + $('#invoiceCode').val().trim() + "&tin=" + $('#tin').val().trim();
+					params 	= "&pageAction=cancel&" + $('#frm').serialize();
+					
+					$.ajax({
+						async:true,
+			            type: "POST",
+			            url: gv_url,
+			            data: gv_service + params,
+			            beforeSend: gp_progressBarOn(),
+			            success: function(data){
+			            	var jsonObj 			= null;
+			            	var status				= null;
+			            	
+			            	try{
+			            		gp_progressBarOff();
+			            		//alert(data);
+			            		jsonObj = JSON.parse(data);
+			            		status	= jsonObj.status;
+			            		
+			            		if(status=="SUCCESS"){
+			            			alert("ยกเลิกเรียบร้อย", function() { 
+			            				window.location = gv_url + "?service=" + $("#service").val() + "&pageAction=getDetail&invoiceCode=" + jsonObj.invoiceCode;
+					    		    });
+			            			//alert("ยกเลิกเรียบร้อย");
+			            			//window.location = gv_url + "?service=" + $("#service").val() + "&pageAction=getDetail&invoiceCode=" + jsonObj.invoiceCode;
+			            		}else{
+			            			alert(jsonObj.errMsg);
+			            			
+			            		}
+			            	}catch(e){
+			            		alert("in lp_cancel :: " + e);
+			            	}
+			            }
+			        });
+				});
 				
 			}catch(e){
 				alert("lp_cancel :: " + e);
@@ -616,6 +634,11 @@
 		function lp_getProductDetailByName(av_seq, av_productName){
 			
 			try{
+				
+				if(!gp_validateEmptyObj(new Array( "tin:บริษัทที่สังกัด"))){
+					return false;
+				}
+				
 				$.ajax({
 					async:false,
 		            type: "POST",
@@ -1126,6 +1149,11 @@
 			var lv_productCodeDis 	= "";
 			
 			try{
+				
+				if(!gp_validateEmptyObj(new Array( "tin:บริษัทที่สังกัด"))){
+					return false;
+				}
+				
 				lv_productCodeDis = $("#productCodeDis").val().trim();
 				
 				if(lv_productCodeDis==""){
@@ -1211,6 +1239,75 @@
 			}
 		}
 		
+		function lp_onchangeTin(){
+			var la_productCode 	= null;
+			var la_inventory 	= null;
+			var params			= "";
+			
+			try{
+				la_productCode		= document.getElementsByName("productCode");
+				la_inventory		= document.getElementsByName("inventory");
+				
+				if($("#tin").val()==""){
+					for(var i=0;i<la_inventory.length;i++){
+						la_inventory[i].value = "0.00";
+					}
+					return;
+				}
+				
+				params 	= "pageAction=getInventoryForProduct&" + $('#frm').serialize();
+				
+				$.ajax({
+					async:true,
+		            type: "POST",
+		            url: gv_url,
+		            data: params,
+		            beforeSend: gp_progressBarOn(),
+		            success: function(data){
+		            	var jsonObj 			= null;
+		            	var status				= null;
+		            	var flag				= null;
+		            	
+		            	try{
+		            		gp_progressBarOff();
+		            		
+		            		jsonObj = JSON.parse(data);
+		            		status	= jsonObj.status;
+		            		
+		            		if(status=="SUCCESS"){
+		            			flag	= jsonObj.flag;
+		            			
+		            			if(flag=="Y"){
+		            				for(var i=0;i<la_productCode.length;i++){
+		            					if(la_productCode[i].value==""){
+		            						la_inventory[i].value = "0.00";
+		            					}else{
+		            						inventoryList 	= jsonObj.inventoryList;
+		            						
+		            						$.each(inventoryList, function(idx, obj) {
+		            							if(obj.productCode==la_productCode[i].value){
+		            								la_inventory[i].value = obj.inventory;
+		            							}
+		            						});
+		            					}
+		            				}
+		            			}
+		            			
+		            		}else{
+		            			alert(jsonObj.errMsg);
+		            			
+		            		}
+		            	}catch(e){
+		            		alert("in lp_onchangeTin :: " + e);
+		            	}
+		            }
+		        });
+				
+			}catch(e){
+				alert("lp_onchangeTin :: " + e);
+			}
+		}
+		
 	</script>
 </head>
 <body onkeydown="lp_focusBarCodeTxt(event);">
@@ -1219,6 +1316,7 @@
 		<input type="hidden" id="pageMode" 	name="pageMode" value="<%=pageMode%>" />
 		<input type="hidden" id="seqTemp" name="seqTemp" value="<%=invoiceCreditMaintananceForm.getSeqTemp()%>" />
 		<input type="hidden" id="systemVat" name="systemVat" value="<%=invoiceCreditMaintananceForm.VAT%>" />
+		<input type="hidden" id="invoiceCash" name="invoiceCash" value="<%=invoiceCreditMasterBean.getInvoiceCash()%>" />
 		<div id="menu" style="width: 100%;background: black;">
 			<%@ include file="/pages/menu/menu.jsp"%>
 		</div>
@@ -1282,7 +1380,7 @@
 					         				<table class="table user-register-table" style="border-bottom-color: white;">
 					         					<tr>
 					         						<td align="right">
-								        				รหัสลูกค้า  : &nbsp;
+								        				รหัสลูกค้า <span style="color: red;"><b>*</b></span> : &nbsp;
 								        			</td>
 								        			<td align="left" colspan="5">
 								        				<input type='text' 
@@ -1335,11 +1433,20 @@
 														บริษัทที่สังกัด<span style="color: red;"><b>*</b></span> :
 													</td>
 								        			<td align="left" colspan="3">
-								        				<select id="tin" name="tin" style="width: 220px;" >
-								        					<% for(ComboBean comboBean:companyCombo){ %>
-								        					<option value="<%=comboBean.getCode()%>" <%if(invoiceCreditMasterBean.getTin().equals(comboBean.getCode())){ %> selected <%} %> ><%=comboBean.getDesc()%></option>
-								        					<%} %>
+								        				<%if(invoiceCreditMaintananceForm.getPageMode().equals(invoiceCreditMaintananceForm.NEW)){%>
+									        				<select id="tin" name="tin" style="width: 220px;" onchange="lp_onchangeTin();" >
+									        					<% for(ComboBean comboBean:companyCombo){ %>
+									        					<option value="<%=comboBean.getCode()%>" <%if(invoiceCreditMasterBean.getTin().equals(comboBean.getCode())){ %> selected <%} %> ><%=comboBean.getDesc()%></option>
+									        					<%} %>
+									        				</select>
+				   										<%}else{%>
+				   											<select id="tinDis" name="tinDis" style="width: 220px;" onchange="lp_onchangeTin();" >
+									        					<% for(ComboBean comboBean:companyCombo){ %>
+									        					<option value="<%=comboBean.getCode()%>" <%if(invoiceCreditMasterBean.getTin().equals(comboBean.getCode())){ %> selected <%} %> ><%=comboBean.getDesc()%></option>
+									        					<%} %>
 								        				</select>
+								        				<input type="hidden" id="tin" name="tin" value="<%=invoiceCreditMasterBean.getTin()%>" />
+				   										<%}%>
 								        			</td>
 								        		</tr>
 								        		<tr>
@@ -1591,8 +1698,10 @@
 								        				<input type="button" id="btnSave" class="btn btn-sm btn-warning" value='บันทึก' onclick="lp_save();" />&nbsp;&nbsp;&nbsp;
 				   										<input type="button" id="btnReset" onclick="lp_reset();" class="btn btn-sm btn-danger" value='เริ่มใหม่' />
 				   										<%}else{%>
-				   										<input type="button" id="btnPrint" name="btnPrint" class="btn btn-sm btn-warning" value='พิมพ์' onclick="lp_print();" />&nbsp;&nbsp;&nbsp;
-				   										<input type="button" id="btnCancel" name="btnCancel" onclick="lp_cancel();" class="btn btn-sm btn-danger" value='ยกเลิก' />
+					   										<%if(!invoiceCreditMasterBean.getInvoiceStatus().equals("C")){ %>
+						   										<input type="button" id="btnPrint" name="btnPrint" class="btn btn-sm btn-warning" value='พิมพ์' onclick="lp_print();" />&nbsp;&nbsp;&nbsp;
+						   										<input type="button" id="btnCancel" name="btnCancel" onclick="lp_cancel();" class="btn btn-sm btn-danger" value='ยกเลิก' />
+					   										<%}%>
 				   										<%}%>
 								        			</td>
 								        		</tr>

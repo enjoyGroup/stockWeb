@@ -28,16 +28,15 @@
 	<script>
 		$(document).ready(function(){
 			
-			var h = $(document).height();
+			//var h = $(document).height();
 			
 			//$("#xx").corner("round 8px");
 			
 			$('#menu1').ptMenu();
 			$(window).scroll(function(){//alert($(window).scrollTop());
-				
-				h = $(document).height();
+				gp_controlMenu();
+				/*h = $(document).height();
 				//var options = {};
-				
 		        if(document.documentElement.scrollTop || jQuery(this).scrollTop() > 10){//alert("s " + h); 
 		        	document.getElementById("m1").className 			= "fixs";
 		        	document.getElementById("headwrap").style.display 	= "none";
@@ -52,7 +51,7 @@
 		        	//$("#headwrap").show("slide",{direction: 'up'}, 1000);
 		        	//document.getElementById("m1").className 			= "";
 		        }
-		        $('body').css('height', h);
+		        $('body').css('height', h);*/
 		    });
 			
 			$('#logOut').click(function(){ 
