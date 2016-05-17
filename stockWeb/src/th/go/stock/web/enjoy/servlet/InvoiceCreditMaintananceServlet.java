@@ -1144,6 +1144,7 @@ public class InvoiceCreditMaintananceServlet extends EnjoyStandardSvc {
 		DataOutput 						output 					= null;
 		ByteArrayOutputStream			buffer					= null;
 		byte[] 							bytes					= null;
+		String							invoiceType				= null;
 	 
 		try{
 			invoiceCode 		= EnjoyUtils.nullToStr(this.request.getParameter("invoiceCode"));
@@ -1155,7 +1156,9 @@ public class InvoiceCreditMaintananceServlet extends EnjoyStandardSvc {
 			objDetail = new JSONObject();
 			objDetail.put("invoiceCode"		, invoiceCreditMasterDb.getInvoiceCode());
 			objDetail.put("invoiceDate"		, invoiceCreditMasterDb.getInvoiceDate());
-			objDetail.put("invoiceType"		, invoiceCreditMasterDb.getInvoiceType());
+			
+			invoiceType = invoiceCreditMasterDb.getInvoiceType();
+			objDetail.put("invoiceType"		, invoiceType);
 			
 			cusCode = invoiceCreditMasterDb.getCusCode();
 			objDetail.put("cusCode"			, cusCode);
@@ -1191,6 +1194,7 @@ public class InvoiceCreditMaintananceServlet extends EnjoyStandardSvc {
 				objDetail.put("productName"		, vo.getProductName());
 				objDetail.put("quantity"		, vo.getQuantity());
 				objDetail.put("pricePerUnit"	, vo.getPricePerUnit());
+				objDetail.put("discount"		, vo.getDiscount());
 				objDetail.put("price"			, vo.getPrice());
 				objDetail.put("unitCode"		, vo.getUnitCode());
 				objDetail.put("unitName"		, vo.getUnitName());
@@ -1247,7 +1251,11 @@ public class InvoiceCreditMaintananceServlet extends EnjoyStandardSvc {
    
 			logger.info("[print] obj.toString() :: " + jsonObject.toString());
    
-			buffer = viewPdfMainForm.writeTicketPDF("FullSlipCreditPdfForm", jsonObject);
+			if("V".equals(invoiceType)){
+				buffer = viewPdfMainForm.writeTicketPDF("FullSlipCreditPdfForm", jsonObject);
+			}else{
+				buffer = viewPdfMainForm.writeTicketPDF("FullSlipCreditNoVatPdfForm", jsonObject);
+			}
 	
 			response.setContentType( "application/pdf" );
 			output 	= new DataOutputStream( this.response.getOutputStream() );

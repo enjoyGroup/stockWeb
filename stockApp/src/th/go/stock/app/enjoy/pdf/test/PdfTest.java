@@ -27,8 +27,9 @@ public class PdfTest {
 	public static void main(String[] args) {
 		try {
 //			writePDF("ProductBarcodePdfForm", createJsonObjForProductBarcode(), "D:/motor/PDF/ProductBarcodePdfForm.pdf");
-//			writePDF("FullSlipCashPdfForm", createJsonObjForFullSlip(), "D:/motor/PDF/FullSlipCashPdfForm.pdf");
-			writePDF("HistoryPurchasedByDealerPdfForm", createJsonObjForHistoryPurchasedByDealer(), "D:/motor/PDF/HistoryPurchasedByDealerPdfForm.pdf");
+			writePDF("FullSlipCashPdfForm", createJsonObjForFullSlip(), "D:/motor/PDF/FullSlipCashPdfFormA5.pdf");
+//			writePDF("FullSlipCashNoVatPdfForm", createJsonObjForFullSlip(), "D:/motor/PDF/FullSlipCashNoVatPdfFormA5.pdf");
+//			writePDF("HistoryPurchasedByDealerPdfForm", createJsonObjForHistoryPurchasedByDealer(), "D:/motor/PDF/HistoryPurchasedByDealerPdfForm.pdf");
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -48,7 +49,8 @@ public class PdfTest {
 			System.out.println("formName :: " + formName);
 			
 			formClass					= "th.go.stock.app.enjoy.pdf."+formName;
-			document 					= new Document(PageSize.A4);
+//			document 					= new Document(PageSize.A4);
+			document 					= new Document(PageSize.A5);
 			f 							= new File(pdfPath);
 			fos            				= new FileOutputStream(f.getAbsolutePath());			
 			writer 						= PdfWriter.getInstance( document,fos  );
@@ -152,7 +154,7 @@ public class PdfTest {
 	    List<InvoiceCashDetailBean> invoiceCashDetailList 	= null;
 	    
 		try{
-			invoiceCode = "1";
+			invoiceCode = "INC59-00000001";
 			
 			/*Begin รายละเอียดใบกำกับภาษี*/
 			invoiceCashMasterBean.setInvoiceCode(invoiceCode);
@@ -196,6 +198,7 @@ public class PdfTest {
 				objDetail.put("productName"		, vo.getProductName());
 				objDetail.put("quantity"		, vo.getQuantity());
 				objDetail.put("pricePerUnit"	, vo.getPricePerUnit());
+				objDetail.put("discount"		, vo.getDiscount());
 				objDetail.put("price"			, vo.getPrice());
 				objDetail.put("unitCode"		, vo.getUnitCode());
 				objDetail.put("unitName"		, vo.getUnitName());

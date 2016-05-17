@@ -6,9 +6,7 @@ import java.net.MalformedURLException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import th.go.stock.app.enjoy.main.ConfigFile;
 import th.go.stock.app.enjoy.pdf.header.FullSlipCashNoVatHeader;
-import th.go.stock.app.enjoy.pdf.header.FullSlipCreditHeader;
 import th.go.stock.app.enjoy.pdf.utils.EnjoyItext;
 import th.go.stock.app.enjoy.pdf.utils.PdfFormService;
 import th.go.stock.app.enjoy.utils.EnjoyUtils;
@@ -19,11 +17,11 @@ import com.lowagie.text.Element;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
 
-public class FullSlipCreditPdfForm extends EnjoyItext implements PdfFormService {
+public class FullSlipCashNoVatPdfForm extends EnjoyItext implements PdfFormService {
 	
 	private PdfWriter 				writer;
 	private JSONObject 				formDataObj;
-	private FullSlipCreditHeader 	header;
+	private FullSlipCashNoVatHeader header;
 	
 	private void setWriter(PdfWriter writer) {
 		this.writer = writer;
@@ -31,18 +29,16 @@ public class FullSlipCreditPdfForm extends EnjoyItext implements PdfFormService 
 
 	public void setJSONObject(PdfWriter writer, JSONObject jsonObject) {
 		this.formDataObj  	= jsonObject;
-		this.header			= new FullSlipCreditHeader(jsonObject);
+		this.header			= new FullSlipCashNoVatHeader(jsonObject);
 		setWriter(writer);
 		writer.setPageEvent(this.header);
 		
 	}
 	
 	public Document createForm(Document document) {
-		System.out.println("[FullSlipCreditPdfForm][createForm][Begin]");
+		System.out.println("[FullSlipCashNoVatPdfForm][createForm][Begin]");
 		
 		try{
-			document.add(this.genHeader());
-			document.add(this.brLine());
 			document.add(this.genHeader1());
 			
 			JSONObject  customerDetails		= (JSONObject) this.formDataObj.get("customerDetails");
@@ -54,21 +50,21 @@ public class FullSlipCreditPdfForm extends EnjoyItext implements PdfFormService 
 			document.add(this.brLine());
 			document.add(this.brLine());
 			document.add(this.genTotalCost());
-			document.add(this.brLine());
-			document.add(this.brLine());
-			document.add(this.brLine());
-			document.add(this.brLine());
-			document.add(this.brLine());
-			document.add(this.brLine());
-			document.add(this.brLine());
-			document.add(this.brLine());
-			document.add(this.brLine());
-			document.add(this.brLine());
-			document.add(this.brLine());
-			document.add(this.brLine());
-			document.add(this.brLine());
-			document.add(this.brLine());
-			document.add(this.genFooter());
+//			document.add(this.brLine());
+//			document.add(this.brLine());
+//			document.add(this.brLine());
+//			document.add(this.brLine());
+//			document.add(this.brLine());
+//			document.add(this.brLine());
+//			document.add(this.brLine());
+//			document.add(this.brLine());
+//			document.add(this.brLine());
+//			document.add(this.brLine());
+//			document.add(this.brLine());
+//			document.add(this.brLine());
+//			document.add(this.brLine());
+//			document.add(this.brLine());
+//			document.add(this.genFooter());
 			
 		}
 		catch(DocumentException de){
@@ -79,31 +75,10 @@ public class FullSlipCreditPdfForm extends EnjoyItext implements PdfFormService 
 			e.printStackTrace();
 		}
 		finally{
-			System.out.println("[FullSlipCreditPdfForm][createForm][End]");
+			System.out.println("[FullSlipCashNoVatPdfForm][createForm][End]");
 		}
 		
 		return document;
-	}
-	
-	private PdfPTable genHeader() throws DocumentException, MalformedURLException, IOException {
-		
-		float[] 	widths	 		= {1};
-		PdfPTable 	table 			= new PdfPTable(widths);
-		JSONObject 	jsonObjectMain  = this.formDataObj;
-		JSONObject  companyDetails	= (JSONObject) jsonObjectMain.get("companyDetails");
-		String		address			= "";
-		
-		address = " โทร." + getText(companyDetails, "tel") 
-				+ " Fax." + getText(companyDetails, "fax") 
-				+ " Email." + getText(companyDetails, "email");
-		
-		table.addCell(setCellWB(getText(companyDetails, "companyName"), getFont11Bold(), 1, Element.ALIGN_CENTER, 0));
-		table.addCell(setCellWB(getText(companyDetails, "address"), getFont8(), 1, Element.ALIGN_CENTER, 0));
-		table.addCell(setCellWB(address, getFont8(), 1, Element.ALIGN_CENTER, 0));
-		
-		table.setWidthPercentage(100);
-	
-		return table;
 	}
 	
 	private PdfPTable genHeader1() throws DocumentException, MalformedURLException, IOException {
@@ -111,17 +86,15 @@ public class FullSlipCreditPdfForm extends EnjoyItext implements PdfFormService 
 		float[] 	widths	 			= {22f,28f ,25f,25f};
 		PdfPTable 	table 				= new PdfPTable(widths);
 		JSONObject 	jsonObjectMain  	= this.formDataObj;
-		JSONObject  invoiceCreditMaster	= (JSONObject) jsonObjectMain.get("invoiceCreditMaster");
+		JSONObject  invoiceCashMaster	= (JSONObject) jsonObjectMain.get("invoiceCashMaster");
 		
 		table.addCell(setCellWB("ใบกำกับภาษี/ใบเสร็จรับเงิน", getFont10Bold(), 4, Element.ALIGN_CENTER, 0));
 		
-		table.addCell(setCellWB("เลขประจำตัวผู้เสียภาษี", getFont8Bold(), 1, Element.ALIGN_RIGHT, 0));
-		table.addCell(setCellWB(getText(invoiceCreditMaster, "tin"), getFont8(), 1, Element.ALIGN_LEFT, 0));
-		table.addCell(setCellWB("เลขที่ใบเสร็จ", getFont8Bold(), 1, Element.ALIGN_RIGHT, 0));
-		table.addCell(setCellWB(getText(invoiceCreditMaster, "invoiceCode"), getFont8(), 1, Element.ALIGN_LEFT, 0));
+		table.addCell(setCellWB("เลขที่ใบเสร็จ", getFont8Bold(), 3, Element.ALIGN_RIGHT, 0));
+		table.addCell(setCellWB(getText(invoiceCashMaster, "invoiceCode"), getFont8(), 1, Element.ALIGN_LEFT, 0));
 		
 		table.addCell(setCellWB("วันที่ใบเสร็จ", getFont8Bold(), 3, Element.ALIGN_RIGHT, 0));
-		table.addCell(setCellWB(getText(invoiceCreditMaster, "invoiceDate"), getFont8(), 1, Element.ALIGN_LEFT, 0));
+		table.addCell(setCellWB(getText(invoiceCashMaster, "invoiceDate"), getFont8(), 1, Element.ALIGN_LEFT, 0));
 		
 		table.setWidthPercentage(100);
 	
@@ -148,8 +121,9 @@ public class FullSlipCreditPdfForm extends EnjoyItext implements PdfFormService 
 		float[] 	widths	 				= {7f ,28f ,17f ,16f ,16f ,16f};
 		PdfPTable 	table 					= new PdfPTable(widths);
 		JSONObject 	jsonObjectMain  		= this.formDataObj;
-		JSONArray 	invoiceCreditDetailList = (JSONArray) jsonObjectMain.get("invoiceCreditDetailList");
-		JSONObject 	invoiceCreditDetail  	= null;
+		JSONArray 	invoiceCashDetailList 	= (JSONArray) jsonObjectMain.get("invoiceCashDetailList");
+//		JSONObject  invoiceCashMaster		= (JSONObject) jsonObjectMain.get("invoiceCashMaster");
+		JSONObject 	invoiceCashDetail  		= null;
 		
 		table.addCell(setCell("ลำดับ", getFont8Bold(), 1, 1, Element.ALIGN_CENTER));
 		table.addCell(setCell("สินค้า", getFont8Bold(), 1, 1, Element.ALIGN_CENTER));
@@ -158,15 +132,18 @@ public class FullSlipCreditPdfForm extends EnjoyItext implements PdfFormService 
 		table.addCell(setCell("ส่วนลด(%)", getFont8Bold(), 1, 1, Element.ALIGN_CENTER));
 		table.addCell(setCell("ราคาขาย", getFont8Bold(), 1, 1, Element.ALIGN_CENTER));
 		
-		for(int i=0;i<invoiceCreditDetailList.size();i++){
-			invoiceCreditDetail = (JSONObject) invoiceCreditDetailList.get(i);
+		for(int i=0;i<invoiceCashDetailList.size();i++){
+			invoiceCashDetail = (JSONObject) invoiceCashDetailList.get(i);
 			table.addCell(setCell(String.valueOf((i+1)),   getFont8(), 1, 1, Element.ALIGN_CENTER));
-			table.addCell(setCell(getText(invoiceCreditDetail, "productName"),   getFont8(), 1, 1, Element.ALIGN_LEFT));
-			table.addCell(setCell(getText(invoiceCreditDetail, "quantity") + " " + getText(invoiceCreditDetail, "unitName"),   getFont8(), 1, 1, Element.ALIGN_CENTER));
-			table.addCell(setCell(getText(invoiceCreditDetail, "pricePerUnit"),   getFont8(), 1, 1, Element.ALIGN_RIGHT));
-			table.addCell(setCell(getText(invoiceCreditDetail, "discount"),   getFont8(), 1, 1, Element.ALIGN_RIGHT));
-			table.addCell(setCell(getText(invoiceCreditDetail, "price"),   getFont8(), 1, 1, Element.ALIGN_RIGHT));
+			table.addCell(setCell(getText(invoiceCashDetail, "productName"),   getFont8(), 1, 1, Element.ALIGN_LEFT));
+			table.addCell(setCell(getText(invoiceCashDetail, "quantity") + " " + getText(invoiceCashDetail, "unitName"),   getFont8(), 1, 1, Element.ALIGN_CENTER));
+			table.addCell(setCell(getText(invoiceCashDetail, "pricePerUnit"),   getFont8(), 1, 1, Element.ALIGN_RIGHT));
+			table.addCell(setCell(getText(invoiceCashDetail, "discount"),   getFont8(), 1, 1, Element.ALIGN_RIGHT));
+			table.addCell(setCell(getText(invoiceCashDetail, "price"),   getFont8(), 1, 1, Element.ALIGN_RIGHT));
 		}
+		
+//		table.addCell(setCell("จำนวนเงินรวมทั้งสิ้น",   getFont8Bold(), 5, 1, Element.ALIGN_RIGHT));
+//		table.addCell(setCell(getText(invoiceCashMaster, "invoiceTotal"),   getFont8(), 1, 1, Element.ALIGN_RIGHT));
 		
 		table.setHeaderRows(1);
 		table.setWidthPercentage(100);
@@ -181,47 +158,47 @@ public class FullSlipCreditPdfForm extends EnjoyItext implements PdfFormService 
 		float[] 	sub_w	 			= {1};
 		PdfPTable 	tableSub 			= new PdfPTable(sub_w);
 		JSONObject 	jsonObjectMain  	= this.formDataObj;
-		JSONObject  invoiceCreditMaster	= (JSONObject) jsonObjectMain.get("invoiceCreditMaster");
-		String		vat					= ConfigFile.getVat() + "%";
+		JSONObject  invoiceCashMaster	= (JSONObject) jsonObjectMain.get("invoiceCashMaster");
+//		String		vat					= ConfigFile.getVat() + "%";
 		
 		table.addCell(setCellWB("รวมจำรวนเงิน ", getFont8Bold(), 3, Element.ALIGN_RIGHT, 0));
-		table.addCell(setCellWB(getText(invoiceCreditMaster, "invoicePrice"), getFont8(), 1, Element.ALIGN_RIGHT, 0));
+		table.addCell(setCellWB(getText(invoiceCashMaster, "invoicePrice"), getFont8(), 1, Element.ALIGN_RIGHT, 0));
 		
 		table.addCell(setCellWB("หักส่วนลด ", getFont8Bold(), 3, Element.ALIGN_RIGHT, 0));
-		table.addCell(setCellWB(getText(invoiceCreditMaster, "invoicediscount"), getFont8(), 1, Element.ALIGN_RIGHT, 0));
+		table.addCell(setCellWB(getText(invoiceCashMaster, "invoicediscount"), getFont8(), 1, Element.ALIGN_RIGHT, 0));
 		
-		table.addCell(setCellWB("ภาษีมูลค่าเพิ่ม " + vat + " ", getFont8Bold(), 3, Element.ALIGN_RIGHT, 0));
-		table.addCell(setCellWB(getText(invoiceCreditMaster, "invoiceVat"), getFont8(), 1, Element.ALIGN_RIGHT, 0));
+//		table.addCell(setCellWB("ภาษีมูลค่าเพิ่ม " + vat + " ", getFont8Bold(), 3, Element.ALIGN_RIGHT, 0));
+//		table.addCell(setCellWB(getText(invoiceCashMaster, "invoiceVat"), getFont8(), 1, Element.ALIGN_RIGHT, 0));
 		
 		table.addCell(setCellWB("หักมัดจำ ", getFont8Bold(), 3, Element.ALIGN_RIGHT, 0));
-		table.addCell(setCellWB(getText(invoiceCreditMaster, "invoiceDeposit"), getFont8(), 1, Element.ALIGN_RIGHT, 0));
+		table.addCell(setCellWB(getText(invoiceCashMaster, "invoiceDeposit"), getFont8(), 1, Element.ALIGN_RIGHT, 0));
 		
-		tableSub.addCell(setCell(EnjoyUtils.displayAmountThai(getText(invoiceCreditMaster, "invoiceTotal")), getFont8(), 1, 1, Element.ALIGN_CENTER));
+		tableSub.addCell(setCell(EnjoyUtils.displayAmountThai(getText(invoiceCashMaster, "invoiceTotal")), getFont8(), 1, 1, Element.ALIGN_CENTER));
 		table.addCell(setCellWB(tableSub, 2, Element.ALIGN_LEFT, 0, false, false));
 		table.addCell(setCellWB("จำนวนเงินรวมทั้งสิ้น ", getFont8Bold(), 1, Element.ALIGN_RIGHT, 0));
-		table.addCell(setCellWB(getText(invoiceCreditMaster, "invoiceTotal"), getFont8(), 1, Element.ALIGN_RIGHT, 0));
+		table.addCell(setCellWB(getText(invoiceCashMaster, "invoiceTotal"), getFont8(), 1, Element.ALIGN_RIGHT, 0));
 		
 		table.addCell(setCellWB("", getFont8Bold(), 4, Element.ALIGN_LEFT, 0));
 		
 		table.addCell(setCellWB("หมายเหต ", getFont8Bold(), 1, Element.ALIGN_LEFT, 0));
-		table.addCell(setCellWB(getText(invoiceCreditMaster, "remark"), getFont8(), 3, Element.ALIGN_LEFT, 0));
+		table.addCell(setCellWB(getText(invoiceCashMaster, "remark"), getFont8(), 3, Element.ALIGN_LEFT, 0));
 		
 		table.setWidthPercentage(100);
 	
 		return table;
 	}
 	
-	private PdfPTable genFooter() throws DocumentException, MalformedURLException, IOException {
-		float[] 	widths	 	= {75f, 25f};
-		PdfPTable 	table 		= new PdfPTable(widths);
-		
-		table.addCell(setCellWB("ผู้รับเงิน (ลายเซ็นต์)", getFont8(), 1, Element.ALIGN_RIGHT, 0));
-		table.addCell(setCellWB("ผู้รับสินค้า (ลายเซ็นต์)", getFont8(), 1, Element.ALIGN_RIGHT, 0));
-		
-		table.setWidthPercentage(100);
-	
-		return table;
-	}
+//	private PdfPTable genFooter() throws DocumentException, MalformedURLException, IOException {
+//		float[] 	widths	 	= {75f, 25f};
+//		PdfPTable 	table 		= new PdfPTable(widths);
+//		
+//		table.addCell(setCellWB("ผู้รับเงิน (ลายเซ็นต์)", getFont8(), 1, Element.ALIGN_RIGHT, 0));
+//		table.addCell(setCellWB("ผู้รับสินค้า (ลายเซ็นต์)", getFont8(), 1, Element.ALIGN_RIGHT, 0));
+//		
+//		table.setWidthPercentage(100);
+//	
+//		return table;
+//	}
 
 	public PdfPTable brLine() throws DocumentException, MalformedURLException, IOException {
 		

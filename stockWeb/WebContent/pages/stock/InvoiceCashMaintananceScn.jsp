@@ -1428,7 +1428,7 @@
 								        				<input type='text' 
 								        					   id="cusCodeDis" 
 								        					   name='cusCodeDis' 
-								        					   maxlength="5" 
+								        					   maxlength="10" 
 								        					   style="width: 220px;"
 								        					   onblur="getCustomerDetail();"
 								        					   value="<%=customerDetailsBean.getCusCode() %>" />
