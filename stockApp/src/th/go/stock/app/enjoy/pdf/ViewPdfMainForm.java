@@ -51,4 +51,42 @@ public class ViewPdfMainForm {
 		return buffer;
 	}
 	
+	public ByteArrayOutputStream writeTicketPDFA5(String formName, JSONObject jsonObject) throws Exception{
+	    String 					formClass					= null;
+		Document 				document					= null;
+		PdfWriter 				writer 						= null;
+		PdfFormService 			pdfForm 					= null;
+		ByteArrayOutputStream 	buffer 						= null;
+		
+		try{
+			System.out.println("formName :: " + formName);
+			
+			formClass					= "th.go.stock.app.enjoy.pdf."+formName;
+			document 					= new Document(PageSize.A5);
+
+			buffer 						=	new ByteArrayOutputStream();
+			writer 						=	PdfWriter.getInstance( document, buffer );
+	
+			document.addTitle("Stock Form");
+			Class c 					= 	Class.forName(formClass);
+			pdfForm 	        		= 	(PdfFormService) c.newInstance();
+			document.open();
+					
+			pdfForm.setJSONObject(writer, jsonObject);
+			pdfForm.createForm(document);
+	
+			document.close();
+			writer.close();
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally{
+		    formClass					= null;
+			document					= null;
+			writer 						= null;
+			pdfForm 					= null;
+			jsonObject 					= null;
+		}
+		return buffer;
+	}
+	
 }

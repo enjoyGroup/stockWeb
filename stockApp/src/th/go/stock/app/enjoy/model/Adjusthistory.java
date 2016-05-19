@@ -29,6 +29,8 @@ public class Adjusthistory implements Serializable {
 	private BigDecimal quanOld;
 
 	private String remark;
+	
+	private String tin;
 
 	public Adjusthistory() {
 	}
@@ -79,6 +81,14 @@ public class Adjusthistory implements Serializable {
 
 	public void setRemark(String remark) {
 		this.remark = remark;
+	}
+
+	public String getTin() {
+		return tin;
+	}
+
+	public void setTin(String tin) {
+		this.tin = tin;
 	}
 
 }

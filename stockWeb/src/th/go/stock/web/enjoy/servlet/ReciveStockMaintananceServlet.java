@@ -17,6 +17,7 @@ import org.json.simple.JSONObject;
 import th.go.stock.app.enjoy.bean.ComboBean;
 import th.go.stock.app.enjoy.bean.CompanyVendorBean;
 import th.go.stock.app.enjoy.bean.ComparePriceBean;
+import th.go.stock.app.enjoy.bean.ProductQuanHistoryBean;
 import th.go.stock.app.enjoy.bean.ProductmasterBean;
 import th.go.stock.app.enjoy.bean.ProductquantityBean;
 import th.go.stock.app.enjoy.bean.ReciveOrdeDetailBean;
@@ -25,6 +26,7 @@ import th.go.stock.app.enjoy.bean.UserDetailsBean;
 import th.go.stock.app.enjoy.dao.CompanyVendorDao;
 import th.go.stock.app.enjoy.dao.ComparePriceDao;
 import th.go.stock.app.enjoy.dao.ProductDetailsDao;
+import th.go.stock.app.enjoy.dao.ProductQuanHistoryDao;
 import th.go.stock.app.enjoy.dao.ProductquantityDao;
 import th.go.stock.app.enjoy.dao.ReciveStockDao;
 import th.go.stock.app.enjoy.dao.RelationUserAndCompanyDao;
@@ -56,6 +58,7 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
     private ComparePriceDao					comparePriceDao				= null;
     private ProductquantityDao				productquantityDao			= null;
     private RelationUserAndCompanyDao		relationUserAndCompanyDao	= null;
+    private ProductQuanHistoryDao			productQuanHistoryDao		= null;
     
 	@Override
 	public void execute(HttpServletRequest request, HttpServletResponse response)
@@ -83,6 +86,7 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
              this.comparePriceDao			= new ComparePriceDao();
              this.productquantityDao		= new ProductquantityDao();
              this.relationUserAndCompanyDao = new RelationUserAndCompanyDao();
+             this.productQuanHistoryDao		= new ProductQuanHistoryDao();
  			
              logger.info("[execute] pageAction : " + pageAction );
              
@@ -127,6 +131,7 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
  			e.printStackTrace();
  			logger.info(e.getMessage());
  		}finally{
+ 			productQuanHistoryDao.destroySession();
  			logger.info("[execute][End]");
  		}
 	}
@@ -331,6 +336,9 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 		ProductquantityBean			productquantityBean			= null;
 		String						tin							= null;
 		String						quantityDb					= null;
+		ProductQuanHistoryBean		productQuanHistoryBean		= null;
+		ProductmasterBean 			productmasterBean			= null;
+		ProductmasterBean 			productmasterBeanDb			= null;
 		
 		try{
 			pageMode 					= EnjoyUtil.nullToStr(request.getParameter("pageMode"));
@@ -459,13 +467,38 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 						quantityDb = this.productquantityDao.getProductquantity(productquantityBean);
 						
 						if(quantityDb==null){
-							productquantityBean.setQuantity("0.00");
+							quantity =  EnjoyUtils.parseDouble("0.00");
+							productquantityBean.setQuantity(String.valueOf(quantity));
 							this.productquantityDao.insertProductquantity(session, productquantityBean);
 						}else{
 							quantity =  EnjoyUtils.parseDouble(quantityDb) +  EnjoyUtils.parseDouble(beanTemp.getQuantity());
 							productquantityBean.setQuantity(String.valueOf(quantity));
 							this.productquantityDao.updateProductquantity(session, productquantityBean);
 						}
+						
+						/*Begin ส่วนประวัตเพิ่มลดสินค้า*/
+						productQuanHistoryBean = new ProductQuanHistoryBean();
+						productQuanHistoryBean.setFormRef(reciveNo);
+						
+						productmasterBean = new ProductmasterBean();
+						productmasterBean.setProductCode(beanTemp.getProductCode());
+						productmasterBeanDb = productDetailsDao.getProductDetail(session, productmasterBean);
+						if(productmasterBeanDb!=null){
+							productQuanHistoryBean.setProductType(productmasterBeanDb.getProductTypeCode());
+							productQuanHistoryBean.setProductGroup(productmasterBeanDb.getProductGroupCode());
+							productQuanHistoryBean.setProductCode(productmasterBeanDb.getProductCode());
+						}else{
+							productQuanHistoryBean.setProductType("");
+							productQuanHistoryBean.setProductGroup("");
+							productQuanHistoryBean.setProductCode("");
+						}
+						productQuanHistoryBean.setTin(tin);
+						productQuanHistoryBean.setQuantityPlus(beanTemp.getQuantity());
+						productQuanHistoryBean.setQuantityMinus("0.00");
+						productQuanHistoryBean.setQuantityTotal(String.valueOf(quantity));
+						
+						productQuanHistoryDao.insert(session, productQuanHistoryBean);
+						/*End ส่วนประวัตเพิ่มลดสินค้า*/
 						
 					}else if(currReciveStatus.equals("3") && reciveStatus.equals("4")){
 						productquantityBean = new ProductquantityBean();
@@ -476,13 +509,38 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 						quantityDb = this.productquantityDao.getProductquantity(productquantityBean);
 						
 						if(quantityDb==null){
-							productquantityBean.setQuantity("0.00");
+							quantity =  EnjoyUtils.parseDouble("0.00");
+							productquantityBean.setQuantity(String.valueOf(quantity));
 							this.productquantityDao.insertProductquantity(session, productquantityBean);
 						}else{
 							quantity	=  EnjoyUtils.parseDouble(quantityDb) -  EnjoyUtils.parseDouble(beanTemp.getQuantity());
 							productquantityBean.setQuantity(String.valueOf(quantity));
 							this.productquantityDao.updateProductquantity(session, productquantityBean);
 						}
+						
+						/*Begin ส่วนประวัตเพิ่มลดสินค้า*/
+						productQuanHistoryBean = new ProductQuanHistoryBean();
+						productQuanHistoryBean.setFormRef(reciveNo);
+						
+						productmasterBean = new ProductmasterBean();
+						productmasterBean.setProductCode(beanTemp.getProductCode());
+						productmasterBeanDb = productDetailsDao.getProductDetail(session, productmasterBean);
+						if(productmasterBeanDb!=null){
+							productQuanHistoryBean.setProductType(productmasterBeanDb.getProductTypeCode());
+							productQuanHistoryBean.setProductGroup(productmasterBeanDb.getProductGroupCode());
+							productQuanHistoryBean.setProductCode(productmasterBeanDb.getProductCode());
+						}else{
+							productQuanHistoryBean.setProductType("");
+							productQuanHistoryBean.setProductGroup("");
+							productQuanHistoryBean.setProductCode("");
+						}
+						productQuanHistoryBean.setTin(tin);
+						productQuanHistoryBean.setQuantityPlus("0.00");
+						productQuanHistoryBean.setQuantityMinus(beanTemp.getQuantity());
+						productQuanHistoryBean.setQuantityTotal(String.valueOf(quantity));
+						
+						productQuanHistoryDao.insert(session, productQuanHistoryBean);
+						/*End ส่วนประวัตเพิ่มลดสินค้า*/
 					}
 				}
 			}

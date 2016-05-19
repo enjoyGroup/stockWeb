@@ -36,6 +36,7 @@ public class AdjustStockDao {
 								+ "			SELECT @rownum\\:=@rownum+1 AS rownum,t.*"
 								+ "				from (SELECT @rownum\\:=0) r, adjusthistory t"
 								+ "				where t.productCode = '"+adjustStockBean.getProductCode()+"'"
+								+ "					and t.tin = '"+adjustStockBean.getTin()+"'"
 								+ "				order by t.adjustDate desc, adjustNo desc"
 								+ "		) a LIMIT " + adjustStockBean.getLastOrder() + ", " + AdjustStockForm.ORDER_LIMIT;
 			
@@ -79,7 +80,7 @@ public class AdjustStockDao {
 		
 	}
 	
-	public int checkLimitAdjustHistoryOrder(Session session, String productCode, int lastOrder) throws EnjoyException{
+	public int checkLimitAdjustHistoryOrder(Session session, String productCode, String tin, int lastOrder) throws EnjoyException{
 		logger.info("[checkLimitAdjustHistoryOrder][Begin]");
 		
 		String							hql									= null;
@@ -94,6 +95,7 @@ public class AdjustStockDao {
 							+ "		SELECT @rownum\\:=@rownum+1 AS rownum,t.* "
 							+ " 		from (SELECT @rownum\\:=0) r, adjusthistory t"
 							+ " 		where t.productCode = '"+productCode+"'"
+							+ "					and t.tin = '"+tin+"'"
 							+ " 		order by t.adjustDate desc, adjustNo desc"
 							+ " ) a where a.rownum > " + lastOrder;
 			
@@ -140,6 +142,7 @@ public class AdjustStockDao {
 			adjusthistory.setQuanOld			(EnjoyUtils.parseBigDecimal(adjustStockBean.getQuanOld()));
 			adjusthistory.setQuanNew			(EnjoyUtils.parseBigDecimal(adjustStockBean.getQuanNew()));
 			adjusthistory.setRemark				(adjustStockBean.getRemark());
+			adjusthistory.setTin				(adjustStockBean.getTin());
 			
 			session.saveOrUpdate(adjusthistory);
 			

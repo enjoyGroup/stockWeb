@@ -24,9 +24,13 @@
 		var gv_url 					= '<%=servURL%>/EnjoyGenericSrv';
 		
 		$(document).ready(function(){
-			//gp_progressBarOn();
-			
 			gv_service 		= "service=" + $('#service').val();
+			
+			if($("#chk").val()=="false"){
+				$("#tin").focus();
+			}else{
+				$("#quanNew").focus();
+			}
 			
 			$('#btnSearch').click(function(){ 
 				var la_validate             = new Array( "productName:สินค้า", "tin:บริษัทที่สังกัด");
@@ -121,6 +125,13 @@
 			
 			try{
 				
+				if($("#quanNew").val()=="0.00"){
+					alert("ไม่มีการเพิ่ม/ลด สินค้า", function() { 
+						$("#quanNew").focus();
+	    		    });
+					return;
+				}
+				
 				params 	= "pageAction=save&" + $('#frm').serialize();
 				
 				$.ajax({
@@ -199,7 +210,8 @@
 			try{
 				params 	 = gv_service + "&pageAction=loadNextRangeOrder"
 						 + "&lastOrder=" 			+ $("#lastOrder").val().trim() 
-						 + "&productCode=" 			+ $("#productCode").val();
+						 + "&productCode=" 			+ $("#productCode").val()
+						 + "&tin=" 					+ $("#tin").val();
 				$.ajax({
 					async:true,
 		            type: "POST",
@@ -277,6 +289,7 @@
 		<input type="hidden" id="service" 	name="service" value="servlet.AdjustStockServlet" />
 		<input type="hidden" id="productCode" name="productCode" value="<%=adjustStockBean.getProductCode()%>" />
 		<input type="hidden" id="lastOrder" name="lastOrder" value="<%=adjustStockBean.getLastOrder()%>" />
+		<input type="hidden" id="chk" name="chk" value="<%=chk%>" />
 		<div id="menu" style="width: 100%;background: black;">
 			<%@ include file="/pages/menu/menu.jsp"%>
 		</div>
@@ -297,6 +310,16 @@
 												บริษัทที่สังกัด<span style="color: red;"><b>*</b></span> :
 											</td>
 						        			<td align="left" colspan="3">
+						        			<%if(chk==true){%>
+						        				<select id="tinDis" name="tinDis" style="width: 220px;" disabled="disabled" >
+						        					<% for(ComboBean comboBean:companyCombo){ %>
+						        					<option value="<%=comboBean.getCode()%>" <%if(adjustStockBean.getTin().equals(comboBean.getCode())){%>selected<%}%>>
+						        						<%=comboBean.getDesc()%>
+						        					</option>
+						        					<%} %>
+						        				</select>
+						        				<input type="hidden" id="tin" name="tin" value="<%=adjustStockBean.getTin()%>" />
+						        			<%}else{%>
 						        				<select id="tin" name="tin" style="width: 220px;" >
 						        					<% for(ComboBean comboBean:companyCombo){ %>
 						        					<option value="<%=comboBean.getCode()%>" <%if(adjustStockBean.getTin().equals(comboBean.getCode())){%>selected<%}%>>
@@ -304,6 +327,7 @@
 						        					</option>
 						        					<%} %>
 						        				</select>
+						        			<%}%>
 						        			</td>
 						        			<td align="right" width="10%">
 						        				สินค้า <span style="color: red;"><b>*</b></span> : &nbsp;

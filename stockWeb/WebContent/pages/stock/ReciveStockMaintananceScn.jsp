@@ -1306,13 +1306,14 @@
 													</td>
 								        			<td align="left">
 								        				<input type='text' 
-								        					   id="reciveNo" 
-								        					   name='reciveNo' 
-								        					   value="<%=reciveOrderMasterBean.getReciveNo() %>" 
+								        					   id="reciveNoDis" 
+								        					   name='reciveNoDis' 
+								        					   value="<%=reciveOrderMasterBean.getReciveNo()%>" 
 								        					   maxlength="50" 
 								        					   class="input-disabled"
 							        					   	   readonly="readonly"
 								        					   style="width: 220px;" />
+								        				<input type="hidden" id="reciveNo" name="reciveNo" value="<%=reciveOrderMasterBean.getReciveNo()%>" />
 								        			</td>
 								        			<td align="right">
 														วันที่สั่งซื้อ<span style="color: red;"><b>*</b></span>:

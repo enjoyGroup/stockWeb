@@ -15,12 +15,14 @@ import org.json.simple.JSONObject;
 
 import th.go.stock.app.enjoy.bean.AdjustStockBean;
 import th.go.stock.app.enjoy.bean.ComboBean;
+import th.go.stock.app.enjoy.bean.ProductQuanHistoryBean;
 import th.go.stock.app.enjoy.bean.ProductmasterBean;
 import th.go.stock.app.enjoy.bean.ProductquantityBean;
 import th.go.stock.app.enjoy.bean.ReciveOrderMasterBean;
 import th.go.stock.app.enjoy.bean.UserDetailsBean;
 import th.go.stock.app.enjoy.dao.AdjustStockDao;
 import th.go.stock.app.enjoy.dao.ProductDetailsDao;
+import th.go.stock.app.enjoy.dao.ProductQuanHistoryDao;
 import th.go.stock.app.enjoy.dao.ProductquantityDao;
 import th.go.stock.app.enjoy.dao.RelationUserAndCompanyDao;
 import th.go.stock.app.enjoy.exception.EnjoyException;
@@ -49,6 +51,7 @@ public class AdjustStockServlet extends EnjoyStandardSvc {
     private AdjustStockForm					form						= null;
     private ProductquantityDao				productquantityDao			= null;
     private RelationUserAndCompanyDao		relationUserAndCompanyDao	= null;
+    private ProductQuanHistoryDao			productQuanHistoryDao		= null;
     
 	@Override
 	public void execute(HttpServletRequest request, HttpServletResponse response)
@@ -74,6 +77,7 @@ public class AdjustStockServlet extends EnjoyStandardSvc {
              this.productDetailsDao			= new ProductDetailsDao();
              this.productquantityDao		= new ProductquantityDao();
              this.relationUserAndCompanyDao = new RelationUserAndCompanyDao();
+             this.productQuanHistoryDao		= new ProductQuanHistoryDao();
  			
              logger.info("[execute] pageAction : " + pageAction );
              
@@ -101,6 +105,7 @@ public class AdjustStockServlet extends EnjoyStandardSvc {
  			e.printStackTrace();
  			logger.info(e.getMessage());
  		}finally{
+ 			productQuanHistoryDao.destroySession();
  			logger.info("[execute][End]");
  		}
 	}
@@ -171,18 +176,21 @@ public class AdjustStockServlet extends EnjoyStandardSvc {
 	private void onSave() throws EnjoyException{
 		logger.info("[onSave][Begin]");
 		
-		SessionFactory 						sessionFactory				= null;
-		Session 							session						= null;
-		JSONObject 							obj 						= null;
-		String								productCode					= null;
-		String								quanOld						= null;
-		String 								quanNew						= null;
-		String 								remark						= null;
-		String								quantity					= null;
-		AdjustStockBean 					adjustStockBean				= null;
-		ProductquantityBean					productquantityBean			= null;
-		String								tin							= null;
-		String								quantityDb					= null;
+		SessionFactory 				sessionFactory				= null;
+		Session 					session						= null;
+		JSONObject 					obj 						= null;
+		String						productCode					= null;
+		String						quanOld						= null;
+		String 						quanNew						= null;
+		String 						remark						= null;
+		String						quantity					= null;
+		AdjustStockBean 			adjustStockBean				= null;
+		ProductquantityBean			productquantityBean			= null;
+		String						tin							= null;
+		String						quantityDb					= null;
+		ProductQuanHistoryBean		productQuanHistoryBean		= null;
+		ProductmasterBean 			productmasterBean			= null;
+		ProductmasterBean 			productmasterBeanDb			= null;
 		
 		try{
 			sessionFactory 				= HibernateUtil.getSessionFactory();
@@ -201,7 +209,7 @@ public class AdjustStockServlet extends EnjoyStandardSvc {
 			productquantityBean = new ProductquantityBean();
 			productquantityBean.setProductCode(productCode);
 			productquantityBean.setTin(tin);
-			productquantityBean.setQuantity(quanNew);
+			productquantityBean.setQuantity(quantity);
 			
 			quantityDb = this.productquantityDao.getProductquantity(productquantityBean);
 			
@@ -211,11 +219,42 @@ public class AdjustStockServlet extends EnjoyStandardSvc {
 				this.productquantityDao.updateProductquantity(session, productquantityBean);
 			}
 			
+			/*Begin ส่วนประวัตเพิ่มลดสินค้า*/
+			productQuanHistoryBean = new ProductQuanHistoryBean();
+			productQuanHistoryBean.setFormRef("adjuststock");
+			
+			productmasterBean = new ProductmasterBean();
+			productmasterBean.setProductCode(productCode);
+			productmasterBeanDb = productDetailsDao.getProductDetail(session, productmasterBean);
+			if(productmasterBeanDb!=null){
+				productQuanHistoryBean.setProductType(productmasterBeanDb.getProductTypeCode());
+				productQuanHistoryBean.setProductGroup(productmasterBeanDb.getProductGroupCode());
+				productQuanHistoryBean.setProductCode(productmasterBeanDb.getProductCode());
+			}else{
+				productQuanHistoryBean.setProductType("");
+				productQuanHistoryBean.setProductGroup("");
+				productQuanHistoryBean.setProductCode("");
+			}
+			productQuanHistoryBean.setTin(tin);
+			
+			if(EnjoyUtils.parseDouble(quanNew) > 0){
+				productQuanHistoryBean.setQuantityPlus(quanNew);
+				productQuanHistoryBean.setQuantityMinus("0.00");
+			}else{
+				productQuanHistoryBean.setQuantityPlus("0.00");
+				productQuanHistoryBean.setQuantityMinus(EnjoyUtil.nullToStr(Math.abs(EnjoyUtils.parseDouble(quanNew))));
+			}
+			productQuanHistoryBean.setQuantityTotal(String.valueOf(quantity));
+			
+			productQuanHistoryDao.insert(session, productQuanHistoryBean);
+			/*End ส่วนประวัตเพิ่มลดสินค้า*/
+			
 			adjustStockBean.setAdjustDate(EnjoyUtils.currDateThai());
 			adjustStockBean.setProductCode(productCode);
 			adjustStockBean.setQuanOld(quanOld);
-			adjustStockBean.setQuanNew(quanNew);
+			adjustStockBean.setQuanNew(quantity);
 			adjustStockBean.setRemark(remark);
+			adjustStockBean.setTin(tin);
 			
 			this.dao.insertAdjustHistory(session, adjustStockBean);
 			
@@ -293,7 +332,7 @@ public class AdjustStockServlet extends EnjoyStandardSvc {
 			
 			session.beginTransaction();
 			
-			limitAdjustHistoryOrder = this.dao.checkLimitAdjustHistoryOrder(session, productmasterBean.getProductCode(), adjustStockBean.getLastOrder());
+			limitAdjustHistoryOrder = this.dao.checkLimitAdjustHistoryOrder(session, productmasterBean.getProductCode(), tin, adjustStockBean.getLastOrder());
 			adjustHistoryListList	= this.dao.getAdjustHistoryList(session, adjustStockBean);
 			
 			if(limitAdjustHistoryOrder > AdjustStockForm.ORDER_LIMIT){
@@ -377,18 +416,20 @@ public class AdjustStockServlet extends EnjoyStandardSvc {
 		JSONArray 				jSONArray 						= null;
 		int						newLastOrder					= 0;
 		List<AdjustStockBean> 	adjustHistoryList				= null;
+		String					tin								= null;
 		
 		try{
-			sessionFactory 				= HibernateUtil.getSessionFactory();
-			session 					= sessionFactory.openSession();
-			obj 						= new JSONObject();
-			jSONArray 					= new JSONArray();
-			lastOrder 					= EnjoyUtils.nullToStr(this.request.getParameter("lastOrder"));
-			productCode 				= EnjoyUtils.nullToStr(this.request.getParameter("productCode"));
+			sessionFactory 		= HibernateUtil.getSessionFactory();
+			session 			= sessionFactory.openSession();
+			obj 				= new JSONObject();
+			jSONArray 			= new JSONArray();
+			lastOrder 			= EnjoyUtils.nullToStr(this.request.getParameter("lastOrder"));
+			productCode 		= EnjoyUtils.nullToStr(this.request.getParameter("productCode"));
+			tin 				= EnjoyUtils.nullToStr(this.request.getParameter("tin"));
 			
 			session.beginTransaction();
 			
-			limitAdjustHistoryOrder 	= this.dao.checkLimitAdjustHistoryOrder(session, productCode, EnjoyUtils.parseInt(lastOrder));
+			limitAdjustHistoryOrder 	= this.dao.checkLimitAdjustHistoryOrder(session, productCode, tin, EnjoyUtils.parseInt(lastOrder));
 			adjustHistoryList			= this.dao.getAdjustHistoryList(session, this.form.getAdjustStockBean());
 			
 			for(AdjustStockBean bean:adjustHistoryList){
