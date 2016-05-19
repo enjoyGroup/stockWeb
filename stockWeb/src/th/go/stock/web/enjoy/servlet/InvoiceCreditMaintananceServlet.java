@@ -1311,14 +1311,17 @@ public class InvoiceCreditMaintananceServlet extends EnjoyStandardSvc {
 			jsonObject.put(STATUS, 			SUCCESS);
    
 			logger.info("[print] obj.toString() :: " + jsonObject.toString());
-   
+			String pdfName = "";
 			if("V".equals(invoiceType)){
-				buffer = viewPdfMainForm.writeTicketPDFA5("FullSlipCreditPdfForm", jsonObject);
+				pdfName = "FullSlipCreditPdfForm";
 			}else{
-				buffer = viewPdfMainForm.writeTicketPDFA5("FullSlipCreditNoVatPdfForm", jsonObject);
+				pdfName = "FullSlipCreditNoVatPdfForm";
 			}
 	
+			buffer = viewPdfMainForm.writeTicketPDFA5(pdfName, jsonObject, "ใบเสร็จรับเงิน");
+			
 			response.setContentType( "application/pdf" );
+			response.setHeader("Content-Disposition", "filename=".concat(String.valueOf(pdfName+".pdf")));
 			output 	= new DataOutputStream( this.response.getOutputStream() );
 			bytes 	= buffer.toByteArray();
 	

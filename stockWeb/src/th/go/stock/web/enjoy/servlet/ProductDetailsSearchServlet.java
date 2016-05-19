@@ -516,10 +516,11 @@ public class ProductDetailsSearchServlet extends EnjoyStandardSvc {
 			   obj.put("detailList" , detailJSONArray);
 			   
 			   logger.info("[print] obj.toString() :: " + obj.toString());
-			   
-			   buffer = viewPdfMainForm.writeTicketPDF("ProductBarcodePdfForm", obj);
+			   String pdfName = "ProductBarcodePdfForm";
+			   buffer = viewPdfMainForm.writeTicketPDF(pdfName, obj, "รหัสสินค้า");
 				
 			   response.setContentType( "application/pdf" );
+			   response.setHeader("Content-Disposition", "filename=".concat(String.valueOf(pdfName+".pdf")));
 			   output 	= new DataOutputStream( this.response.getOutputStream() );
 			   bytes 	= buffer.toByteArray();
 				

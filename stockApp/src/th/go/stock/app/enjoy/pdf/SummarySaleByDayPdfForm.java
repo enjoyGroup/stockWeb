@@ -100,7 +100,7 @@ public class SummarySaleByDayPdfForm extends EnjoyItext implements PdfFormServic
 	
 	private PdfPTable genDetail() throws DocumentException, MalformedURLException, IOException,Exception {
 		
-		float[] 	widths	 							= {5f ,10f ,25f ,15f ,15f ,30f};
+		float[] 	widths	 							= {5f ,15f ,25f ,12f ,13f ,30f};
 		PdfPTable 	table 								= new PdfPTable(widths);
 		JSONObject 	jsonObjectMain  					= this.formDataObj;
 		JSONArray 	resultList 							= (JSONArray) jsonObjectMain.get("resultList");

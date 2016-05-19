@@ -13,7 +13,7 @@ import com.lowagie.text.pdf.PdfWriter;
 
 public class ViewPdfMainForm {
 	
-	public ByteArrayOutputStream writeTicketPDF(String formName, JSONObject jsonObject) throws Exception{
+	public ByteArrayOutputStream writeTicketPDF(String formName, JSONObject jsonObject, String title) throws Exception{
 	    String 					formClass					= null;
 		Document 				document					= null;
 		PdfWriter 				writer 						= null;
@@ -21,7 +21,8 @@ public class ViewPdfMainForm {
 		ByteArrayOutputStream 	buffer 						= null;
 		
 		try{
-			System.out.println("formName :: " + formName);
+			System.out.println("formName 	:: " + formName);
+			System.out.println("title 		:: " + title);
 			
 			formClass					= "th.go.stock.app.enjoy.pdf."+formName;
 			document 					= new Document(PageSize.A4);
@@ -29,7 +30,7 @@ public class ViewPdfMainForm {
 			buffer 						=	new ByteArrayOutputStream();
 			writer 						=	PdfWriter.getInstance( document, buffer );
 	
-			document.addTitle("Stock Form");
+			document.addTitle(title);
 			Class c 					= 	Class.forName(formClass);
 			pdfForm 	        		= 	(PdfFormService) c.newInstance();
 			document.open();
@@ -51,7 +52,7 @@ public class ViewPdfMainForm {
 		return buffer;
 	}
 	
-	public ByteArrayOutputStream writeTicketPDFA5(String formName, JSONObject jsonObject) throws Exception{
+	public ByteArrayOutputStream writeTicketPDFA5(String formName, JSONObject jsonObject, String title) throws Exception{
 	    String 					formClass					= null;
 		Document 				document					= null;
 		PdfWriter 				writer 						= null;
@@ -59,7 +60,8 @@ public class ViewPdfMainForm {
 		ByteArrayOutputStream 	buffer 						= null;
 		
 		try{
-			System.out.println("formName :: " + formName);
+			System.out.println("formName 	:: " + formName);
+			System.out.println("title 		:: " + title);
 			
 			formClass					= "th.go.stock.app.enjoy.pdf."+formName;
 			document 					= new Document(PageSize.A5);
@@ -67,7 +69,7 @@ public class ViewPdfMainForm {
 			buffer 						=	new ByteArrayOutputStream();
 			writer 						=	PdfWriter.getInstance( document, buffer );
 	
-			document.addTitle("Stock Form");
+			document.addTitle(title);
 			Class c 					= 	Class.forName(formClass);
 			pdfForm 	        		= 	(PdfFormService) c.newInstance();
 			document.open();

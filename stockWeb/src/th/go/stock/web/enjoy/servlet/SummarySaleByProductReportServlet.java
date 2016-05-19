@@ -231,10 +231,11 @@ public class SummarySaleByProductReportServlet extends EnjoyStandardSvc {
 			jsonObject.put(STATUS, 			SUCCESS);
    
 			logger.info("[print] obj.toString() :: " + jsonObject.toString());
-   
-			buffer = viewPdfMainForm.writeTicketPDF("SummarySaleByProductPdfForm", jsonObject);
-	
+			String pdfName = "SummarySaleByProductPdfForm";
+			buffer = viewPdfMainForm.writeTicketPDF(pdfName, jsonObject, this.form.getTitlePage());
+			
 			response.setContentType( "application/pdf" );
+			response.setHeader("Content-Disposition", "filename=".concat(String.valueOf(pdfName+".pdf")));
 			output 	= new DataOutputStream( this.response.getOutputStream() );
 			bytes 	= buffer.toByteArray();
 	
