@@ -1262,14 +1262,14 @@
 		            type: "POST",
 		            url: gv_url,
 		            data: params,
-		            beforeSend: gp_progressBarOn(),
+		            beforeSend: "",
 		            success: function(data){
 		            	var jsonObj 			= null;
 		            	var status				= null;
 		            	var flag				= null;
 		            	
 		            	try{
-		            		gp_progressBarOff();
+		            		//gp_progressBarOff();
 		            		
 		            		jsonObj = JSON.parse(data);
 		            		status	= jsonObj.status;

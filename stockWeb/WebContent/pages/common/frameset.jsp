@@ -4,6 +4,7 @@
 <head>
 <title>Stock</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="icon" href="/stockWeb/images/icon.ico" type="image/x-icon">
 </head>
 <script language="javascript">
 <!--

@@ -116,7 +116,7 @@
 								        			<td align="right">
 								        				เดือน/ปี <span style="color: red;"><b>*</b></span> :&nbsp;
 								        			</td>
-								        			<td align="left">
+								        			<td align="left" colspan="3">
 								        				<input type='text' 
 								        					   id="invoiceMonth" 
 								        					   name='invoiceMonth' 
@@ -128,7 +128,10 @@
 								        			</td>
 								        		</tr>
 								        		<tr>
-								        			<td align="left" colspan="4">
+								        			<td align="left" height="50px;" colspan="6">&nbsp;</td>
+								        		</tr>
+								        		<tr>
+								        			<td align="left" colspan="6">
 								        				<input type="button" id="btnShowData" class='btn btn-primary pull-right padding-sm' style="margin-right:12px; padding-right:24px; padding-left:24px;" value='แสดงข้อมูล'/>
 								        				<input type="button" id="btnReset" class='btn pull-right padding-sm'  style="margin-right:12px" value='เริ่มใหม่' />
 								        			</td>

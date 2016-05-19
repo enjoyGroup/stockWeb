@@ -84,6 +84,14 @@ import th.go.stock.web.enjoy.utils.EnjoyUtil;
         		}else{
         			userBean.setUserPrivilegeList((ArrayList<UserPrivilegeBean>) userPrivilegeDao.userPrivilegeListSelect(userBean.getUserPrivilege()));
             		session.setAttribute("userBean", userBean);
+            		
+            		String sessionid    = request.getSession().getId();
+                    String secure       = "";
+                    if (request.isSecure()) {
+                        secure = "; Secure"; 
+                    }
+                    response.setHeader( "Set-Cookie", "JSESSIONID=" + sessionid + ";HttpOnly" + secure );
+            		
         			obj.put(STATUS				, SUCCESS);
         			obj.put("flagChkCompany"	, userBean.getFlagChkCompany());
         			obj.put("FlagChange"		, userBean.getFlagChangePassword());
