@@ -51,7 +51,7 @@
 				//var lo_iframe = null;
 				
 				try{
-					gp_dialogPopUp("/stockWeb/EnjoyGenericSrv?service=servlet.UserDetailsLookUpServlet&pageAction=new", "ค้นหาผู้ใช้งานระบบ");
+					gp_dialogPopUp("/stockWeb/EnjoyGenericSrv?service=servlet.UserDetailsLookUpServlet&pageAction=new&tin="+$("#tin").val(), "ค้นหาผู้ใช้งานระบบ");
 					
 					/*lo_dialog 	= $( "#dialog" );
 					lo_iframe	= $("<iframe />").attr("src", "/stockWeb/EnjoyGenericSrv?service=servlet.UserDetailsLookUpServlet&pageAction=new")
@@ -178,32 +178,34 @@
 			//gp_progressBarOff();
 				
 		});
-			
+		
 		function lp_validate(){
 		    var lv_return				= true;
-		    var la_userUniqueId			= null;
-		    var lv_currUserUniqueId		= "";
-		    var lv_nextUserUniqueId		= "";
-		    var la_userFullName			= null;
+		    //var la_userUniqueId			= null;
+		    //var lv_currUserUniqueId		= "";
+		    //var lv_nextUserUniqueId		= "";
+		    //var la_userFullName			= null;
 		    
 			try{
-				la_userUniqueId = document.getElementsByName("userUniqueId");
-				la_userFullName	= document.getElementsByName("userFullName");
+				/*la_userUniqueId = document.getElementsByName("userUniqueId");
+				la_userFullName	= document.getElementsByName("hidUserFullName");
 				
 				for(var i=0;i<la_userUniqueId.length;i++){
 					lv_currUserUniqueId = la_userUniqueId[i].value;
+					
 					for(var j=(i+1);j<la_userUniqueId.length;j++){
 						lv_nextUserUniqueId = la_userUniqueId[j].value;
 						
 						if(lv_currUserUniqueId==lv_nextUserUniqueId){
-							alert(la_userFullName[i].value + "มีสังกัดแล้ว", function() { 
-								return false;
-			    		    });
+							alert(la_userFullName[i].value + "มีสังกัดแล้ว");
+							return false;
 						}
 					}
 				}
 				
-				/*$.ajax({
+				return true;*/
+				/*
+				$.ajax({
 					async:false,
 		            type: "POST",
 		            url: gv_url,
@@ -231,8 +233,8 @@
 		            		lv_return = false;
 		            	}
 		            }
-		        });*/
-				
+		        });
+				*/
 			}catch(e){
 				alert("lp_validate :: " + e);
 				return false;
@@ -313,7 +315,7 @@
 		                       	
 		                      	//ชื่อ-นามสกุล
 		                       	newNodeTd3.innerHTML        = av_userFullName
-		                       								+ '<input type="hidden" id="userFullName' + lv_maxSeq + '" name="userFullName" value="'+av_userFullName+'" />';
+		                       								+ '<input type="hidden" id="hidUserFullName' + lv_maxSeq + '" name="hidUserFullName" value="'+av_userFullName+'" />';
 		                       	
 		                      	//สถานะ
 		                       	newNodeTd4.innerHTML        = av_userStatusName
@@ -400,9 +402,9 @@
 			
 			try{
 				
-				if(!lp_validate()){
+				/*if(!lp_validate()){
 					return;
-				}
+				}*/
 				
 				params 	= "pageAction=save&" + $('#frm').serialize();
 				
@@ -547,7 +549,7 @@
 														</td>
 														<td align="left">
 															<%=bean.getUserFullName()%>
-															<input type="hidden" id="userFullName<%=bean.getSeq()%>" name="userFullName" value="<%=bean.getUserFullName()%>" />
+															<input type="hidden" id="hidUserFullName<%=bean.getSeq()%>" name="hidUserFullName" value="<%=bean.getUserFullName()%>" />
 														</td>
 														<td align="left">
 															<%=bean.getUserStatusName()%>

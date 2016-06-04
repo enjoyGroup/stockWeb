@@ -214,6 +214,12 @@ public class RelationGroupCustomerServlet extends EnjoyStandardSvc {
 			session.beginTransaction();
 			
 			for(RelationGroupCustomerBean bean:relationGroupCustomerList){
+				
+				logger.info("[onSave] cusGroupName 		:: " + bean.getCusGroupName());
+				logger.info("[onSave] RowStatus 		:: " + bean.getRowStatus());
+				logger.info("[onSave] groupSalePrice 	:: " + bean.getGroupSalePrice());
+				logger.info("[onSave] cusGroupCode 		:: " + bean.getCusGroupCode());
+				
 				if(!bean.getRowStatus().equals("")){
 					if(bean.getRowStatus().equals(RelationGroupCustomerForm.NEW)){
 						this.dao.insertRelationGroupCustomer(session, bean);
@@ -230,12 +236,13 @@ public class RelationGroupCustomerServlet extends EnjoyStandardSvc {
 			obj.put(STATUS, 			SUCCESS);
 			
 		}catch(EnjoyException e){
+			logger.error(e);
 			session.getTransaction().rollback();
 			obj.put(STATUS, 		ERROR);
 			obj.put(ERR_MSG, 		e.getMessage());
 		}catch(Exception e){
 			session.getTransaction().rollback();
-			logger.info(e.getMessage());
+			logger.error(e);
 			e.printStackTrace();
 			obj.put(STATUS, 		ERROR);
 			obj.put(ERR_MSG, 		"onSave is error");

@@ -89,7 +89,16 @@ public class UserDetailsLookUpServlet extends EnjoyStandardSvc {
 	private void onLoad() throws EnjoyException{
 		logger.info("[onLoad][Begin]");
 		
+		String tin = "";
+		
 		try{
+			tin = EnjoyUtils.nullToStr(request.getParameter("tin"));
+			
+			if(!"".equals(tin)){
+				this.form.setTin(tin);
+			}
+			
+			this.form.setLikeFlag("Y");
 			this.initialCombo();	
 		}catch(EnjoyException e){
 			throw new EnjoyException(e.getMessage());
@@ -208,6 +217,7 @@ public class UserDetailsLookUpServlet extends EnjoyStandardSvc {
     	String						sortBy				= null;
     	String						likeFlag			= null;
     	List<UserDetailsBean> 		dataList			= null;
+    	String						tin					= null;
 
 		try{
 			find						= EnjoyUtils.nullToStr(this.request.getParameter("find"));
@@ -215,6 +225,7 @@ public class UserDetailsLookUpServlet extends EnjoyStandardSvc {
 			orderBy						= EnjoyUtils.nullToStr(this.request.getParameter("orderBy"));
 			sortBy						= EnjoyUtils.nullToStr(this.request.getParameter("sortBy"));
 			likeFlag					= EnjoyUtils.chkBoxtoDb(this.request.getParameter("likeFlag"));
+			tin 						= EnjoyUtils.nullToStr(request.getParameter("tin"));
 			sessionFactory 				= HibernateUtil.getSessionFactory();
 			session 					= sessionFactory.openSession();			
 			session.beginTransaction();
@@ -224,12 +235,14 @@ public class UserDetailsLookUpServlet extends EnjoyStandardSvc {
 			logger.info("[onSearch] orderBy 	:: " + orderBy);
 			logger.info("[onSearch] sortBy 	 	:: " + sortBy);
 			logger.info("[onSearch] likeFlag 	:: " + likeFlag);
+			logger.info("[onSearch] tin 		:: " + tin);
 			
-			this.form.setFind(find);
-			this.form.setColumn(column);
-			this.form.setOrderBy(orderBy);
-			this.form.setSortBy(sortBy);
-			this.form.setLikeFlag(likeFlag);
+			this.form.setFind		(find);
+			this.form.setColumn		(column);
+			this.form.setOrderBy	(orderBy);
+			this.form.setSortBy		(sortBy);
+			this.form.setLikeFlag	(likeFlag);
+			this.form.setTin		(tin);
 			
 			dataList = this.dao.getUserDetailsLookUpList(session, this.form);
 			

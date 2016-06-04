@@ -12,7 +12,7 @@
 	List<Userprivilege> 	userprivilegeList	= userDetailsMaintananceForm.getUserprivilegeList();
 	List<ComboBean> 		companyCombo 		= userDetailsMaintananceForm.getCompanyCombo();
 	int 					couChkRow			= 0;
-
+	String					titlePage			= userDetailsMaintananceForm.getTitlePage();
 
 %>
 
@@ -20,7 +20,7 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
-	<title>เพิ่ม Match การแข่งขัน</title>
+	<title><%=titlePage%></title>
 	<%@ include file="/pages/include/enjoyInclude.jsp"%>
 	<script>
 		var gv_service 			= null;
@@ -56,7 +56,6 @@
 			var lo_commission 			= null;
 		    
 			try{
-				
 				lo_flagSalesman 	= document.getElementById("flagSalesman");
 				lo_commission 		= document.getElementById("commission");
 				
@@ -183,9 +182,6 @@
 		}
 		
 		function lp_save(){
-			var la_chkUserPrivilege = null;
-			var lv_userPrivilege	= "";
-			var params				= "";
 			
 			try{
 				
@@ -194,6 +190,33 @@
                     return;
                 }
 				
+				if(!lp_validate()){
+					return;
+				}
+				
+				if($("#pageMode").val()=="NEW"){
+					
+					confirm("Password จะถูกส่งไปที่ E-mail ที่คุณกรอก คุณกรอก E-mail ถูกต้องแล้วใช่หรือไม่ ?", function(){
+						onSave();
+					},function(){
+						$('#userEmail').focus();
+						return;
+					});
+				}else if ($("#pageMode").val()=="EDIT"){
+					onSave();
+				}
+				
+			}catch(e){
+				alert("lp_save :: " + e);
+			}
+		}
+		
+		function onSave(){
+			var params 				= "";
+			var la_chkUserPrivilege = null;
+			var lv_userPrivilege	= "";
+			
+			try{
 				la_chkUserPrivilege = document.getElementsByName("chkUserPrivilege");
 				
 				for(var i=0;i<la_chkUserPrivilege.length;i++){
@@ -212,60 +235,41 @@
 				
 				$("#hidUserPrivilege").val(lv_userPrivilege);
 				
+				params 				= "pageAction=save&" + $('#frm').serialize();
 				
-				if(!lp_validate()){
-					return;
-				}
-				
-				if($("#pageMode").val()=="NEW"){
-					
-					confirm("Password จะถูกส่งไปที่ E-mail ที่คุณกรอก คุณกรอก E-mail ถูกต้องแล้วใช่หรือไม่ ?", function(){
-						params 	= "pageAction=save&" + $('#frm').serialize();
-						
-						$.ajax({
-							async:true,
-				            type: "POST",
-				            url: gv_url,
-				            data: params,
-				            beforeSend: gp_progressBarOn(),
-				            success: function(data){
-				            	var jsonObj 			= null;
-				            	var status				= null;
-				            	var userUniqueId		= 0;
-				            	
-				            	try{
-				            		//gp_progressBarOff();
-				            		
-				            		jsonObj = JSON.parse(data);
-				            		status	= jsonObj.status;
-				            		
-				            		if(status=="SUCCESS"){
-				            			userUniqueId = jsonObj.userUniqueId;
-				            			alert("บันทึกเรียบร้อย", function() { 
-				            				lp_reset();
-				    	    		    });
-				            			//alert("บันทึกเรียบร้อย");
-				            			//lp_reset();
-				            		}else{
-				            			alert(jsonObj.errMsg);
-				            			
-				            		}
-				            	}catch(e){
-				            		alert("in lp_save :: " + e);
-				            	}
-				            }
-				        });
-					},function(){
-						$('#userEmail').focus();
-						return;
-					});
-				}
-				
+				$.ajax({
+					async:true,
+		            type: "POST",
+		            url: gv_url,
+		            data: params,
+		            beforeSend: gp_progressBarOn(),
+		            success: function(data){
+		            	var jsonObj 			= null;
+		            	var status				= null;
+		            	var userUniqueId		= 0;
+		            	
+		            	try{
+		            		
+		            		jsonObj = JSON.parse(data);
+		            		status	= jsonObj.status;
+		            		
+		            		if(status=="SUCCESS"){
+		            			userUniqueId = jsonObj.userUniqueId;
+		            			alert("บันทึกเรียบร้อย", function() { 
+		            				lp_reset();
+		    	    		    });
+		            		}else{
+		            			alert(jsonObj.errMsg);
+		            			
+		            		}
+		            	}catch(e){
+		            		alert("in onSave :: " + e);
+		            	}
+		            }
+		        });
 			}catch(e){
-				alert("lp_save :: " + e);
+				alert("onSave :: " + e);
 			}
-			
-			
 		}
 		
 		function lp_reset(){
@@ -381,7 +385,7 @@
 		<div class="container main-container round-sm padding-xl-h">
 				<div class="col-sm-12 toppad" >
 						<div id="seasonTitle" class="padding-md round-sm season-title-head" style="">
-							<h6 class="panel-title" style="font-size:1.0em">เพิ่มผู้ใช้งานระบบ</h6>
+							<h6 class="panel-title" style="font-size:1.0em"><%=titlePage%></h6>
 						</div>
            				<div class="panel-body">
            					<table border="0" width="100%">

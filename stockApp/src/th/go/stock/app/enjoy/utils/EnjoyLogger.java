@@ -25,8 +25,7 @@ public class EnjoyLogger {
 			prop.put("log4j.rootLogger", "INFO, xDefault");
 			prop.put("log4j.appender.xDefault"			, "org.apache.log4j.RollingFileAppender");
 //			prop.put("log4j.appender.xDefault"			, "org.apache.log4j.DailyRollingFileAppender");
-//			prop.put("log4j.appender.xDefault.file"		, ConfigFile.getPathLog() + "/System.log.txt");
-			prop.put("log4j.appender.xDefault.file"		, "${jboss.server.log.dir}/System.log.txt");
+			prop.put("log4j.appender.xDefault.file"		, ConfigFile.getPathLog() + "/System.log.txt");
 			prop.put("log4j.appender.xDefault.datePattern", "'.'yyyy-MM-dd");
 			prop.put("log4j.appender.xDefault.layout"					, "org.apache.log4j.PatternLayout");
 			prop.put("log4j.appender.xDefault.layout.ConversionPattern"	, "%d [%t] %-5p %c - %m%n");

@@ -168,6 +168,7 @@ public class AddressDao {
 								   + "  where subdistrictId <> 000000 "
 								   + " and provinceId <> 00 "
 								   + " and districtId <> 0000 "
+								   + " and SUBSTR(subdistrictId, 5, 2) <> 00"
 								   + " and subdistrictName like ('"+subdistrict+"%') "
 								   + " and provinceId = "+provinceId
 								   + " and districtId = "+districtId

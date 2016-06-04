@@ -131,7 +131,7 @@
 			      },
 			      select: function( event, ui ) {
 			    	  lp_getProductDetailByName();
-			    	  $('#btnSearch').click();
+			    	  //$('#btnSearch').click();
 			      }
 			});
 			

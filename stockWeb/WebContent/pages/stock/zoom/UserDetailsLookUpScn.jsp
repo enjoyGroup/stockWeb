@@ -147,6 +147,7 @@
 <body>
 	<form id="frm" onsubmit="return false;">
 		<input type="hidden" id="service" 	name="service" value="servlet.UserDetailsLookUpServlet" />
+		<input type="hidden" id="tin" 	name="tin" value="<%=userDetailsLookUpForm.getTin()%>" />
 		<div style="background-color:white;width: 100%;height: 100%;">
 			<table class="user-register-table user-search-table" width="100%" border="0" cellpadding="5" cellspacing="5">
         		<tr>

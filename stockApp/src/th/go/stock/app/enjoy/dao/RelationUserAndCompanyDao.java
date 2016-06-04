@@ -106,6 +106,8 @@ public class RelationUserAndCompanyDao {
 			hql				= "select count(*) cou from relationuserncompany"
 								+ " where userUniqueId 	= " + userUniqueId + " and not in (" + notInUserUniqueId + ")";
 			
+			logger.info("[checkDupUser] hql :: " + hql);
+			
 			query			= session.createSQLQuery(hql);
 			
 			query.addScalar("cou"			, new IntegerType());
@@ -121,7 +123,7 @@ public class RelationUserAndCompanyDao {
 			
 			
 		}catch(Exception e){
-			logger.info(e.getMessage());
+			logger.error(e);
 			e.printStackTrace();
 		}finally{
 			session.close();

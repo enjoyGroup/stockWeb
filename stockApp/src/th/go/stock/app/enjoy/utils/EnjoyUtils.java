@@ -229,7 +229,7 @@ public class EnjoyUtils {
 				strFormat = strFormat + "0";	
 			}		
 			DecimalFormat df	= new DecimalFormat(strFormat);			
-			stFloat 			= df.format(Double.parseDouble(stFloat));	
+			stFloat 			= df.format(parseDouble(stFloat));	
 		}else{
 			stFloat = "0.00";
 		}

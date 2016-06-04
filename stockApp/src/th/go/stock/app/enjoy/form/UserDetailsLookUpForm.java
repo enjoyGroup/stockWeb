@@ -14,6 +14,7 @@ public class UserDetailsLookUpForm {
 	private String					orderBy;
 	private String					sortBy;
 	private String					likeFlag;
+	private	String					tin;
 	
 	private List<ComboBean> 		columnList;
 	private List<ComboBean> 		orderByList;
@@ -32,7 +33,7 @@ public class UserDetailsLookUpForm {
 		this.orderBy			= "";
 		this.sortBy				= "";
 		this.likeFlag			= "";
-		
+		this.tin				= "";
 		
 		this.columnList				= new ArrayList<ComboBean>();
 		this.orderByList			= new ArrayList<ComboBean>();
@@ -147,5 +148,13 @@ public class UserDetailsLookUpForm {
 
 	public void setHashTable(HashMap hashTable) {
 		this.hashTable = hashTable;
+	}
+
+	public String getTin() {
+		return tin;
+	}
+
+	public void setTin(String tin) {
+		this.tin = tin;
 	}
 }

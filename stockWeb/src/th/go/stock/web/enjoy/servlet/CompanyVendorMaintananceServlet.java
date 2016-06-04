@@ -263,7 +263,7 @@ public class CompanyVendorMaintananceServlet extends EnjoyStandardSvc {
 		try{
 			pageMode 					= EnjoyUtil.nullToStr(request.getParameter("pageMode"));
 			vendorCode 					= EnjoyUtil.nullToStr(request.getParameter("vendorCode"));
-			tin 						= EnjoyUtil.nullToStr(request.getParameter("tin"));
+			tin 						= EnjoyUtil.nullToStr(request.getParameter("tin")).replaceAll("-", "");
 			branchName 					= EnjoyUtil.nullToStr(request.getParameter("branchName"));
 			vendorName 					= EnjoyUtil.nullToStr(request.getParameter("vendorName"));
 			buildingName				= EnjoyUtil.nullToStr(request.getParameter("buildingName"));

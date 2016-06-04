@@ -69,7 +69,7 @@ public class RelationGroupCustomerDao {
 			}	
 			
 		}catch(Exception e){
-			logger.info("[searchByCriteria] " + e.getMessage());
+			logger.error(e);
 			e.printStackTrace();
 			throw new EnjoyException("error searchByCriteria");
 		}finally{
@@ -93,6 +93,10 @@ public class RelationGroupCustomerDao {
 															+ ", groupSalePrice	= :groupSalePrice"
 										+ " where cusGroupCode = :cusGroupCode";
 			
+			logger.info("[updateRelationGroupCustomer] cusGroupName :: " + relationGroupCustomerBean.getCusGroupName());
+			logger.info("[updateRelationGroupCustomer] groupSalePrice :: " + EnjoyUtils.parseInt(relationGroupCustomerBean.getGroupSalePrice()));
+			logger.info("[updateRelationGroupCustomer] cusGroupCode :: " + EnjoyUtils.parseInt(relationGroupCustomerBean.getCusGroupCode()));
+			
 			query = session.createQuery(hql);
 			query.setParameter("cusGroupName"			, relationGroupCustomerBean.getCusGroupName());
 			query.setParameter("groupSalePrice"			, EnjoyUtils.parseInt(relationGroupCustomerBean.getGroupSalePrice()));
@@ -102,7 +106,7 @@ public class RelationGroupCustomerDao {
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			logger.info(e.getMessage());
+			logger.error(e);
 			throw new EnjoyException("Error updateRelationGroupCustomer");
 		}finally{
 			
@@ -129,7 +133,7 @@ public class RelationGroupCustomerDao {
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			logger.info(e.getMessage());
+			logger.error(e);
 			throw new EnjoyException("Error rejectRelationGroupCustomer");
 		}finally{
 			
@@ -147,7 +151,7 @@ public class RelationGroupCustomerDao {
 		try{
 			
 			relationgroupcustomer 	= new Relationgroupcustomer();
-			relationgroupcustomer.setCusGroupCode	(EnjoyUtils.parseInt(relationGroupCustomerBean.getSeq()));
+//			relationgroupcustomer.setCusGroupCode	(EnjoyUtils.parseInt(relationGroupCustomerBean.getSeq()));
 			relationgroupcustomer.setCusGroupName	(relationGroupCustomerBean.getCusGroupName());
 			relationgroupcustomer.setGroupSalePrice	(EnjoyUtils.parseInt(relationGroupCustomerBean.getGroupSalePrice()));
 			relationgroupcustomer.setCusGroupStatus	("A");
@@ -156,7 +160,7 @@ public class RelationGroupCustomerDao {
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			logger.info(e.getMessage());
+			logger.error(e);
 			throw new EnjoyException("Error insertRelationGroupCustomer");
 		}finally{
 			relationgroupcustomer 	= null;

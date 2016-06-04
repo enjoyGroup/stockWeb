@@ -100,7 +100,7 @@
 
 			      },
 			      select: function( event, ui ) {
-			    	  $('#btnSearch').click();
+			    	  //$('#btnSearch').click();
 			      }
 			});
 			

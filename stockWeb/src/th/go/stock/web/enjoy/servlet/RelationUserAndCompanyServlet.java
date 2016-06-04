@@ -216,9 +216,13 @@ public class RelationUserAndCompanyServlet extends EnjoyStandardSvc {
 //	   RelationUserAndCompanyBean			beanTemp					= null;
 //	   String								notInUserUniqueId			= "";
 //	   int									cou							= 0;
+//	   String								tin							= "";
 //	   
 //	   try{
 //		   relationUserAndCompanyList		= this.form.getRelationUserAndCompanyList();
+//		   tin								= EnjoyUtil.nullToStr(request.getParameter("tin"));
+//		   
+//		   logger.info("[lp_validate] tin :: " + tin);
 //		   
 //		   /*Begin Check ภายในบริษัทตัวเองว่ามี User ซ้ำมั้ย*/
 //		   for(int i=0;i<relationUserAndCompanyList.size();i++){

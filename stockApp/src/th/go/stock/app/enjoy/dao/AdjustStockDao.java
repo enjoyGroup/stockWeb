@@ -60,8 +60,8 @@ public class AdjustStockDao {
 				bean.setAdjustNo			(EnjoyUtils.nullToStr(row[0]));
 				bean.setAdjustDate			(EnjoyUtils.dateToThaiDisplay(row[1]));
 				bean.setProductCode			(EnjoyUtils.nullToStr(row[2]));
-				bean.setQuanOld				(EnjoyUtils.nullToStr(row[3]));
-				bean.setQuanNew				(EnjoyUtils.nullToStr(row[4]));
+				bean.setQuanOld				(EnjoyUtils.convertFloatToDisplay(row[3], 2));
+				bean.setQuanNew				(EnjoyUtils.convertFloatToDisplay(row[4], 2));
 				bean.setRemark				(EnjoyUtils.nullToStr(row[5]));
 				
 				adjustStockBeanList.add(bean);

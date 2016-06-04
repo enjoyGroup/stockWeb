@@ -503,7 +503,7 @@
 												</tr>
 												<tr>
 													<td align="right">
-														จังหวัด :
+														จังหวัด<span style="color: red;"><b>*</b></span> :
 													</td>
 													<td align="left" >
 														<input  type="text" 
@@ -515,7 +515,7 @@
 														/>
 													</td>
 													<td align="right">
-														อำเภอ/เขต :
+														อำเภอ/เขต<span style="color: red;"><b>*</b></span> :
 													</td>
 													<td align="left" colspan="3">
 														<input  type="text"
@@ -529,7 +529,7 @@
 												</tr>
 								        		<tr>
 													<td align="right">
-														ตำบล/แขวง :
+														ตำบล/แขวง<span style="color: red;"><b>*</b></span> :
 													</td>
 													<td align="left" >
 														<input  type="text"
@@ -541,7 +541,7 @@
 															/>
 													</td>
 													<td align="right">
-														รหัสไปรษณีย์:
+														รหัสไปรษณีย์<span style="color: red;"><b>*</b></span> :
 													</td>
 													<td align="left" colspan="3">
 														<input  type="text" 
@@ -557,7 +557,7 @@
 												</tr>
 								        		<tr>
 								        			<td align="right">
-								        				เบอร์โทร :
+								        				เบอร์โทร<span style="color: red;"><b>*</b></span> :
 								        			</td>
 								        			<td align="left">
 								        				<input  type="text" 

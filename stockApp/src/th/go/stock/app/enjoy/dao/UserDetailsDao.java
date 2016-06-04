@@ -784,13 +784,20 @@ public class UserDetailsDao {
 		UserDetailsBean 		userDetailsBean			= null;
 		List<UserDetailsBean> 	listData 				= new ArrayList<UserDetailsBean>();
 		String					find					= null;
+		String					specialCriteria			= "";
 		
 		try{
 			find				= form.getFind();
-			hql					= "select * from (select a.*, CONCAT(a.userName, ' ', a.userSurname) userFullName, b.userStatusName"
+			
+			if(!form.getTin().equals("")){
+				specialCriteria = " and a.userUniqueId not in (select c.userUniqueId from relationuserncompany c where c.tin = '"+form.getTin()+"')";
+			}
+			
+			hql					= "select t.* from (select a.*, CONCAT(a.userName, ' ', a.userSurname) userFullName, b.userStatusName"
 													+ "	from userdetails a, refuserstatus b "
 													+ "	where b.userStatusCode = a.userStatus"
 													+ " 	and a.userStatus = 'A'"
+													+ specialCriteria
 													+ " 	and a.userId <> 'admin') t where 1=1";
 			
 			if(find!=null && !find.equals("")){
