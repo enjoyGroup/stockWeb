@@ -23,6 +23,7 @@ public class ReciveStockSearchForm {
 	private List<ReciveOrderMasterBean> dataList;
 	private HashMap						hashTable;
 	private List<ComboBean> 			statusCombo;
+	private List<ComboBean> 			companyCombo;
 	
 	public ReciveStockSearchForm(){
 		this.reciveOrderMasterBean 	= new ReciveOrderMasterBean();
@@ -34,7 +35,8 @@ public class ReciveStockSearchForm {
 		this.totalRecord			= "";
 		this.dataList				= new ArrayList<ReciveOrderMasterBean>();
 		this.hashTable				= new HashMap();
-		this.statusCombo				= new ArrayList<ComboBean>();
+		this.statusCombo			= new ArrayList<ComboBean>();
+		this.companyCombo			= new ArrayList<ComboBean>();
 	}
 
 	public ReciveOrderMasterBean getReciveOrderMasterBean() {
@@ -115,5 +117,13 @@ public class ReciveStockSearchForm {
 
 	public void setStatusCombo(List<ComboBean> statusCombo) {
 		this.statusCombo = statusCombo;
+	}
+
+	public List<ComboBean> getCompanyCombo() {
+		return companyCombo;
+	}
+
+	public void setCompanyCombo(List<ComboBean> companyCombo) {
+		this.companyCombo = companyCombo;
 	}
 }

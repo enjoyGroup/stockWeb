@@ -468,7 +468,6 @@
 		            success: function(data){
 		            	var jsonObj 			= null;
 		            	var status				= null;
-		            	var lv_reciveNo			= "";
 		            	
 		            	try{
 		            		//gp_progressBarOff();
@@ -478,8 +477,8 @@
 		            		
 		            		if(status=="SUCCESS"){
 		            			alert("บันทึกเรียบร้อย", function() { 
-		            				lv_reciveNo = jsonObj.reciveNo;
-		            				window.location = gv_url + "?service=" + $("#service").val() + "&pageAction=getDetail&reciveNo=" + lv_reciveNo;
+		            				var params = "reciveNo=" + jsonObj.reciveNo + "&tin=" + jsonObj.tin;
+		            				window.location = gv_url + "?service=" + $("#service").val() + "&pageAction=getDetail&" + params;
 		    	    		    });
 		            			//alert("บันทึกเรียบร้อย");
 		            			//lp_reset();
@@ -500,11 +499,14 @@
 		}
 		
 		function lp_reset(){
+			var params = "";
+			
 			try{
 				if($("#pageMode").val()=="NEW"){
 					window.location = gv_url + "?service=" + $("#service").val() + "&pageAction=new";
 				}else{
-					window.location = gv_url + "?service=" + $("#service").val() + "&pageAction=getDetail&reciveNo=" + $('#reciveNo').val();
+					params = "reciveNo=" + $('#reciveNo').val() + "&tin=" + $("#tin").val();
+					window.location = gv_url + "?service=" + $("#service").val() + "&pageAction=getDetail&" + params;
 				}
 			}catch(e){
 				alert("lp_reset :: " + e);
@@ -1288,11 +1290,20 @@
 														บริษัทที่สังกัด<span style="color: red;"><b>*</b></span> :
 													</td>
 								        			<td align="left" colspan="3">
-								        				<select id="tin" name="tin" style="width: 220px;" >
-								        					<% for(ComboBean comboBean:companyCombo){ %>
-								        					<option value="<%=comboBean.getCode()%>" <%if(reciveOrderMasterBean.getTin().equals(comboBean.getCode())){ %> selected <%} %> ><%=comboBean.getDesc()%></option>
-								        					<%} %>
-								        				</select>
+								        				<%if(pageMode.equals(reciveStockMaintananceForm.EDIT)){ %>
+								        					<select id="tinDis" name="tinDis" style="width: 220px;" >
+									        					<% for(ComboBean comboBean:companyCombo){ %>
+									        					<option value="<%=comboBean.getCode()%>" <%if(reciveOrderMasterBean.getTin().equals(comboBean.getCode())){ %> selected <%} %> ><%=comboBean.getDesc()%></option>
+									        					<%} %>
+									        				</select>
+									        				<input type="hidden" id="tin" name="tin" value="<%=reciveOrderMasterBean.getTin()%>" />
+								        				<%}else{%>
+								        					<select id="tin" name="tin" style="width: 220px;" >
+									        					<% for(ComboBean comboBean:companyCombo){ %>
+									        					<option value="<%=comboBean.getCode()%>" <%if(reciveOrderMasterBean.getTin().equals(comboBean.getCode())){ %> selected <%} %> ><%=comboBean.getDesc()%></option>
+									        					<%} %>
+									        				</select>
+								        				<%}%>
 								        			</td>
 								        		</tr>
 									        </table>

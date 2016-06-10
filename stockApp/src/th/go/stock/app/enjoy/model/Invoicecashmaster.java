@@ -1,9 +1,7 @@
 package th.go.stock.app.enjoy.model;
 
 import java.io.Serializable;
-
 import javax.persistence.*;
-
 import java.math.BigDecimal;
 
 
@@ -16,8 +14,8 @@ import java.math.BigDecimal;
 public class Invoicecashmaster implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	@Id
-	private String invoiceCode;
+	@EmbeddedId
+	private InvoicecashmasterPK id;
 
 	private String branchName;
 
@@ -41,25 +39,23 @@ public class Invoicecashmaster implements Serializable {
 
 	private BigDecimal invoiceVat;
 
+	private String remark;
+
 	private BigDecimal saleCommission;
 
 	private int saleUniqueId;
 
 	private int userUniqueId;
-	
-	private String tin;
-	
-	private String remark;
 
 	public Invoicecashmaster() {
 	}
 
-	public String getInvoiceCode() {
-		return this.invoiceCode;
+	public InvoicecashmasterPK getId() {
+		return this.id;
 	}
 
-	public void setInvoiceCode(String invoiceCode) {
-		this.invoiceCode = invoiceCode;
+	public void setId(InvoicecashmasterPK id) {
+		this.id = id;
 	}
 
 	public String getBranchName() {
@@ -71,7 +67,7 @@ public class Invoicecashmaster implements Serializable {
 	}
 
 	public String getCusCode() {
-		return cusCode;
+		return this.cusCode;
 	}
 
 	public void setCusCode(String cusCode) {
@@ -150,6 +146,14 @@ public class Invoicecashmaster implements Serializable {
 		this.invoiceVat = invoiceVat;
 	}
 
+	public String getRemark() {
+		return this.remark;
+	}
+
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
+
 	public BigDecimal getSaleCommission() {
 		return this.saleCommission;
 	}
@@ -172,22 +176,6 @@ public class Invoicecashmaster implements Serializable {
 
 	public void setUserUniqueId(int userUniqueId) {
 		this.userUniqueId = userUniqueId;
-	}
-
-	public String getTin() {
-		return tin;
-	}
-
-	public void setTin(String tin) {
-		this.tin = tin;
-	}
-
-	public String getRemark() {
-		return remark;
-	}
-
-	public void setRemark(String remark) {
-		this.remark = remark;
 	}
 
 }

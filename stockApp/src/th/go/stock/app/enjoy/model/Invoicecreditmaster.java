@@ -14,8 +14,8 @@ import java.math.BigDecimal;
 public class Invoicecreditmaster implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	@Id
-	private String invoiceCode;
+	@EmbeddedId
+	private InvoicecreditmasterPK id;
 
 	private String branchName;
 
@@ -39,25 +39,23 @@ public class Invoicecreditmaster implements Serializable {
 
 	private BigDecimal invoiceVat;
 
+	private String remark;
+
 	private BigDecimal saleCommission;
 
 	private int saleUniqueId;
 
 	private int userUniqueId;
-	
-	private String tin;
-	
-	private String remark;
 
 	public Invoicecreditmaster() {
 	}
 
-	public String getInvoiceCode() {
-		return this.invoiceCode;
+	public InvoicecreditmasterPK getId() {
+		return this.id;
 	}
 
-	public void setInvoiceCode(String invoiceCode) {
-		this.invoiceCode = invoiceCode;
+	public void setId(InvoicecreditmasterPK id) {
+		this.id = id;
 	}
 
 	public String getBranchName() {
@@ -69,7 +67,7 @@ public class Invoicecreditmaster implements Serializable {
 	}
 
 	public String getCusCode() {
-		return cusCode;
+		return this.cusCode;
 	}
 
 	public void setCusCode(String cusCode) {
@@ -148,6 +146,14 @@ public class Invoicecreditmaster implements Serializable {
 		this.invoiceVat = invoiceVat;
 	}
 
+	public String getRemark() {
+		return this.remark;
+	}
+
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
+
 	public BigDecimal getSaleCommission() {
 		return this.saleCommission;
 	}
@@ -170,22 +176,6 @@ public class Invoicecreditmaster implements Serializable {
 
 	public void setUserUniqueId(int userUniqueId) {
 		this.userUniqueId = userUniqueId;
-	}
-
-	public String getTin() {
-		return tin;
-	}
-
-	public void setTin(String tin) {
-		this.tin = tin;
-	}
-
-	public String getRemark() {
-		return remark;
-	}
-
-	public void setRemark(String remark) {
-		this.remark = remark;
 	}
 
 }

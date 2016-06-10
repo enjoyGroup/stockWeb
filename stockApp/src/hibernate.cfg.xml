@@ -37,9 +37,11 @@
 		<mapping class="th.go.stock.app.enjoy.model.Invoicecashdetail" />
 		<mapping class="th.go.stock.app.enjoy.model.InvoicecashdetailPK" />
 		<mapping class="th.go.stock.app.enjoy.model.Invoicecashmaster" />
+		<mapping class="th.go.stock.app.enjoy.model.InvoicecashmasterPK" />
 		<mapping class="th.go.stock.app.enjoy.model.Invoicecreditdetail" />
 		<mapping class="th.go.stock.app.enjoy.model.InvoicecreditdetailPK" />
 		<mapping class="th.go.stock.app.enjoy.model.Invoicecreditmaster" />
+		<mapping class="th.go.stock.app.enjoy.model.InvoicecreditmasterPK" />
 		<mapping class="th.go.stock.app.enjoy.model.Productdetail" />
 		<mapping class="th.go.stock.app.enjoy.model.ProductdetailPK" />
 		<mapping class="th.go.stock.app.enjoy.model.Productgroup" />
@@ -50,6 +52,7 @@
 		<mapping class="th.go.stock.app.enjoy.model.Reciveordedetail" />
 		<mapping class="th.go.stock.app.enjoy.model.ReciveordedetailPK" />
 		<mapping class="th.go.stock.app.enjoy.model.Reciveordermaster" />
+		<mapping class="th.go.stock.app.enjoy.model.ReciveordermasterPK" />
 		<mapping class="th.go.stock.app.enjoy.model.Refcompanystatus" />
 		<mapping class="th.go.stock.app.enjoy.model.Refconstantcode" />
 		<mapping class="th.go.stock.app.enjoy.model.Refcustomerstatus" />

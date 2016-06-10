@@ -341,7 +341,8 @@
 		            		
 		            		if(status=="SUCCESS"){
 		            			alert("บันทึกเรียบร้อย", function() { 
-		            				window.location = gv_url + "?service=" + $("#service").val() + "&pageAction=getDetail&invoiceCode=" + jsonObj.invoiceCode;
+		            				var params = "invoiceCode=" + jsonObj.invoiceCode + "&tin=" + jsonObj.tin;
+		            				window.location = gv_url + "?service=" + $("#service").val() + "&pageAction=getDetail&" + params;
 				    		    });
 		            			//alert("บันทึกเรียบร้อย");//alert(jsonObj.invoiceCode);
 		            			//window.location = gv_url + "?service=" + $("#service").val() + "&pageAction=getDetail&invoiceCode=" + jsonObj.invoiceCode;
@@ -388,7 +389,8 @@
 			            		
 			            		if(status=="SUCCESS"){
 			            			alert("ยกเลิกเรียบร้อย", function() { 
-			            				window.location = gv_url + "?service=" + $("#service").val() + "&pageAction=getDetail&invoiceCode=" + jsonObj.invoiceCode;
+			            				var params = "invoiceCode=" + jsonObj.invoiceCode + "&tin=" + jsonObj.tin;
+			            				window.location = gv_url + "?service=" + $("#service").val() + "&pageAction=getDetail&" + params;
 					    		    });
 			            			//alert("ยกเลิกเรียบร้อย");
 			            			//window.location = gv_url + "?service=" + $("#service").val() + "&pageAction=getDetail&invoiceCode=" + jsonObj.invoiceCode;
@@ -1232,9 +1234,11 @@
 		
 		function lp_print(){
 			
+			var params = "";
+			
 			try{
-				
-				$('#printSection').attr('src', gv_url + "?" + gv_service + "&pageAction=print&invoiceCode=" + $("#invoiceCode").val());
+				params = "invoiceCode=" + $("#invoiceCode").val() + "&tin=" + $("#tin").val();
+				$('#printSection').attr('src', gv_url + "?" + gv_service + "&pageAction=print&" + params);
 				
 			}catch(e){
 				alert("lp_print :: " + e);
@@ -1332,7 +1336,8 @@
 			            		
 			            		if(status=="SUCCESS"){
 			            			alert("ปรับปรุงงบการขายเงินเชื่อเรียบร้อย", function() { 
-			            				window.location = gv_url + "?service=" + $("#service").val() + "&pageAction=getDetail&invoiceCode=" + jsonObj.invoiceCode;
+			            				var params = "invoiceCode=" + jsonObj.invoiceCode + "&tin=" + jsonObj.tin;
+			            				window.location = gv_url + "?service=" + $("#service").val() + "&pageAction=getDetail&" + params;
 					    		    });
 			            		}else{
 			            			alert(jsonObj.errMsg);
@@ -1725,9 +1730,7 @@
 									        				<tr>
 									        					<td width="10%" align="right" valign="top">หมายเหต :</td>
 									        					<td width="90%" align="left">
-									        						<textarea rows="3" style="width: 100%;" id="remark" name="remark">
-											        					<%=invoiceCashMasterBean.getRemark()%>
-											        				</textarea>
+									        						<textarea rows="3" style="width: 100%;" id="remark" name="remark"><%=invoiceCashMasterBean.getRemark()%></textarea>
 									        					</td>
 									        				</tr>
 									        			</table>

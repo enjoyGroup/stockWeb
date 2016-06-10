@@ -450,9 +450,7 @@
 								        				หมายเหตุ :&nbsp;
 								        			</td>
 								        			<td align="left">
-								        				<textarea rows="3" style="width: 100%;" id="remark" name="remark">
-								        				<%=userDetailsBean.getRemark() %>
-								        				</textarea>
+								        				<textarea rows="3" style="width: 100%;" id="remark" name="remark"><%=userDetailsBean.getRemark() %></textarea>
 								        			</td>
 								        		</tr>
 								        		<tr>

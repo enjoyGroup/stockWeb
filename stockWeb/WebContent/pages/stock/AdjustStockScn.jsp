@@ -402,9 +402,7 @@
 							        				หมายเหต :
 							        			</td>
 							        			<td align="left" colspan="5">
-							        				<textarea rows="4" style="width: 500px;" id="remark" name="remark" >
-							        					<%=adjustStockBean.getRemark()%>
-							        				</textarea>
+							        				<textarea rows="4" style="width: 500px;" id="remark" name="remark" ><%=adjustStockBean.getRemark()%></textarea>
 							        			</td>
 							        		</tr>
 							        		<tr>

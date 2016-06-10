@@ -4,11 +4,11 @@ import java.io.Serializable;
 import javax.persistence.*;
 
 /**
- * The primary key class for the reciveordedetail database table.
+ * The primary key class for the reciveordermaster database table.
  * 
  */
 @Embeddable
-public class ReciveordedetailPK implements Serializable {
+public class ReciveordermasterPK implements Serializable {
 	//default serial version id, required for serializable classes.
 	private static final long serialVersionUID = 1L;
 
@@ -16,9 +16,7 @@ public class ReciveordedetailPK implements Serializable {
 
 	private String tin;
 
-	private int seq;
-
-	public ReciveordedetailPK() {
+	public ReciveordermasterPK() {
 	}
 	public String getReciveNo() {
 		return this.reciveNo;
@@ -32,25 +30,18 @@ public class ReciveordedetailPK implements Serializable {
 	public void setTin(String tin) {
 		this.tin = tin;
 	}
-	public int getSeq() {
-		return this.seq;
-	}
-	public void setSeq(int seq) {
-		this.seq = seq;
-	}
 
 	public boolean equals(Object other) {
 		if (this == other) {
 			return true;
 		}
-		if (!(other instanceof ReciveordedetailPK)) {
+		if (!(other instanceof ReciveordermasterPK)) {
 			return false;
 		}
-		ReciveordedetailPK castOther = (ReciveordedetailPK)other;
+		ReciveordermasterPK castOther = (ReciveordermasterPK)other;
 		return 
 			this.reciveNo.equals(castOther.reciveNo)
-			&& this.tin.equals(castOther.tin)
-			&& (this.seq == castOther.seq);
+			&& this.tin.equals(castOther.tin);
 	}
 
 	public int hashCode() {
@@ -58,7 +49,6 @@ public class ReciveordedetailPK implements Serializable {
 		int hash = 17;
 		hash = hash * prime + this.reciveNo.hashCode();
 		hash = hash * prime + this.tin.hashCode();
-		hash = hash * prime + this.seq;
 		
 		return hash;
 	}

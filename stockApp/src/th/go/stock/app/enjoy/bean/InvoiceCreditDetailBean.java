@@ -16,6 +16,7 @@ public class InvoiceCreditDetailBean {
 	private String unitCode;
 	private String unitName;
 	private String quanDiscount;
+	private String tin;
 	
 	public InvoiceCreditDetailBean(){
 		this.invoiceCode 	= "";
@@ -32,6 +33,7 @@ public class InvoiceCreditDetailBean {
 		this.unitCode		= "";
 		this.unitName		= "";
 		this.quanDiscount	= "0.00";
+		this.tin			= "";
 	}
 
 	public String getInvoiceCode() {
@@ -144,5 +146,13 @@ public class InvoiceCreditDetailBean {
 
 	public void setQuanDiscount(String quanDiscount) {
 		this.quanDiscount = quanDiscount;
+	}
+
+	public String getTin() {
+		return tin;
+	}
+
+	public void setTin(String tin) {
+		this.tin = tin;
 	}
 }

@@ -9,6 +9,7 @@
 	InvoiceCreditMasterBean 		invoiceCreditMasterBean = updateInvoiceCreditSearchForm.getInvoiceCreditMasterBean();
 	List<InvoiceCreditMasterBean> 	dataList 				= updateInvoiceCreditSearchForm.getDataList();
 	String							titlePage				= updateInvoiceCreditSearchForm.getTitlePage();
+	List<ComboBean> 				companyCombo 			= updateInvoiceCreditSearchForm.getCompanyCombo();
 %>
 
 <html>
@@ -71,6 +72,10 @@
 			 
 			$('#btnSearch').click(function(){ 
 				try{
+					if(!gp_validateEmptyObj(new Array( "tin:บริษัทที่สังกัด"))){
+						return false;
+					}
+					
 					$.ajax({
 						async:true,
 			            type: "POST",
@@ -101,9 +106,11 @@
 			
 		});
 		
-		function lp_sendEditPage(av_val){
+		function lp_sendEditPage(av_invoiceCode, av_tin){
+			var params = "";
 			try{
-				window.location.replace(gv_url + "?service=servlet.InvoiceCashMaintananceServlet&pageAction=getDetail&invoiceCode=" + av_val + "&updateCredit=Y");
+				params = "invoiceCode=" + av_invoiceCode + "&tin=" + av_tin + "&updateCredit=Y";
+				window.location.replace(gv_url + "?service=servlet.InvoiceCashMaintananceServlet&pageAction=getDetail&" + params);
 			}catch(e){
 				alert("lp_sendEditPage :: " + e);
 			}
@@ -196,6 +203,16 @@
 												<div class="panel-body" align="center">
 										        	<table width="100%" border="0" cellpadding="5" cellspacing="5">
 										        		<tr>
+										        			<td align="right">
+																บริษัทที่สังกัด<span style="color: red;"><b>*</b></span> :
+															</td>
+										        			<td align="left">
+										        				<select id="tin" name="tin" style="width: 220px;">
+										        					<% for(ComboBean comboBean:companyCombo){ %>
+										        					<option value="<%=comboBean.getCode()%>" <%if(invoiceCreditMasterBean.getTin().equals(comboBean.getCode())){ %> selected <%} %> ><%=comboBean.getDesc()%></option>
+										        					<%} %>
+										        				</select>
+										        			</td>
 										        			<td align="right" width="150px;">
 										        				เลขที่ใบเสร็จ  : &nbsp;
 										        			</td>
@@ -229,7 +246,7 @@
 										        			<td align="right">
 										        				ชื่อลุกค้า :&nbsp;
 										        			</td>
-										        			<td align="left" colspan="3">
+										        			<td align="left" colspan="5">
 										        				<input type='text' 
 										        					   id="cusFullName" 
 										        					   name='cusFullName' 
@@ -237,7 +254,7 @@
 										        			</td>
 										        		</tr>
 										        		<tr>
-										        			<td align="left" colspan="4">
+										        			<td align="left" colspan="6">
 										        				<span style="color: red;">*ถ้าต้องการค้นหาทั้งหมดให้ระบุช่องนั้นเป็น *** (ยกเว้นวันที่)</span>
 										        				<input type="button" id="btnSearch" class='btn btn-primary pull-right padding-sm' style="margin-right:12px; padding-right:24px; padding-left:24px;" value='ค้นหา'/>
 										        				<input type="button" id="btnReset" class='btn pull-right padding-sm'  style="margin-right:12px" value='เริ่มใหม่' />
@@ -292,7 +309,7 @@
 													if(dataList.size()>0){
 														for(InvoiceCreditMasterBean bean:dataList){
 												%>
-															<tr class="rowSelect" onclick="lp_sendEditPage('<%=bean.getInvoiceCash()%>')" >
+															<tr class="rowSelect" onclick="lp_sendEditPage('<%=bean.getInvoiceCash()%>', '<%=bean.getTin()%>')" >
 																<td style="text-align:center"><%=seq%></td>
 																<td align="center"><%=bean.getInvoiceCode()%></td>
 																<td align="center"><%=bean.getInvoiceTypeDesc()%></td>

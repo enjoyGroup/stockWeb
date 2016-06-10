@@ -96,7 +96,7 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
  				this.onLoad();
  				request.setAttribute("target", Constants.PAGE_URL +"/ReciveStockMaintananceScn.jsp");
  			}else if(pageAction.equals("getDetail")){
- 				this.getDetail("0");
+ 				this.getDetail("0", "0");
  				request.setAttribute("target", Constants.PAGE_URL +"/ReciveStockMaintananceScn.jsp");
  			}else if(pageAction.equals("save")){
 				this.onSave();
@@ -228,7 +228,7 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 		}
 	}
 	
-	private void getDetail(String reciveNo) throws EnjoyException{
+	private void getDetail(String reciveNo, String tin) throws EnjoyException{
 		logger.info("[getDetail][Begin]");
 		
 		ReciveOrderMasterBean 			reciveOrderMasterBean		= null;
@@ -242,16 +242,18 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 		List<ReciveOrdeDetailBean> 		reciveOrdeDetailList		= null;
 		
 		try{
-			sessionFactory 				= HibernateUtil.getSessionFactory();
-			session 					= sessionFactory.openSession();
-			reciveNo					= reciveNo.equals("0")?EnjoyUtil.nullToStr(request.getParameter("reciveNo")):reciveNo;
+			sessionFactory 		= HibernateUtil.getSessionFactory();
+			session 			= sessionFactory.openSession();
+			reciveNo			= reciveNo.equals("0")?EnjoyUtil.nullToStr(request.getParameter("reciveNo")):reciveNo;
+			tin					= tin.equals("0")?EnjoyUtil.nullToStr(request.getParameter("tin")):tin;
 			
 			session.beginTransaction();
 			
 			logger.info("[getDetail] reciveNo :: " + reciveNo);
 			
 			reciveOrderMasterBean = new ReciveOrderMasterBean();
-			reciveOrderMasterBean.setReciveNo(reciveNo);
+			reciveOrderMasterBean.setReciveNo	(reciveNo);
+			reciveOrderMasterBean.setTin		(tin);
 			
 			reciveOrderMasterBeanDb				= this.dao.getReciveOrderMaster(session, reciveOrderMasterBean);
 			
@@ -264,6 +266,7 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 				reciveOrdeDetailBean = new ReciveOrdeDetailBean();
 				
 				reciveOrdeDetailBean.setReciveNo(reciveNo);
+				reciveOrdeDetailBean.setTin		(tin);
 				reciveOrdeDetailList = this.dao.getReciveOrdeDetailList(session, reciveOrdeDetailBean);
 				
 				for(ReciveOrdeDetailBean bean:reciveOrdeDetailList){
@@ -368,7 +371,7 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 			
 			/*Begin Section รายละเอียดใบสั่งซื้อ*/
 			if(pageMode.equals(ReciveStockMaintananceForm.NEW)){
-				reciveNo = this.dao.genReciveNo();
+				reciveNo = this.dao.genReciveNo(tin);
 				
 				reciveOrderMasterBean.setReciveNo				(reciveNo);
 				reciveOrderMasterBean.setReciveDate				(EnjoyUtils.dateThaiToDb(reciveDate));
@@ -411,6 +414,7 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 					this.dao.updateReciveOrderMaster(session, reciveOrderMasterBean);
 				}else{
 					reciveOrderMasterBean.setReciveNo				(reciveNo);
+					reciveOrderMasterBean.setTin					(tin);
 					reciveOrderMasterBean.setReciveDate				(EnjoyUtils.dateThaiToDb(reciveDate));
 					reciveOrderMasterBean.setUserUniqueId			(String.valueOf(this.userBean.getUserUniqueId()));
 					reciveOrderMasterBean.setReciveStatus			(reciveStatus);
@@ -422,13 +426,14 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 			
 			/*Begin Section รายการสินค้า*/
 			if(reciveStatus.equals("") || reciveStatus.equals("1") || reciveStatus.equals("2")){
-				this.dao.deleteReciveordedetail(session, reciveNo);
+				this.dao.deleteReciveordedetail(session, reciveNo, tin);
 				
 				for(int i=0;i<reciveOrdeDetailList.size();i++){
 					bean = reciveOrdeDetailList.get(i);
 					if(!bean.getRowStatus().equals(ReciveStockMaintananceForm.DEL)){
 						bean.setReciveNo(reciveNo);
-						bean.setSeqDb(String.valueOf(seqDb));
+						bean.setTin		(tin);
+						bean.setSeqDb	(String.valueOf(seqDb));
 						this.dao.insertReciveOrdeDetail(session, bean);
 						seqDb++;
 						
@@ -455,6 +460,7 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 				bean = new ReciveOrdeDetailBean();
 				
 				bean.setReciveNo(reciveNo);
+				bean.setTin		(tin);
 				reciveOrdeDetailList = this.dao.getReciveOrdeDetailList(session, bean);
 				
 				for(ReciveOrdeDetailBean beanTemp:reciveOrdeDetailList){
@@ -548,8 +554,9 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 			
 			session.getTransaction().commit();
 			
-			obj.put(STATUS, 			SUCCESS);
-			obj.put("reciveNo", 		reciveNo);
+			obj.put(STATUS, 		SUCCESS);
+			obj.put("reciveNo", 	reciveNo);
+			obj.put("tin", 			tin);
 			
 		}catch(EnjoyException e){
 			session.getTransaction().rollback();

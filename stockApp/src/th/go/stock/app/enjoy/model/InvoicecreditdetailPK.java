@@ -14,6 +14,8 @@ public class InvoicecreditdetailPK implements Serializable {
 
 	private String invoiceCode;
 
+	private String tin;
+
 	private int seq;
 
 	public InvoicecreditdetailPK() {
@@ -23,6 +25,12 @@ public class InvoicecreditdetailPK implements Serializable {
 	}
 	public void setInvoiceCode(String invoiceCode) {
 		this.invoiceCode = invoiceCode;
+	}
+	public String getTin() {
+		return this.tin;
+	}
+	public void setTin(String tin) {
+		this.tin = tin;
 	}
 	public int getSeq() {
 		return this.seq;
@@ -41,6 +49,7 @@ public class InvoicecreditdetailPK implements Serializable {
 		InvoicecreditdetailPK castOther = (InvoicecreditdetailPK)other;
 		return 
 			this.invoiceCode.equals(castOther.invoiceCode)
+			&& this.tin.equals(castOther.tin)
 			&& (this.seq == castOther.seq);
 	}
 
@@ -48,6 +57,7 @@ public class InvoicecreditdetailPK implements Serializable {
 		final int prime = 31;
 		int hash = 17;
 		hash = hash * prime + this.invoiceCode.hashCode();
+		hash = hash * prime + this.tin.hashCode();
 		hash = hash * prime + this.seq;
 		
 		return hash;

@@ -685,9 +685,7 @@
 								        				อื่นๆ :
 								        			</td>
 								        			<td align="left" colspan="3">
-								        				<textarea rows="4" style="width: 500px;" id="remark" name="remark" style="float:right;" >
-								        					<%=companyDetailsBean.getRemark()%>
-								        				</textarea>
+								        				<textarea rows="4" style="width: 500px;" id="remark" name="remark" style="float:right;" ><%=companyDetailsBean.getRemark()%></textarea>
 								        			</td>
 								        		</tr>
 								        		<tr>

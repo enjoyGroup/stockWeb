@@ -4,11 +4,11 @@ import java.io.Serializable;
 import javax.persistence.*;
 
 /**
- * The primary key class for the invoicecashdetail database table.
+ * The primary key class for the invoicecashmaster database table.
  * 
  */
 @Embeddable
-public class InvoicecashdetailPK implements Serializable {
+public class InvoicecashmasterPK implements Serializable {
 	//default serial version id, required for serializable classes.
 	private static final long serialVersionUID = 1L;
 
@@ -16,9 +16,7 @@ public class InvoicecashdetailPK implements Serializable {
 
 	private String tin;
 
-	private int seq;
-
-	public InvoicecashdetailPK() {
+	public InvoicecashmasterPK() {
 	}
 	public String getInvoiceCode() {
 		return this.invoiceCode;
@@ -32,25 +30,18 @@ public class InvoicecashdetailPK implements Serializable {
 	public void setTin(String tin) {
 		this.tin = tin;
 	}
-	public int getSeq() {
-		return this.seq;
-	}
-	public void setSeq(int seq) {
-		this.seq = seq;
-	}
 
 	public boolean equals(Object other) {
 		if (this == other) {
 			return true;
 		}
-		if (!(other instanceof InvoicecashdetailPK)) {
+		if (!(other instanceof InvoicecashmasterPK)) {
 			return false;
 		}
-		InvoicecashdetailPK castOther = (InvoicecashdetailPK)other;
+		InvoicecashmasterPK castOther = (InvoicecashmasterPK)other;
 		return 
 			this.invoiceCode.equals(castOther.invoiceCode)
-			&& this.tin.equals(castOther.tin)
-			&& (this.seq == castOther.seq);
+			&& this.tin.equals(castOther.tin);
 	}
 
 	public int hashCode() {
@@ -58,7 +49,6 @@ public class InvoicecashdetailPK implements Serializable {
 		int hash = 17;
 		hash = hash * prime + this.invoiceCode.hashCode();
 		hash = hash * prime + this.tin.hashCode();
-		hash = hash * prime + this.seq;
 		
 		return hash;
 	}

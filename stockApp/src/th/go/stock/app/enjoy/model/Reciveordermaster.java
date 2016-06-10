@@ -14,8 +14,8 @@ import java.math.BigDecimal;
 public class Reciveordermaster implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	@Id
-	private String reciveNo;
+	@EmbeddedId
+	private ReciveordermasterPK id;
 
 	private String billNo;
 
@@ -44,18 +44,16 @@ public class Reciveordermaster implements Serializable {
 	private int userUniqueId;
 
 	private int vendorCode;
-	
-	private String tin;
 
 	public Reciveordermaster() {
 	}
 
-	public String getReciveNo() {
-		return this.reciveNo;
+	public ReciveordermasterPK getId() {
+		return this.id;
 	}
 
-	public void setReciveNo(String reciveNo) {
-		this.reciveNo = reciveNo;
+	public void setId(ReciveordermasterPK id) {
+		this.id = id;
 	}
 
 	public String getBillNo() {
@@ -168,14 +166,6 @@ public class Reciveordermaster implements Serializable {
 
 	public void setVendorCode(int vendorCode) {
 		this.vendorCode = vendorCode;
-	}
-
-	public String getTin() {
-		return tin;
-	}
-
-	public void setTin(String tin) {
-		this.tin = tin;
 	}
 
 }

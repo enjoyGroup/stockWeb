@@ -19,6 +19,7 @@ import th.go.stock.app.enjoy.main.ConfigFile;
 import th.go.stock.app.enjoy.model.Reciveordedetail;
 import th.go.stock.app.enjoy.model.ReciveordedetailPK;
 import th.go.stock.app.enjoy.model.Reciveordermaster;
+import th.go.stock.app.enjoy.model.ReciveordermasterPK;
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
 import th.go.stock.app.enjoy.utils.EnjoyUtils;
 import th.go.stock.app.enjoy.utils.HibernateUtil;
@@ -47,8 +48,9 @@ public class ReciveStockDao {
 			
 			hql					= "select a.*, CONCAT(b.username, ' ', b.userSurname) as usrName, c.reciveStatusName"
 								+ "	from reciveordermaster a, userdetails b, refreciveorderstatus c"
-								+ "	where a.userUniqueId = b.userUniqueId"
-								+ " 	and a.reciveStatus = c.reciveStatusCode";
+								+ "	where a.userUniqueId 	= b.userUniqueId"
+								+ " 	and a.reciveStatus 	= c.reciveStatusCode"
+								+ "		and a.tin			= '" + reciveOrderMasterBean.getTin() + "'";
 			
 			if(!reciveOrderMasterBean.getReciveNo().equals("***")){
 				if(reciveOrderMasterBean.getReciveNo().equals("")){
@@ -78,6 +80,7 @@ public class ReciveStockDao {
 			query.addScalar("usrName"			, new StringType());
 			query.addScalar("reciveStatus"		, new StringType());
 			query.addScalar("reciveStatusName"	, new StringType());
+			query.addScalar("tin"				, new StringType());
 			
 			list		 	= query.list();
 			
@@ -91,18 +94,20 @@ public class ReciveStockDao {
 				logger.info("usrName 			:: " + row[2]);
 				logger.info("reciveStatus 		:: " + row[3]);
 				logger.info("reciveStatusName 	:: " + row[4]);
+				logger.info("tin 				:: " + row[5]);
 				
 				bean.setReciveNo			(EnjoyUtils.nullToStr(row[0]));
 				bean.setReciveDate			(EnjoyUtils.dateToThaiDisplay(row[1]));
 				bean.setUsrName				(EnjoyUtils.nullToStr(row[2]));
 				bean.setReciveStatus		(EnjoyUtils.nullToStr(row[3]));
 				bean.setReciveStatusDesc	(EnjoyUtils.nullToStr(row[4]));
+				bean.setTin					(EnjoyUtils.nullToStr(row[5]));
 				
 				reciveOrderMasterList.add(bean);
 			}	
 			
 		}catch(Exception e){
-			logger.info("[searchByCriteria] " + e.getMessage());
+			logger.error(e);
 			e.printStackTrace();
 			throw new EnjoyException("error searchByCriteria");
 		}finally{
@@ -113,7 +118,6 @@ public class ReciveStockDao {
 		return reciveOrderMasterList;
 		
 	}
-
 	
 	public ReciveOrderMasterBean getReciveOrderMaster(	Session 				session, 
 														ReciveOrderMasterBean 	reciveOrderMasterBean) throws EnjoyException{
@@ -127,7 +131,8 @@ public class ReciveStockDao {
 		try{		
 			hql		= "select *"
 					+ "	from reciveordermaster"
-					+ "	where reciveNo 	= '" + reciveOrderMasterBean.getReciveNo() + "'";
+					+ "	where reciveNo 	= '" + reciveOrderMasterBean.getReciveNo() + "'"
+					+ "		and tin 	= '" + reciveOrderMasterBean.getTin() + "'";
 			
 			logger.info("[getReciveOrderMaster] hql :: " + hql);
 
@@ -212,13 +217,18 @@ public class ReciveStockDao {
 	public void insertReciveordermaster(Session session, ReciveOrderMasterBean 		reciveOrderMasterBean) throws EnjoyException{
 		logger.info("[insertReciveordermaster][Begin]");
 		
-		Reciveordermaster	reciveordermaster						= null;//genReciveNo
+		Reciveordermaster	reciveordermaster	= null;//genReciveNo
+		ReciveordermasterPK	id					= null;
 		
 		try{
 			
-			reciveordermaster = new Reciveordermaster();
+			reciveordermaster 	= new Reciveordermaster();
+			id					= new ReciveordermasterPK();
 			
-			reciveordermaster.setReciveNo				(reciveOrderMasterBean.getReciveNo());
+			id.setReciveNo				(reciveOrderMasterBean.getReciveNo());
+			id.setTin					(reciveOrderMasterBean.getTin());
+			
+			reciveordermaster.setId						(id);
 			reciveordermaster.setReciveDate				(reciveOrderMasterBean.getReciveDate());
 			reciveordermaster.setReciveType				(reciveOrderMasterBean.getReciveType());
 			reciveordermaster.setCreditDay				(EnjoyUtils.parseInt(reciveOrderMasterBean.getCreditDay()));
@@ -233,7 +243,6 @@ public class ReciveStockDao {
 			reciveordermaster.setReciveDiscount			(EnjoyUtils.parseBigDecimal(reciveOrderMasterBean.getReciveDiscount()));
 			reciveordermaster.setReciveVat				(EnjoyUtils.parseBigDecimal(reciveOrderMasterBean.getReciveVat()));
 			reciveordermaster.setReciveTotal			(EnjoyUtils.parseBigDecimal(reciveOrderMasterBean.getReciveTotal()));
-			reciveordermaster.setTin					(reciveOrderMasterBean.getTin());
 			
 			session.saveOrUpdate(reciveordermaster);
 			
@@ -255,22 +264,22 @@ public class ReciveStockDao {
 		Query 							query 								= null;
 		
 		try{
-			hql				= "update  Reciveordermaster set reciveDate 	= :reciveDate"
-												+ ", reciveType				= :reciveType"
-												+ ", creditDay				= :creditDay"
-												+ ", creditExpire			= :creditExpire"
-												+ ", vendorCode				= :vendorCode"
-												+ ", branchName 			= :branchName"
-												+ ", billNo					= :billNo"
-												+ ", priceType				= :priceType"
-												+ ", reciveStatus 			= :reciveStatus"
-												+ ", userUniqueId 			= :userUniqueId"
-												+ ", reciveAmount 			= :reciveAmount"
-												+ ", reciveDiscount 		= :reciveDiscount"
-												+ ", reciveVat 				= :reciveVat"
-												+ ", reciveTotal 			= :reciveTotal"
-												+ ", tin 					= :tin"
-										+ " where reciveNo = :reciveNo";
+			hql				= "update  Reciveordermaster t set t.reciveDate 	= :reciveDate"
+													+ ", t.reciveType			= :reciveType"
+													+ ", t.creditDay			= :creditDay"
+													+ ", t.creditExpire			= :creditExpire"
+													+ ", t.vendorCode			= :vendorCode"
+													+ ", t.branchName 			= :branchName"
+													+ ", t.billNo				= :billNo"
+													+ ", t.priceType			= :priceType"
+													+ ", t.reciveStatus 		= :reciveStatus"
+													+ ", t.userUniqueId 		= :userUniqueId"
+													+ ", t.reciveAmount 		= :reciveAmount"
+													+ ", t.reciveDiscount 		= :reciveDiscount"
+													+ ", t.reciveVat 			= :reciveVat"
+													+ ", t.reciveTotal 			= :reciveTotal"
+										+ " where t.id.reciveNo = :reciveNo"
+										+ "		and t.id.tin 	= :tin";
 			
 			query = session.createQuery(hql);
 			query.setParameter("reciveDate"			, reciveOrderMasterBean.getReciveDate());
@@ -287,8 +296,8 @@ public class ReciveStockDao {
 			query.setParameter("reciveDiscount"		, EnjoyUtils.parseBigDecimal(reciveOrderMasterBean.getReciveDiscount()));
 			query.setParameter("reciveVat"			, EnjoyUtils.parseBigDecimal(reciveOrderMasterBean.getReciveVat()));
 			query.setParameter("reciveTotal"		, EnjoyUtils.parseBigDecimal(reciveOrderMasterBean.getReciveTotal()));
-			query.setParameter("tin"				, reciveOrderMasterBean.getTin());
 			query.setParameter("reciveNo"			, reciveOrderMasterBean.getReciveNo());
+			query.setParameter("tin"				, reciveOrderMasterBean.getTin());
 			
 			query.executeUpdate();
 			
@@ -311,16 +320,18 @@ public class ReciveStockDao {
 		Query 							query 								= null;
 		
 		try{
-			hql				= "update  Reciveordermaster set reciveDate 	= :reciveDate"
-												+ ", reciveStatus 			= :reciveStatus"
-												+ ", userUniqueId 			= :userUniqueId"
-										+ " where reciveNo = :reciveNo";
+			hql				= "update  Reciveordermaster t set t.reciveDate 	= :reciveDate"
+													+ ", t.reciveStatus 		= :reciveStatus"
+													+ ", t.userUniqueId 		= :userUniqueId"
+										+ " where t.id.reciveNo = :reciveNo"
+										+ "		and t.id.tin 	= :tin";
 			
 			query = session.createQuery(hql);
 			query.setParameter("reciveDate"			, reciveOrderMasterBean.getReciveDate());
 			query.setParameter("reciveStatus"		, reciveOrderMasterBean.getReciveStatus());
 			query.setParameter("userUniqueId"		, EnjoyUtils.parseInt(reciveOrderMasterBean.getUserUniqueId()));
 			query.setParameter("reciveNo"			, reciveOrderMasterBean.getReciveNo());
+			query.setParameter("tin"				, reciveOrderMasterBean.getTin());
 			
 			query.executeUpdate();
 			
@@ -362,10 +373,10 @@ public class ReciveStockDao {
 								+ "	from reciveordedetail a"
 									+ "	inner JOIN productmaster b on b.productCode 	= a.productCode"
 									+ "	inner JOIN unittype c on  b.unitCode 	= c.unitCode"
-									+ "	LEFT JOIN reciveordermaster d on a.reciveNo = d.reciveNo"
+									+ "	LEFT JOIN reciveordermaster d on a.reciveNo = d.reciveNo and a.tin = d.tin"
 									+ "	LEFT JOIN productquantity e on a.productCode = e.productCode AND d.tin = e.tin"
-								+ "	where"
-									+ " a.reciveNo 	= '" + reciveOrdeDetailBean.getReciveNo() + "'"
+								+ "	where a.reciveNo 	= '" + reciveOrdeDetailBean.getReciveNo() + "'"
+								+ "		and a.tin		= '" + reciveOrdeDetailBean.getTin() + "'"
 								+ "	order by a.seq asc";
 			
 			logger.info("[getReciveOrdeDetailList] hql :: " + hql);
@@ -446,6 +457,7 @@ public class ReciveStockDao {
 			id 					= new ReciveordedetailPK();
 			
 			id.setReciveNo	(reciveOrdeDetailBean.getReciveNo());
+			id.setTin		(reciveOrdeDetailBean.getTin());
 			id.setSeq		(EnjoyUtils.parseInt(reciveOrdeDetailBean.getSeqDb()));
 			
 			reciveordedetail.setId					(id);
@@ -468,7 +480,7 @@ public class ReciveStockDao {
 		}
 	}
 	
-	public void deleteReciveordedetail(Session session, String reciveNo) throws EnjoyException{
+	public void deleteReciveordedetail(Session session, String reciveNo, String tin) throws EnjoyException{
 		logger.info("[deleteReciveordedetail][Begin]");
 		
 		String							hql									= null;
@@ -476,7 +488,8 @@ public class ReciveStockDao {
 		
 		try{
 			hql				= "delete Reciveordedetail t"
-							+ " where t.id.reciveNo	 = '" + reciveNo + "'";
+							+ " where t.id.reciveNo	 = '" + reciveNo + "'"
+							+ "		and t.id.tin	 = '" + tin + "'";
 			
 			query = session.createQuery(hql);
 			
@@ -586,7 +599,7 @@ public class ReciveStockDao {
 		
 	}
 	
-	public String genReciveNo() throws EnjoyException{
+	public String genReciveNo(String tin) throws EnjoyException{
 		logger.info("[genReciveNo][Begin]");
 		
 		String				hql						= null;
@@ -607,7 +620,8 @@ public class ReciveStockDao {
 			hql				= "SELECT (MAX(SUBSTRING_INDEX(reciveNo, '-', -1)) + 1) AS newId"
 							+ "	FROM reciveordermaster"
 							+ "	WHERE"
-							+ "		SUBSTRING_INDEX(reciveNo, '-', 1) = '" + codeDisplay + "'";
+							+ "		SUBSTRING_INDEX(reciveNo, '-', 1) = '" + codeDisplay + "'"
+							+ "		and tin = '" + tin + "'";
 			query			= session.createSQLQuery(hql);
 			
 			

@@ -15,6 +15,7 @@ public class ReciveOrdeDetailBean {
 	private String costPrice;
 	private String seq;
 	private String rowStatus;
+	private String tin;
 	
 	public ReciveOrdeDetailBean(){
 		this.reciveNo 		= "";
@@ -30,6 +31,7 @@ public class ReciveOrdeDetailBean {
 		this.costPrice 		= "0.00";
 		this.seq 			= "";
 		this.rowStatus		= "";
+		this.tin			= "";
 	}
 
 	public String getReciveNo() {
@@ -134,5 +136,13 @@ public class ReciveOrdeDetailBean {
 
 	public void setUnitName(String unitName) {
 		this.unitName = unitName;
+	}
+
+	public String getTin() {
+		return tin;
+	}
+
+	public void setTin(String tin) {
+		this.tin = tin;
 	}
 }

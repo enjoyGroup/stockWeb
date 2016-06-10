@@ -21,6 +21,7 @@ import th.go.stock.app.enjoy.bean.InvoiceCreditMasterBean;
 import th.go.stock.app.enjoy.bean.UserDetailsBean;
 import th.go.stock.app.enjoy.dao.CustomerDetailsDao;
 import th.go.stock.app.enjoy.dao.InvoiceCreditDao;
+import th.go.stock.app.enjoy.dao.RelationUserAndCompanyDao;
 import th.go.stock.app.enjoy.exception.EnjoyException;
 import th.go.stock.app.enjoy.form.InvoiceCreditSearchForm;
 import th.go.stock.app.enjoy.main.Constants;
@@ -44,6 +45,7 @@ public class InvoiceCreditSearchServlet extends EnjoyStandardSvc {
     private UserDetailsBean             userBean                    = null;
     private InvoiceCreditDao			dao							= null;
     private CustomerDetailsDao			customerDetailsDao			= null;
+    private RelationUserAndCompanyDao	relationUserAndCompanyDao	= null;
     private InvoiceCreditSearchForm		form						= null;
     
 	@Override
@@ -59,15 +61,16 @@ public class InvoiceCreditSearchServlet extends EnjoyStandardSvc {
          String pageAction = null; 
  		
  		try{
- 			 pageAction 				= EnjoyUtil.nullToStr(request.getParameter("pageAction"));
- 			 this.enjoyUtil 			= new EnjoyUtil(request, response);
- 			 this.request            	= request;
-             this.response           	= response;
-             this.session            	= request.getSession(false);
-             this.userBean           	= (UserDetailsBean) session.getAttribute("userBean");
-             this.form               	= (InvoiceCreditSearchForm) session.getAttribute(FORM_NAME);
-             this.dao					= new InvoiceCreditDao();
-             this.customerDetailsDao	= new CustomerDetailsDao();
+ 			 pageAction 					= EnjoyUtil.nullToStr(request.getParameter("pageAction"));
+ 			 this.enjoyUtil 				= new EnjoyUtil(request, response);
+ 			 this.request            		= request;
+             this.response           		= response;
+             this.session            		= request.getSession(false);
+             this.userBean           		= (UserDetailsBean) session.getAttribute("userBean");
+             this.form               		= (InvoiceCreditSearchForm) session.getAttribute(FORM_NAME);
+             this.dao						= new InvoiceCreditDao();
+             this.customerDetailsDao		= new CustomerDetailsDao();
+             this.relationUserAndCompanyDao = new RelationUserAndCompanyDao();
  			
              logger.info("[execute] pageAction : " + pageAction );
              
@@ -136,12 +139,14 @@ public class InvoiceCreditSearchServlet extends EnjoyStandardSvc {
 			logger.info("[setInvoiceStatusCombo][End]");
 		}
 	}
+	
 	private void setRefference() throws EnjoyException{
 		
 		logger.info("[setRefference][Begin]");
 		
 		try{
 			this.setInvoiceStatusCombo();
+			this.setCompanyCombo();
 		}catch(EnjoyException e){
 			throw new EnjoyException(e.getMessage());
 		}catch(Exception e){
@@ -152,6 +157,30 @@ public class InvoiceCreditSearchServlet extends EnjoyStandardSvc {
 		}
 	}
 	
+	private void setCompanyCombo() throws EnjoyException{
+		
+		logger.info("[setCompanyCombo][Begin]");
+		
+		List<ComboBean>			companyCombo 		= null;
+		
+		try{
+			
+			companyCombo = this.relationUserAndCompanyDao.getCompanyList(this.userBean.getUserUniqueId());
+			
+			if(companyCombo.size() > 1){
+				companyCombo.add(0, new ComboBean("", "กรุณาระบุ"));
+			}
+			
+			this.form.setCompanyCombo(companyCombo);
+		}
+		catch(Exception e){
+			logger.error(e);
+			throw new EnjoyException("setCompanyCombo is error");
+		}finally{
+			logger.info("[setCompanyCombo][End]");
+		}
+	}
+		
 	private void onSearch() throws EnjoyException{
 		logger.info("[onSearch][Begin]");
 		
@@ -175,6 +204,7 @@ public class InvoiceCreditSearchServlet extends EnjoyStandardSvc {
 			invoiceCreditMasterBean		= new InvoiceCreditMasterBean();
 			
 			invoiceCreditMasterBean.setInvoiceCode		(EnjoyUtils.nullToStr(this.request.getParameter("invoiceCode")));
+			invoiceCreditMasterBean.setTin				(EnjoyUtils.nullToStr(this.request.getParameter("tin")));
 			invoiceCreditMasterBean.setInvoiceDateForm	(EnjoyUtils.nullToStr(this.request.getParameter("invoiceDateForm")));
 			invoiceCreditMasterBean.setInvoiceDateTo	(EnjoyUtils.nullToStr(this.request.getParameter("invoiceDateTo")));
 			invoiceCreditMasterBean.setCusFullName		(EnjoyUtils.nullToStr(this.request.getParameter("cusFullName")));
