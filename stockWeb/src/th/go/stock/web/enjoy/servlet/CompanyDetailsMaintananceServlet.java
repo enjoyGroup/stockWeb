@@ -432,6 +432,7 @@ public class CompanyDetailsMaintananceServlet extends EnjoyStandardSvc {
 			}
 			
 			obj.put(STATUS				, SUCCESS);
+			obj.put("tin"				, tin);
 			obj.put("flagChkCompany"	, flagChkCompany);
 			obj.put("FlagChange"		, this.userBean.getFlagChangePassword());
 			

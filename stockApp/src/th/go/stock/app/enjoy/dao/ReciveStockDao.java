@@ -52,12 +52,8 @@ public class ReciveStockDao {
 								+ " 	and a.reciveStatus 	= c.reciveStatusCode"
 								+ "		and a.tin			= '" + reciveOrderMasterBean.getTin() + "'";
 			
-			if(!reciveOrderMasterBean.getReciveNo().equals("***")){
-				if(reciveOrderMasterBean.getReciveNo().equals("")){
-					hql += " and (a.reciveNo is null or a.reciveNo = '')";
-				}else{
-					hql += " and a.reciveNo like ('" + reciveOrderMasterBean.getReciveNo() + "%')";
-				}
+			if(!reciveOrderMasterBean.getReciveNo().equals("")){
+				hql += " and a.reciveNo like ('" + reciveOrderMasterBean.getReciveNo() + "%')";
 			}
 			
 			if(!reciveDateFrom.equals("")){

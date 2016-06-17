@@ -91,6 +91,7 @@ public class CustomerDetailsLookUpServlet extends EnjoyStandardSvc {
 		logger.info("[onLoad][Begin]");
 		
 		try{
+			this.form.setLikeFlag("Y");
 			this.initialCombo();	
 		}catch(EnjoyException e){
 			throw new EnjoyException(e.getMessage());

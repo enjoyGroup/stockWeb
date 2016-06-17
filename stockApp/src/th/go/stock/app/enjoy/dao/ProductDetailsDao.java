@@ -48,19 +48,11 @@ public class ProductDetailsDao {
 			if(!productDetailsBean.getProductTypeName().equals("")){
 				hql += " and b.productTypeName like ('" + productDetailsBean.getProductTypeName() + "%')";
 			}
-			if(!productDetailsBean.getProductGroupName().equals("***")){
-				if(productDetailsBean.getProductGroupName().equals("")){
-					hql += " and (c.productGroupName is null or c.productGroupName = '')";
-				}else{
-					hql += " and c.productGroupName like ('" + productDetailsBean.getProductGroupName() + "%')";
-				}
+			if(!productDetailsBean.getProductGroupName().equals("")){
+				hql += " and c.productGroupName like ('" + productDetailsBean.getProductGroupName() + "%')";
 			}
-			if(!productDetailsBean.getProductName().equals("***")){
-				if(productDetailsBean.getProductName().equals("")){
-					hql += " and (a.productName is null or a.productName = '')";
-				}else{
-					hql += " and a.productName like ('" + productDetailsBean.getProductName() + "%')";
-				}
+			if(!productDetailsBean.getProductName().equals("")){
+				hql += " and a.productName like ('" + productDetailsBean.getProductName() + "%')";
 			}
 			
 			logger.info("[searchByCriteria] hql :: " + hql);
@@ -833,7 +825,7 @@ public class ProductDetailsDao {
 						+ " and d.unitCode 			= a.unitCode"
 						+ " and a.productName		= '" + productName + "'";
 			
-			logger.info("[getProductDetail] hql :: " + hql);
+			logger.info("[getProductDetailByName] hql :: " + hql);
 
 			query			= session.createSQLQuery(hql);			
 			query			= session.createSQLQuery(hql);			
@@ -915,7 +907,7 @@ public class ProductDetailsDao {
 		
 	}
 	
-	public String getQuanDiscount(String productCode, String quantity) throws EnjoyException{
+	public String getQuanDiscount(String productCode, String quantity, String invoiceDate) throws EnjoyException{
 		logger.info("[getQuanDiscount][Begin]");
 		
 		String			hql							= null;
@@ -929,13 +921,15 @@ public class ProductDetailsDao {
 		try{
 			sessionFactory 		= HibernateUtil.getSessionFactory();
 			session 			= sessionFactory.openSession();
+			invoiceDate			= invoiceDate.equals("")?EnjoyUtils.currDateThai():EnjoyUtils.dateThaiToDb(invoiceDate);
+			quantity			= quantity.equals("")?"0.00":quantity;
 			
 			hql		= "select discountRate from productdetail"
 					+ "		where productCode = '" + productCode + "'"
 					+ "			and quanDiscount <= " + quantity
-					+ "			and startDate <= '" + EnjoyUtils.currDateThai() + "'"
-					+ "			and (expDate is null or expDate = '' or expDate >= '" + EnjoyUtils.currDateThai() + "')"
-					+ "		order by quanDiscount ASC"
+					+ "			and startDate <= '" + invoiceDate + "'"
+					+ "			and (expDate is null or expDate = '' or expDate >= '" + invoiceDate + "')"
+					+ "		order by quanDiscount ASC, startDate DESC"
 					+ "		LIMIT 1";
 			
 			logger.info("[getQuanDiscount] hql 			:: " + hql);

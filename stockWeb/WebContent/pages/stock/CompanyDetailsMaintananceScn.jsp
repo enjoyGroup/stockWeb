@@ -411,7 +411,8 @@
 		            				if (jsonObj.flagChkCompany == "Y" && jsonObj.FlagChange == "Y"){
 			            				window.location.replace('<%=pagesURL%>/ChangePassScn.jsp');
 			            			} else {
-			            				lp_reset();
+			            				window.location = gv_url + "?service=" + $("#service").val() + "&pageAction=getDetail&tin=" + jsonObj.tin;
+			            				//lp_reset();
 			            			}
 		    	    		    });
 		            			

@@ -171,9 +171,7 @@
         						}
         					%>
         				</select>
-        			</td>
-        			<td align="left">
-        				<input type="checkbox" id="likeFlag" name="likeFlag" value="Y" <%if("Y".equals(customerDetailsLookUpForm.getLikeFlag())){%> checked <%}%> /> like
+        				<input type="hidden" id="likeFlag" name="likeFlag" value="<%=customerDetailsLookUpForm.getLikeFlag()%>" />
         			</td>
         		</tr>
         		<tr>
@@ -209,10 +207,9 @@
         					%>
         				</select>
         			</td>
-        			<td></td>
         		</tr>
         		<tr>
-        			<td align="right" colspan="5">
+        			<td align="right" colspan="4">
         				<input type="button" id="btnSearch" class='btn btn-primary pull-right padding-sm' style="margin-right:12px; padding-right:24px; padding-left:24px;" value='ค้นหา'/>
         				<input type="button" id="btnReset" class='btn pull-right padding-sm'  style="margin-right:12px" value='เริ่มใหม่' />
         			</td>

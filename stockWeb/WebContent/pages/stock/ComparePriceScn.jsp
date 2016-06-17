@@ -281,11 +281,13 @@
 		    var la_vendorName			= null;
 		    var	la_branchName			= null;
 		    var	la_vendorCode			= null;
+		    var la_quantity				= null;
 		    
 			try{
-				la_vendorName = document.getElementsByName("vendorName");
-				la_branchName = document.getElementsByName("branchName");
-				la_vendorCode = document.getElementsByName("vendorCode");
+				la_vendorName 	= document.getElementsByName("vendorName");
+				la_branchName 	= document.getElementsByName("branchName");
+				la_vendorCode 	= document.getElementsByName("vendorCode");
+				la_quantity 	= document.getElementsByName("quantity");
 				
 				for(var i=0;i < la_vendorName.length;i++){
 					
@@ -319,9 +321,9 @@
 				
 				for(var i=0;i<la_vendorCode.length;i++){
 					for(var j=(i+1);j<la_vendorCode.length;j++){
-						if(la_vendorCode[i].value==la_vendorCode[j].value){
-							alert("บริษัทห้ามซ้ำ", function() { 
-								la_vendorCode[j].focus();
+						if((la_vendorCode[i].value==la_vendorCode[j].value) && (la_quantity[i].value==la_quantity[j].value)){
+							alert("บริษัท สาขา และปริมาณห้ามซ้ำ", function() { 
+								la_vendorName[j].focus();
 	    	    		    });
 							return false;
 						}

@@ -53,12 +53,8 @@ public class InvoiceCashDao {
 									+ " 	ON a.cusCode = b.cusCode"
 									+ "	where a.tin = '" + invoiceCashMasterBean.getTin() + "'";
 			
-			if(!invoiceCashMasterBean.getInvoiceCode().equals("***")){
-				if(invoiceCashMasterBean.getInvoiceCode().equals("")){
-					hql += " and (a.invoiceCode is null or a.invoiceCode = '')";
-				}else{
-					hql += " and a.invoiceCode like ('" + invoiceCashMasterBean.getInvoiceCode() + "%')";
-				}
+			if(!invoiceCashMasterBean.getInvoiceCode().equals("")){
+				hql += " and a.invoiceCode like ('" + invoiceCashMasterBean.getInvoiceCode() + "%')";
 			}
 			
 			if(!invoiceDateForm.equals("")){
@@ -69,12 +65,8 @@ public class InvoiceCashDao {
 				hql += " and a.invoiceDate <= STR_TO_DATE('" + invoiceDateTo + "', '%Y%m%d')";
 			}
 			
-			if(!invoiceCashMasterBean.getCusFullName().equals("***")){
-				if(invoiceCashMasterBean.getCusFullName().equals("")){
-					hql += " and CONCAT(b.cusName, ' ', b.cusSurname) = ''";
-				}else{
-					hql += " and CONCAT(b.cusName, ' ', b.cusSurname) like ('" + invoiceCashMasterBean.getCusFullName() + "%')";
-				}
+			if(!invoiceCashMasterBean.getCusFullName().equals("")){
+				hql += " and CONCAT(b.cusName, ' ', b.cusSurname) like ('" + invoiceCashMasterBean.getCusFullName() + "%')";
 			}
 			
 			if(!invoiceCashMasterBean.getInvoiceStatus().equals("")){

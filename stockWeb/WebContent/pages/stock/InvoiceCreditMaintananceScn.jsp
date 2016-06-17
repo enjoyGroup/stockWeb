@@ -129,7 +129,7 @@
 				
 				try{
 					
-					if(!gp_validateEmptyObj(new Array( "tin:บริษัทที่สังกัด"))){
+					if(!gp_validateEmptyObj(new Array( "tin:บริษัทที่สังกัด", "cusCodeDis:รหัสลูกค้า"))){
 						return false;
 					}
 					
@@ -481,6 +481,10 @@
 			
 			try{
 				
+				if(!gp_validateEmptyObj(new Array( "tin:บริษัทที่สังกัด", "cusCodeDis:รหัสลูกค้า"))){
+					return false;
+				}
+				
 				params 	= gv_service + "&pageAction=newRecord&newSeq=" + lv_maxSeq;
 				
 				$.ajax({
@@ -634,6 +638,7 @@
 		}
 		
 		function lp_getProductDetailByName(av_seq, av_productName){
+			var params = "";
 			
 			try{
 				
@@ -641,11 +646,17 @@
 					return false;
 				}
 				
+				params = "productName=" + av_productName.trim() 
+					   + "&groupSalePrice=" + $("#groupSalePrice").val().trim() 
+					   + "&tin=" + $("#tin").val().trim()
+					   + "&invoiceDate=" + $("#invoiceDate").val()
+					   + "&quantity=" + $("#quantity" + av_seq).val();
+				
 				$.ajax({
 					async:false,
 		            type: "POST",
 		            url: gv_url,
-		            data: gv_service + "&pageAction=getProductDetailByName&productName=" + av_productName.trim() + "&groupSalePrice=" + $("#groupSalePrice").val().trim() + "&tin=" + $("#tin").val().trim(),
+		            data: gv_service + "&pageAction=getProductDetailByName&" + params,
 		            beforeSend: "",
 		            success: function(data){
 		            	var jsonObj 			= null;
@@ -695,13 +706,21 @@
 		}
 		
 		function lp_getProductDetailByCode(av_seq, av_productCode){
+			var params = "";
 			
 			try{
+				
+				params = "productCode=" + av_productCode.trim() 
+					   + "&groupSalePrice=" + $("#groupSalePrice").val().trim() 
+					   + "&tin=" + $("#tin").val().trim()
+					   + "&invoiceDate=" + $("#invoiceDate").val()
+					   + "&quantity="  + $("#quantity" + av_seq).val();
+				
 				$.ajax({
 					async:false,
 		            type: "POST",
 		            url: gv_url,
-		            data: gv_service + "&pageAction=getProductDetailByCode&productCode=" + av_productCode.trim() + "&groupSalePrice=" + $("#groupSalePrice").val().trim() + "&tin=" + $("#tin").val().trim(),
+		            data: gv_service + "&pageAction=getProductDetailByCode&" + params,
 		            beforeSend: "",
 		            success: function(data){
 		            	var jsonObj 			= null;
@@ -715,6 +734,7 @@
 		            		if(status=="SUCCESS"){
 		            			
 		            			$("#pricePerUnit" + av_seq).val(jsonObj.pricePerUnit);
+		            			$("#discount" + av_seq).val(jsonObj.discount);
 		            			//alert($("#pricePerUnit" + av_seq).val());
 		            			lp_calAmount(av_seq);
 		            			//lp_updateRecord(av_seq);
@@ -838,6 +858,7 @@
 			
 			var lv_productCode 	= "";
 			var lv_quantity 	= "";
+			var params			= "";
 			
 			try{
 				lv_productCode 	= $("#productCode" + av_seq).val().trim();
@@ -847,11 +868,15 @@
 					return;
 				}
 				
+				params = "productCode=" + lv_productCode 
+					   + "&quantity=" + lv_quantity
+					   + "&invoiceDate=" + $("#invoiceDate").val();
+				
 				$.ajax({
 					async:false,
 		            type: "POST",
 		            url: gv_url,
-		            data: gv_service + "&pageAction=getDiscount&productCode=" + lv_productCode + "&quantity=" + lv_quantity,
+		            data: gv_service + "&pageAction=getDiscount&" + params,
 		            beforeSend: "",
 		            success: function(data){
 		            	var jsonObj 			= null;
@@ -1312,6 +1337,25 @@
 			}
 		}
 		
+		function lp_onchangeInvoiceDate(){
+			var la_productCode 	= null;
+			var la_seq 			= null;
+			
+			try{
+				la_productCode	= document.getElementsByName("productCode");
+				la_seq			= document.getElementsByName("seq");
+				
+				for(var i=0;i<la_productCode.length;i++){
+					if(la_productCode[i].value!=""){
+						lp_getProductDetailByCode(la_seq[i].value, la_productCode[i].value);
+					}
+				}
+				
+			}catch(e){
+				alert("getCustomerDetail :: " + e);
+			}
+		}
+		
 	</script>
 </head>
 <body onkeydown="lp_focusBarCodeTxt(event);">
@@ -1365,7 +1409,8 @@
 								        					   name='invoiceDate' 
 								        					   placeholder="DD/MM/YYYY"
 								        					   class="dateFormat"
-								        					   onchange="gp_checkDate(this);"
+								        					   readonly="readonly"
+								        					   onchange="lp_onchangeInvoiceDate();"
 								        					   value="<%=invoiceCreditMasterBean.getInvoiceDate()%>" 
 								        					   style="width: 100px;" />
 				   										<%}else{%>
@@ -1506,7 +1551,9 @@
 													   value="" />
 												<input type="button" id="btnSearch" name="btnSearch" class="btn btn-primary" value='ตกลง' onclick="lp_searchProductByProductCode();" />
 											</div>
-									        <table class="table sim-panel-result-table" id="resultData">
+											<!-- Begin ตารางตอนบันทึกกับตอนหน้า view ไม่เหมือนกัน -->
+											<%if(invoiceCreditMaintananceForm.getPageMode().equals(invoiceCreditMaintananceForm.NEW)){%>
+											<table class="table sim-panel-result-table" id="resultData">
 												<tr height="26px;">
 													<th  style="text-align: center;" width="5%" ><B>ลำดับ</B></th>
 													<th  style="text-align: center;" width="16%"><B>สินค้า</B><span style="color: red;"><b>*</b></span></th>
@@ -1519,7 +1566,7 @@
 													<th style="text-align: center;" width="9%">Action</th>
 												</tr> 
 												<%
-														int					  	seq		= 1;
+													int					  	seq		= 1;
 													for(InvoiceCreditDetailBean bean:invoiceCreditDetailList){
 														if(!bean.getRowStatus().equals(invoiceCreditMaintananceForm.DEL)){
 													%>
@@ -1592,9 +1639,7 @@
 								        					   style="width: 100%" />
 													</td>
 													<td align="center">
-														<%if(invoiceCreditMaintananceForm.getPageMode().equals(invoiceCreditMaintananceForm.NEW)){%>
-								        				<img alt="ลบ" title="ลบ" src="<%=imgURL%>/wrong.png" width="24" height="24" border="0" onclick="lp_deleteRecord(this, '<%=bean.getSeq()%>');" />
-				   										<%}%>
+														<img alt="ลบ" title="ลบ" src="<%=imgURL%>/wrong.png" width="24" height="24" border="0" onclick="lp_deleteRecord(this, '<%=bean.getSeq()%>');" />
 														<input type="hidden" id="seq<%=bean.getSeq()%>" name="seq" value="<%=bean.getSeq()%>" />
 													</td>
 												</tr>
@@ -1602,13 +1647,65 @@
 												<tr>
 													<td colspan="8">&nbsp;</td>
 													<td align="center">
-														<%if(invoiceCreditMaintananceForm.getPageMode().equals(invoiceCreditMaintananceForm.NEW)){%>
-								        				<img alt="เพิ่ม" title="เพิ่ม" src="<%=imgURL%>/Add.png" width="24" height="24" border="0" id="btnAdd" onclick="lp_newRecord(this, null);" />
+														<img alt="เพิ่ม" title="เพิ่ม" src="<%=imgURL%>/Add.png" width="24" height="24" border="0" id="btnAdd" onclick="lp_newRecord(this, null);" />
 														<img alt="รายการสินค้า" width="30px" height="30px" title="รายการสินค้า" id="btnZoom" src="<%=imgURL%>/zoom.png" border="0" />
-				   										<%}%>
 													</td>
 												</tr>
 											</table>
+											<%}else{%>
+											<table class="table sim-panel-result-table" id="resultData">
+												<tr height="26px;">
+													<th  style="text-align: center;" width="5%" ><B>ลำดับ</B></th>
+													<th  style="text-align: center;" width="11%"><B>สินค้า</B><span style="color: red;"><b>*</b></span></th>
+													<th  style="text-align: center;" width="12%"><B>ปริมาณ</B><span style="color: red;"><b>*</b></span></th>
+													<th  style="text-align: center;" width="12%"><B>หน่วย</B></th>
+													<th  style="text-align: center;" width="12%"><B>ราคาต่อหน่วย</B><span style="color: red;"><b>*</b></span></th>
+													<th  style="text-align: center;" width="12%"><B>ส่วนลด(%)</B><span style="color: red;"><b>*</b></span></th>
+													<th  style="text-align: center;" width="12%"><B>ราคาขาย</B><span style="color: red;"><b>*</b></span></th>
+												</tr> 
+												<%
+													int					  	seq		= 1;
+													for(InvoiceCreditDetailBean bean:invoiceCreditDetailList){
+														if(!bean.getRowStatus().equals(invoiceCreditMaintananceForm.DEL)){
+												%>
+												<tr>
+													<td style="text-align:center">
+														<%=seq%>
+													</td>
+													<td align="left">
+														<%=bean.getProductName()%>
+														<input type="hidden" id="productName<%=bean.getSeq()%>" name="productName" value="<%=bean.getProductName()%>" />
+														<input type="hidden" id="productCode<%=bean.getSeq()%>" name="productCode" value="<%=bean.getProductCode()%>" />
+													</td>
+													<td align="center">
+														<%=bean.getQuantity() %>
+														<input type='hidden' id="quantity<%=bean.getSeq()%>" name='quantity' value="<%=bean.getQuantity() %>" />
+													</td>
+													<td align="center">
+														<%=bean.getUnitName()%>
+														<input type="hidden" id="unitName<%=bean.getSeq()%>" name="unitName" value="<%=bean.getUnitName()%>" />
+														<input type="hidden" id="unitCode<%=bean.getSeq()%>" name="unitCode" value="<%=bean.getUnitCode()%>" />
+													</td>
+													<td align="right">
+														<%=bean.getPricePerUnit()%>
+														<input type='hidden' id="pricePerUnit<%=bean.getSeq()%>" name='pricePerUnit' value="<%=bean.getPricePerUnit()%>" />
+													</td>
+													<td align="center">
+														<%=bean.getDiscount()%>
+														<input type='hidden' id="discount<%=bean.getSeq()%>" name='discount' value="<%=bean.getDiscount()%>" />
+													</td>
+													<td align="right">
+														<%=bean.getPrice()%>
+														<input type='hidden' id="price<%=bean.getSeq()%>" name='price' value="<%=bean.getPrice()%>"  />
+													</td>
+												</tr>
+												<% seq++;}}%>
+												<tr>
+													<td colspan="7">&nbsp;</td>
+												</tr>
+											</table>
+											<%}%>
+											<!-- End ตารางตอนบันทึกกับตอนหน้า view ไม่เหมือนกัน -->
 											<br/>
 											<table class="table user-register-table" style="border-bottom-color: white;">
 												<tr>

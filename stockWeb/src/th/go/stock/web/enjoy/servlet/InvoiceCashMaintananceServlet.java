@@ -711,15 +711,22 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 	   String							tin						= null;
 	   ProductquantityBean				productquantityBean		= null;
 	   String							inventory				= "0.00";
+	   String							invoiceDate				= null;
+	   String							quantity				= null;
 	
 	   try{
 		   obj 				= new JSONObject();
 		   productName		= EnjoyUtils.nullToStr(this.request.getParameter("productName"));
 		   groupSalePrice 	= EnjoyUtil.nullToStr(request.getParameter("groupSalePrice"));
 		   tin				= EnjoyUtils.nullToStr(this.request.getParameter("tin"));
+		   invoiceDate		= EnjoyUtils.nullToStr(this.request.getParameter("invoiceDate"));
+		   quantity 		= EnjoyUtil.replaceComma(request.getParameter("quantity"));
 		   
-		   logger.info("[getProductDetailByName] productName 				:: " + productName);
-		   logger.info("[getProductDetailByName] groupSalePrice 			:: " + groupSalePrice);
+		   logger.info("[getProductDetailByName] productName 		:: " + productName);
+		   logger.info("[getProductDetailByName] groupSalePrice 	:: " + groupSalePrice);
+		   logger.info("[getProductDetailByName] tin 				:: " + tin);
+		   logger.info("[getProductDetailByName] invoiceDate 		:: " + invoiceDate);
+		   logger.info("[getProductDetailByName] quantity 			:: " + quantity);
 		   
 		   productmasterBean 		= this.productDetailsDao.getProductDetailByName(productName);
 		   
@@ -737,7 +744,7 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 				   pricePerUnit = productmasterBean.getSalePrice1();
 			   }
 			   
-			   discount = this.productDetailsDao.getQuanDiscount(productmasterBean.getProductCode(), "1");
+			   discount = this.productDetailsDao.getQuanDiscount(productmasterBean.getProductCode(), quantity, invoiceDate);
 			   
 			   obj.put("productCode"	,productmasterBean.getProductCode());
 			   obj.put("productName"	,productmasterBean.getProductName());
@@ -936,6 +943,8 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 	   String					tin						= null;
 	   ProductquantityBean		productquantityBean		= null;
 	   String					inventory				= "0.00";
+	   String					invoiceDate				= null;
+	   String					quantity				= null;
 	
 	   try{
 		   obj 				= new JSONObject();
@@ -944,9 +953,14 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 		   sessionFactory 	= HibernateUtil.getSessionFactory();
 		   session 			= sessionFactory.openSession();
 		   tin				= EnjoyUtils.nullToStr(this.request.getParameter("tin"));
+		   invoiceDate		= EnjoyUtils.nullToStr(this.request.getParameter("invoiceDate"));
+		   quantity 		= EnjoyUtil.replaceComma(request.getParameter("quantity"));
 		   
-		   logger.info("[getProductDetailByCode] productCode 				:: " + productCode);
-		   logger.info("[getProductDetailByCode] groupSalePrice 			:: " + groupSalePrice);
+		   logger.info("[getProductDetailByCode] productCode 		:: " + productCode);
+		   logger.info("[getProductDetailByCode] groupSalePrice 	:: " + groupSalePrice);
+		   logger.info("[getProductDetailByCode] tin 				:: " + tin);
+		   logger.info("[getProductDetailByCode] invoiceDate 		:: " + invoiceDate);
+		   logger.info("[getProductDetailByCode] quantity 			:: " + quantity);
 		   
 		   productmasterBean = new ProductmasterBean();
 		   productmasterBean.setProductCode(productCode);
@@ -967,7 +981,7 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 				   pricePerUnit = productmasterBeanDb.getSalePrice1();
 			   }
 			   
-			   discount = this.productDetailsDao.getQuanDiscount(productmasterBean.getProductCode(), "1");
+			   discount = this.productDetailsDao.getQuanDiscount(productmasterBean.getProductCode(), quantity, invoiceDate);
 			   
 			   obj.put("productCode"	,productmasterBeanDb.getProductCode());
 			   obj.put("productName"	,productmasterBeanDb.getProductName());
@@ -1016,13 +1030,15 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 		String			quantity		= null;
 		JSONObject 		obj		 		= null;
 		String 			discount 		= "";
+		String			invoiceDate		= null;
 		
 		try {
 			obj 			= new JSONObject();
 			productCode 	= EnjoyUtil.nullToStr(this.request.getParameter("productCode"));
 			quantity 		= EnjoyUtil.replaceComma(request.getParameter("quantity"));
+			invoiceDate 	= EnjoyUtil.nullToStr(request.getParameter("invoiceDate"));
 			
-			discount = this.productDetailsDao.getQuanDiscount(productCode, quantity);
+			discount = this.productDetailsDao.getQuanDiscount(productCode, quantity, invoiceDate);
 			
 			obj.put("discount"	,discount);
 			obj.put(STATUS		,SUCCESS);

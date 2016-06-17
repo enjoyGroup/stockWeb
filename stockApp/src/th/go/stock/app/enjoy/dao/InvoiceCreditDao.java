@@ -53,12 +53,8 @@ public class InvoiceCreditDao {
 									+ " 	ON a.cusCode = b.cusCode"
 									+ "	where a.tin = '" + invoiceCreditMasterBean.getTin() + "'";
 			
-			if(!invoiceCreditMasterBean.getInvoiceCode().equals("***")){
-				if(invoiceCreditMasterBean.getInvoiceCode().equals("")){
-					hql += " and (a.invoiceCode is null or a.invoiceCode = '')";
-				}else{
-					hql += " and a.invoiceCode like ('" + invoiceCreditMasterBean.getInvoiceCode() + "%')";
-				}
+			if(!invoiceCreditMasterBean.getInvoiceCode().equals("")){
+				hql += " and a.invoiceCode like ('" + invoiceCreditMasterBean.getInvoiceCode() + "%')";
 			}
 			
 			if(!invoiceDateForm.equals("")){
@@ -69,12 +65,8 @@ public class InvoiceCreditDao {
 				hql += " and a.invoiceDate <= STR_TO_DATE('" + invoiceDateTo + "', '%Y%m%d')";
 			}
 			
-			if(!invoiceCreditMasterBean.getCusFullName().equals("***")){
-				if(invoiceCreditMasterBean.getCusFullName().equals("")){
-					hql += " and CONCAT(b.cusName, ' ', b.cusSurname) = ''";
-				}else{
-					hql += " and CONCAT(b.cusName, ' ', b.cusSurname) like ('" + invoiceCreditMasterBean.getCusFullName() + "%')";
-				}
+			if(!invoiceCreditMasterBean.getCusFullName().equals("")){
+				hql += " and CONCAT(b.cusName, ' ', b.cusSurname) like ('" + invoiceCreditMasterBean.getCusFullName() + "%')";
 			}
 			
 			if(!invoiceCreditMasterBean.getInvoiceStatus().equals("")){
@@ -641,11 +633,7 @@ public class InvoiceCreditDao {
 									+ "		and a.tin = '" + invoiceCreditMasterBean.getTin() + "'";
 			
 			if(!invoiceCreditMasterBean.getInvoiceCode().equals("***")){
-				if(invoiceCreditMasterBean.getInvoiceCode().equals("")){
-					hql += " and (a.invoiceCode is null or a.invoiceCode = '')";
-				}else{
-					hql += " and a.invoiceCode like ('" + invoiceCreditMasterBean.getInvoiceCode() + "%')";
-				}
+				hql += " and a.invoiceCode like ('" + invoiceCreditMasterBean.getInvoiceCode() + "%')";
 			}
 			
 			if(!invoiceDateForm.equals("")){
@@ -657,11 +645,7 @@ public class InvoiceCreditDao {
 			}
 			
 			if(!invoiceCreditMasterBean.getCusFullName().equals("***")){
-				if(invoiceCreditMasterBean.getCusFullName().equals("")){
-					hql += " and CONCAT(b.cusName, ' ', b.cusSurname) = ''";
-				}else{
-					hql += " and CONCAT(b.cusName, ' ', b.cusSurname) like ('" + invoiceCreditMasterBean.getCusFullName() + "%')";
-				}
+				hql += " and CONCAT(b.cusName, ' ', b.cusSurname) like ('" + invoiceCreditMasterBean.getCusFullName() + "%')";
 			}
 			
 			logger.info("[searchByCriteriaForCredit] hql :: " + hql);

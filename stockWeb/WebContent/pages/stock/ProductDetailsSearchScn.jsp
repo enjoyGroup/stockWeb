@@ -434,7 +434,6 @@
 										        		</tr>
 										        		<tr>
 										        			<td align="left" colspan="4">
-										        				<span style="color: red;">*ถ้าต้องการค้นหาทั้งหมดให้ระบุช่องนั้นเป็น *** (ยกเว้นหมวดสินค้า)</span>
 										        				<input type="button" id="btnSearch" class='btn btn-primary pull-right padding-sm' style="margin-right:12px; padding-right:24px; padding-left:24px;" value='ค้นหา'/>
 										        				<input type="button" id="btnReset" class='btn pull-right padding-sm'  style="margin-right:12px" value='เริ่มใหม่' />
 										        			</td>
