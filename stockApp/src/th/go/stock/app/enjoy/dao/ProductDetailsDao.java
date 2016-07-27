@@ -2,127 +2,103 @@
 package th.go.stock.app.enjoy.dao;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.hibernate.Query;
-import org.hibernate.SQLQuery;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.type.IntegerType;
-import org.hibernate.type.StringType;
 
 import th.go.stock.app.enjoy.bean.ComboBean;
 import th.go.stock.app.enjoy.bean.ProductdetailBean;
 import th.go.stock.app.enjoy.bean.ProductmasterBean;
 import th.go.stock.app.enjoy.exception.EnjoyException;
 import th.go.stock.app.enjoy.form.ProductDetailsMaintananceForm;
+import th.go.stock.app.enjoy.main.Constants;
+import th.go.stock.app.enjoy.main.DaoControl;
 import th.go.stock.app.enjoy.model.Productdetail;
 import th.go.stock.app.enjoy.model.ProductdetailPK;
 import th.go.stock.app.enjoy.model.Productmaster;
+import th.go.stock.app.enjoy.model.ProductmasterPK;
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
 import th.go.stock.app.enjoy.utils.EnjoyUtils;
-import th.go.stock.app.enjoy.utils.HibernateUtil;
 
-public class ProductDetailsDao {
+public class ProductDetailsDao extends DaoControl{
 	
-	private static final EnjoyLogger logger = EnjoyLogger.getLogger(ProductDetailsDao.class);
+	public ProductDetailsDao(){
+		setLogger(EnjoyLogger.getLogger(ProductDetailsDao.class));
+		super.init();
+	}
 	
-	public List<ProductmasterBean> searchByCriteria(	Session 				session, 
-														ProductmasterBean 		productDetailsBean) throws EnjoyException{
-		logger.info("[searchByCriteria][Begin]");
+	public List<ProductmasterBean> searchByCriteria(ProductmasterBean productDetailsBean) throws EnjoyException{
+		getLogger().info("[searchByCriteria][Begin]");
 		
-		String						hql						= null;
-		SQLQuery 					query 					= null;
-		List<Object[]>				list					= null;
-		ProductmasterBean			bean					= null;
-		List<ProductmasterBean> 	productDetailsList 		= new ArrayList<ProductmasterBean>();
-		int							chkBoxSeq				= 0;
+		String							hql						= null;
+		ProductmasterBean				bean					= null;
+		List<ProductmasterBean> 		productDetailsList 		= new ArrayList<ProductmasterBean>();
+		int								chkBoxSeq				= 0;
+		HashMap<String, Object>			param					= new HashMap<String, Object>();
+		List<String>					columnList				= new ArrayList<String>();
+		List<HashMap<String, Object>>	resultList				= null;
 		
 		try{	
 			hql					= "select a.*, b.productTypeName, c.productGroupName "
-								+ "	from productmaster a, productype b, productgroup c"
-								+ "	where b.productTypeCode = a.productType"
-									+ " and c.productTypeCode = a.productType"
-									+ " and c.productGroupCode = a.productGroup";
+								+ "	from productmaster a"
+								+ "		inner join productype b on b.productTypeCode = a.productType and b.tin = a.tin"
+								+ "		inner join productgroup c on c.productTypeCode 	= a.productType and c.productGroupCode = a.productGroup and c.tin = a.tin"
+								+ "	where a.tin	= :tin";
+			
+			//Criteria
+			param.put("tin"	, productDetailsBean.getTin());
 			
 			if(!productDetailsBean.getProductTypeName().equals("")){
-				hql += " and b.productTypeName like ('" + productDetailsBean.getProductTypeName() + "%')";
+				hql += " and b.productTypeName LIKE CONCAT(:productTypeName, '%')";
+				param.put("productTypeName"	, productDetailsBean.getProductTypeName());
 			}
 			if(!productDetailsBean.getProductGroupName().equals("")){
-				hql += " and c.productGroupName like ('" + productDetailsBean.getProductGroupName() + "%')";
+				hql += " and c.productGroupName LIKE CONCAT(:productGroupName, '%')";
+				param.put("productGroupName"	, productDetailsBean.getProductGroupName());
 			}
 			if(!productDetailsBean.getProductName().equals("")){
-				hql += " and a.productName like ('" + productDetailsBean.getProductName() + "%')";
+				hql += " and a.productName LIKE CONCAT(:productName, '%')";
+				param.put("productName"	, productDetailsBean.getProductName());
 			}
 			
-			logger.info("[searchByCriteria] hql :: " + hql);
-
-			query			= session.createSQLQuery(hql);			
-			query.addScalar("productCode"		, new StringType());
-			query.addScalar("productType"		, new StringType());
-			query.addScalar("productGroup"		, new StringType());
-			query.addScalar("productName"		, new StringType());
-			query.addScalar("unitCode"			, new StringType());
-//			query.addScalar("quantity"			, new StringType());
-			query.addScalar("minQuan"			, new StringType());
-			query.addScalar("costPrice"			, new StringType());
-			query.addScalar("salePrice1"		, new StringType());
-			query.addScalar("salePrice2"		, new StringType());
-			query.addScalar("salePrice3"		, new StringType());
-			query.addScalar("salePrice4"		, new StringType());
-			query.addScalar("salePrice5"		, new StringType());
-//			query.addScalar("startDate"			, new StringType());
-//			query.addScalar("expDate"			, new StringType());
-//			query.addScalar("quantity"			, new StringType());
-//			query.addScalar("productStatus"		, new StringType());
-			query.addScalar("productTypeName"	, new StringType());
-			query.addScalar("productGroupName"	, new StringType());
+			//Column select
+			columnList.add("productCode");
+			columnList.add("tin");
+			columnList.add("productType");
+			columnList.add("productGroup");
+			columnList.add("productName");
+			columnList.add("unitCode");
+			columnList.add("minQuan");
+			columnList.add("costPrice");
+			columnList.add("salePrice1");
+			columnList.add("salePrice2");
+			columnList.add("salePrice3");
+			columnList.add("salePrice4");
+			columnList.add("salePrice5");
+			columnList.add("productTypeName");
+			columnList.add("productGroupName");
 			
-			list		 	= query.list();
+			resultList = getResult(hql, param, columnList);
 			
-			logger.info("[searchByCriteria] list.size() :: " + list.size());
-			
-			for(Object[] row:list){
+			for(HashMap<String, Object> row:resultList){
 				bean 	= new ProductmasterBean();
 				
-				logger.info("productCode 			:: " + row[0]);
-				logger.info("productType 			:: " + row[1]);
-				logger.info("productGroup 			:: " + row[2]);
-				logger.info("productName 			:: " + row[3]);
-				logger.info("unitCode 				:: " + row[4]);
-//				logger.info("quantity 				:: " + row[5]);
-				logger.info("minQuan 				:: " + row[5]);
-				logger.info("costPrice 				:: " + row[6]);
-				logger.info("salePrice1 			:: " + row[7]);
-				logger.info("salePrice2 			:: " + row[8]);
-				logger.info("salePrice3 			:: " + row[9]);
-				logger.info("salePrice4 			:: " + row[10]);
-				logger.info("salePrice5 			:: " + row[11]);
-//				logger.info("startDate 				:: " + row[8]);
-//				logger.info("expDate 				:: " + row[9]);
-//				logger.info("quantity 				:: " + row[10]);
-//				logger.info("productStatus 			:: " + row[11]);
-				logger.info("productTypeName 		:: " + row[12]);
-				logger.info("productGroupName 		:: " + row[13]);
-				
-				bean.setProductCode				(EnjoyUtils.nullToStr(row[0]));
-				bean.setProductTypeCode			(EnjoyUtils.nullToStr(row[1]));
-				bean.setProductGroupCode		(EnjoyUtils.nullToStr(row[2]));
-				bean.setProductName				(EnjoyUtils.nullToStr(row[3]));
-				bean.setUnitCode				(EnjoyUtils.nullToStr(row[4]));
-//				bean.setQuantity				(EnjoyUtils.convertFloatToDisplay(row[5], 2));
-				bean.setMinQuan					(EnjoyUtils.convertFloatToDisplay(row[5], 2));
-				bean.setCostPrice				(EnjoyUtils.convertFloatToDisplay(row[6], 2));
-				bean.setSalePrice1				(EnjoyUtils.convertFloatToDisplay(row[7], 2));
-				bean.setSalePrice2				(EnjoyUtils.convertFloatToDisplay(row[8], 2));
-				bean.setSalePrice3				(EnjoyUtils.convertFloatToDisplay(row[9], 2));
-				bean.setSalePrice4				(EnjoyUtils.convertFloatToDisplay(row[10], 2));
-				bean.setSalePrice5				(EnjoyUtils.convertFloatToDisplay(row[11], 2));
-//				bean.setStartDate				(EnjoyUtils.dateFormat(row[8], "yyyyMMdd", "dd/MM/yyyy"));
-//				bean.setExpDate					(EnjoyUtils.dateFormat(row[9], "yyyyMMdd", "dd/MM/yyyy"));
-//				bean.setProductStatus			(row[11]);
-				bean.setProductTypeName			(EnjoyUtils.nullToStr(row[12]));
-				bean.setProductGroupName		(EnjoyUtils.nullToStr(row[13]));
+				bean.setProductCode				(EnjoyUtils.nullToStr(row.get("productCode")));
+				bean.setTin						(EnjoyUtils.nullToStr(row.get("tin")));
+				bean.setProductTypeCode			(EnjoyUtils.nullToStr(row.get("productType")));
+				bean.setProductGroupCode		(EnjoyUtils.nullToStr(row.get("productGroup")));
+				bean.setProductName				(EnjoyUtils.nullToStr(row.get("productName")));
+				bean.setUnitCode				(EnjoyUtils.nullToStr(row.get("unitCode")));
+				bean.setMinQuan					(EnjoyUtils.convertFloatToDisplay(row.get("minQuan"), 2));
+				bean.setCostPrice				(EnjoyUtils.convertFloatToDisplay(row.get("costPrice"), 2));
+				bean.setSalePrice1				(EnjoyUtils.convertFloatToDisplay(row.get("salePrice1"), 2));
+				bean.setSalePrice2				(EnjoyUtils.convertFloatToDisplay(row.get("salePrice2"), 2));
+				bean.setSalePrice3				(EnjoyUtils.convertFloatToDisplay(row.get("salePrice3"), 2));
+				bean.setSalePrice4				(EnjoyUtils.convertFloatToDisplay(row.get("salePrice4"), 2));
+				bean.setSalePrice5				(EnjoyUtils.convertFloatToDisplay(row.get("salePrice5"), 2));
+				bean.setProductTypeName			(EnjoyUtils.nullToStr(row.get("productTypeName")));
+				bean.setProductGroupName		(EnjoyUtils.nullToStr(row.get("productGroupName")));
 				bean.setChkBoxSeq				(String.valueOf(chkBoxSeq));
 				
 				productDetailsList.add(bean);
@@ -130,99 +106,84 @@ public class ProductDetailsDao {
 			}	
 			
 		}catch(Exception e){
-			logger.info("[searchByCriteria] " + e.getMessage());
+			getLogger().error(e);
 			e.printStackTrace();
 			throw new EnjoyException("error searchByCriteria");
 		}finally{
 			hql						= null;
-			logger.info("[searchByCriteria][End]");
+			getLogger().info("[searchByCriteria][End]");
 		}
 		
 		return productDetailsList;
 		
 	}
-
 	
-	public ProductmasterBean getProductDetail(	Session 				session, 
-												ProductmasterBean 		productDetailsBean) throws EnjoyException{
-		logger.info("[getProductDetail][Begin]");
+	public ProductmasterBean getProductDetail(ProductmasterBean 		productDetailsBean) throws EnjoyException{
+		getLogger().info("[getProductDetail][Begin]");
 		
-		String						hql						= null;
-		SQLQuery 					query 					= null;
-		List<Object[]>				list					= null;
-		ProductmasterBean			bean					= null;
+		String							hql						= null;
+		ProductmasterBean				bean					= null;
+		HashMap<String, Object>			param					= new HashMap<String, Object>();
+		List<String>					columnList				= new ArrayList<String>();
+		List<HashMap<String, Object>>	resultList				= null;
 		
 		try{		
 			hql		= "select a.*, b.productTypeName, c.productGroupName, d.unitName"
 					+ "	from productmaster a, productype b, productgroup c, unittype d"
 					+ "	where b.productTypeCode 	= a.productType"
-						+ " and c.productTypeCode 	= a.productType"
-						+ " and c.productGroupCode 	= a.productGroup"
-						+ " and d.unitCode 			= a.unitCode"
-						+ " and a.productCode		= '" + productDetailsBean.getProductCode() + "'";
+					+ "		and b.tin				= a.tin"
+					+ " 	and c.productTypeCode 	= a.productType"
+					+ " 	and c.productGroupCode 	= a.productGroup"
+					+ "		and c.tin				= a.tin"
+					+ " 	and d.unitCode 			= a.unitCode"
+					+ "		and d.tin				= a.tin"
+					+ " 	and a.productCode		= :productCode"
+					+ "		and a.tin				= :tin";
 			
-			logger.info("[getProductDetail] hql :: " + hql);
-
-			query			= session.createSQLQuery(hql);			
-			query			= session.createSQLQuery(hql);			
-			query.addScalar("productCode"		, new StringType());
-			query.addScalar("productType"		, new StringType());
-			query.addScalar("productGroup"		, new StringType());
-			query.addScalar("productName"		, new StringType());
-			query.addScalar("unitCode"			, new StringType());
-			query.addScalar("minQuan"			, new StringType());
-//			query.addScalar("quantity"			, new StringType());
-			query.addScalar("costPrice"			, new StringType());
-			query.addScalar("salePrice1"		, new StringType());
-			query.addScalar("salePrice2"		, new StringType());
-			query.addScalar("salePrice3"		, new StringType());
-			query.addScalar("salePrice4"		, new StringType());
-			query.addScalar("salePrice5"		, new StringType());
-			query.addScalar("productTypeName"	, new StringType());
-			query.addScalar("productGroupName"	, new StringType());
-			query.addScalar("unitName"			, new StringType());
+			//Criteria
+			param.put("productCode"	, productDetailsBean.getProductCode());
+			param.put("tin"			, productDetailsBean.getTin());
 			
-			list		 	= query.list();
+			//Column select
+			columnList.add("productCode");
+			columnList.add("tin");
+			columnList.add("productType");
+			columnList.add("productGroup");
+			columnList.add("productName");
+			columnList.add("unitCode");
+			columnList.add("minQuan");
+			columnList.add("costPrice");
+			columnList.add("salePrice1");
+			columnList.add("salePrice2");
+			columnList.add("salePrice3");
+			columnList.add("salePrice4");
+			columnList.add("salePrice5");
+			columnList.add("productTypeName");
+			columnList.add("productGroupName");
+			columnList.add("unitName");
 			
-			logger.info("[getProductDetail] list.size() :: " + list.size());
+			resultList = getResult(hql, param, columnList);
 			
-			if(list.size()==1){
-				for(Object[] row:list){
+			if(resultList.size()==1){
+				for(HashMap<String, Object> row:resultList){
 					bean 	= new ProductmasterBean();
 					
-					logger.info("productCode 			:: " + row[0]);
-					logger.info("productType 			:: " + row[1]);
-					logger.info("productGroup 			:: " + row[2]);
-					logger.info("productName 			:: " + row[3]);
-					logger.info("unitCode 				:: " + row[4]);
-					logger.info("minQuan 				:: " + row[5]);
-//					logger.info("quantity 				:: " + row[6]);
-					logger.info("costPrice 				:: " + row[6]);
-					logger.info("salePrice1 			:: " + row[7]);
-					logger.info("salePrice2 			:: " + row[8]);
-					logger.info("salePrice3 			:: " + row[9]);
-					logger.info("salePrice4 			:: " + row[10]);
-					logger.info("salePrice5 			:: " + row[11]);
-					logger.info("productTypeName 		:: " + row[12]);
-					logger.info("productGroupName 		:: " + row[13]);
-					logger.info("unitName 				:: " + row[14]);
-					
-					bean.setProductCode				(EnjoyUtils.nullToStr(row[0]));
-					bean.setProductTypeCode			(EnjoyUtils.nullToStr(row[1]));
-					bean.setProductGroupCode		(EnjoyUtils.nullToStr(row[2]));
-					bean.setProductName				(EnjoyUtils.nullToStr(row[3]));
-					bean.setUnitCode				(EnjoyUtils.nullToStr(row[4]));
-					bean.setMinQuan					(EnjoyUtils.convertFloatToDisplay(row[5], 2));
-//					bean.setQuantity				(EnjoyUtils.convertFloatToDisplay(row[6], 2));
-					bean.setCostPrice				(EnjoyUtils.convertFloatToDisplay(row[6], 2));
-					bean.setSalePrice1				(EnjoyUtils.convertFloatToDisplay(row[7], 2));
-					bean.setSalePrice2				(EnjoyUtils.convertFloatToDisplay(row[8], 2));
-					bean.setSalePrice3				(EnjoyUtils.convertFloatToDisplay(row[9], 2));
-					bean.setSalePrice4				(EnjoyUtils.convertFloatToDisplay(row[10], 2));
-					bean.setSalePrice5				(EnjoyUtils.convertFloatToDisplay(row[11], 2));
-					bean.setProductTypeName			(EnjoyUtils.nullToStr(row[12]));
-					bean.setProductGroupName		(EnjoyUtils.nullToStr(row[13]));
-					bean.setUnitName				(EnjoyUtils.nullToStr(row[14]));
+					bean.setProductCode				(EnjoyUtils.nullToStr(row.get("productCode")));
+					bean.setTin						(EnjoyUtils.nullToStr(row.get("tin")));
+					bean.setProductTypeCode			(EnjoyUtils.nullToStr(row.get("productType")));
+					bean.setProductGroupCode		(EnjoyUtils.nullToStr(row.get("productGroup")));
+					bean.setProductName				(EnjoyUtils.nullToStr(row.get("productName")));
+					bean.setUnitCode				(EnjoyUtils.nullToStr(row.get("unitCode")));
+					bean.setMinQuan					(EnjoyUtils.convertFloatToDisplay(row.get("minQuan"), 2));
+					bean.setCostPrice				(EnjoyUtils.convertFloatToDisplay(row.get("costPrice"), 2));
+					bean.setSalePrice1				(EnjoyUtils.convertFloatToDisplay(row.get("salePrice1"), 2));
+					bean.setSalePrice2				(EnjoyUtils.convertFloatToDisplay(row.get("salePrice2"), 2));
+					bean.setSalePrice3				(EnjoyUtils.convertFloatToDisplay(row.get("salePrice3"), 2));
+					bean.setSalePrice4				(EnjoyUtils.convertFloatToDisplay(row.get("salePrice4"), 2));
+					bean.setSalePrice5				(EnjoyUtils.convertFloatToDisplay(row.get("salePrice5"), 2));
+					bean.setProductTypeName			(EnjoyUtils.nullToStr(row.get("productTypeName")));
+					bean.setProductGroupName		(EnjoyUtils.nullToStr(row.get("productGroupName")));
+					bean.setUnitName				(EnjoyUtils.nullToStr(row.get("unitName")));
 					
 				}	
 			}
@@ -230,84 +191,81 @@ public class ProductDetailsDao {
 			
 			
 		}catch(Exception e){
-			logger.info("[getProductDetail] " + e.getMessage());
+			getLogger().error(e);
 			e.printStackTrace();
 			throw new EnjoyException("error getProductDetail");
 		}finally{
 			hql						= null;
-			logger.info("[getProductDetail][End]");
+			getLogger().info("[getProductDetail][End]");
 		}
 		
 		return bean;
 		
 	}
 	
-	public void insertProductmaster(Session session, ProductmasterBean 		productmasterBean) throws EnjoyException{
-		logger.info("[insertProductmaster][Begin]");
+	public void insertProductmaster(ProductmasterBean productmasterBean) throws EnjoyException{
+		getLogger().info("[insertProductmaster][Begin]");
 		
-		Productmaster	productmaster						= null;
+		Productmaster	productmaster	= new Productmaster();
+		ProductmasterPK id				= new ProductmasterPK();
 		
 		try{
 			
-			productmaster = new Productmaster();
+			id.setProductCode	(productmasterBean.getProductCode());
+			id.setTin			(productmasterBean.getTin());
 			
-			productmaster.setProductCode			(productmasterBean.getProductCode());
-			productmaster.setProductType			(productmasterBean.getProductTypeCode());
-			productmaster.setProductGroup			(productmasterBean.getProductGroupCode());
-			productmaster.setProductName			(productmasterBean.getProductName());
-			productmaster.setUnitCode				(EnjoyUtils.parseInt(productmasterBean.getUnitCode()));
-//			productmaster.setQuantity				(EnjoyUtils.parseBigDecimal(productmasterBean.getQuantity()));
-			productmaster.setMinQuan				(EnjoyUtils.parseBigDecimal(productmasterBean.getMinQuan()));
-			productmaster.setCostPrice				(EnjoyUtils.parseBigDecimal(productmasterBean.getCostPrice()));
-			productmaster.setSalePrice1				(EnjoyUtils.parseBigDecimal(productmasterBean.getSalePrice1()));
-			productmaster.setSalePrice2				(EnjoyUtils.parseBigDecimal(productmasterBean.getSalePrice2()));
-			productmaster.setSalePrice3				(EnjoyUtils.parseBigDecimal(productmasterBean.getSalePrice3()));
-			productmaster.setSalePrice4				(EnjoyUtils.parseBigDecimal(productmasterBean.getSalePrice4()));
-			productmaster.setSalePrice5				(EnjoyUtils.parseBigDecimal(productmasterBean.getSalePrice5()));
-//			productmaster.setStartDate				(productDetailsBean.getStartDate());
-//			productmaster.setExpDate				(productDetailsBean.getExpDate());
-//			productmaster.setProductStatus			(productDetailsBean.getProductStatus());
+			productmaster.setId				(id);
+			productmaster.setProductType	(productmasterBean.getProductTypeCode());
+			productmaster.setProductGroup	(productmasterBean.getProductGroupCode());
+			productmaster.setProductName	(productmasterBean.getProductName());
+			productmaster.setUnitCode		(EnjoyUtils.parseInt(productmasterBean.getUnitCode()));
+			productmaster.setMinQuan		(EnjoyUtils.parseBigDecimal(productmasterBean.getMinQuan()));
+			productmaster.setCostPrice		(EnjoyUtils.parseBigDecimal(productmasterBean.getCostPrice()));
+			productmaster.setSalePrice1		(EnjoyUtils.parseBigDecimal(productmasterBean.getSalePrice1()));
+			productmaster.setSalePrice2		(EnjoyUtils.parseBigDecimal(productmasterBean.getSalePrice2()));
+			productmaster.setSalePrice3		(EnjoyUtils.parseBigDecimal(productmasterBean.getSalePrice3()));
+			productmaster.setSalePrice4		(EnjoyUtils.parseBigDecimal(productmasterBean.getSalePrice4()));
+			productmaster.setSalePrice5		(EnjoyUtils.parseBigDecimal(productmasterBean.getSalePrice5()));
 			
-			session.saveOrUpdate(productmaster);
+			insertData(productmaster);
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			logger.info(e.getMessage());
+			getLogger().info(e.getMessage());
 			throw new EnjoyException("Error insertProductmaster");
 		}finally{
 			
 			productmaster = null;
-			logger.info("[insertProductmaster][End]");
+			getLogger().info("[insertProductmaster][End]");
 		}
 	}
 	
-	public void updateProductmaster(Session session, ProductmasterBean 		productmasterBean) throws EnjoyException{
-		logger.info("[updateProductmaster][Begin]");
+	public void updateProductmaster(ProductmasterBean productmasterBean) throws EnjoyException{
+		getLogger().info("[updateProductmaster][Begin]");
 		
 		String							hql									= null;
 		Query 							query 								= null;
 		
 		try{
-			hql				= "update  Productmaster set productType 			= :productType"
-												+ ", productGroup		= :productGroup"
-												+ ", productName		= :productName"
-												+ ", unitCode			= :unitCode"
-//												+ ", quantity 			= :quantity"
-												+ ", minQuan			= :minQuan"
-												+ ", costPrice			= :costPrice"
-												+ ", salePrice1 			= :salePrice1"
-												+ ", salePrice2 			= :salePrice2"
-												+ ", salePrice3 			= :salePrice3"
-												+ ", salePrice4 			= :salePrice4"
-												+ ", salePrice5 			= :salePrice5"
-										+ " where productCode = :productCode";
+			hql				= "update  Productmaster t set t.productType 	= :productType"
+												+ ", t.productGroup			= :productGroup"
+												+ ", t.productName			= :productName"
+												+ ", t.unitCode				= :unitCode"
+												+ ", t.minQuan				= :minQuan"
+												+ ", t.costPrice			= :costPrice"
+												+ ", t.salePrice1 			= :salePrice1"
+												+ ", t.salePrice2 			= :salePrice2"
+												+ ", t.salePrice3 			= :salePrice3"
+												+ ", t.salePrice4 			= :salePrice4"
+												+ ", t.salePrice5 			= :salePrice5"
+										+ " where t.id.productCode 	= :productCode"
+										+ "		and t.id.tin		= :tin";
 			
-			query = session.createQuery(hql);
+			query = createQuery(hql);
 			query.setParameter("productType"		, productmasterBean.getProductTypeCode());
 			query.setParameter("productGroup"		, productmasterBean.getProductGroupCode());
 			query.setParameter("productName"		, productmasterBean.getProductName());
 			query.setParameter("unitCode"			, EnjoyUtils.parseInt(productmasterBean.getUnitCode()));
-//			query.setParameter("quantity"			, EnjoyUtils.parseBigDecimal(productmasterBean.getQuantity()));
 			query.setParameter("minQuan"			, EnjoyUtils.parseBigDecimal(productmasterBean.getMinQuan()));
 			query.setParameter("costPrice"			, EnjoyUtils.parseBigDecimal(productmasterBean.getCostPrice()));
 			query.setParameter("salePrice1"			, EnjoyUtils.parseBigDecimal(productmasterBean.getSalePrice1()));
@@ -316,229 +274,215 @@ public class ProductDetailsDao {
 			query.setParameter("salePrice4"			, EnjoyUtils.parseBigDecimal(productmasterBean.getSalePrice4()));
 			query.setParameter("salePrice5"			, EnjoyUtils.parseBigDecimal(productmasterBean.getSalePrice5()));
 			query.setParameter("productCode"		, productmasterBean.getProductCode());
+			query.setParameter("tin"				, productmasterBean.getTin());
 			
 			query.executeUpdate();
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			logger.info(e.getMessage());
+			getLogger().error(e);
 			throw new EnjoyException("Error updateProductmaster");
 		}finally{
 			
 			hql									= null;
 			query 								= null;
-			logger.info("[updateProductmaster][End]");
+			getLogger().info("[updateProductmaster][End]");
 		}
 	}
 	
-//	public void updateProductQuantity(Session session, ProductmasterBean 		productmasterBean) throws EnjoyException{
-//		logger.info("[updateProductQuantity][Begin]");
-//		
-//		String							hql									= null;
-//		Query 							query 								= null;
-//		
-//		try{
-//			hql				= "update  Productmaster set quantity 			= :quantity"
-//										+ " where productCode = :productCode";
-//			
-//			query = session.createQuery(hql);
-//			
-//			query.setParameter("quantity"			, EnjoyUtils.parseBigDecimal(productmasterBean.getQuantity()));
-//			query.setParameter("productCode"		, productmasterBean.getProductCode());
-//			
-//			query.executeUpdate();
-//			
-//		}catch(Exception e){
-//			e.printStackTrace();
-//			logger.info(e.getMessage());
-//			throw new EnjoyException("Error updateProductQuantity");
-//		}finally{
-//			
-//			hql									= null;
-//			query 								= null;
-//			logger.info("[updateProductQuantity][End]");
-//		}
-//	}
-	
-	public int checkDupProductCode(Session session, String productCode) throws EnjoyException{
-		logger.info("[checkDupProductCode][Begin]");
+	public int checkDupProductCode(String productCode, String tin) throws EnjoyException{
+		getLogger().info("[checkDupProductCode][Begin]");
 		
-		String							hql									= null;
-		List<Integer>			 		list								= null;
-		SQLQuery 						query 								= null;
-		int 							result								= 0;
-		
+		String							hql				= null;
+		int 							result			= 0;
+		HashMap<String, Object>			param			= new HashMap<String, Object>();
+		List<Object>					resultList		= null;
 		
 		try{
-//			hql				= "Select count(*) cou from product where productCode = '" + productCode + "' and productStatus = 'A'";
-			hql				= "Select count(*) cou from productmaster where productCode = '" + productCode + "'";
+			hql		= "select count(*) cou "
+					+ "	from productmaster "
+					+ "	where productCode 	= :productCode"
+					+ "		and tin 		= :tin";
 			
-			query			= session.createSQLQuery(hql);
+			//Criteria
+			param.put("productCode"	, productCode);
+			param.put("tin"			, tin);
 			
-			query.addScalar("cou"			, new IntegerType());
+			resultList = getResult(hql, param, "cou", Constants.INT_TYPE);
 			
-			list		 	= query.list();
-			
-			if(list!=null && list.size() > 0){
-				result = list.get(0);
+			if(resultList!=null && resultList.size() > 0){
+				result = EnjoyUtils.parseInt(resultList.get(0));
 			}
 			
-			logger.info("[checkDupProductCode] result 			:: " + result);
-			
-			
+			getLogger().info("[checkDupProductCode] result 			:: " + result);
 			
 		}catch(Exception e){
-			logger.info(e.getMessage());
-			throw new EnjoyException(e.getMessage());
+			getLogger().error(e);
+			throw new EnjoyException("checkDupProductCode error");
 		}finally{
-			
 			hql									= null;
-			list								= null;
-			query 								= null;
-			logger.info("[checkDupProductCode][End]");
+			getLogger().info("[checkDupProductCode][End]");
 		}
 		
 		return result;
 	}
 	
-	public int checkDupProductName(Session session, String productName, String productCode, String pageMode) throws EnjoyException{
-		logger.info("[checkDupProductName][Begin]");
+	public int checkDupProductName(String productName, String productCode, String tin, String pageMode) throws EnjoyException{
+		getLogger().info("[checkDupProductName][Begin]");
 		
-		String							hql									= null;
-		List<Integer>			 		list								= null;
-		SQLQuery 						query 								= null;
-		int 							result								= 0;
-		
+		String							hql				= null;
+		int 							result			= 0;
+		HashMap<String, Object>			param			= new HashMap<String, Object>();
+		List<Object>					resultList		= null;
 		
 		try{
-//			hql	= "select count(*) cou from product where productName = '" + productName + "' and productStatus = 'A'";
-			hql	= "select count(*) cou from productmaster where productName = '" + productName + "'";
+			hql	= "select count(*) cou "
+				+ "	from productmaster "
+				+ "	where productName 	= :productName"
+				+ "		and tin 		= :tin";
+			
+			//Criteria
+			param.put("productName"	, productName);
+			param.put("tin"			, tin);
 			
 			if(pageMode.equals(ProductDetailsMaintananceForm.EDIT)){
-				hql += " and productCode <> '" + productCode + "'";
+				hql += " and productCode <> :productCode";
+				param.put("productCode"	, productCode);
 			}
 			
-			query			= session.createSQLQuery(hql);
+			resultList = getResult(hql, param, "cou", Constants.INT_TYPE);
 			
-			query.addScalar("cou"			, new IntegerType());
-			
-			list		 	= query.list();
-			
-			if(list!=null && list.size() > 0){
-				result = list.get(0);
+			if(resultList!=null && resultList.size() > 0){
+				result = EnjoyUtils.parseInt(resultList.get(0));
 			}
 			
-			logger.info("[checkDupProductName] result 			:: " + result);
-			
-			
+			getLogger().info("[checkDupProductName] result 			:: " + result);
 			
 		}catch(Exception e){
-			logger.info(e.getMessage());
-			throw new EnjoyException(e.getMessage());
+			getLogger().error(e);
+			throw new EnjoyException("checkDupProductName error");
 		}finally{
-			
 			hql									= null;
-			list								= null;
-			query 								= null;
-			logger.info("[checkDupProductName][End]");
+			getLogger().info("[checkDupProductName][End]");
 		}
 		
 		return result;
 	}
 	
-	public List<ComboBean> productNameList(String productName, String productTypeName, String productGroupName, boolean flag){
-		logger.info("[productNameList][Begin]");
+	public List<ComboBean> productNameList(String productName, String productTypeName, String productGroupName, String tin, boolean flag) throws EnjoyException{
+		getLogger().info("[productNameList][Begin]");
 		
-		String 						hql			 		= null;
-        SessionFactory 				sessionFactory		= null;
-		Session 					session				= null;
-		SQLQuery 					query 				= null;
-		List<String>			 	list				= null;
-        String						productTypeCode		= null;
-        String						productGroupCode	= null;
-        List<Object[]>				listTemp			= null;
-		List<ComboBean>				comboList 			= null;
-		ComboBean					comboBean			= null;
+		String 							hql			 		= null;
+        String							productTypeCode		= null;
+        String							productGroupCode	= null;
+		List<ComboBean>					comboList 			= null;
+		ComboBean						comboBean			= null;
+		HashMap<String, Object>			param				= new HashMap<String, Object>();
+		List<String>					columnList			= new ArrayList<String>();
+		List<HashMap<String, Object>>	resultList			= null;
+		List<Object>					listObj				= null;
 		
 		try{
-			
-			sessionFactory 		= HibernateUtil.getSessionFactory();
-			session 			= sessionFactory.openSession();
 			comboList			=  new ArrayList<ComboBean>();
 			
 			if(productTypeName!=null && productGroupName!=null){
 				/*Begin check ProductType section*/
-				hql 				= " select productTypeCode from productype where productTypeName = '"+productTypeName+"' and productTypeStatus = 'A'";
+				hql = "select productTypeCode "
+					+ "	from productype "
+					+ "	where productTypeName 		= :productTypeName"
+					+ "		and tin					= :tin"
+					+ "		and productTypeStatus 	= 'A'";
 				
-				logger.info("[productNameList] Check ProductType hql :: " + hql);
+				//Criteria
+				param.put("productTypeName"	, productTypeName);
+				param.put("tin"				, tin);
 				
-				query			= session.createSQLQuery(hql);
-				query.addScalar("productTypeCode"			, new StringType());
+				listObj = getResult(hql, param, "productTypeCode", Constants.STRING_TYPE);
 				
-				list		 	= query.list();
-				
-				if(list!=null && list.size() == 1){
-					productTypeCode = list.get(0);
+				if(listObj!=null && listObj.size() == 1){
+					productTypeCode = EnjoyUtils.nullToStr(listObj.get(0));
 				}
 			    /*End check ProductType section*/
 				
+				/*Begin check ProductGroup section*/
 			    if(productTypeCode!=null){
-			    	/*Begin check ProductGroup section*/
-					hql 				= " select productGroupCode from productgroup where productTypeCode = '"+productTypeCode+"' and productGroupStatus = 'A'";
+			    	param		= new HashMap<String, Object>();
+			    	
+					hql 	= "select productGroupCode "
+							+ "	from productgroup "
+							+ "	where productTypeCode 		= :productTypeCode"
+							+ "		and tin					= :tin"
+							+ "		and productGroupStatus 	= 'A'";
 					
-					logger.info("[productNameList] Check ProductType hql :: " + hql);
+					//Criteria
+					param.put("productTypeCode"	, productTypeCode);
+					param.put("tin"				, tin);
 					
-					query			= session.createSQLQuery(hql);
-					query.addScalar("productGroupCode"			, new StringType());
+					listObj = getResult(hql, param, "productGroupCode", Constants.STRING_TYPE);
 					
-					list		 	= query.list();
-					
-					if(list!=null && list.size() == 1){
-						productGroupCode = list.get(0);
+					if(listObj!=null && listObj.size() == 1){
+						productGroupCode = EnjoyUtils.nullToStr(listObj.get(0));
 					}
-				    /*End check ProductGroup section*/
 			    }
+			    /*End check ProductGroup section*/
 			}
 		    
-		    hql = "";
-		    
+		    hql 		= "";
+		    param		= new HashMap<String, Object>();
+			
 		    if(productTypeCode!=null && productGroupCode!=null){
 		    	hql = " select productCode, productName"
 		    			+ " from productmaster"
-		    			+ " where productType 			= '" + productTypeCode + "'"
-		    					+ " and productGroup 	= '" + productGroupCode + "'"
-//		    					+ " and productStatus = 'A'"
-		    			+ " and productName like('"+productName+"%')"
+		    			+ " where productType 		= :productTypeCode"
+		    			+ " 	and productGroup 	= :productGroupCode"
+		    			+ " 	and tin 			= :tin"
+		    			+ " 	and productName LIKE CONCAT(:productName, '%')"
 		    			+ " order by productName asc limit 10";
+		    	
+		    	//Criteria
+				param.put("productTypeCode"	, productTypeCode);
+				param.put("productGroupCode", productGroupCode);
+				param.put("tin"				, tin);
+				param.put("productName"		, productName);
+				
 		    }else{
 		    	if(flag==true){
-		    		hql = " select productCode, productName"
-			    			+ " from productmaster where 1=1";
-		    		if(productTypeCode!=null) 	hql+= " and productType 	= '" + productTypeCode + "'";
-		    		if(productGroupCode!=null) 	hql+= " and productGroup 	= '" + productGroupCode + "'";
+		    		hql = "select productCode, productName"
+			    		+ " from productmaster where tin = :tin";
 		    		
-		    		hql += " and productName like('"+productName+"%')";
+		    		param.put("tin"				, tin);
+		    		
+		    		if(productTypeCode!=null){
+		    			hql+= " and productType 	= :productTypeCode";
+		    			param.put("productTypeCode"	, productTypeCode);
+		    		}
+		    		if(productGroupCode!=null){
+		    			hql+= " and productGroup 	= :productGroupCode";
+		    			param.put("productGroupCode", productGroupCode);
+		    		}
+		    		
+		    		hql += " and productName LIKE CONCAT(:productName, '%')";
 		    		hql += " order by productName asc limit 10";
+		    		
+		    		param.put("productName"		, productName);
+		    		
 		    	}
 		    }
 		    
-		    logger.info("[productGroupNameList] hql :: " + hql);
+		    getLogger().info("[productGroupNameList] hql :: " + hql);
 		    
 	    	if(!hql.equals("")){
-		    	query			= session.createSQLQuery(hql);
-				query.addScalar("productCode"			, new StringType());
-				query.addScalar("productName"			, new StringType());
+	    		//Column select
+				columnList.add("productCode");
+				columnList.add("productName");
 				
-				listTemp = query.list();
+				resultList = getResult(hql, param, columnList);
 				
-				for(Object[] row:listTemp){
+				for(HashMap<String, Object> row:resultList){
 					comboBean 	= new ComboBean();
 					
-					logger.info("productCode 		:: " + row[0]);
-					logger.info("productName 		:: " + row[1]);
-					
-					comboBean.setCode				(EnjoyUtils.nullToStr(row[0]));
-					comboBean.setDesc				(EnjoyUtils.nullToStr(row[1]));
+					comboBean.setCode	(EnjoyUtils.nullToStr(row.get("productCode")));
+					comboBean.setDesc	(EnjoyUtils.nullToStr(row.get("productName")));
 					
 					comboList.add(comboBean);
 				}
@@ -546,183 +490,56 @@ public class ProductDetailsDao {
 			
 		}catch(Exception e){
 			e.printStackTrace();
+			getLogger().error(e);
+			throw new EnjoyException("productGroupNameList error");
 		}finally{
-			session.close();
-			sessionFactory	= null;
-			session			= null;
-			logger.info("[productGroupNameList][End]");
+			getLogger().info("[productGroupNameList][End]");
 		}
 		
 		return comboList;
 	}
 	
-//	public List<ProductmasterBean> getProductDetailsLookUpList(	Session 					session, 
-//																	ProductDetailsLookUpForm 	form) throws EnjoyException{
-//		logger.info("[getProductDetailsLookUpList][Begin]");
-//		
-//		String						hql						= null;
-//		SQLQuery 					query 					= null;
-//		List<Object[]>				list					= null;
-//		ProductmasterBean 			bean					= null;
-//		List<ProductmasterBean> 	listData 				= new ArrayList<ProductmasterBean>();
-//		String						find					= null;
-//		
-//		try{
-//			find				= form.getFind();
-//			hql					= "select * from (select a.*, b.productTypeName, c.productGroupName "
-//													+ "	from productmaster a, productype b, productgroup c"
-//													+ "	where b.productTypeCode = a.productType"
-//														+ " and c.productTypeCode = a.productType"
-//														+ " and c.productGroupCode = a.productGroup) t";
-//			
-//			if(find!=null && !find.equals("")){
-//				hql += " and t." + form.getColumn();
-//				
-//				if(form.getLikeFlag().equals("Y")){
-//					hql += " like ('" + find + "%')";
-//				}else{
-//					hql += " = '" + find + "'";
-//				}
-//				
-//			}
-//			
-//			hql += " order by t." + form.getOrderBy() + " " + form.getSortBy();
-//			
-//			logger.info("[getProductDetailsLookUpList] hql :: " + hql);
-//
-//			query			= session.createSQLQuery(hql);			
-//			query.addScalar("productCode"		, new StringType());
-//			query.addScalar("productType"		, new StringType());
-//			query.addScalar("productGroup"		, new StringType());
-//			query.addScalar("productName"		, new StringType());
-//			query.addScalar("unitCode"			, new StringType());
-//			query.addScalar("quantity"			, new StringType());
-//			query.addScalar("minQuan"			, new StringType());
-//			query.addScalar("costPrice"			, new StringType());
-//			query.addScalar("salePrice1"		, new StringType());
-//			query.addScalar("salePrice2"		, new StringType());
-//			query.addScalar("salePrice3"		, new StringType());
-//			query.addScalar("salePrice4"		, new StringType());
-//			query.addScalar("salePrice5"		, new StringType());
-////			query.addScalar("startDate"			, new StringType());
-////			query.addScalar("expDate"			, new StringType());
-////			query.addScalar("productStatus"		, new StringType());
-//			query.addScalar("productTypeName"	, new StringType());
-//			query.addScalar("productGroupName"	, new StringType());
-//			
-//			list		 	= query.list();
-//			
-//			logger.info("[getProductDetailsLookUpList] list :: " + list);
-//			
-//			if(list!=null){
-//				logger.info("[getProductDetailsLookUpList] list.size() :: " + list.size());
-//				
-//				for(Object[] row:list){
-//					bean 		= new ProductmasterBean();
-//					
-//					logger.info("productCode 			:: " + row[0]);
-//					logger.info("productType 			:: " + row[1]);
-//					logger.info("productGroup 			:: " + row[2]);
-//					logger.info("productName 			:: " + row[3]);
-//					logger.info("unitCode 				:: " + row[4]);
-//					logger.info("quantity 				:: " + row[5]);
-//					logger.info("minQuan 				:: " + row[6]);
-//					logger.info("costPrice 				:: " + row[7]);
-//					logger.info("salePrice1 			:: " + row[8]);
-//					logger.info("salePrice2 			:: " + row[9]);
-//					logger.info("salePrice3 			:: " + row[10]);
-//					logger.info("salePrice4 			:: " + row[11]);
-//					logger.info("salePrice5 			:: " + row[12]);
-////					logger.info("startDate 				:: " + row[8]);
-////					logger.info("expDate 				:: " + row[9]);
-////					logger.info("productStatus 			:: " + row[11]);
-//					logger.info("productTypeName 		:: " + row[13]);
-//					logger.info("productGroupName 		:: " + row[14]);
-//					
-//					bean.setProductCode				(row[0]);
-//					bean.setProductTypeCode			(row[1]);
-//					bean.setProductGroupCode		(row[2]);
-//					bean.setProductName				(row[3]);
-//					bean.setUnitCode				(row[4]);
-//					bean.setQuantity				(EnjoyUtils.convertFloatToDisplay(row[5], 2));
-//					bean.setMinQuan					(EnjoyUtils.convertFloatToDisplay(row[6], 2));
-//					bean.setCostPrice				(EnjoyUtils.convertFloatToDisplay(row[7], 2));
-//					bean.setSalePrice1				(EnjoyUtils.convertFloatToDisplay(row[8], 2));
-//					bean.setSalePrice2				(EnjoyUtils.convertFloatToDisplay(row[9], 2));
-//					bean.setSalePrice3				(EnjoyUtils.convertFloatToDisplay(row[10], 2));
-//					bean.setSalePrice4				(EnjoyUtils.convertFloatToDisplay(row[11], 2));
-//					bean.setSalePrice5				(EnjoyUtils.convertFloatToDisplay(row[12], 2));
-////					bean.setStartDate				(EnjoyUtils.dateFormat(row[8], "yyyyMMdd", "dd/MM/yyyy"));
-////					bean.setExpDate					(EnjoyUtils.dateFormat(row[9], "yyyyMMdd", "dd/MM/yyyy"));
-////					bean.setProductStatus			(row[11]);
-//					bean.setProductTypeName			(row[13]);
-//					bean.setProductGroupName		(row[14]);
-//					
-//					listData.add(bean);
-//				}	
-//			}
-//			
-//		}catch(Exception e){
-//			logger.info("[getLookUpList] " + e.getMessage());
-//			e.printStackTrace();
-//			throw new EnjoyException("เกิดข้อผิดพลาดในการดึง LookUp");
-//		}finally{
-//			hql						= null;
-//			logger.info("[getProductDetailsLookUpList][End]");
-//		}
-//		
-//		return listData;
-//		
-//	}
-	
-	
-	public List<ProductdetailBean> getProductdetailList( Session 				session
-														,ProductdetailBean 		productdetailBean) throws EnjoyException{
-		logger.info("[getProductdetailList][Begin]");
+	public List<ProductdetailBean> getProductdetailList(ProductdetailBean productdetailBean) throws EnjoyException{
+		getLogger().info("[getProductdetailList][Begin]");
 		
-		String						hql							= null;
-		SQLQuery 					query 						= null;
-		List<Object[]>				list						= null;
-		ProductdetailBean			bean						= null;
-		List<ProductdetailBean> 	productdetailList 			= new ArrayList<ProductdetailBean>();
-		int							seq							= 0;
+		String							hql					= null;
+		ProductdetailBean				bean				= null;
+		List<ProductdetailBean> 		productdetailList 	= new ArrayList<ProductdetailBean>();
+		int								seq					= 0;
+		HashMap<String, Object>			param				= new HashMap<String, Object>();
+		List<String>					columnList			= new ArrayList<String>();
+		List<HashMap<String, Object>>	resultList			= null;
 		
 		try{	
 			hql					= "select * "
 								+ "	from productdetail"
-								+ "	where productCode = '" + productdetailBean.getProductCode() + "' order by seq asc";
+								+ "	where productCode 	= :productCode"
+								+ "		and tin 		= :tin"
+								+ "	order by seq asc";
 			
-			logger.info("[getProductdetailList] hql :: " + hql);
+			//Criteria
+			param.put("productCode"	, productdetailBean.getProductCode());
+			param.put("tin"			, productdetailBean.getTin());
+			
+			//Column select
+			columnList.add("productCode");
+			columnList.add("seq");
+			columnList.add("quanDiscount");
+			columnList.add("discountRate");
+			columnList.add("startDate");
+			columnList.add("expDate");
+			
+			resultList = getResult(hql, param, columnList);
 
-			query			= session.createSQLQuery(hql);			
-			query.addScalar("productCode"		, new StringType());
-			query.addScalar("seq"				, new StringType());
-			query.addScalar("quanDiscount"		, new StringType());
-			query.addScalar("discountRate"		, new StringType());
-			query.addScalar("startDate"			, new StringType());
-			query.addScalar("expDate"			, new StringType());
-			
-			list		 	= query.list();
-			
-			logger.info("[getProductdetailList] list.size() :: " + list.size());
-			
-			for(Object[] row:list){
+			for(HashMap<String, Object> row:resultList){
 				bean 	= new ProductdetailBean();
 				
-				logger.info("productCode 	:: " + row[0]);
-				logger.info("seqDb 			:: " + row[1]);
-				logger.info("quanDiscount 	:: " + row[2]);
-				logger.info("discountRate 	:: " + row[3]);
-				logger.info("startDate 		:: " + row[4]);
-				logger.info("expDate 		:: " + row[5]);
-				logger.info("seq 			:: " + seq);
-				
-				bean.setProductCode			(EnjoyUtils.nullToStr(row[0]));
-				bean.setSeqDb				(EnjoyUtils.nullToStr(row[1]));
-				bean.setQuanDiscount		(EnjoyUtils.convertFloatToDisplay(row[2], 2));
-				bean.setDiscountRate		(EnjoyUtils.convertFloatToDisplay(row[3], 2));
-				bean.setStartDate			(EnjoyUtils.dateToThaiDisplay(row[4]));
-				bean.setExpDate				(EnjoyUtils.dateToThaiDisplay(row[5]));
+				bean.setProductCode			(EnjoyUtils.nullToStr(row.get("productCode")));
+				bean.setSeqDb				(EnjoyUtils.nullToStr(row.get("seq")));
+				bean.setQuanDiscount		(EnjoyUtils.convertFloatToDisplay(row.get("quanDiscount"), 2));
+				bean.setDiscountRate		(EnjoyUtils.convertFloatToDisplay(row.get("discountRate"), 2));
+				bean.setStartDate			(EnjoyUtils.dateToThaiDisplay(row.get("startDate")));
+				bean.setExpDate				(EnjoyUtils.dateToThaiDisplay(row.get("expDate")));
 				bean.setSeq					(String.valueOf(seq));
 				
 				productdetailList.add(bean);
@@ -731,31 +548,28 @@ public class ProductDetailsDao {
 			}	
 			
 		}catch(Exception e){
-			logger.info("[getProductdetailList] " + e.getMessage());
+			getLogger().error(e);
 			e.printStackTrace();
 			throw new EnjoyException("error getProductdetailList");
 		}finally{
 			hql						= null;
-			logger.info("[getProductdetailList][End]");
+			getLogger().info("[getProductdetailList][End]");
 		}
 		
 		return productdetailList;
 		
 	}
 	
-	public void insertProductdetail(Session session, ProductdetailBean 		productdetailBean) throws EnjoyException{
-		logger.info("[insertProductdetail][Begin]");
+	public void insertProductdetail(ProductdetailBean productdetailBean) throws EnjoyException{
+		getLogger().info("[insertProductdetail][Begin]");
 		
-		Productdetail			productdetail		= null;
-		ProductdetailPK 		id 					= null;
+		Productdetail			productdetail		= new Productdetail();
+		ProductdetailPK 		id 					= new ProductdetailPK();
 		
 		try{
-			
-			productdetail 	= new Productdetail();
-			id 				= new ProductdetailPK();
-			
-			id.setProductCode(productdetailBean.getProductCode());
-			id.setSeq(EnjoyUtils.parseInt(productdetailBean.getSeqDb()));
+			id.setProductCode	(productdetailBean.getProductCode());
+			id.setTin			(productdetailBean.getTin());
+			id.setSeq			(EnjoyUtils.parseInt(productdetailBean.getSeqDb()));
 			
 			productdetail.setId					(id);
 			productdetail.setQuanDiscount		(EnjoyUtils.parseBigDecimal(productdetailBean.getQuanDiscount()));
@@ -763,260 +577,257 @@ public class ProductDetailsDao {
 			productdetail.setStartDate			(EnjoyUtils.dateToThaiDB(productdetailBean.getStartDate()));
 			productdetail.setExpDate			(EnjoyUtils.dateToThaiDB(productdetailBean.getExpDate()));
 			
-			session.saveOrUpdate(productdetail);
+			insertData(productdetail);
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			logger.info(e.getMessage());
+			getLogger().info(e.getMessage());
 			throw new EnjoyException("Error insertProductdetail");
 		}finally{
 			id 				= null;
 			productdetail 	= null;
-			logger.info("[insertProductdetail][End]");
+			getLogger().info("[insertProductdetail][End]");
 		}
 	}
 	
-	public void deleteProductdetail(Session session, String productCode) throws EnjoyException{
-		logger.info("[deleteProductdetail][Begin]");
+	public void deleteProductdetail(String productCode, String tin) throws EnjoyException{
+		getLogger().info("[deleteProductdetail][Begin]");
 		
 		String							hql									= null;
 		Query 							query 								= null;
 		
 		try{
 			hql				= "delete Productdetail t"
-							+ " where t.id.productCode	 = '" + productCode + "'";
+							+ " where t.id.productCode	= :productCode"
+							+ "		and t.id.tin		= :tin";
 			
-			query = session.createQuery(hql);
+			query = createQuery(hql);
+			query.setParameter("productCode", productCode);
+			query.setParameter("tin"		, tin);
 			
 			query.executeUpdate();			
 		}catch(Exception e){
 			e.printStackTrace();
-			logger.info(e.getMessage());
+			getLogger().error(e);
 			throw new EnjoyException("เกิดข้อผิดพลาดในการลบข้อมูล");
 		}finally{
 			
 			hql									= null;
 			query 								= null;
-			logger.info("[deleteProductdetail][End]");
+			getLogger().info("[deleteProductdetail][End]");
 		}
 	}
 
 	
-	public ProductmasterBean getProductDetailByName(String 	productName) throws EnjoyException{
-		logger.info("[getProductDetailByName][Begin]");
+	public ProductmasterBean getProductDetailByName(String 	productName, String tin) throws EnjoyException{
+		getLogger().info("[getProductDetailByName][Begin]");
 		
-		String						hql						= null;
-		SQLQuery 					query 					= null;
-		List<Object[]>				list					= null;
-		ProductmasterBean			bean					= null;
-		SessionFactory 				sessionFactory			= null;
-		Session 					session					= null;
+		String							hql					= null;
+		ProductmasterBean				bean				= null;
+		HashMap<String, Object>			param				= new HashMap<String, Object>();
+		List<String>					columnList			= new ArrayList<String>();
+		List<HashMap<String, Object>>	resultList			= null;
 		
 		try{		
-			
-			sessionFactory 		= HibernateUtil.getSessionFactory();
-			session 			= sessionFactory.openSession();
-			
 			hql		= "select a.*, b.productTypeName, c.productGroupName, d.unitName"
 					+ "	from productmaster a, productype b, productgroup c, unittype d"
 					+ "	where b.productTypeCode 	= a.productType"
-						+ " and c.productTypeCode 	= a.productType"
-						+ " and c.productGroupCode 	= a.productGroup"
-						+ " and d.unitCode 			= a.unitCode"
-						+ " and a.productName		= '" + productName + "'";
+					+ "		and b.tin				= a.tin"
+					+ " and c.productTypeCode 	= a.productType"
+					+ " and c.productGroupCode 	= a.productGroup"
+					+ "	and c.tin				= a.tin"
+					+ " and d.unitCode 			= a.unitCode"
+					+ "	and d.tin				= d.tin"
+					+ " and a.productName		= :productName"
+					+ "	and a.tin				= :tin";
 			
-			logger.info("[getProductDetailByName] hql :: " + hql);
+			//Criteria
+			param.put("productName"	, productName);
+			param.put("tin"			, tin);
+			
+			//Column select
+			columnList.add("productCode");
+			columnList.add("productType");
+			columnList.add("productGroup");
+			columnList.add("productName");
+			columnList.add("unitCode");
+			columnList.add("minQuan");
+			columnList.add("costPrice");
+			columnList.add("salePrice1");
+			columnList.add("salePrice2");
+			columnList.add("salePrice3");
+			columnList.add("salePrice4");
+			columnList.add("salePrice5");
+			columnList.add("productTypeName");
+			columnList.add("productGroupName");
+			columnList.add("unitName");
+			
+			resultList = getResult(hql, param, columnList);
 
-			query			= session.createSQLQuery(hql);			
-			query			= session.createSQLQuery(hql);			
-			query.addScalar("productCode"		, new StringType());
-			query.addScalar("productType"		, new StringType());
-			query.addScalar("productGroup"		, new StringType());
-			query.addScalar("productName"		, new StringType());
-			query.addScalar("unitCode"			, new StringType());
-			query.addScalar("minQuan"			, new StringType());
-//			query.addScalar("quantity"			, new StringType());
-			query.addScalar("costPrice"			, new StringType());
-			query.addScalar("salePrice1"		, new StringType());
-			query.addScalar("salePrice2"		, new StringType());
-			query.addScalar("salePrice3"		, new StringType());
-			query.addScalar("salePrice4"		, new StringType());
-			query.addScalar("salePrice5"		, new StringType());
-			query.addScalar("productTypeName"	, new StringType());
-			query.addScalar("productGroupName"	, new StringType());
-			query.addScalar("unitName"			, new StringType());
-			
-			list		 	= query.list();
-			
-			logger.info("[getProductDetailByName] list.size() :: " + list.size());
-			
-			if(list.size()==1){
-				for(Object[] row:list){
+			if(resultList.size()==1){
+				for(HashMap<String, Object> row:resultList){
 					bean 	= new ProductmasterBean();
 					
-					logger.info("productCode 			:: " + row[0]);
-					logger.info("productType 			:: " + row[1]);
-					logger.info("productGroup 			:: " + row[2]);
-					logger.info("productName 			:: " + row[3]);
-					logger.info("unitCode 				:: " + row[4]);
-					logger.info("minQuan 				:: " + row[5]);
-//					logger.info("quantity 				:: " + row[6]);
-					logger.info("costPrice 				:: " + row[6]);
-					logger.info("salePrice1 			:: " + row[7]);
-					logger.info("salePrice2 			:: " + row[8]);
-					logger.info("salePrice3 			:: " + row[9]);
-					logger.info("salePrice4 			:: " + row[10]);
-					logger.info("salePrice5 			:: " + row[11]);
-					logger.info("productTypeName 		:: " + row[12]);
-					logger.info("productGroupName 		:: " + row[13]);
-					logger.info("unitName 				:: " + row[14]);
-					
-					bean.setProductCode				(EnjoyUtils.nullToStr(row[0]));
-					bean.setProductTypeCode			(EnjoyUtils.nullToStr(row[1]));
-					bean.setProductGroupCode		(EnjoyUtils.nullToStr(row[2]));
-					bean.setProductName				(EnjoyUtils.nullToStr(row[3]));
-					bean.setUnitCode				(EnjoyUtils.nullToStr(row[4]));
-					bean.setMinQuan					(EnjoyUtils.convertFloatToDisplay(row[5], 2));
-//					bean.setQuantity				(EnjoyUtils.convertFloatToDisplay(row[6], 2));
-					bean.setCostPrice				(EnjoyUtils.convertFloatToDisplay(row[6], 2));
-					bean.setSalePrice1				(EnjoyUtils.convertFloatToDisplay(row[7], 2));
-					bean.setSalePrice2				(EnjoyUtils.convertFloatToDisplay(row[8], 2));
-					bean.setSalePrice3				(EnjoyUtils.convertFloatToDisplay(row[9], 2));
-					bean.setSalePrice4				(EnjoyUtils.convertFloatToDisplay(row[10], 2));
-					bean.setSalePrice5				(EnjoyUtils.convertFloatToDisplay(row[11], 2));
-					bean.setProductTypeName			(EnjoyUtils.nullToStr(row[12]));
-					bean.setProductGroupName		(EnjoyUtils.nullToStr(row[13]));
-					bean.setUnitName				(EnjoyUtils.nullToStr(row[14]));
+					bean.setProductCode				(EnjoyUtils.nullToStr(row.get("productCode")));
+					bean.setProductTypeCode			(EnjoyUtils.nullToStr(row.get("productType")));
+					bean.setProductGroupCode		(EnjoyUtils.nullToStr(row.get("productGroup")));
+					bean.setProductName				(EnjoyUtils.nullToStr(row.get("productName")));
+					bean.setUnitCode				(EnjoyUtils.nullToStr(row.get("unitCode")));
+					bean.setMinQuan					(EnjoyUtils.convertFloatToDisplay(row.get("minQuan"), 2));
+					bean.setCostPrice				(EnjoyUtils.convertFloatToDisplay(row.get("costPrice"), 2));
+					bean.setSalePrice1				(EnjoyUtils.convertFloatToDisplay(row.get("salePrice1"), 2));
+					bean.setSalePrice2				(EnjoyUtils.convertFloatToDisplay(row.get("salePrice2"), 2));
+					bean.setSalePrice3				(EnjoyUtils.convertFloatToDisplay(row.get("salePrice3"), 2));
+					bean.setSalePrice4				(EnjoyUtils.convertFloatToDisplay(row.get("salePrice4"), 2));
+					bean.setSalePrice5				(EnjoyUtils.convertFloatToDisplay(row.get("salePrice5"), 2));
+					bean.setProductTypeName			(EnjoyUtils.nullToStr(row.get("productTypeName")));
+					bean.setProductGroupName		(EnjoyUtils.nullToStr(row.get("productGroupName")));
+					bean.setUnitName				(EnjoyUtils.nullToStr(row.get("unitName")));
 					
 				}	
 			}
 			
 		}catch(Exception e){
-			logger.info("[getProductDetailByName] " + e.getMessage());
+			getLogger().error(e);
 			e.printStackTrace();
 			throw new EnjoyException("error getProductDetailByName");
 		}finally{
 			hql					= null;
-			session.close();
-			sessionFactory		= null;
-			session				= null;
-			logger.info("[getProductDetailByName][End]");
+			getLogger().info("[getProductDetailByName][End]");
 		}
 		
 		return bean;
 		
 	}
 	
-	public String getQuanDiscount(String productCode, String quantity, String invoiceDate) throws EnjoyException{
-		logger.info("[getQuanDiscount][Begin]");
+	public String getQuanDiscount(String productCode, String quantity, String invoiceDate, String tin) throws EnjoyException{
+		getLogger().info("[getQuanDiscount][Begin]");
 		
-		String			hql							= null;
-		List<String>	list						= null;
-		SQLQuery 		query 						= null;
-		String 			discountRate				= "0.00";
-		SessionFactory 	sessionFactory				= null;
-		Session 		session						= null;
-		
+		String							hql					= null;
+		String 							discountRate		= "0.00";
+		HashMap<String, Object>			param				= new HashMap<String, Object>();
+		List<Object>					resultList			= null;
 		
 		try{
-			sessionFactory 		= HibernateUtil.getSessionFactory();
-			session 			= sessionFactory.openSession();
 			invoiceDate			= invoiceDate.equals("")?EnjoyUtils.currDateThai():EnjoyUtils.dateThaiToDb(invoiceDate);
 			quantity			= quantity.equals("")?"0.00":quantity;
 			
 			hql		= "select discountRate from productdetail"
-					+ "		where productCode = '" + productCode + "'"
-					+ "			and quanDiscount <= " + quantity
-					+ "			and startDate <= '" + invoiceDate + "'"
-					+ "			and (expDate is null or expDate = '' or expDate >= '" + invoiceDate + "')"
+					+ "		where productCode 		= :productCode"
+					+ "			and quanDiscount 	<= :quantity"
+					+ "			and startDate 		<= :startDate"
+					+ "			and (expDate is null or expDate = '' or expDate >= :expDate)"
+					+ "			and tin				= :tin"
 					+ "		order by quanDiscount ASC, startDate DESC"
 					+ "		LIMIT 1";
 			
-			logger.info("[getQuanDiscount] hql 			:: " + hql);
+			//Criteria
+			param.put("productCode"	, productCode);
+			param.put("quantity"	, quantity);
+			param.put("startDate"	, invoiceDate);
+			param.put("expDate"		, invoiceDate);
+			param.put("tin"			, tin);
+
+			resultList = getResult(hql, param, "discountRate", Constants.STRING_TYPE);
 			
-			query			= session.createSQLQuery(hql);
-			
-			query.addScalar("discountRate"			, new StringType());
-			
-			list		 	= query.list();
-			
-			if(list!=null && list.size() > 0){
-				discountRate = EnjoyUtils.convertFloatToDisplay(list.get(0), 2);
+			if(resultList!=null && resultList.size() > 0){
+				discountRate = EnjoyUtils.convertFloatToDisplay(resultList.get(0), 2);
 			}
 			
-			logger.info("[getQuanDiscount] discountRate 			:: " + discountRate);
-			
-			
+			getLogger().info("[getQuanDiscount] discountRate 			:: " + discountRate);
 			
 		}catch(Exception e){
-			logger.error(e);
+			getLogger().error(e);
 			e.printStackTrace();
 			throw new EnjoyException(e.getMessage());
 		}finally{
-			session.flush();
-			session.clear();
-			
-			session.close();
-			
 			hql				= null;
-			list			= null;
-			query 			= null;
-			sessionFactory	= null;
-			session			= null;
-			logger.info("[getQuanDiscount][End]");
+			getLogger().info("[getQuanDiscount][End]");
 		}
 		
 		return discountRate;
 	}
 	
-//	public String getInventory(String productCode) throws EnjoyException{
-//		logger.info("[getInventory][Begin]");
-//		
-//		String			hql							= null;
-//		List<String>	list						= null;
-//		SQLQuery 		query 						= null;
-//		String 			inventory					= "0.00";
-//		SessionFactory 	sessionFactory				= null;
-//		Session 		session						= null;
-//		
-//		
-//		try{
-//			sessionFactory 				= HibernateUtil.getSessionFactory();
-//			session 					= sessionFactory.openSession();
-//			
-//			hql		= "select quantity from productmaster where productCode = '" + productCode + "'";
-//			
-//			query			= session.createSQLQuery(hql);
-//			
-//			query.addScalar("quantity"			, new StringType());
-//			
-//			list		 	= query.list();
-//			
-//			if(list!=null && list.size() > 0){
-//				inventory = EnjoyUtils.convertFloatToDisplay(list.get(0), 2);
-//			}
-//			
-//			logger.info("[getInventory] inventory 			:: " + inventory);
-//			
-//			
-//			
-//		}catch(Exception e){
-//			logger.error(e);
-//			throw new EnjoyException(e.getMessage());
-//		}finally{
-//			session.flush();
-//			session.clear();
-//			session.close();
-//			
-//			hql				= null;
-//			list			= null;
-//			query 			= null;
-//			sessionFactory	= null;
-//			session			= null;
-//			logger.info("[getInventory][End]");
-//		}
-//		
-//		return inventory;
-//	}
 	
+	public List<ProductmasterBean> getMultiManageProduct(ProductmasterBean productDetailsBean) throws EnjoyException{
+		getLogger().info("[searchByCriteria][Begin]");
+		
+		String							hql						= null;
+		ProductmasterBean				bean					= null;
+		List<ProductmasterBean> 		productDetailsList 		= new ArrayList<ProductmasterBean>();
+		HashMap<String, Object>			param					= new HashMap<String, Object>();
+		List<String>					columnList				= new ArrayList<String>();
+		List<HashMap<String, Object>>	resultList				= null;
+		
+		try{	
+			hql					= "select a.*, b.productTypeName, c.productGroupName, d.unitName"
+								+ "	from productmaster a"
+								+ "		inner join productype b on b.productTypeCode = a.productType and b.tin = a.tin"
+								+ "		inner join productgroup c on c.productTypeCode 	= a.productType and c.productGroupCode = a.productGroup and c.tin = a.tin"
+								+ "		inner join unittype d on d.unitCode = a.unitCode and d.tin = a.tin"
+								+ "	where a.tin					= :tin"
+								+ "		and b.productTypeName 	= :productTypeName"
+								+ "		and c.productGroupName 	= :productGroupName"
+								+ "		and d.unitName			= :unitName";
+			
+			//Criteria
+			param.put("tin"				, productDetailsBean.getTin());
+			param.put("productTypeName"	, productDetailsBean.getProductTypeName());
+			param.put("productGroupName", productDetailsBean.getProductGroupName());
+			param.put("unitName"		, productDetailsBean.getUnitName());
+			
+			//Column select
+			columnList.add("productCode");
+			columnList.add("tin");
+			columnList.add("productType");
+			columnList.add("productGroup");
+			columnList.add("productName");
+			columnList.add("unitCode");
+			columnList.add("minQuan");
+			columnList.add("costPrice");
+			columnList.add("salePrice1");
+			columnList.add("salePrice2");
+			columnList.add("salePrice3");
+			columnList.add("salePrice4");
+			columnList.add("salePrice5");
+			columnList.add("productTypeName");
+			columnList.add("productGroupName");
+			
+			resultList = getResult(hql, param, columnList);
+			
+			for(HashMap<String, Object> row:resultList){
+				bean 	= new ProductmasterBean();
+				
+				bean.setProductCode				(EnjoyUtils.nullToStr(row.get("productCode")));
+				bean.setTin						(EnjoyUtils.nullToStr(row.get("tin")));
+				bean.setProductTypeCode			(EnjoyUtils.nullToStr(row.get("productType")));
+				bean.setProductGroupCode		(EnjoyUtils.nullToStr(row.get("productGroup")));
+				bean.setProductName				(EnjoyUtils.nullToStr(row.get("productName")));
+				bean.setUnitCode				(EnjoyUtils.nullToStr(row.get("unitCode")));
+				bean.setMinQuan					(EnjoyUtils.convertFloatToDisplay(row.get("minQuan"), 2));
+				bean.setCostPrice				(EnjoyUtils.convertFloatToDisplay(row.get("costPrice"), 2));
+				bean.setSalePrice1				(EnjoyUtils.convertFloatToDisplay(row.get("salePrice1"), 2));
+				bean.setSalePrice2				(EnjoyUtils.convertFloatToDisplay(row.get("salePrice2"), 2));
+				bean.setSalePrice3				(EnjoyUtils.convertFloatToDisplay(row.get("salePrice3"), 2));
+				bean.setSalePrice4				(EnjoyUtils.convertFloatToDisplay(row.get("salePrice4"), 2));
+				bean.setSalePrice5				(EnjoyUtils.convertFloatToDisplay(row.get("salePrice5"), 2));
+				bean.setProductTypeName			(EnjoyUtils.nullToStr(row.get("productTypeName")));
+				bean.setProductGroupName		(EnjoyUtils.nullToStr(row.get("productGroupName")));
+				
+				productDetailsList.add(bean);
+			}	
+			
+		}catch(Exception e){
+			getLogger().error(e);
+			e.printStackTrace();
+			throw new EnjoyException("error searchByCriteria");
+		}finally{
+			hql						= null;
+			getLogger().info("[searchByCriteria][End]");
+		}
+		
+		return productDetailsList;
+		
+	}
+
 }

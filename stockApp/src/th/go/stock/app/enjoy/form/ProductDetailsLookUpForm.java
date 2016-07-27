@@ -83,5 +83,4 @@ public class ProductDetailsLookUpForm {
 	public void setHashTable(HashMap hashTable) {
 		this.hashTable = hashTable;
 	}
-
 }

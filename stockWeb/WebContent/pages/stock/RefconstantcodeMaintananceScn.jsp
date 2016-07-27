@@ -6,9 +6,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
 <%
-	String						titlePage				= refconstantcodeMaintananceForm.getTitlePage();
-	List<RefconstantcodeBean> 	refconstantcodeList 	= refconstantcodeMaintananceForm.getRefconstantcodeList();
-
+	String						titlePage			= refconstantcodeMaintananceForm.getTitlePage();
+	List<RefconstantcodeBean> 	section1ListList 	= refconstantcodeMaintananceForm.getSection1List();
+	List<RefconstantcodeBean> 	section2ListList 	= refconstantcodeMaintananceForm.getSection2List();
 
 %>
 
@@ -196,7 +196,7 @@
 												</tr> 
 												<%
  													int					  	seq		= 1;
-													for(RefconstantcodeBean bean:refconstantcodeList){
+													for(RefconstantcodeBean bean:section1ListList){
 														if(!bean.getRowStatus().equals(refconstantcodeMaintananceForm.DEL)){
  												%>
 												<tr>
@@ -253,16 +253,39 @@
 												<% seq++;}}%>
 											</table>
 											<br/>
-											<table class="table user-register-table" style="border-bottom-color: white;">
-							        			<tr>
-								        			<td align="right">
-								        				<br/>
-								        				<input type="button" id="btnSave" class="btn btn-sm btn-warning" value='บันทึก' onclick="lp_save();" />&nbsp;&nbsp;&nbsp;
-				   										<input type="button" id="btnReset" onclick="lp_reset();" class="btn btn-sm btn-danger" value='เริ่มใหม่' />
-								        			</td>
-								        		</tr>
-									        </table>
 										</div>
+										<div id="seasonTitle" class="padding-md round-sm season-title-head">
+											<h6 class="panel-title" style="font-size:1.0em">ตั้งค่ารายละเอียดโปรแกรม</h6>
+										</div>
+										<div class="panel-body">
+											<table border="0" width="100%">
+												<%
+												int					  	seq2		= 0;
+												for(RefconstantcodeBean bean:section2ListList){ 
+												%>
+												<tr>
+													<td align="left">
+														<input type="checkbox" 
+															   id="sendMailFlg<%=seq2++%>" 
+															   name="sendMailFlg" 
+															   <%if(!"Y".equals(bean.getFlagEdit())){%> disabled="disabled" <%}%> 
+															   <%if("Y".equals(bean.getCodeDisplay())){%> checked="checked" <%}%> 
+															   value="Y" /> :&nbsp;
+														<%=bean.getCodeNameTH()%>
+													</td>
+												</tr>
+												<%}%>
+											</table>
+										</div>
+										<table class="table user-register-table" style="border-bottom-color: white;">
+						        			<tr>
+							        			<td align="right">
+							        				<br/>
+							        				<input type="button" id="btnSave" class="btn btn-sm btn-warning" value='บันทึก' onclick="lp_save();" />&nbsp;&nbsp;&nbsp;
+			   										<input type="button" id="btnReset" onclick="lp_reset();" class="btn btn-sm btn-danger" value='เริ่มใหม่' />
+							        			</td>
+							        		</tr>
+								        </table>
 									</div>          
 								</div>
 							</section>

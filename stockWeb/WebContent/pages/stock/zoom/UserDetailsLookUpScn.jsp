@@ -20,7 +20,7 @@
 	<script>
 		var gv_service 			= null;
 		var gv_url 				= '<%=servURL%>/EnjoyGenericSrv';
-		var gv_checkDupUserId 	= false;
+		//var gv_checkDupUserId 	= false;
 		
 		$(document).ready(function(){
 			
@@ -69,9 +69,9 @@
 			
 		});
 		
-		function lp_setData(av_userUniqueId, av_userFullName, av_userId, av_userStatus, av_userStatusName){
+		function lp_setData(av_userUniqueId, av_userFullName, av_userEmail, av_userStatus, av_userStatusName){
 			try{
-				parent.lp_returnData(av_userUniqueId, av_userFullName, av_userId, av_userStatus, av_userStatusName);
+				parent.lp_returnData(av_userUniqueId, av_userFullName, av_userEmail, av_userStatus, av_userStatusName);
 			}catch(e){
 				alert("lp_sendEditPage :: " + e);
 			}
@@ -147,7 +147,6 @@
 <body>
 	<form id="frm" onsubmit="return false;">
 		<input type="hidden" id="service" 	name="service" value="servlet.UserDetailsLookUpServlet" />
-		<input type="hidden" id="tin" 	name="tin" value="<%=userDetailsLookUpForm.getTin()%>" />
 		<div style="background-color:white;width: 100%;height: 100%;">
 			<table class="user-register-table user-search-table" width="100%" border="0" cellpadding="5" cellspacing="5">
         		<tr>
@@ -223,8 +222,8 @@
 				<thead> 
 	               <tr height="26px;">
 						<th  style="text-align: center;" width="15%"><B>ลำดับ</B></th>
+						<th  style="text-align: center;" width="20%"><B>E-mail</B></th>
 						<th  style="text-align: center;" width="40%"><B>ชื่อ-นามสกุล</B></th> 
-						<th  style="text-align: center;" width="20%"><B>รหัสผู้ใช้งาน</B></th>
 						<th  style="text-align: center;" width="25%"><B>สถานะ</B></th>
 					</tr> 
 				</thead>
@@ -254,10 +253,10 @@
 						if(dataList.size()>0){
 							for(UserDetailsBean bean:dataList){
 					%>
-								<tr class="rowSelect" onclick="lp_setData('<%=bean.getUserUniqueId()%>', '<%=bean.getUserFullName()%>', '<%=bean.getUserId()%>', '<%=bean.getUserStatus()%>', '<%=bean.getUserStatusName()%>');" >
+								<tr class="rowSelect" onclick="lp_setData('<%=bean.getUserUniqueId()%>', '<%=bean.getUserFullName()%>', '<%=bean.getUserEmail()%>', '<%=bean.getUserStatus()%>', '<%=bean.getUserStatusName()%>');" >
 									<td align="center"><%=seq%></td>
+									<td><%=bean.getUserEmail()%></td>
 									<td><%=bean.getUserFullName()%></td>
-									<td><%=bean.getUserId()%></td>
 									<td><%=bean.getUserStatusName()%></td>
 								</tr>
 					<% 			seq++;

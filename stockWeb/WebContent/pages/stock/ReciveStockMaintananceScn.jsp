@@ -15,7 +15,6 @@
 	String						titlePage				= reciveStockMaintananceForm.getTitlePage();
 	CompanyVendorBean 			companyVendorBean 		= reciveStockMaintananceForm.getCompanyVendorBean();
 	List<ReciveOrdeDetailBean> 	reciveOrdeDetailList 	= reciveStockMaintananceForm.getReciveOrdeDetailList();
-	List<ComboBean> 			companyCombo 			= reciveStockMaintananceForm.getCompanyCombo();
 
 
 %>
@@ -196,7 +195,6 @@
 		function lp_validate(){
 			var la_validate             = new Array( "vendorName:บริษัท"	
 													, "branchName:สาขา"
-													, "tin:บริษัทที่สังกัด"
 													, "reciveDate:วันที่สั่งซื้อ");
 		    var lv_return				= true;
 		    var la_reciveType			= null;
@@ -477,7 +475,7 @@
 		            		
 		            		if(status=="SUCCESS"){
 		            			alert("บันทึกเรียบร้อย", function() { 
-		            				var params = "reciveNo=" + jsonObj.reciveNo + "&tin=" + jsonObj.tin;
+		            				var params = "reciveNo=" + jsonObj.reciveNo;
 		            				window.location = gv_url + "?service=" + $("#service").val() + "&pageAction=getDetail&" + params;
 		    	    		    });
 		            			//alert("บันทึกเรียบร้อย");
@@ -505,7 +503,7 @@
 				if($("#pageMode").val()=="NEW"){
 					window.location = gv_url + "?service=" + $("#service").val() + "&pageAction=new";
 				}else{
-					params = "reciveNo=" + $('#reciveNo').val() + "&tin=" + $("#tin").val();
+					params = "reciveNo=" + $('#reciveNo').val();
 					window.location = gv_url + "?service=" + $("#service").val() + "&pageAction=getDetail&" + params;
 				}
 			}catch(e){
@@ -731,18 +729,15 @@
 			var params 		= "";
 			var vendorCode 	= null;
 			var quantity	= null;
-			var tin			= null;
 			
 			try{
 				vendorCode 	= $("#vendorCode").val().trim();
 				quantity	= $("#quantity" + av_seq).val().trim();
-				tin 		= $("#tin").val().trim();
 				
 				params = "&pageAction=getProductDetailByName" 
 						+ "&productName=" + av_productName.trim()
 						+ "&vendorCode=" + vendorCode
-						+ "&quantity=" + quantity
-						+ "&tin=" + tin;
+						+ "&quantity=" + quantity;
 				
 				$.ajax({
 					async:false,
@@ -800,6 +795,7 @@
 			var lv_productCode 	= "";
 			var lv_quantity 	= "";
 			var lv_vendorCode 	= "";
+			var params			= "";
 			
 			try{
 				lv_productCode 	= $("#productCode" + av_seq).val().trim();
@@ -810,11 +806,15 @@
 					return;
 				}
 				
+				params = "productCode=" + lv_productCode 
+						+ "&quantity=" + lv_quantity 
+						+ "&vendorCode=" + lv_vendorCode;
+				
 				$.ajax({
 					async:false,
 		            type: "POST",
 		            url: gv_url,
-		            data: gv_service + "&pageAction=getPrice&productCode=" + lv_productCode + "&quantity=" + lv_quantity + "&vendorCode=" + lv_vendorCode,
+		            data: gv_service + "&pageAction=getPrice&" + params,
 		            beforeSend: "",
 		            success: function(data){
 		            	var jsonObj 			= null;
@@ -957,7 +957,7 @@
 						async:false,
 			            type: "POST",
 			            url: gv_url,
-			            data: gv_service + "&pageAction=getProductDetailByName&productName=" + obj.productName.trim() + "&tin=" + $("#tin").val().trim(),
+			            data: gv_service + "&pageAction=getProductDetailByName&productName=" + obj.productName.trim(),
 			            beforeSend: "",
 			            success: function(data){
 			            	var jsonObj 			= null;
@@ -990,17 +990,21 @@
 			
 			var vendorName = "";
 			var branchName = "";
+			var params 		= "";
 			
 			try{
 				
 				vendorName = $("#vendorName").val().trim();
 				branchName = $("#branchName").val().trim();
 				
+				params = "vendorName=" + vendorName 
+						+ "&branchName=" + branchName;
+				
 				$.ajax({
 					async:false,
 		            type: "POST",
 		            url: gv_url,
-		            data: gv_service + "&pageAction=getCompanyVendorDetail&vendorName=" + vendorName + "&branchName=" + branchName,
+		            data: gv_service + "&pageAction=getCompanyVendorDetail&" + params,
 		            beforeSend: "",
 		            success: function(data){
 		            	var jsonObj 			= null;
@@ -1162,23 +1166,11 @@
 					return;
 				}
 				
-				lv_param = "&productCode=" + lv_productCode + "&productName=" + lv_productName;
+				lv_param = "&productCode=" + lv_productCode 
+							+ "&productName=" + lv_productName;
 				
 				gp_dialogPopUp("/stockWeb/EnjoyGenericSrv?service=servlet.ComparePriceServlet&pageAction=lookup" + lv_param, "เปรียบเทียบราคา" + lv_productName);
 				
-				/*lo_dialog 	= $( "#dialog" );
-				lo_iframe	= $("<iframe />").attr("src", "/stockWeb/EnjoyGenericSrv?service=servlet.ComparePriceServlet&pageAction=lookup" + lv_param)
-											 .attr("width", "100%")
-											 .attr("height", "100%")
-											 .attr("border", "0");
-				
-				gp_progressBarOn();
-				lo_dialog.empty();
-				
-				lo_dialog.dialog("option", "title", "เปรียบเทียบราคา" + lv_productName);
-				
-				lo_dialog.append(lo_iframe).dialog( "open" );
-				event.preventDefault();*/
 			}catch(e){
 				alert("lp_comparePrice :: " + e);
 			}
@@ -1186,7 +1178,8 @@
 		
 		function lp_showCompVenDetail(){
 			
-			var lv_vendorCode = "";
+			var lv_vendorCode 	= "";
+			var params			= "";
 			
 			try{
 				
@@ -1199,7 +1192,9 @@
 					return;
 				}
 				
-				gp_dialogPopUp("/stockWeb/EnjoyGenericSrv?service=servlet.CompanyVendorDisplayServlet&pageAction=getDetail&vendorCode=" + lv_vendorCode, "รายละเอียดผู้จำหน่าย");
+				params = "vendorCode=" + lv_vendorCode;
+				
+				gp_dialogPopUp("/stockWeb/EnjoyGenericSrv?service=servlet.CompanyVendorDisplayServlet&pageAction=getDetail&" + params, "รายละเอียดผู้จำหน่าย");
 			}catch(e){
 				alert("lp_showCompVenDetail :: " + e);
 			}
@@ -1251,7 +1246,7 @@
 								        					   value="<%=companyVendorBean.getVendorName() %>" 
 								        					   maxlength="100" 
 								        					   onblur="lp_getCompanyVendorDetail();"
-								        					   style="width: 220px;" />
+								        					   style="width: 280px;" />
 								        				<img alt="รายละเอียดผู้จำหน่าย" title="รายละเอียดผู้จำหน่าย" src="<%=imgURL%>/lookup.png" width="30" height="30" border="0" onclick="lp_showCompVenDetail();" />
 								        			</td>
 								        			<td align="right">
@@ -1278,32 +1273,6 @@
 								        						style="width: 220px;"
 								        						value="<%=reciveOrderMasterBean.getBillNo()%>" 
 								        						maxlength="50" />
-								        			</td>
-								        		</tr>
-									        </table>
-									        <div id="seasonTitle" class="padding-sm round-sm season-title-head2">
-												<h6 class="panel-title" style="font-size:1.0em">รายละเอียดผู้ใช้งาน</h6>
-											</div>
-											<table class="table user-register-table" style="border-bottom-color: white;">
-												<tr>
-								        			<td align="right" width="120">
-														บริษัทที่สังกัด<span style="color: red;"><b>*</b></span> :
-													</td>
-								        			<td align="left" colspan="3">
-								        				<%if(pageMode.equals(reciveStockMaintananceForm.EDIT)){ %>
-								        					<select id="tinDis" name="tinDis" style="width: 220px;" >
-									        					<% for(ComboBean comboBean:companyCombo){ %>
-									        					<option value="<%=comboBean.getCode()%>" <%if(reciveOrderMasterBean.getTin().equals(comboBean.getCode())){ %> selected <%} %> ><%=comboBean.getDesc()%></option>
-									        					<%} %>
-									        				</select>
-									        				<input type="hidden" id="tin" name="tin" value="<%=reciveOrderMasterBean.getTin()%>" />
-								        				<%}else{%>
-								        					<select id="tin" name="tin" style="width: 220px;" >
-									        					<% for(ComboBean comboBean:companyCombo){ %>
-									        					<option value="<%=comboBean.getCode()%>" <%if(reciveOrderMasterBean.getTin().equals(comboBean.getCode())){ %> selected <%} %> ><%=comboBean.getDesc()%></option>
-									        					<%} %>
-									        				</select>
-								        				<%}%>
 								        			</td>
 								        		</tr>
 									        </table>

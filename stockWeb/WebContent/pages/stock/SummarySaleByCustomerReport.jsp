@@ -151,7 +151,6 @@
 		}
 		
 		function lp_lookUpCusDetail(){
-			
 			try{
 				gp_dialogPopUp(gv_url + "?service=servlet.CustomerDetailsLookUpServlet&pageAction=new", "ค้นหาลุกค้า");
 			}catch(e){

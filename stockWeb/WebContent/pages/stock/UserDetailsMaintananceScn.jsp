@@ -1,6 +1,6 @@
 <%@ include file="/pages/include/checkLogin.jsp"%>
 <%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
-<%@ page import="th.go.stock.app.enjoy.bean.UserDetailsBean,th.go.stock.app.enjoy.bean.ComboBean,th.go.stock.app.enjoy.model.Userprivilege"%>
+<%@ page import="th.go.stock.app.enjoy.bean.UserDetailsBean,th.go.stock.app.enjoy.bean.ComboBean,th.go.stock.app.enjoy.bean.UserPrivilegeBean"%>
 <%@ page import="java.util.*"%>
 <jsp:useBean id="userDetailsMaintananceForm" class="th.go.stock.app.enjoy.form.UserDetailsMaintananceForm" scope="session"/>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -9,8 +9,7 @@
 	String 					pageMode 			= userDetailsMaintananceForm.getPageMode();
 	UserDetailsBean 		userDetailsBean 	= userDetailsMaintananceForm.getUserDetailsBean();
 	List<ComboBean> 		refuserstatusCombo 	= userDetailsMaintananceForm.getStatusCombo();
-	List<Userprivilege> 	userprivilegeList	= userDetailsMaintananceForm.getUserprivilegeList();
-	List<ComboBean> 		companyCombo 		= userDetailsMaintananceForm.getCompanyCombo();
+	List<UserPrivilegeBean> userprivilegeList	= userDetailsMaintananceForm.getUserprivilegeList();
 	int 					couChkRow			= 0;
 	String					titlePage			= userDetailsMaintananceForm.getTitlePage();
 
@@ -25,7 +24,7 @@
 	<script>
 		var gv_service 			= null;
 		var gv_url 				= '<%=servURL%>/EnjoyGenericSrv';
-		var gv_checkDupUserId 	= false;
+		var gv_checkDupUserEmail 	= false;
 		
 		$(document).ready(function(){
 			//gp_progressBarOn();
@@ -38,6 +37,7 @@
 				lp_setModeEdit();
 			}else{
 				$("#userStatusDis").prop('disabled', true);
+				//$("#userName").focus();
 			}
 			
 			lp_ctrlCommission();
@@ -49,7 +49,6 @@
 		function lp_validate(){
 		    var la_validate             = new Array( "userName:ชื่อ"	
 													, "userSurname:นามสกุล"
-													, "userId:User ID"
 													, "userEmail:E-mail");
 		    
 		    var lo_flagSalesman 		= null;
@@ -63,12 +62,10 @@
 					return false;
 				}
 				
-				if(gv_checkDupUserId==false){
-					alert("มี userid นี้ในระบบแล้ว", function() { 
-						$("#userId").focus();
+				if(gv_checkDupUserEmail==false){
+					alert("มี E-mail นี้ในระบบแล้ว", function() { 
+						$("#userEmail").focus();
 	    		    });
-					//alert("มี userid นี้ในระบบแล้ว");
-					//$("#userId").focus();
 					return false;
 				}
 				
@@ -86,23 +83,23 @@
 			return true;
 		}
 		
-		function lp_checkDupUserId(){
+		function lp_checkDupUserEmail(){
 			
-			var lv_userId 	= null;
+			var lv_userEmail 	= null;
 			var params		= "";
 			
 			try{
-				lv_userId = gp_trim($("#userId").val());
+				lv_userEmail = gp_trim($("#userEmail").val());
 				
 				$("#inValidSpan").html("");
 				
-				if(lv_userId==""){
+				if(lv_userEmail==""){
 					return;
 				}
 				
-				$("#userId").val(lv_userId);
+				$("#userEmail").val(lv_userEmail);
 				
-				params 	= "pageAction=checkDupUserId&" + $('#frm').serialize();
+				params 	= "pageAction=checkDupUserEmail&" + $('#frm').serialize();
 				$.ajax({
 					async:false,
 		            type: "POST",
@@ -125,28 +122,28 @@
 		            			
 		            			if(cou > 0){
 		            				$("#inValidSpan").css("color", "red");
-		            				$("#inValidSpan").html("มี userid นี้ในระบบแล้ว");
+		            				$("#inValidSpan").html("มี E-mail นี้ในระบบแล้ว");
 		            				
-		            				gv_checkDupUserId = false;
+		            				gv_checkDupUserEmail = false;
 		            				
 		            			}else{
 		            				$("#inValidSpan").css("color", "green");
-		            				$("#inValidSpan").html("userid นี้ใช้งานได้");
+		            				$("#inValidSpan").html("E-mail นี้ใช้งานได้");
 		            				
-		            				gv_checkDupUserId = true;
+		            				gv_checkDupUserEmail = true;
 		            			}
 		            			
 		            		}else{
 		            			alert(jsonObj.errMsg);
 		            		}
 		            	}catch(e){
-		            		alert("in lp_checkDupUserId :: " + e);
+		            		alert("in lp_checkDupUserEmail :: " + e);
 		            	}
 		            }
 		        });
 				
 			}catch(e){
-				alert("lp_checkDupUserId :: " + e);
+				alert("lp_checkDupUserEmail :: " + e);
 			}
 		}
 		
@@ -173,7 +170,7 @@
 					
 				}
 				
-				lp_checkDupUserId();
+				lp_checkDupUserEmail();
 				
 			}catch(e){
 				alert("lp_setModeEdit :: " + e);
@@ -196,12 +193,17 @@
 				
 				if($("#pageMode").val()=="NEW"){
 					
-					confirm("Password จะถูกส่งไปที่ E-mail ที่คุณกรอก คุณกรอก E-mail ถูกต้องแล้วใช่หรือไม่ ?", function(){
+					if($("#sendMailFlag").val()=="Y"){
+						confirm("Password จะถูกส่งไปที่ E-mail ที่คุณกรอก คุณกรอก E-mail ถูกต้องแล้วใช่หรือไม่ ?", function(){
+							onSave();
+						},function(){
+							$('#userEmail').focus();
+							return;
+						});
+					}else{
 						onSave();
-					},function(){
-						$('#userEmail').focus();
-						return;
-					});
+					}
+					
 				}else if ($("#pageMode").val()=="EDIT"){
 					onSave();
 				}
@@ -246,18 +248,31 @@
 		            success: function(data){
 		            	var jsonObj 			= null;
 		            	var status				= null;
-		            	var userUniqueId		= 0;
 		            	
 		            	try{
-		            		
+		            		//gp_progressBarOff();
 		            		jsonObj = JSON.parse(data);
 		            		status	= jsonObj.status;
+		            		params 	= "userUniqueId=" 	+ jsonObj.userUniqueId
+		            				+ "&fullName=" 		+ jsonObj.fullName
+		            				+ "&userEmail=" 	+ jsonObj.userEmail
+		            				+ "&pwd=" 			+ jsonObj.pwd;
 		            		
 		            		if(status=="SUCCESS"){
-		            			userUniqueId = jsonObj.userUniqueId;
-		            			alert("บันทึกเรียบร้อย", function() { 
-		            				lp_reset();
-		    	    		    });
+		            			if($("#sendMailFlag").val()=="N" && $("#pageMode").val()=="NEW"){
+		            				userUniqueId = jsonObj.userUniqueId;
+		            				gp_dialogPopUp(gv_url + "?" + gv_service + "&pageAction=genPdf&" + params, "แจ้งรหัสผู้ใช้งานและรหัสผ่าน"
+		            								, function(){
+						            					alert("บันทึกเรียบร้อย", function(){
+							            					lp_reset();
+							    						});
+		            							   });
+		            			}else{
+		            				alert("บันทึกเรียบร้อย", function(){
+		            					lp_reset();
+		    						});
+		            			}
+		            			
 		            		}else{
 		            			alert(jsonObj.errMsg);
 		            			
@@ -290,9 +305,11 @@
 			var params				= "";
 			
 			try{
-				if(!confirm("Password จะถูกส่งไปที่ E-mail ที่คุณกรอก คุณกรอก E-mail ถูกต้องแล้วใช่หรือไม่ ?")){
-					$('#userEmail').focus();
-					return;
+				if($("#sendMailFlag").val()=="Y"){
+					if(!confirm("Password จะถูกส่งไปที่ E-mail ที่คุณกรอก คุณกรอก E-mail ถูกต้องแล้วใช่หรือไม่ ?")){
+						$('#userEmail').focus();
+						return;
+					}
 				}
 				
 				params 	= "pageAction=resetPass&" + $('#frm').serialize();
@@ -314,8 +331,15 @@
 		            		status	= jsonObj.status;
 		            		
 		            		if(status=="SUCCESS"){
-		            			
-		            			alert("Password ถูกส่งไปที่ E-mail แล้ว");
+		            			if($("#sendMailFlag").val()=="Y"){
+		            				alert("Password ถูกส่งไปที่ E-mail แล้ว");
+		            			}else{
+		            				params 	= "userUniqueId=" 	+ jsonObj.userUniqueId
+				            				+ "&fullName=" 		+ jsonObj.fullName
+				            				+ "&userEmail=" 	+ jsonObj.userEmail
+				            				+ "&pwd=" 			+ jsonObj.pwd;
+		            				gp_dialogPopUp(gv_url + "?" + gv_service + "&pageAction=genPdf&" + params, "แจ้งรหัสผู้ใช้งานและรหัสผ่าน");
+		            			}
 		            		}else{
 		            			alert(jsonObj.errMsg);
 		            			
@@ -370,6 +394,7 @@
 		<input type="hidden" id="hidUserPrivilege" 	name="hidUserPrivilege" value="<%=userDetailsBean.getUserPrivilege()%>" />
 		<input type="hidden" id="pageMode" 	name="pageMode" value="<%=pageMode%>" />
 		<input type="hidden" id="userUniqueId" 	name="userUniqueId" value="<%=userDetailsBean.getUserUniqueId()%>" />
+		<input type="hidden" id="sendMailFlag" 	name="sendMailFlag" value="<%=userDetailsMaintananceForm.getSendMailFlag()%>" />
 		<div id="menu" style="width: 100%;background: black;">
 			<%@ include file="/pages/menu/menu.jsp"%>
 		</div>
@@ -396,13 +421,13 @@
            								</div>
            							</td>
            							<td align="left" width="70%">
-           								<div class=" col-md-8 line-left"> 
-											<table class="table user-register-table" style="border-bottom-color: white;">
+           								<div class=" line-left"> 
+											<table class="table user-register-table" style="border-bottom-color: white;" width="100%" border="0">
 												<tr>
-									        		<td align="right" width="30px">
+									        		<td align="right" width="20%">
 														ชื่อ <span style="color: red;"><b>*</b></span> : &nbsp;
 													</td>
-								        			<td align="left" width="200px">
+								        			<td align="left" width="80%">
 								        				<input type='text' id="userName" name='userName' value="<%=userDetailsBean.getUserName() %>" maxlength="50" style="width: 250px;" />
 								        			</td>
 									        	</tr>
@@ -416,20 +441,18 @@
 								        		</tr>
 								        		<tr>
 								        			<td align="right">
-								        				User ID <span style="color: red;"><b>*</b></span> : &nbsp;
-								        			</td>
-								        			<td align="left">
-								        				<input type='text' id="userId" name='userId' value="<%=userDetailsBean.getUserId() %>" onchange="lp_checkDupUserId();" maxlength="20" style="width: 250px;" />
-								        				&nbsp;
-								        				<span id="inValidSpan"></span>
-								        			</td>
-								        		</tr>
-								        		<tr>
-								        			<td align="right">
 								        				E-mail <span style="color: red;"><b>*</b></span> : &nbsp;
 								        			</td>
 								        			<td align="left">
-								        				<input type="text" id="userEmail" name="userEmail" value="<%=userDetailsBean.getUserEmail()%>" maxlength="100" style="width: 250px;" />
+								        				<input type="text" 
+								        					   id="userEmail" 
+								        					   name="userEmail" 
+								        					   value="<%=userDetailsBean.getUserEmail()%>" 
+								        					   onchange="lp_checkDupUserEmail();"
+								        					   maxlength="100" 
+								        					   style="width: 250px;" />
+								        				&nbsp;
+								        				<span id="inValidSpan"></span>
 								        			</td>
 								        		</tr>
 								        		<tr>
@@ -496,7 +519,7 @@
 								        		</tr>
 									        		
 									        		<%
-									        			for(Userprivilege beanUserprivilege:userprivilegeList){
+									        			for(UserPrivilegeBean beanUserprivilege:userprivilegeList){
 									        		%>
 									        		<%if(couChkRow==0){ %><tr><%} %>
 									        			<td align="right">

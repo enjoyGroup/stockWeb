@@ -3,7 +3,6 @@ package th.go.stock.app.enjoy.form;
 import java.util.ArrayList;
 import java.util.List;
 
-import th.go.stock.app.enjoy.bean.ComboBean;
 import th.go.stock.app.enjoy.bean.HistoryPurchasedByDealerReportBean;
 
 public class HistoryPurchasedByDealerReportForm {
@@ -12,14 +11,12 @@ public class HistoryPurchasedByDealerReportForm {
 	private String										errMsg;
 	private String										titlePage;
 	private List<HistoryPurchasedByDealerReportBean> 	dataList;
-	private List<ComboBean> 							companyCombo;
 	
 	public HistoryPurchasedByDealerReportForm(){
 		this.historyPurchasedByDealerReportBean 	= new HistoryPurchasedByDealerReportBean();
 		this.errMsg									= "";
 		this.titlePage								= "";
 		this.dataList								= new ArrayList<HistoryPurchasedByDealerReportBean>();
-		this.companyCombo							= new ArrayList<ComboBean>();
 	}
 
 	public HistoryPurchasedByDealerReportBean getHistoryPurchasedByDealerReportBean() {
@@ -53,13 +50,5 @@ public class HistoryPurchasedByDealerReportForm {
 
 	public void setDataList(List<HistoryPurchasedByDealerReportBean> dataList) {
 		this.dataList = dataList;
-	}
-
-	public List<ComboBean> getCompanyCombo() {
-		return companyCombo;
-	}
-
-	public void setCompanyCombo(List<ComboBean> companyCombo) {
-		this.companyCombo = companyCombo;
 	}
 }

@@ -12,6 +12,7 @@ public class ProductdetailBean {
 	private String seq;
 	private String startDate;
 	private String expDate;
+	private String tin;
 	
 	
 	public ProductdetailBean(){
@@ -23,6 +24,7 @@ public class ProductdetailBean {
 		this.seq 			= "";
 		this.startDate 		= "";
 		this.expDate 		= "";
+		this.tin			= "";
 	}
 
 
@@ -103,6 +105,16 @@ public class ProductdetailBean {
 
 	public void setExpDate(String expDate) {
 		this.expDate = expDate;
+	}
+
+
+	public String getTin() {
+		return tin;
+	}
+
+
+	public void setTin(String tin) {
+		this.tin = tin;
 	}
 
 }

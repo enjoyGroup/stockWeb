@@ -2,66 +2,65 @@
 package th.go.stock.app.enjoy.dao;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.hibernate.Query;
-import org.hibernate.SQLQuery;
-import org.hibernate.Session;
-import org.hibernate.type.IntegerType;
-import org.hibernate.type.StringType;
 
-import th.go.stock.app.enjoy.bean.ComboBean;
 import th.go.stock.app.enjoy.bean.RelationGroupCustomerBean;
 import th.go.stock.app.enjoy.exception.EnjoyException;
+import th.go.stock.app.enjoy.main.Constants;
+import th.go.stock.app.enjoy.main.DaoControl;
 import th.go.stock.app.enjoy.model.Relationgroupcustomer;
+import th.go.stock.app.enjoy.model.RelationgroupcustomerPK;
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
 import th.go.stock.app.enjoy.utils.EnjoyUtils;
 
-public class RelationGroupCustomerDao {
+public class RelationGroupCustomerDao extends DaoControl{
 	
-	private static final EnjoyLogger logger = EnjoyLogger.getLogger(RelationGroupCustomerDao.class);
+	public RelationGroupCustomerDao(){
+		setLogger(EnjoyLogger.getLogger(RelationGroupCustomerDao.class));
+		super.init();
+	}
 	
-	
-	public List<RelationGroupCustomerBean> searchByCriteria(Session 					session, 
-															RelationGroupCustomerBean 	relationGroupCustomerBean) throws EnjoyException{
-		logger.info("[searchByCriteria][Begin]");
+	public List<RelationGroupCustomerBean> searchByCriteria(RelationGroupCustomerBean 	relationGroupCustomerBean) throws EnjoyException{
+		getLogger().info("[searchByCriteria][Begin]");
 		
 		String							hql							= null;
-		SQLQuery 						query 						= null;
-		List<Object[]>					list						= null;
 		RelationGroupCustomerBean		bean						= null;
 		List<RelationGroupCustomerBean> relationGroupCustomerList 	= new ArrayList<RelationGroupCustomerBean>();
 		int								seq							= 0;
+		HashMap<String, Object>			param						= new HashMap<String, Object>();
+		List<String>					columnList					= new ArrayList<String>();
+		List<HashMap<String, Object>>	resultList					= null;
 		
 		try{				
-			hql					= "select * from relationgroupcustomer where cusGroupStatus = 'A' order by cusGroupCode asc";
+			hql	= "select * "
+				+ "	from relationgroupcustomer"
+				+ "	where cusGroupStatus 	= 'A'"
+				+ "		and tin				= :tin"
+				+ "	order by cusGroupCode asc";
 			
+			//Criteria
+			param.put("tin"			, relationGroupCustomerBean.getTin());
 			
-			logger.info("[searchByCriteria] hql :: " + hql);
+			//Column select
+			columnList.add("cusGroupCode");
+			columnList.add("tin");
+			columnList.add("cusGroupName");
+			columnList.add("groupSalePrice");
+			columnList.add("cusGroupStatus");
 
-			query			= session.createSQLQuery(hql);			
-			query.addScalar("cusGroupCode"		, new StringType());
-			query.addScalar("cusGroupName"		, new StringType());
-			query.addScalar("groupSalePrice"	, new StringType());
-			query.addScalar("cusGroupStatus"	, new StringType());
+			resultList = getResult(hql, param, columnList);
 			
-			list		 	= query.list();
-			
-			logger.info("[searchByCriteria] list.size() :: " + list.size());
-			
-			for(Object[] row:list){
+			for(HashMap<String, Object> row:resultList){
 				bean 	= new RelationGroupCustomerBean();
 				
-				logger.info("cusGroupCode 	:: " + row[0]);
-				logger.info("cusGroupName 	:: " + row[1]);
-				logger.info("groupSalePrice :: " + row[2]);
-				logger.info("cusGroupStatus :: " + row[3]);
-				logger.info("seq 			:: " + seq);
-				
-				bean.setCusGroupCode			(EnjoyUtils.nullToStr(row[0]));
-				bean.setCusGroupName			(EnjoyUtils.nullToStr(row[1]));
-				bean.setGroupSalePrice			(EnjoyUtils.nullToStr(row[2]));
-				bean.setCusGroupStatus			(EnjoyUtils.nullToStr(row[3]));
+				bean.setCusGroupCode			(EnjoyUtils.nullToStr(row.get("cusGroupCode")));
+				bean.setTin						(EnjoyUtils.nullToStr(row.get("tin")));
+				bean.setCusGroupName			(EnjoyUtils.nullToStr(row.get("cusGroupName")));
+				bean.setGroupSalePrice			(EnjoyUtils.nullToStr(row.get("groupSalePrice")));
+				bean.setCusGroupStatus			(EnjoyUtils.nullToStr(row.get("cusGroupStatus")));
 				bean.setSeq						(EnjoyUtils.nullToStr(seq));
 				
 				relationGroupCustomerList.add(bean);
@@ -69,140 +68,178 @@ public class RelationGroupCustomerDao {
 			}	
 			
 		}catch(Exception e){
-			logger.error(e);
+			getLogger().error(e);
 			e.printStackTrace();
 			throw new EnjoyException("error searchByCriteria");
 		}finally{
 			hql						= null;
-			logger.info("[searchByCriteria][End]");
+			getLogger().info("[searchByCriteria][End]");
 		}
 		
 		return relationGroupCustomerList;
 		
 	}
 
-	
-	public void updateRelationGroupCustomer(Session session, RelationGroupCustomerBean 	relationGroupCustomerBean) throws EnjoyException{
-		logger.info("[updateRelationGroupCustomer][Begin]");
+	public void updateRelationGroupCustomer(RelationGroupCustomerBean relationGroupCustomerBean) throws EnjoyException{
+		getLogger().info("[updateRelationGroupCustomer][Begin]");
 		
 		String							hql									= null;
 		Query 							query 								= null;
 		
 		try{
-			hql				= "update  Relationgroupcustomer set cusGroupName 	= :cusGroupName"
-															+ ", groupSalePrice	= :groupSalePrice"
-										+ " where cusGroupCode = :cusGroupCode";
+			hql	= "update  Relationgroupcustomer t "
+				+ "	set t.cusGroupName 		= :cusGroupName"
+				+ "		,t.groupSalePrice	= :groupSalePrice"
+				+ " where t.id.cusGroupCode = :cusGroupCode"
+				+ "		and t.id.tin		= :tin";
 			
-			logger.info("[updateRelationGroupCustomer] cusGroupName :: " + relationGroupCustomerBean.getCusGroupName());
-			logger.info("[updateRelationGroupCustomer] groupSalePrice :: " + EnjoyUtils.parseInt(relationGroupCustomerBean.getGroupSalePrice()));
-			logger.info("[updateRelationGroupCustomer] cusGroupCode :: " + EnjoyUtils.parseInt(relationGroupCustomerBean.getCusGroupCode()));
-			
-			query = session.createQuery(hql);
-			query.setParameter("cusGroupName"			, relationGroupCustomerBean.getCusGroupName());
-			query.setParameter("groupSalePrice"			, EnjoyUtils.parseInt(relationGroupCustomerBean.getGroupSalePrice()));
-			query.setParameter("cusGroupCode"			, EnjoyUtils.parseInt(relationGroupCustomerBean.getCusGroupCode()));
+			query = createQuery(hql);
+			query.setParameter("cusGroupName"	, relationGroupCustomerBean.getCusGroupName());
+			query.setParameter("groupSalePrice"	, EnjoyUtils.parseInt(relationGroupCustomerBean.getGroupSalePrice()));
+			query.setParameter("cusGroupCode"	, EnjoyUtils.parseInt(relationGroupCustomerBean.getCusGroupCode()));
+			query.setParameter("tin"			, relationGroupCustomerBean.getTin());
 			
 			query.executeUpdate();
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			logger.error(e);
+			getLogger().error(e);
 			throw new EnjoyException("Error updateRelationGroupCustomer");
 		}finally{
 			
 			hql									= null;
 			query 								= null;
-			logger.info("[updateRelationGroupCustomer][End]");
+			getLogger().info("[updateRelationGroupCustomer][End]");
 		}
 	}
 	
-	public void rejectRelationGroupCustomer(Session session, RelationGroupCustomerBean 	relationGroupCustomerBean) throws EnjoyException{
-		logger.info("[rejectRelationGroupCustomer][Begin]");
+	public void rejectRelationGroupCustomer(RelationGroupCustomerBean 	relationGroupCustomerBean) throws EnjoyException{
+		getLogger().info("[rejectRelationGroupCustomer][Begin]");
 		
 		String							hql									= null;
 		Query 							query 								= null;
 		
 		try{
-			hql				= "update  Relationgroupcustomer set cusGroupStatus 	= 'R'"
-										+ " where cusGroupCode = :cusGroupCode";
+			hql	= "update Relationgroupcustomer t"
+				+ "	set t.cusGroupStatus 	= 'R'"
+				+ " where t.id.cusGroupCode = :cusGroupCode"
+				+ "		and t.id.tin		= :tin";
 			
-			query = session.createQuery(hql);
-			query.setParameter("cusGroupCode"			, EnjoyUtils.parseInt(relationGroupCustomerBean.getCusGroupCode()));
+			query = createQuery(hql);
+			query.setParameter("cusGroupCode"	, EnjoyUtils.parseInt(relationGroupCustomerBean.getCusGroupCode()));
+			query.setParameter("tin"			, relationGroupCustomerBean.getTin());
 			
 			query.executeUpdate();
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			logger.error(e);
+			getLogger().error(e);
 			throw new EnjoyException("Error rejectRelationGroupCustomer");
 		}finally{
 			
 			hql									= null;
 			query 								= null;
-			logger.info("[rejectRelationGroupCustomer][End]");
+			getLogger().info("[rejectRelationGroupCustomer][End]");
 		}
 	}
 	
-	public void insertRelationGroupCustomer(Session session, RelationGroupCustomerBean 	relationGroupCustomerBean) throws EnjoyException{
-		logger.info("[insertRelationGroupCustomer][Begin]");
+	public void insertRelationGroupCustomer(RelationGroupCustomerBean 	relationGroupCustomerBean) throws EnjoyException{
+		getLogger().info("[insertRelationGroupCustomer][Begin]");
 		
-		Relationgroupcustomer		relationgroupcustomer		= null;
+		Relationgroupcustomer		relationgroupcustomer	= new Relationgroupcustomer();
+		RelationgroupcustomerPK 	id 						= new RelationgroupcustomerPK();
+		String						tin						= null;
 		
 		try{
+			tin = relationGroupCustomerBean.getTin();
+			id.setCusGroupCode(EnjoyUtils.parseInt(relationGroupCustomerBean.getCusGroupCode()));
+			id.setTin(tin);
+//			id.setCusGroupCode(genId(tin));
 			
-			relationgroupcustomer 	= new Relationgroupcustomer();
-//			relationgroupcustomer.setCusGroupCode	(EnjoyUtils.parseInt(relationGroupCustomerBean.getSeq()));
+			relationgroupcustomer.setId				(id);
 			relationgroupcustomer.setCusGroupName	(relationGroupCustomerBean.getCusGroupName());
 			relationgroupcustomer.setGroupSalePrice	(EnjoyUtils.parseInt(relationGroupCustomerBean.getGroupSalePrice()));
 			relationgroupcustomer.setCusGroupStatus	("A");
 			
-			session.saveOrUpdate(relationgroupcustomer);
+			insertData(relationgroupcustomer);
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			logger.error(e);
+			getLogger().error(e);
 			throw new EnjoyException("Error insertRelationGroupCustomer");
 		}finally{
 			relationgroupcustomer 	= null;
-			logger.info("[insertRelationGroupCustomer][End]");
+			getLogger().info("[insertRelationGroupCustomer][End]");
 		}
 	}
-	public int getlastId(Session session) throws EnjoyException{
-		logger.info("[getlastId][Begin]");
+	
+	public int genId(String tin) throws EnjoyException{
+		getLogger().info("[genId][Begin]");
 		
-		String							hql									= null;
-		List<Integer>			 		list								= null;
-		SQLQuery 						query 								= null;
-		int 							result								= 0;
-		
+		String							hql				= null;
+		int 							result			= 1;
+		HashMap<String, Object>			param			= new HashMap<String, Object>();
+		List<Object>					resultList		= null;
 		
 		try{
+			hql		= "select (max(cusGroupCode) + 1) newId"
+					+ "	from relationgroupcustomer "
+					+ "	where tin		= :tin";
 			
-			hql				= "select max(cusGroupCode) lastId from relationgroupcustomer";
-			query			= session.createSQLQuery(hql);
+			//Criteria
+			param.put("tin"		, tin);
 			
-			query.addScalar("lastId"			, new IntegerType());
+			resultList = getResult(hql, param, "newId", Constants.INT_TYPE);
 			
-			list		 	= query.list();
+			if(resultList!=null && resultList.size() > 0){
+				result = EnjoyUtils.parseInt(resultList.get(0))==0?1:EnjoyUtils.parseInt(resultList.get(0));
+			}
 			
-			if(list!=null && list.size() > 0){
-				result = list.get(0)==null?0:list.get(0);
+			getLogger().info("[genId] newId 			:: " + result);
+			
+		}catch(Exception e){
+			getLogger().error(e);
+			throw new EnjoyException("genId error");
+		}finally{
+			hql									= null;
+			getLogger().info("[genId][End]");
+		}
+		
+		return result;
+	}
+
+	public int getlastId(String tin) throws EnjoyException{
+		getLogger().info("[getlastId][Begin]");
+	
+		String							hql						= null;
+		int 							result					= 0;
+		HashMap<String, Object>			param					= new HashMap<String, Object>();
+		List<Object>					resultList				= null;
+		
+		try{
+			hql	= "select max(cusGroupCode) lastId from relationgroupcustomer where tin = :tin";
+			
+			//Criteria
+			param.put("tin"	, tin);
+			
+			resultList = getResult(hql, param, "lastId", Constants.INT_TYPE);
+			
+			if(resultList!=null && resultList.size() > 0){
+				result = EnjoyUtils.parseInt(resultList.get(0));
 			}
 			
 			result++;
 			
-			logger.info("[getlastId] result 			:: " + result);
+			getLogger().info("[getlastId] result 			:: " + result);
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			logger.info(e.getMessage());
+			getLogger().info(e.getMessage());
 			throw new EnjoyException(e.getMessage());
 		}finally{
 			
 			hql									= null;
-			list								= null;
-			query 								= null;
-			logger.info("[genId][End]");
+			getLogger().info("[genId][End]");
 		}
 		
 		return result;

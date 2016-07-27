@@ -40,11 +40,11 @@ public class HistoryPurchasedByProductReportDao extends DaoControl {
 									+ " , a.reciveDate"
 									+ " , c.costPrice"
 									+ " , c.discountRate"
-									+ " from reciveordermaster a, companyvendor b, reciveordedetail c, productmaster d"
-									+ " where a.vendorCode 		= b.vendorCode"
-									+ "		and a.reciveNo 		= c.reciveNo"
-									+ "		and c.productCode 	= d.productCode"
-									+ "		and a.tin 			= :tin"
+									+ " from reciveordermaster a"
+									+ "		inner join companyvendor b on b.vendorCode = a.vendorCode and b.tinCompany = a.tin"
+									+ "		inner join reciveordedetail c on c.reciveNo = a.reciveNo and c.tin = a.tin"
+									+ "		inner join productmaster d on d.productCode = c.productCode and d.tin = c.tin"
+									+ " where a.tin 			= :tin"
 									+ " 	and a.reciveDate >= STR_TO_DATE(:reciveDateFrom	, '%Y%m%d')"
 									+ " 	and a.reciveDate <= STR_TO_DATE(:reciveDateTo	, '%Y%m%d')";
 			

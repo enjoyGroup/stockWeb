@@ -4,7 +4,7 @@ public class RelationUserAndCompanyBean {
 	
 	private String userUniqueId;
 	private String tin;
-	private String userId;
+	private String userEmail;
 	private String userFullName;
 	private String userStatus;
 	private String userStatusName;
@@ -14,7 +14,7 @@ public class RelationUserAndCompanyBean {
 	public RelationUserAndCompanyBean(){
 		this.userUniqueId 		= "";
 		this.tin 				= "";
-		this.userId 			= "";
+		this.userEmail 			= "";
 		this.userFullName 		= "";
 		this.userStatus 		= "";
 		this.userStatusName 	= "";
@@ -38,12 +38,12 @@ public class RelationUserAndCompanyBean {
 		this.tin = tin;
 	}
 
-	public String getUserId() {
-		return userId;
+	public String getUserEmail() {
+		return userEmail;
 	}
 
-	public void setUserId(String userId) {
-		this.userId = userId;
+	public void setUserEmail(String userEmail) {
+		this.userEmail = userEmail;
 	}
 
 	public String getUserFullName() {

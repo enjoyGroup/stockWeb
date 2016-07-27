@@ -14,12 +14,10 @@ import javax.servlet.http.HttpSession;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import th.go.stock.app.enjoy.bean.ComboBean;
 import th.go.stock.app.enjoy.bean.CompanyDetailsBean;
 import th.go.stock.app.enjoy.bean.SummarySaleByMonthReportBean;
 import th.go.stock.app.enjoy.bean.UserDetailsBean;
 import th.go.stock.app.enjoy.dao.CompanyDetailsDao;
-import th.go.stock.app.enjoy.dao.RelationUserAndCompanyDao;
 import th.go.stock.app.enjoy.dao.SummarySaleByMonthReportDao;
 import th.go.stock.app.enjoy.exception.EnjoyException;
 import th.go.stock.app.enjoy.form.SummarySaleByMonthReportForm;
@@ -44,7 +42,6 @@ public class SummarySaleByMonthReportServlet extends EnjoyStandardSvc {
     private UserDetailsBean             		userBean                    = null;
     private SummarySaleByMonthReportDao			dao							= null;
     private CompanyDetailsDao					companyDetailsDao			= null;
-    private RelationUserAndCompanyDao			relationUserAndCompanyDao	= null;
     private SummarySaleByMonthReportForm		form						= null;
     
 	@Override
@@ -68,7 +65,6 @@ public class SummarySaleByMonthReportServlet extends EnjoyStandardSvc {
              this.userBean           		= (UserDetailsBean) session.getAttribute("userBean");
              this.form               		= (SummarySaleByMonthReportForm) session.getAttribute(FORM_NAME);
              this.dao						= new SummarySaleByMonthReportDao();
-             this.relationUserAndCompanyDao = new RelationUserAndCompanyDao();
              this.companyDetailsDao			= new CompanyDetailsDao();
  			
              logger.info("[execute] pageAction : " + pageAction );
@@ -89,7 +85,7 @@ public class SummarySaleByMonthReportServlet extends EnjoyStandardSvc {
  			e.printStackTrace();
  			logger.info(e.getMessage());
  		}finally{
- 			dao.destroySession();
+ 			destroySession();
  			logger.info("[execute][End]");
  		}
 	}
@@ -99,7 +95,6 @@ public class SummarySaleByMonthReportServlet extends EnjoyStandardSvc {
 		
 		try{		
 			this.form.setTitlePage("รายงานสรุปยอดขายประจำเดือน");
-			this.setRefference();
 			
 		}catch(Exception e){
 			logger.info(e.getMessage());
@@ -108,46 +103,6 @@ public class SummarySaleByMonthReportServlet extends EnjoyStandardSvc {
 			logger.info("[onLoad][End]");
 		}
 		
-	}
-	
-	private void setCompanyCombo() throws EnjoyException{
-		
-		logger.info("[setCompanyCombo][Begin]");
-		
-		List<ComboBean>			companyCombo 		= null;
-		
-		try{
-			
-			companyCombo = this.relationUserAndCompanyDao.getCompanyList(this.userBean.getUserUniqueId());
-			
-			if(companyCombo.size() > 1){
-				companyCombo.add(0, new ComboBean("", "กรุณาระบุ"));
-			}
-			
-			this.form.setCompanyCombo(companyCombo);
-		}
-		catch(Exception e){
-			logger.error(e);
-			throw new EnjoyException("setCompanyCombo is error");
-		}finally{
-			logger.info("[setCompanyCombo][End]");
-		}
-	}
-
-	private void setRefference() throws EnjoyException{
-		
-		logger.info("[setRefference][Begin]");
-		
-		try{
-			this.setCompanyCombo();
-		}catch(EnjoyException e){
-			throw new EnjoyException(e.getMessage());
-		}catch(Exception e){
-			e.printStackTrace();
-			logger.info(e.getMessage());
-		}finally{
-			logger.info("[setRefference][End]");
-		}
 	}
 	
 	private void showData() throws EnjoyException{
@@ -170,7 +125,7 @@ public class SummarySaleByMonthReportServlet extends EnjoyStandardSvc {
 		byte[] 										bytes							= null;
 
 		try{
-			tin 			= EnjoyUtils.nullToStr(this.request.getParameter("tin"));
+			tin 			= this.userBean.getTin();
 			invoiceMonth 	= EnjoyUtils.nullToStr(this.request.getParameter("invoiceMonth"));
 			invoiceDateFrom = "01/" + invoiceMonth;
 			invoiceDateTo 	= EnjoyUtils.getLastDateOfMonth(invoiceDateFrom);
@@ -245,6 +200,24 @@ public class SummarySaleByMonthReportServlet extends EnjoyStandardSvc {
 			logger.info("[showData][End]");
 		}
 		
+	}
+
+	@Override
+	public void destroySession() {
+		this.dao.destroySession();
+        this.companyDetailsDao.destroySession();
+	}
+
+	@Override
+	public void commit() {
+		this.dao.commit();
+        this.companyDetailsDao.commit();
+	}
+
+	@Override
+	public void rollback() {
+		this.dao.rollback();
+        this.companyDetailsDao.rollback();
 	}
 	
 	

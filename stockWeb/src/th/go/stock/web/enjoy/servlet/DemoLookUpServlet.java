@@ -315,6 +315,24 @@ public class DemoLookUpServlet extends EnjoyStandardSvc {
 		   }
 		   
 	   }
+
+	@Override
+	public void destroySession() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void commit() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void rollback() {
+		// TODO Auto-generated method stub
+		
+	}
 	
 	
 	

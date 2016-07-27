@@ -8,6 +8,7 @@ public class RelationGroupCustomerBean {
 	private String cusGroupStatus;
 	private String seq;
 	private String rowStatus;
+	private String tin;
 	
 	public RelationGroupCustomerBean(){
 		this.cusGroupCode 		= "";
@@ -16,6 +17,7 @@ public class RelationGroupCustomerBean {
 		this.cusGroupStatus		= "";
 		this.seq 				= "";
 		this.rowStatus			= "";
+		this.tin				= "";
 	}
 
 	public String getCusGroupCode() {
@@ -64,5 +66,13 @@ public class RelationGroupCustomerBean {
 
 	public void setRowStatus(String rowStatus) {
 		this.rowStatus = rowStatus;
+	}
+
+	public String getTin() {
+		return tin;
+	}
+
+	public void setTin(String tin) {
+		this.tin = tin;
 	}
 }

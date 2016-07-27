@@ -1,5 +1,9 @@
 package th.go.stock.app.enjoy.form;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import th.go.stock.app.enjoy.bean.ComboBean;
 import th.go.stock.app.enjoy.bean.CompanyVendorBean;
 
 public class CompanyVendorMaintananceForm {
@@ -52,5 +56,4 @@ public class CompanyVendorMaintananceForm {
 	public void setTitlePage(String titlePage) {
 		this.titlePage = titlePage;
 	}
-
 }

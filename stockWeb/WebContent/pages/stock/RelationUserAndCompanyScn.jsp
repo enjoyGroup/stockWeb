@@ -22,48 +22,14 @@
 		var gv_url 					= '<%=servURL%>/EnjoyGenericSrv';
 		
 		$(document).ready(function(){
-			//gp_progressBarOn();
 			
 			gv_service 		= "service=" + $('#service').val();
 			
-			/*$( "#dialog" ).dialog({
-		      autoOpen: false,
-		      height: 600,
-		      width: 1050,
-		      show: {
-		        effect: "clip",
-		        duration: 500
-		      },
-		      hide: {
-		        effect: "clip",
-		        duration: 500
-		      },
-		      close: function() {
-		    	  gp_progressBarOff();
-		    	  $( "#dialog" ).removeClass( "zoom" );
-		        },
-		      dialogClass: 'zoom'
-		    });*/
-			
 			$( "#btnZoom" ).live("click", function(event){
 				
-				//var lo_dialog = null;
-				//var lo_iframe = null;
-				
 				try{
-					gp_dialogPopUp("/stockWeb/EnjoyGenericSrv?service=servlet.UserDetailsLookUpServlet&pageAction=new&tin="+$("#tin").val(), "ค้นหาผู้ใช้งานระบบ");
+					gp_dialogPopUp("/stockWeb/EnjoyGenericSrv?service=servlet.UserDetailsLookUpServlet&pageAction=new", "ค้นหาผู้ใช้งานระบบ");
 					
-					/*lo_dialog 	= $( "#dialog" );
-					lo_iframe	= $("<iframe />").attr("src", "/stockWeb/EnjoyGenericSrv?service=servlet.UserDetailsLookUpServlet&pageAction=new")
-												 .attr("width", "100%")
-												 .attr("height", "100%")
-												 .attr("border", "0");
-					
-					gp_progressBarOn();
-					lo_dialog.empty();
-					lo_dialog.dialog("option", "title", "ค้นหาผู้ใช้งานระบบ");
-					lo_dialog.append(lo_iframe).dialog( "open" );
-					event.preventDefault();*/
 				}catch(e){
 					alert("btnZoom :: " + e);
 				}
@@ -75,8 +41,6 @@
 						alert("กรุณาระบุชื่อบริษัท", function() { 
 							$("#companyName").focus();
 		    		    });
-		            	//alert("กรุณาระบุชื่อบริษัท");
-		            	//$("#companyName").focus();
 		                return;
 		            }
 					
@@ -180,31 +144,21 @@
 		});
 		
 		function lp_validate(){
-		    var lv_return				= true;
-		    //var la_userUniqueId			= null;
-		    //var lv_currUserUniqueId		= "";
-		    //var lv_nextUserUniqueId		= "";
-		    //var la_userFullName			= null;
+		    var lv_return	= true;
+		    var la_userEmail	= null;
 		    
 			try{
-				/*la_userUniqueId = document.getElementsByName("userUniqueId");
-				la_userFullName	= document.getElementsByName("hidUserFullName");
+				la_userEmail = document.getElementsByName("userEmail");
 				
-				for(var i=0;i<la_userUniqueId.length;i++){
-					lv_currUserUniqueId = la_userUniqueId[i].value;
-					
-					for(var j=(i+1);j<la_userUniqueId.length;j++){
-						lv_nextUserUniqueId = la_userUniqueId[j].value;
-						
-						if(lv_currUserUniqueId==lv_nextUserUniqueId){
-							alert(la_userFullName[i].value + "มีสังกัดแล้ว");
+				for(var i=0;i<la_userEmail.length;i++){
+					for(var j=(i+1);j<la_userEmail.length;j++){
+						if(la_userEmail[i].value==la_userEmail[j].value){
+							alert($("#companyName").val() + 'มี E-mail <span style="color:red;">' + la_userEmail[j].value + '</span> แล้ว');
 							return false;
 						}
 					}
 				}
 				
-				return true;*/
-				/*
 				$.ajax({
 					async:false,
 		            type: "POST",
@@ -234,7 +188,6 @@
 		            	}
 		            }
 		        });
-				*/
 			}catch(e){
 				alert("lp_validate :: " + e);
 				return false;
@@ -243,11 +196,11 @@
 			return lv_return;
 		}
 		
-		function lp_returnData(av_userUniqueId, av_userFullName, av_userId, av_userStatus, av_userStatusName){
+		function lp_returnData(av_userUniqueId, av_userFullName, av_userEmail, av_userStatus, av_userStatusName){
 			
 			try{
 				
-				lp_newRecord(av_userUniqueId, av_userFullName, av_userId, av_userStatus, av_userStatusName);
+				lp_newRecord(av_userUniqueId, av_userFullName, av_userEmail, av_userStatus, av_userStatusName);
 				$( "#dialog" ).dialog( "close" );
 			}catch(e){
 				alert("lp_returnData :: " + e);
@@ -255,7 +208,7 @@
 			
 		}
 		
-		function lp_newRecord(av_userUniqueId, av_userFullName, av_userId, av_userStatus, av_userStatusName){
+		function lp_newRecord(av_userUniqueId, av_userFullName, av_userEmail, av_userStatus, av_userStatusName){
 			var params							= "";
 		    var lo_table                        = document.getElementById("resultData");
 		    var lo_seqTemp            			= document.getElementById("seqTemp");
@@ -276,7 +229,7 @@
 									 + "&tin=" 					+ $("#tin").val()
 									 + "&userUniqueId=" 		+ av_userUniqueId
 									 + "&userFullName=" 		+ av_userFullName
-									 + "&userId=" 				+ av_userId
+									 + "&userEmail=" 			+ av_userEmail
 									 + "&userStatus=" 			+ av_userStatus
 									 + "&userStatusName=" 		+ av_userStatusName;
 				
@@ -307,10 +260,10 @@
 		                        newNodeTd1.align 			= "center";
 		                        newNodeTd1.innerHTML        = rowIndex;
 		                        
-		                      	//UserId
+		                      	//E-mail
 		                      	newNodeTd2.align 			= "center";
-		                       	newNodeTd2.innerHTML        = av_userId
-		                       								+ '<input type="hidden" id="userId' + lv_maxSeq + '" name="userId" value="' + av_userId + '" />'
+		                       	newNodeTd2.innerHTML        = av_userEmail
+		                       								+ '<input type="hidden" id="userEmail' + lv_maxSeq + '" name="userEmail" value="' + av_userEmail + '" />'
 		                       								+ '<input type="hidden" id="userUniqueId' + lv_maxSeq + '" name="userUniqueId" value="' + av_userUniqueId + '" />';
 		                       	
 		                      	//ชื่อ-นามสกุล
@@ -402,9 +355,9 @@
 			
 			try{
 				
-				/*if(!lp_validate()){
+				if(!lp_validate()){
 					return;
-				}*/
+				}
 				
 				params 	= "pageAction=save&" + $('#frm').serialize();
 				
@@ -528,7 +481,7 @@
 				         				<table class="table sim-panel-result-table" id="resultData">
 											<tr height="26px;">
 												<th  style="text-align: center;" width="5%" ><B>ลำดับ</B></th>
-												<th  style="text-align: center;" width="20%"><B>รหัสผู้ใช้งาน</B></th>
+												<th  style="text-align: center;" width="20%"><B>E-mail</B></th>
 												<th  style="text-align: center;" width="40%"><B>ชื่อ-นามสกุล</B></th>
 												<th  style="text-align: center;" width="20%"><B>สถานะ</B></th>
 												<th style="text-align: center;" width="15%">Action</th>
@@ -543,8 +496,8 @@
 															<%=seq%>
 														</td>
 														<td align="center">
-															<%=bean.getUserId()%>
-															<input type="hidden" id="userId<%=bean.getSeq()%>" name="userId" value="<%=bean.getUserId()%>" />
+															<%=bean.getUserEmail()%>
+															<input type="hidden" id="userEmail<%=bean.getSeq()%>" name="userEmail" value="<%=bean.getUserEmail()%>" />
 															<input type="hidden" id="userUniqueId<%=bean.getSeq()%>" name="userUniqueId" value="<%=bean.getUserUniqueId()%>" />
 														</td>
 														<td align="left">

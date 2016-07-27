@@ -13,9 +13,8 @@ import javax.persistence.*;
 public class Unittype implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
-	private int unitCode;
+	@EmbeddedId
+	private UnittypePK id;
 
 	private String unitName;
 
@@ -24,12 +23,12 @@ public class Unittype implements Serializable {
 	public Unittype() {
 	}
 
-	public int getUnitCode() {
-		return this.unitCode;
+	public UnittypePK getId() {
+		return this.id;
 	}
 
-	public void setUnitCode(int unitCode) {
-		this.unitCode = unitCode;
+	public void setId(UnittypePK id) {
+		this.id = id;
 	}
 
 	public String getUnitName() {

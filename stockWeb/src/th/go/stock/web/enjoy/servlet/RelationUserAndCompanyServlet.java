@@ -8,8 +8,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -24,7 +22,6 @@ import th.go.stock.app.enjoy.form.RelationUserAndCompanyForm;
 import th.go.stock.app.enjoy.main.Constants;
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
 import th.go.stock.app.enjoy.utils.EnjoyUtils;
-import th.go.stock.app.enjoy.utils.HibernateUtil;
 import th.go.stock.web.enjoy.common.EnjoyStandardSvc;
 import th.go.stock.web.enjoy.utils.EnjoyUtil;
 
@@ -85,11 +82,9 @@ public class RelationUserAndCompanyServlet extends EnjoyStandardSvc {
  				this.onSearch();
  			}else if(pageAction.equals("getCompanyName")){
 				this.getCompanyName();
-			}
-// 			else if(pageAction.equals("validate")){
-//				this.lp_validate();
-//			}
- 			else if(pageAction.equals("getUserFullName")){
+			}else if(pageAction.equals("validate")){
+				this.lp_validate();
+			}else if(pageAction.equals("getUserFullName")){
 				this.getUserFullName();
 			}
  			
@@ -97,11 +92,12 @@ public class RelationUserAndCompanyServlet extends EnjoyStandardSvc {
  			
  		}catch(EnjoyException e){
  			e.printStackTrace();
- 			logger.info(e.getMessage());
+ 			logger.error(e);
  		}catch(Exception e){
  			e.printStackTrace();
- 			logger.info(e.getMessage());
+ 			logger.error(e);
  		}finally{
+ 			destroySession();
  			logger.info("[execute][End]");
  		}
 	}
@@ -115,7 +111,7 @@ public class RelationUserAndCompanyServlet extends EnjoyStandardSvc {
 		String						tin							= null;
 		String						userUniqueId				= null;
 		String						userFullName				= null;
-		String						userId						= null;
+		String						userEmail					= null;
 		String						userStatus					= null;
 		String						userStatusName				= null;
 		
@@ -127,7 +123,7 @@ public class RelationUserAndCompanyServlet extends EnjoyStandardSvc {
 			tin 						= EnjoyUtil.nullToStr(request.getParameter("tin"));
 			userUniqueId 				= EnjoyUtil.nullToStr(request.getParameter("userUniqueId"));
 			userFullName 				= EnjoyUtil.nullToStr(request.getParameter("userFullName"));
-			userId 						= EnjoyUtil.nullToStr(request.getParameter("userId"));
+			userEmail 					= EnjoyUtil.nullToStr(request.getParameter("userEmail"));
 			userStatus 					= EnjoyUtil.nullToStr(request.getParameter("userStatus"));
 			userStatusName 				= EnjoyUtil.nullToStr(request.getParameter("userStatusName"));
 			
@@ -135,7 +131,7 @@ public class RelationUserAndCompanyServlet extends EnjoyStandardSvc {
 			logger.info("[newRecord] tin 			:: " + tin);
 			logger.info("[newRecord] userUniqueId 	:: " + userUniqueId);
 			logger.info("[newRecord] userFullName 	:: " + userFullName);
-			logger.info("[newRecord] userId 		:: " + userId);
+			logger.info("[newRecord] userEmail 		:: " + userEmail);
 			logger.info("[newRecord] userStatus 	:: " + userStatus);
 			logger.info("[newRecord] userStatusName :: " + userStatusName);
 			
@@ -145,7 +141,7 @@ public class RelationUserAndCompanyServlet extends EnjoyStandardSvc {
 			
 			relationUserAndCompanyBean.setUserUniqueId(userUniqueId);
 			relationUserAndCompanyBean.setUserFullName(userFullName);
-			relationUserAndCompanyBean.setUserId(userId);
+			relationUserAndCompanyBean.setUserEmail(userEmail);
 			relationUserAndCompanyBean.setUserStatus(userStatusName);
 			relationUserAndCompanyBean.setUserStatusName(userStatusName);
 			
@@ -249,7 +245,7 @@ public class RelationUserAndCompanyServlet extends EnjoyStandardSvc {
 //		   for(int i=0;i<relationUserAndCompanyList.size();i++){
 //			   bean = relationUserAndCompanyList.get(i);
 //			   if(!bean.getRowStatus().equals(RelationUserAndCompanyForm.DEL)){
-//				   cou = this.dao.checkDupUser(bean.getUserUniqueId(), notInUserUniqueId);
+//				   cou = this.dao.checkDupUser(bean.getUserUniqueId(), notInUserUniqueId, tin);
 //				   if(cou > 0){
 //					   throw new EnjoyException(bean.getUserFullName() + " มีบริษัทสังกัดแล้ว");
 //				   }
@@ -273,66 +269,143 @@ public class RelationUserAndCompanyServlet extends EnjoyStandardSvc {
 //	   }
 //	}
 	
+	private void lp_validate(){
+	   logger.info("[lp_validate][Begin]");
+	   
+	   JSONObject 							obj 						= new JSONObject();
+	   List<RelationUserAndCompanyBean> 	relationUserAndCompanyList	= null;
+	   RelationUserAndCompanyBean			bean						= null;
+	   int									cou							= 0;
+	   String								tin							= "";
+	   String								companyName					= "";
+	   
+	   try{
+		   relationUserAndCompanyList		= this.form.getRelationUserAndCompanyList();
+		   tin								= EnjoyUtil.nullToStr(request.getParameter("tin"));
+		   companyName						= EnjoyUtil.nullToStr(request.getParameter("companyName"));
+		   
+		   logger.info("[lp_validate] tin :: " + tin);
+		   
+		   /*Begin Check ใน table ว่ามี E-mail ซ้ำมั้ย*/
+		   for(int i=0;i<relationUserAndCompanyList.size();i++){
+			   bean = relationUserAndCompanyList.get(i);
+			   if(RelationUserAndCompanyForm.NEW.equals(bean.getRowStatus())){
+				   cou = this.dao.checkDupUser(bean.getUserUniqueId(), tin);
+				   if(cou > 0){
+					   throw new EnjoyException(companyName + "มี E-mail <span style=\"color:red;\">" + bean.getUserEmail() + "</span> แล้ว");
+				   }
+			   }
+		   }
+		   /*End Check ใน table ว่ามี User ซ้ำมั้ย*/
+		   
+		   obj.put(STATUS				, SUCCESS);
+		   
+	   }catch(EnjoyException e){
+		   obj.put(STATUS, 				ERROR);
+		   obj.put(ERR_MSG, 			e.getMessage());
+	   }catch(Exception e){
+			obj.put(STATUS, 			ERROR);
+			obj.put(ERR_MSG, 			"เกิดข้อผิดพลาดในการตรวจสอบข้อมูล");
+			logger.info(e.getMessage());
+			e.printStackTrace();
+	   }finally{
+		   this.enjoyUtil.writeMSG(obj.toString());
+		   logger.info("[lp_validate][End]");
+	   }
+	}
+	
 	private void onSave() throws EnjoyException{
 		logger.info("[onSave][Begin]");
 		
-		SessionFactory 						sessionFactory				= null;
-		Session 							session						= null;
 		JSONObject 							obj 						= null;
 		List<RelationUserAndCompanyBean> 	relationUserAndCompanyList	= null;
+		String								tin							= null;
 		
 		try{
-			sessionFactory 				= HibernateUtil.getSessionFactory();
-			session 					= sessionFactory.openSession();
 			obj 						= new JSONObject();
 			relationUserAndCompanyList	= this.form.getRelationUserAndCompanyList();
+			tin							= EnjoyUtil.nullToStr(request.getParameter("tin"));
+			   
+			logger.info("[onSave] tin :: " + tin);
 			
-			session.beginTransaction();
-			
-			this.dao.deleteRelationUserAndCompany(session, this.form.getTin());
+//			this.dao.deleteRelationUserAndCompany(tin);
 			
 			for(RelationUserAndCompanyBean bean:relationUserAndCompanyList){
-				if(!bean.getRowStatus().equals(RelationUserAndCompanyForm.DEL)){
-					this.dao.insertRelationUserAndCompany(session, bean);
+				if(bean.getRowStatus().equals(RelationUserAndCompanyForm.DEL)){
+					this.dao.deleteRelationUserAndCompany(bean.getUserUniqueId(), tin);
 				}
 			}
 			
-			session.getTransaction().commit();
+			for(RelationUserAndCompanyBean bean:relationUserAndCompanyList){
+				if(bean.getRowStatus().equals(RelationUserAndCompanyForm.NEW)){
+					this.dao.insertRelationUserAndCompany(bean);
+				}
+			}
+			
+			commit();
 			
 			obj.put(STATUS, 			SUCCESS);
 			
 		}catch(EnjoyException e){
-			session.getTransaction().rollback();
+			rollback();
 			obj.put(STATUS, 		ERROR);
 			obj.put(ERR_MSG, 		e.getMessage());
 		}catch(Exception e){
-			session.getTransaction().rollback();
+			rollback();
 			logger.info(e.getMessage());
 			e.printStackTrace();
 			obj.put(STATUS, 		ERROR);
 			obj.put(ERR_MSG, 		"onSave is error");
 		}finally{
-			
-			session.flush();
-			session.clear();
-			session.close();
-			
 			this.enjoyUtil.writeMSG(obj.toString());
-			
-			sessionFactory	= null;
-			session			= null;
-			
-			logger.info("[onSave][End]");
 		}
 	}	
-	
+
+//	private void onSave() throws EnjoyException{
+//		logger.info("[onSave][Begin]");
+//		
+//		JSONObject 							obj 						= null;
+//		List<RelationUserAndCompanyBean> 	relationUserAndCompanyList	= null;
+//		String								tin							= null;
+//		
+//		try{
+//			obj 						= new JSONObject();
+//			relationUserAndCompanyList	= this.form.getRelationUserAndCompanyList();
+//			tin							= EnjoyUtil.nullToStr(request.getParameter("tin"));
+//			   
+//			logger.info("[onSave] tin :: " + tin);
+//			
+//			this.dao.deleteRelationUserAndCompany(tin);
+//			
+//			for(RelationUserAndCompanyBean bean:relationUserAndCompanyList){
+//				if(!bean.getRowStatus().equals(RelationUserAndCompanyForm.DEL)){
+//					this.dao.insertRelationUserAndCompany(bean);
+//				}
+//			}
+//			
+//			commit();
+//			
+//			obj.put(STATUS, 			SUCCESS);
+//			
+//		}catch(EnjoyException e){
+//			rollback();
+//			obj.put(STATUS, 		ERROR);
+//			obj.put(ERR_MSG, 		e.getMessage());
+//		}catch(Exception e){
+//			rollback();
+//			logger.info(e.getMessage());
+//			e.printStackTrace();
+//			obj.put(STATUS, 		ERROR);
+//			obj.put(ERR_MSG, 		"onSave is error");
+//		}finally{
+//			this.enjoyUtil.writeMSG(obj.toString());
+//		}
+//	}	
 	
 	private void onSearch() throws EnjoyException{
 		logger.info("[onSearch][Begin]");
 		
 		RelationUserAndCompanyBean 			relationUserAndCompanyBean		= null;
-		SessionFactory 						sessionFactory					= null;
-		Session 							session							= null;
 		List<RelationUserAndCompanyBean> 	relationUserAndCompanyList		= null;
 		String								tin								= null;
 		String								companyName						= null;
@@ -341,8 +414,6 @@ public class RelationUserAndCompanyServlet extends EnjoyStandardSvc {
 		String								seqTemp							= null;
 
 		try{
-			sessionFactory 				= HibernateUtil.getSessionFactory();
-			session 					= sessionFactory.openSession();			
 			obj 						= new JSONObject();
 			companyName					= EnjoyUtils.nullToStr(this.request.getParameter("companyName"));
 			userFullName				= EnjoyUtils.nullToStr(this.request.getParameter("userFullName"));
@@ -361,14 +432,12 @@ public class RelationUserAndCompanyServlet extends EnjoyStandardSvc {
 			this.form.setUserFullName(userFullName);
 			this.form.setChk(true);
 			
-			session.beginTransaction();
-			
 			relationUserAndCompanyBean				= new RelationUserAndCompanyBean();
 			relationUserAndCompanyBean.setTin(tin);
 			relationUserAndCompanyBean.setUserFullName(userFullName);
 			
 			
-			relationUserAndCompanyList	 		= this.dao.searchByCriteria(session, relationUserAndCompanyBean);
+			relationUserAndCompanyList	 		= this.dao.searchByCriteria(relationUserAndCompanyBean);
 			
 			for(RelationUserAndCompanyBean bean:relationUserAndCompanyList){
 				seqTemp = bean.getSeq();
@@ -391,10 +460,6 @@ public class RelationUserAndCompanyServlet extends EnjoyStandardSvc {
 			obj.put(STATUS, 		ERROR);
 			obj.put(ERR_MSG, 		"onSearch is error");
 		}finally{
-			session.close();
-			sessionFactory	= null;
-			session			= null;
-			
 			this.enjoyUtil.writeMSG(obj.toString());
 			
 			logger.info("[onSearch][End]");
@@ -416,7 +481,7 @@ public class RelationUserAndCompanyServlet extends EnjoyStandardSvc {
 		   
 		   logger.info("[getCompanyName] companyName 			:: " + companyName);
 		   
-		   list 		= this.companyDetailsDao.companyNameList(companyName);
+		   list 		= this.companyDetailsDao.companyNameList(companyName, userBean.getUserUniqueId());
 		   
 		   for(ComboBean bean:list){
 			   objDetail 		= new JSONObject();
@@ -451,7 +516,7 @@ public class RelationUserAndCompanyServlet extends EnjoyStandardSvc {
 		   
 		   logger.info("[getUserFullName] userFullName 			:: " + userFullName);
 		   
-		   list 		= this.userDetailsDao.userFullNameList(userFullName);
+		   list 		= this.userDetailsDao.userFullNameList(userFullName, this.userBean.getTin(), userBean.getUserUniqueId());
 		   
 		   for(ComboBean bean:list){
 			   objDetail 		= new JSONObject();
@@ -471,5 +536,26 @@ public class RelationUserAndCompanyServlet extends EnjoyStandardSvc {
 		   logger.info("[getUserFullName][End]");
 	   }
    }
+
+	@Override
+	public void destroySession() {
+		this.dao.destroySession();
+        this.companyDetailsDao.destroySession();
+        this.userDetailsDao.destroySession();
+	}
+
+	@Override
+	public void commit() {
+		this.dao.commit();
+        this.companyDetailsDao.commit();
+        this.userDetailsDao.commit();
+	}
+
+	@Override
+	public void rollback() {
+		this.dao.rollback();
+        this.companyDetailsDao.rollback();
+        this.userDetailsDao.rollback();
+	}
 
 }

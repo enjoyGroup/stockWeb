@@ -15,7 +15,6 @@
 	String							titlePage				= invoiceCreditMaintananceForm.getTitlePage();
 	CustomerDetailsBean 			customerDetailsBean 	= invoiceCreditMaintananceForm.getCustomerDetailsBean();
 	List<InvoiceCreditDetailBean> 	invoiceCreditDetailList = invoiceCreditMaintananceForm.getInvoiceCreditDetailList();
-	List<ComboBean> 				companyCombo 			= invoiceCreditMaintananceForm.getCompanyCombo();
 
 %>
 
@@ -103,49 +102,15 @@
 			      }
 			});
 			
-			/*$( "#dialog" ).dialog({
-		      autoOpen: false,
-		      height: 600,
-		      width: 1050,
-		      show: {
-		        effect: "clip",
-		        duration: 500
-		      },
-		      hide: {
-		        effect: "clip",
-		        duration: 500
-		      },
-		      close: function() {
-		    	  gp_progressBarOff();
-		    	  $( "#dialog" ).removeClass( "zoom" );
-		        },
-		      dialogClass: 'zoom'
-		    });*/
-			
 			$( "#btnZoom" ).live("click", function(event){
-				
-				//var lo_dialog = null;
-				//var lo_iframe = null;
 				
 				try{
 					
-					if(!gp_validateEmptyObj(new Array( "tin:บริษัทที่สังกัด", "cusCodeDis:รหัสลูกค้า"))){
+					if(!gp_validateEmptyObj(new Array( "cusCodeDis:รหัสลูกค้า"))){
 						return false;
 					}
 					
 					gp_dialogPopUp("/stockWeb/EnjoyGenericSrv?service=servlet.ProductDetailsLookUpServlet&pageAction=new", "เลือกสินค้า");
-					
-					/*lo_dialog 	= $( "#dialog" );
-					lo_iframe	= $("<iframe />").attr("src", "/stockWeb/EnjoyGenericSrv?service=servlet.ProductDetailsLookUpServlet&pageAction=new")
-												 .attr("width", "100%")
-												 .attr("height", "100%")
-												 .attr("border", "0");
-					
-					gp_progressBarOn();
-					lo_dialog.empty();
-					lo_dialog.dialog("option", "title", "เลือกสินค้า");
-					lo_dialog.append(lo_iframe).dialog( "open" );
-					event.preventDefault();*/
 				}catch(e){
 					alert("btnZoom :: " + e);
 				}
@@ -184,7 +149,7 @@
 		});
 		
 		function lp_validate(){
-			var la_validate             = new Array( "invoiceDate:วันที่ขาย", "tin:บริษัทที่สังกัด", "cusCodeDis:รหัสลูกค้า");
+			var la_validate             = new Array( "invoiceDate:วันที่ขาย", "cusCodeDis:รหัสลูกค้า");
 		    var lv_return				= true;
 		    var la_productName			= null;
 		    var la_productCode			= null;
@@ -300,10 +265,6 @@
 				$("#cusCodeDis").focus();
 				$("body").scrollTop(0);
 				
-				/*if($('#tin').val()!=""){
-					$("#productCodeDis").focus();
-				}*/
-				
 			}catch(e){
 				alert("setModeNew :: " + e);
 			}
@@ -338,7 +299,7 @@
 		            		
 		            		if(status=="SUCCESS"){
 		            			alert("บันทึกเรียบร้อย", function() { 
-		            				var params = "invoiceCode=" + jsonObj.invoiceCode + "&tin=" + jsonObj.tin;
+		            				var params = "invoiceCode=" + jsonObj.invoiceCode;
 		            				window.location = gv_url + "?service=" + $("#service").val() + "&pageAction=getDetail&" + params;
 				    		    });
 		            			//alert("บันทึกเรียบร้อย");//alert(jsonObj.invoiceCode);
@@ -364,7 +325,6 @@
 			
 			try{
 				confirm("คุณแน่ใจว่าต้องการยกเลิกรายการนี้", function(){
-					//params 	= "&pageAction=cancel&invoiceCode=" + $('#invoiceCode').val().trim() + "&tin=" + $('#tin').val().trim();
 					params 	= "&pageAction=cancel&" + $('#frm').serialize();
 					
 					$.ajax({
@@ -385,7 +345,7 @@
 			            		
 			            		if(status=="SUCCESS"){
 			            			alert("ยกเลิกเรียบร้อย", function() { 
-			            				var params = "invoiceCode=" + jsonObj.invoiceCode + "&tin=" + jsonObj.tin;
+			            				var params = "invoiceCode=" + jsonObj.invoiceCode;
 			            				window.location = gv_url + "?service=" + $("#service").val() + "&pageAction=getDetail&" + params;
 					    		    });
 			            			//alert("ยกเลิกเรียบร้อย");
@@ -481,7 +441,7 @@
 			
 			try{
 				
-				if(!gp_validateEmptyObj(new Array( "tin:บริษัทที่สังกัด", "cusCodeDis:รหัสลูกค้า"))){
+				if(!gp_validateEmptyObj(new Array( "cusCodeDis:รหัสลูกค้า"))){
 					return false;
 				}
 				
@@ -642,13 +602,8 @@
 			
 			try{
 				
-				if(!gp_validateEmptyObj(new Array( "tin:บริษัทที่สังกัด"))){
-					return false;
-				}
-				
 				params = "productName=" + av_productName.trim() 
 					   + "&groupSalePrice=" + $("#groupSalePrice").val().trim() 
-					   + "&tin=" + $("#tin").val().trim()
 					   + "&invoiceDate=" + $("#invoiceDate").val()
 					   + "&quantity=" + $("#quantity" + av_seq).val();
 				
@@ -712,7 +667,6 @@
 				
 				params = "productCode=" + av_productCode.trim() 
 					   + "&groupSalePrice=" + $("#groupSalePrice").val().trim() 
-					   + "&tin=" + $("#tin").val().trim()
 					   + "&invoiceDate=" + $("#invoiceDate").val()
 					   + "&quantity="  + $("#quantity" + av_seq).val();
 				
@@ -920,7 +874,7 @@
 						async:false,
 			            type: "POST",
 			            url: gv_url,
-			            data: gv_service + "&pageAction=getProductDetailByName&productName=" + obj.productName.trim() + "&tin=" + $("#tin").val().trim(),
+			            data: gv_service + "&pageAction=getProductDetailByName&productName=" + obj.productName.trim(),
 			            beforeSend: "",
 			            success: function(data){
 			            	var jsonObj 			= null;
@@ -952,7 +906,6 @@
 		function lp_lookUpCusDetail(){
 			
 			try{
-				
 				gp_dialogPopUp("/stockWeb/EnjoyGenericSrv?service=servlet.CustomerDetailsLookUpServlet&pageAction=new", "ค้นหาลุกค้า");
 			}catch(e){
 				alert("lp_lookUpCusDetail :: " + e);
@@ -1121,7 +1074,7 @@
 			}
 		}
 		
-		function lp_returnData(av_userUniqueId, av_userFullName, av_userId, av_userStatus, av_userStatusName){
+		function lp_returnData(av_userUniqueId, av_userFullName, av_userEmail, av_userStatus, av_userStatusName){
 			
 			try{
 				$("#saleUniqueId").val(av_userUniqueId);
@@ -1177,10 +1130,6 @@
 			
 			try{
 				
-				if(!gp_validateEmptyObj(new Array( "tin:บริษัทที่สังกัด"))){
-					return false;
-				}
-				
 				lv_productCodeDis = $("#productCodeDis").val().trim();
 				
 				if(lv_productCodeDis==""){
@@ -1199,7 +1148,7 @@
 					return;
 				}
 				
-				params = "&productCode=" + lv_productCodeDis + "&groupSalePrice=" + $("#groupSalePrice").val().trim() + "&tin=" + $("#tin").val().trim();
+				params = "&productCode=" + lv_productCodeDis + "&groupSalePrice=" + $("#groupSalePrice").val().trim();
 				
 				$.ajax({
 					async:false,
@@ -1258,82 +1207,33 @@
 		function lp_print(){
 			
 			var params = "";
+			var h	  	= "";
 			
 			try{
-				params = "invoiceCode=" + $("#invoiceCode").val() + "&tin=" + $("#tin").val();
-				$('#printSection').attr('src', gv_url + "?" + gv_service + "&pageAction=print&" + params);
+				params 	= "invoiceCode=" + $("#invoiceCode").val();
+				h 		= '<iframe name="printSection" '
+						  + '		 id="printSection"'
+						  + '		 src="'+gv_url + '?' + gv_service + '&pageAction=print&' + params + '"'
+						  + '		 scrolling="yes"'
+						  + '		 frameborder="0"'
+						  + '		 width="0"'
+						  + '		 height="0">'
+						  + '</iframe>';
+					
+				$("#printDiv").html('');
+				$("#printDiv").html(h);
+					
+				$('#printSection').load(function(){
+					var lo_pdf = document.getElementById("printSection");
+					lo_pdf.focus();
+					lo_pdf.contentWindow.print();
+					return false;
+				});
+				
+				//$('#printSection').attr('src', gv_url + "?" + gv_service + "&pageAction=print&" + params);
 				
 			}catch(e){
 				alert("lp_print :: " + e);
-			}
-		}
-		
-		function lp_onchangeTin(){
-			var la_productCode 	= null;
-			var la_inventory 	= null;
-			var params			= "";
-			
-			try{
-				la_productCode		= document.getElementsByName("productCode");
-				la_inventory		= document.getElementsByName("inventory");
-				
-				if($("#tin").val()==""){
-					for(var i=0;i<la_inventory.length;i++){
-						la_inventory[i].value = "0.00";
-					}
-					return;
-				}
-				
-				params 	= "pageAction=getInventoryForProduct&" + $('#frm').serialize();
-				
-				$.ajax({
-					async:true,
-		            type: "POST",
-		            url: gv_url,
-		            data: params,
-		            beforeSend: "",
-		            success: function(data){
-		            	var jsonObj 			= null;
-		            	var status				= null;
-		            	var flag				= null;
-		            	
-		            	try{
-		            		//gp_progressBarOff();
-		            		
-		            		jsonObj = JSON.parse(data);
-		            		status	= jsonObj.status;
-		            		
-		            		if(status=="SUCCESS"){
-		            			flag	= jsonObj.flag;
-		            			
-		            			if(flag=="Y"){
-		            				for(var i=0;i<la_productCode.length;i++){
-		            					if(la_productCode[i].value==""){
-		            						la_inventory[i].value = "0.00";
-		            					}else{
-		            						inventoryList 	= jsonObj.inventoryList;
-		            						
-		            						$.each(inventoryList, function(idx, obj) {
-		            							if(obj.productCode==la_productCode[i].value){
-		            								la_inventory[i].value = obj.inventory;
-		            							}
-		            						});
-		            					}
-		            				}
-		            			}
-		            			
-		            		}else{
-		            			alert(jsonObj.errMsg);
-		            			
-		            		}
-		            	}catch(e){
-		            		alert("in lp_onchangeTin :: " + e);
-		            	}
-		            }
-		        });
-				
-			}catch(e){
-				alert("lp_onchangeTin :: " + e);
 			}
 		}
 		
@@ -1477,27 +1377,6 @@
 								        					   style="width: 220px;" />
 								        			</td>
 									        	</tr>
-									        	<tr>
-								        			<td align="right">
-														บริษัทที่สังกัด<span style="color: red;"><b>*</b></span> :
-													</td>
-								        			<td align="left" colspan="3">
-								        				<%if(invoiceCreditMaintananceForm.getPageMode().equals(invoiceCreditMaintananceForm.NEW)){%>
-									        				<select id="tin" name="tin" style="width: 220px;" onchange="lp_onchangeTin();" >
-									        					<% for(ComboBean comboBean:companyCombo){ %>
-									        					<option value="<%=comboBean.getCode()%>" <%if(invoiceCreditMasterBean.getTin().equals(comboBean.getCode())){ %> selected <%} %> ><%=comboBean.getDesc()%></option>
-									        					<%} %>
-									        				</select>
-				   										<%}else{%>
-				   											<select id="tinDis" name="tinDis" style="width: 220px;" onchange="lp_onchangeTin();" >
-									        					<% for(ComboBean comboBean:companyCombo){ %>
-									        					<option value="<%=comboBean.getCode()%>" <%if(invoiceCreditMasterBean.getTin().equals(comboBean.getCode())){ %> selected <%} %> ><%=comboBean.getDesc()%></option>
-									        					<%} %>
-								        				</select>
-								        				<input type="hidden" id="tin" name="tin" value="<%=invoiceCreditMasterBean.getTin()%>" />
-				   										<%}%>
-								        			</td>
-								        		</tr>
 								        		<tr>
 									        		<td align="right">
 														ประเภทราคา <span style="color: red;"><b>*</b></span> :
@@ -1815,14 +1694,7 @@
 				</section>
 			</section>
 		</section>
-		<iframe name="printSection" 
-				id="printSection"
-				src="" 
-				scrolling="yes"  
-				frameborder="0" 
-				width="0" 
-				height="0">
-		</iframe>
+		<div id="printDiv" style="display: none;"></div>
 		<div id="dialog" title="Look up"></div>
 		<div align="center" class="FreezeScreen" style="display:none;">
         	<center>

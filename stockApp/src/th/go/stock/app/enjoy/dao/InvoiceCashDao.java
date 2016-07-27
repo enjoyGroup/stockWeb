@@ -2,46 +2,45 @@
 package th.go.stock.app.enjoy.dao;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.hibernate.Query;
-import org.hibernate.SQLQuery;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.type.IntegerType;
-import org.hibernate.type.StringType;
 
 import th.go.stock.app.enjoy.bean.InvoiceCashDetailBean;
 import th.go.stock.app.enjoy.bean.InvoiceCashMasterBean;
 import th.go.stock.app.enjoy.exception.EnjoyException;
 import th.go.stock.app.enjoy.main.ConfigFile;
+import th.go.stock.app.enjoy.main.Constants;
+import th.go.stock.app.enjoy.main.DaoControl;
 import th.go.stock.app.enjoy.model.Invoicecashdetail;
 import th.go.stock.app.enjoy.model.InvoicecashdetailPK;
 import th.go.stock.app.enjoy.model.Invoicecashmaster;
 import th.go.stock.app.enjoy.model.InvoicecashmasterPK;
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
 import th.go.stock.app.enjoy.utils.EnjoyUtils;
-import th.go.stock.app.enjoy.utils.HibernateUtil;
 
-public class InvoiceCashDao {
+public class InvoiceCashDao extends DaoControl{
 	
-	private static final EnjoyLogger logger = EnjoyLogger.getLogger(InvoiceCashDao.class);
+	public InvoiceCashDao(){
+		setLogger(EnjoyLogger.getLogger(InvoiceCashDao.class));
+		super.init();
+	}
 	
-	
-	public List<InvoiceCashMasterBean> searchByCriteria(Session 				session, 
-														InvoiceCashMasterBean 	invoiceCashMasterBean) throws EnjoyException{
-		logger.info("[searchByCriteria][Begin]");
+	public List<InvoiceCashMasterBean> searchByCriteria(InvoiceCashMasterBean 	invoiceCashMasterBean) throws EnjoyException{
+		getLogger().info("[searchByCriteria][Begin]");
 		
-		String						hql						= null;
-		SQLQuery 					query 					= null;
-		List<Object[]>				list					= null;
-		InvoiceCashMasterBean		bean					= null;
-		List<InvoiceCashMasterBean> invoiceCashMasterList 	= new ArrayList<InvoiceCashMasterBean>();
-		String 						invoiceDateForm			= null;
-		String 						invoiceDateTo			= null;
-		String						invoiceTypeDesc			= "";
-		String						invoiceStatus			= "";
-		String						invoiceStatusDesc		= "";
+		String							hql						= null;
+		InvoiceCashMasterBean			bean					= null;
+		List<InvoiceCashMasterBean> 	invoiceCashMasterList 	= new ArrayList<InvoiceCashMasterBean>();
+		String 							invoiceDateForm			= null;
+		String 							invoiceDateTo			= null;
+		String							invoiceTypeDesc			= "";
+		String							invoiceStatus			= "";
+		String							invoiceStatusDesc		= "";
+		HashMap<String, Object>			param					= new HashMap<String, Object>();
+		List<String>					columnList				= new ArrayList<String>();
+		List<HashMap<String, Object>>	resultList				= null;
 		
 		try{	
 			
@@ -50,59 +49,55 @@ public class InvoiceCashDao {
 			
 			hql					= "select a.*, CONCAT(b.cusName, ' ', b.cusSurname) as cusFullName"
 									+ " from invoicecashmaster a LEFT JOIN customer b"
-									+ " 	ON a.cusCode = b.cusCode"
-									+ "	where a.tin = '" + invoiceCashMasterBean.getTin() + "'";
+									+ " 	ON a.cusCode = b.cusCode and a.tin = b.tin"
+									+ "	where a.tin = :tin";
+			
+			//Criteria
+			param.put("tin"	, invoiceCashMasterBean.getTin());
 			
 			if(!invoiceCashMasterBean.getInvoiceCode().equals("")){
-				hql += " and a.invoiceCode like ('" + invoiceCashMasterBean.getInvoiceCode() + "%')";
+				hql += " and a.invoiceCode LIKE CONCAT(:invoiceCode, '%')";
+				param.put("invoiceCode"	, invoiceCashMasterBean.getInvoiceCode());
 			}
 			
 			if(!invoiceDateForm.equals("")){
-				hql += " and a.invoiceDate >= STR_TO_DATE('" + invoiceDateForm + "', '%Y%m%d')";
+				hql += " and a.invoiceDate >= STR_TO_DATE(:invoiceDateForm, '%Y%m%d')";
+				param.put("invoiceDateForm"	, invoiceDateForm);
 			}
 			
 			if(!invoiceDateTo.equals("")){
-				hql += " and a.invoiceDate <= STR_TO_DATE('" + invoiceDateTo + "', '%Y%m%d')";
+				hql += " and a.invoiceDate <= STR_TO_DATE(:invoiceDateTo, '%Y%m%d')";
+				param.put("invoiceDateTo"	, invoiceDateTo);
 			}
 			
 			if(!invoiceCashMasterBean.getCusFullName().equals("")){
-				hql += " and CONCAT(b.cusName, ' ', b.cusSurname) like ('" + invoiceCashMasterBean.getCusFullName() + "%')";
+				hql += " and CONCAT(b.cusName, ' ', b.cusSurname) LIKE CONCAT(:cusName, '%')";
+				param.put("cusName"	, invoiceCashMasterBean.getCusFullName());
 			}
 			
 			if(!invoiceCashMasterBean.getInvoiceStatus().equals("")){
-				hql += " and a.invoiceStatus = '" + invoiceCashMasterBean.getInvoiceStatus() + "'";
+				hql += " and a.invoiceStatus = :invoiceStatus";
+				param.put("invoiceStatus"	, invoiceCashMasterBean.getInvoiceStatus());
 			}else{
 				hql += " and a.invoiceStatus not in ('W')";
 			}
 			
-			logger.info("[searchByCriteria] hql :: " + hql);
-
-			query			= session.createSQLQuery(hql);			
-			query.addScalar("invoiceCode"		, new StringType());
-			query.addScalar("invoiceType"		, new StringType());
-			query.addScalar("cusFullName"		, new StringType());
-			query.addScalar("invoiceDate"		, new StringType());
-			query.addScalar("invoiceTotal"		, new StringType());
-			query.addScalar("invoiceStatus"		, new StringType());
-			query.addScalar("tin"				, new StringType());
+			//Column select
+			columnList.add("invoiceCode");
+			columnList.add("invoiceType");
+			columnList.add("cusFullName");
+			columnList.add("invoiceDate");
+			columnList.add("invoiceTotal");
+			columnList.add("invoiceStatus");
+			columnList.add("tin");
 			
-			list		 	= query.list();
+			resultList = getResult(hql, param, columnList);
 			
-			logger.info("[searchByCriteria] list.size() :: " + list.size());
-			
-			for(Object[] row:list){
+			for(HashMap<String, Object> row:resultList){
 				bean 	= new InvoiceCashMasterBean();
 				
-				logger.info("invoiceCode 			:: " + row[0]);
-				logger.info("invoiceType 			:: " + row[1]);
-				logger.info("cusFullName 			:: " + row[2]);
-				logger.info("invoiceDate 			:: " + row[3]);
-				logger.info("invoiceTotal 			:: " + row[4]);
-				logger.info("invoiceStatus 			:: " + row[5]);
-				logger.info("tin 					:: " + row[6]);
-				
-				invoiceTypeDesc = EnjoyUtils.nullToStr(row[1]).equals("V")?"มี VAT":"ไม่มี VAT";
-				invoiceStatus	= EnjoyUtils.nullToStr(row[5]);
+				invoiceTypeDesc = EnjoyUtils.nullToStr(row.get("invoiceType")).equals("V")?"มี VAT":"ไม่มี VAT";
+				invoiceStatus	= EnjoyUtils.nullToStr(row.get("invoiceStatus"));
 				
 				if(invoiceStatus.equals("A")){
 					invoiceStatusDesc = "ใช้งานอยู่";
@@ -113,141 +108,115 @@ public class InvoiceCashDao {
 				}
 				
 				
-				bean.setInvoiceCode			(EnjoyUtils.nullToStr(row[0]));
-				bean.setInvoiceType			(EnjoyUtils.nullToStr(row[1]));
+				bean.setInvoiceCode			(EnjoyUtils.nullToStr(row.get("invoiceCode")));
+				bean.setInvoiceType			(EnjoyUtils.nullToStr(row.get("invoiceType")));
 				bean.setInvoiceTypeDesc		(invoiceTypeDesc);
-				bean.setCusFullName			(EnjoyUtils.nullToStr(row[2]));
-				bean.setInvoiceDate			(EnjoyUtils.dateToThaiDisplay(row[3]));
-				bean.setInvoiceTotal		(EnjoyUtils.convertFloatToDisplay(row[4], 2));
+				bean.setCusFullName			(EnjoyUtils.nullToStr(row.get("cusFullName")));
+				bean.setInvoiceDate			(EnjoyUtils.dateToThaiDisplay(row.get("invoiceDate")));
+				bean.setInvoiceTotal		(EnjoyUtils.convertFloatToDisplay(row.get("invoiceTotal"), 2));
 				bean.setInvoiceStatus		(invoiceStatus);
 				bean.setInvoiceStatusDesc	(invoiceStatusDesc);
-				bean.setTin					(EnjoyUtils.nullToStr(row[6]));
+				bean.setTin					(EnjoyUtils.nullToStr(row.get("tin")));
 				
 				invoiceCashMasterList.add(bean);
 			}	
 			
 		}catch(Exception e){
-			logger.info("[searchByCriteria] " + e.getMessage());
+			getLogger().error(e);
 			e.printStackTrace();
 			throw new EnjoyException("error searchByCriteria");
 		}finally{
 			hql						= null;
-			logger.info("[searchByCriteria][End]");
+			getLogger().info("[searchByCriteria][End]");
 		}
 		
 		return invoiceCashMasterList;
 		
 	}
 	
-	public InvoiceCashMasterBean getInvoiceCashMaster(InvoiceCashMasterBean 	invoiceCashMasterBean) throws EnjoyException{
-		logger.info("[getInvoiceCashMaster][Begin]");
+	public InvoiceCashMasterBean getInvoiceCashMaster(InvoiceCashMasterBean invoiceCashMasterBean) throws EnjoyException{
+		getLogger().info("[getInvoiceCashMaster][Begin]");
 		
-		String						hql						= null;
-		SQLQuery 					query 					= null;
-		List<Object[]>				list					= null;
-		InvoiceCashMasterBean		bean					= null;
-		SessionFactory 				sessionFactory			= null;
-		Session 					session					= null;
+		String							hql						= null;
+		InvoiceCashMasterBean			bean					= null;
+		HashMap<String, Object>			param					= new HashMap<String, Object>();
+		List<String>					columnList				= new ArrayList<String>();
+		List<HashMap<String, Object>>	resultList				= null;
 		
 		try{	
-			sessionFactory 		= HibernateUtil.getSessionFactory();
-			session 			= sessionFactory.openSession();
 			hql		= "select t.*, CONCAT(a.userName,' ',a.userSurname) saleName"
 					+ "	from invoicecashmaster t"
 					+ "	left join userdetails a on t.saleUniqueId = a.userUniqueId"
-					+ "	where t.invoiceCode = '" + invoiceCashMasterBean.getInvoiceCode() + "'"
-					+ "		and t.tin		= '" + invoiceCashMasterBean.getTin() + "'";
+					+ "	where t.invoiceCode = :invoiceCode"
+					+ "		and t.tin		= :tin";
 			
-			logger.info("[getReciveOrderMaster] hql :: " + hql);
-
-			query			= session.createSQLQuery(hql);			
-			query.addScalar("invoiceCode"		, new StringType());
-			query.addScalar("invoiceDate"		, new StringType());
-			query.addScalar("invoiceType"		, new StringType());
-			query.addScalar("cusCode"			, new StringType());
-			query.addScalar("branchName"		, new StringType());
-			query.addScalar("saleUniqueId"		, new StringType());
-			query.addScalar("saleCommission"	, new StringType());
-			query.addScalar("invoicePrice"		, new StringType());
-			query.addScalar("invoicediscount"	, new StringType());
-			query.addScalar("invoiceDeposit"	, new StringType());
-			query.addScalar("invoiceVat"		, new StringType());
-			query.addScalar("invoiceTotal"		, new StringType());
-			query.addScalar("userUniqueId"		, new StringType());
-			query.addScalar("invoiceCredit"		, new StringType());
-			query.addScalar("invoiceStatus"		, new StringType());
-			query.addScalar("tin"				, new StringType());
-			query.addScalar("remark"			, new StringType());
-			query.addScalar("saleName"			, new StringType());
+			//Criteria
+			param.put("invoiceCode"	, invoiceCashMasterBean.getInvoiceCode());
+			param.put("tin"			, invoiceCashMasterBean.getTin());
 			
-			list		 	= query.list();
+			//Column select
+			columnList.add("invoiceCode");
+			columnList.add("invoiceDate");
+			columnList.add("invoiceType");
+			columnList.add("cusCode");
+			columnList.add("branchName");
+			columnList.add("saleUniqueId");
+			columnList.add("saleCommission");
+			columnList.add("invoicePrice");
+			columnList.add("invoicediscount");
+			columnList.add("invoiceDeposit");
+			columnList.add("invoiceVat");
+			columnList.add("invoiceTotal");
+			columnList.add("userUniqueId");
+			columnList.add("invoiceCredit");
+			columnList.add("invoiceStatus");
+			columnList.add("tin");
+			columnList.add("remark");
+			columnList.add("saleName");
 			
-			logger.info("[getInvoiceCashMaster] list.size() :: " + list.size());
+			resultList = getResult(hql, param, columnList);
 			
-			if(list.size()==1){
-				for(Object[] row:list){
+			if(resultList.size()==1){
+				for(HashMap<String, Object> row:resultList){
 					bean 	= new InvoiceCashMasterBean();
 					
-					logger.info("invoiceCode 				:: " + row[0]);
-					logger.info("invoiceDate 				:: " + row[1]);
-					logger.info("invoiceType 				:: " + row[2]);
-					logger.info("cusCode					:: " + row[3]);
-					logger.info("branchName 				:: " + row[4]);
-					logger.info("saleUniqueId 				:: " + row[5]);
-					logger.info("saleCommission 			:: " + row[6]);
-					logger.info("invoicePrice 				:: " + row[7]);
-					logger.info("invoicediscount 			:: " + row[8]);
-					logger.info("invoiceDeposit 			:: " + row[9]);
-					logger.info("invoiceVat 				:: " + row[10]);
-					logger.info("invoiceTotal 				:: " + row[11]);
-					logger.info("userUniqueId 				:: " + row[12]);
-					logger.info("invoiceCredit 				:: " + row[13]);
-					logger.info("invoiceStatus 				:: " + row[14]);
-					logger.info("tin 						:: " + row[15]);
-					logger.info("remark 					:: " + row[16]);
-					logger.info("saleName 					:: " + row[17]);
-					
-					bean.setInvoiceCode				(EnjoyUtils.nullToStr(row[0]));
-					bean.setInvoiceDate				(EnjoyUtils.dateToThaiDisplay(row[1]));
-					bean.setInvoiceType				(EnjoyUtils.nullToStr(row[2]));
-					bean.setCusCode					(EnjoyUtils.nullToStr(row[3]));
-					bean.setBranchName				(EnjoyUtils.nullToStr(row[4]));
-					bean.setSaleUniqueId			(EnjoyUtils.nullToStr(row[5]));
-					bean.setSaleCommission			(EnjoyUtils.convertFloatToDisplay(row[6], 2));
-					bean.setInvoicePrice			(EnjoyUtils.convertFloatToDisplay(row[7], 2));
-					bean.setInvoicediscount			(EnjoyUtils.convertFloatToDisplay(row[8], 2));
-					bean.setInvoiceDeposit			(EnjoyUtils.convertFloatToDisplay(row[9], 2));
-					bean.setInvoiceVat				(EnjoyUtils.convertFloatToDisplay(row[10], 2));
-					bean.setInvoiceTotal			(EnjoyUtils.convertFloatToDisplay(row[11], 2));
-					bean.setUserUniqueId			(EnjoyUtils.nullToStr(row[12]));
-					bean.setInvoiceCredit			(EnjoyUtils.nullToStr(row[13]));
-					bean.setInvoiceStatus			(EnjoyUtils.nullToStr(row[14]));
-					bean.setTin						(EnjoyUtils.nullToStr(row[15]));
-					bean.setRemark					(EnjoyUtils.nullToStr(row[16]));
-					bean.setSaleName				(EnjoyUtils.nullToStr(row[17]));
+					bean.setInvoiceCode				(EnjoyUtils.nullToStr(row.get("invoiceCode")));
+					bean.setInvoiceDate				(EnjoyUtils.dateToThaiDisplay(row.get("invoiceDate")));
+					bean.setInvoiceType				(EnjoyUtils.nullToStr(row.get("invoiceType")));
+					bean.setCusCode					(EnjoyUtils.nullToStr(row.get("cusCode")));
+					bean.setBranchName				(EnjoyUtils.nullToStr(row.get("branchName")));
+					bean.setSaleUniqueId			(EnjoyUtils.nullToStr(row.get("saleUniqueId")));
+					bean.setSaleCommission			(EnjoyUtils.convertFloatToDisplay(row.get("saleCommission"), 2));
+					bean.setInvoicePrice			(EnjoyUtils.convertFloatToDisplay(row.get("invoicePrice"), 2));
+					bean.setInvoicediscount			(EnjoyUtils.convertFloatToDisplay(row.get("invoicediscount"), 2));
+					bean.setInvoiceDeposit			(EnjoyUtils.convertFloatToDisplay(row.get("invoiceDeposit"), 2));
+					bean.setInvoiceVat				(EnjoyUtils.convertFloatToDisplay(row.get("invoiceVat"), 2));
+					bean.setInvoiceTotal			(EnjoyUtils.convertFloatToDisplay(row.get("invoiceTotal"), 2));
+					bean.setUserUniqueId			(EnjoyUtils.nullToStr(row.get("userUniqueId")));
+					bean.setInvoiceCredit			(EnjoyUtils.nullToStr(row.get("invoiceCredit")));
+					bean.setInvoiceStatus			(EnjoyUtils.nullToStr(row.get("invoiceStatus")));
+					bean.setTin						(EnjoyUtils.nullToStr(row.get("tin")));
+					bean.setRemark					(EnjoyUtils.nullToStr(row.get("remark")));
+					bean.setSaleName				(EnjoyUtils.nullToStr(row.get("saleName")));
 					
 				}	
 			}
 			
 		}catch(Exception e){
-			logger.info("[getInvoiceCashMaster] " + e.getMessage());
+			getLogger().error(e);
 			e.printStackTrace();
 			throw new EnjoyException("error getInvoiceCashMaster");
 		}finally{
-			session.close();
-			
-			sessionFactory	= null;
-			session			= null;
 			hql				= null;
-			logger.info("[getInvoiceCashMaster][End]");
+			getLogger().info("[getInvoiceCashMaster][End]");
 		}
 		
 		return bean;
 		
 	}
 	
-	public void insertInvoiceCashMaster(Session session, InvoiceCashMasterBean 		invoiceCashMasterBean) throws EnjoyException{
-		logger.info("[insertInvoiceCashMaster][Begin]");
+	public void insertInvoiceCashMaster(InvoiceCashMasterBean invoiceCashMasterBean) throws EnjoyException{
+		getLogger().info("[insertInvoiceCashMaster][Begin]");
 		
 		Invoicecashmaster	invoiceCashMaster	= null;
 		InvoicecashmasterPK	id					= null;
@@ -277,21 +246,21 @@ public class InvoiceCashDao {
 			invoiceCashMaster.setInvoiceStatus			(invoiceCashMasterBean.getInvoiceStatus());
 			invoiceCashMaster.setRemark					(invoiceCashMasterBean.getRemark());
 			
-			session.saveOrUpdate(invoiceCashMaster);
+			insertData(invoiceCashMaster);
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			logger.info(e.getMessage());
+			getLogger().error(e);
 			throw new EnjoyException("Error insertInvoiceCashMaster");
 		}finally{
 			
 			invoiceCashMaster = null;
-			logger.info("[insertInvoiceCashMaster][End]");
+			getLogger().info("[insertInvoiceCashMaster][End]");
 		}
 	}
 	
-	public void updateInvoiceCashMaster(Session session, InvoiceCashMasterBean 		invoiceCashMasterBean) throws EnjoyException{
-		logger.info("[updateInvoiceCashMaster][Begin]");
+	public void updateInvoiceCashMaster(InvoiceCashMasterBean 		invoiceCashMasterBean) throws EnjoyException{
+		getLogger().info("[updateInvoiceCashMaster][Begin]");
 		
 		String							hql									= null;
 		Query 							query 								= null;
@@ -315,7 +284,7 @@ public class InvoiceCashDao {
 										+ " where t.id.invoiceCode 	= :invoiceCode"
 										+ "		and t.id.tin		= :tin";
 			
-			query = session.createQuery(hql);
+			query = createQuery(hql);
 			query.setParameter("invoiceDate"		, invoiceCashMasterBean.getInvoiceDate());
 			query.setParameter("invoiceType"		, invoiceCashMasterBean.getInvoiceType());
 			query.setParameter("cusCode"			, invoiceCashMasterBean.getCusCode());
@@ -338,18 +307,18 @@ public class InvoiceCashDao {
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			logger.info(e.getMessage());
+			getLogger().error(e);
 			throw new EnjoyException("Error updateInvoiceCashMaster");
 		}finally{
 			
 			hql									= null;
 			query 								= null;
-			logger.info("[updateInvoiceCashMaster][End]");
+			getLogger().info("[updateInvoiceCashMaster][End]");
 		}
 	}
 	
-	public void updateInvoiceCashMasterStatus(Session session, InvoiceCashMasterBean 		invoiceCashMasterBean) throws EnjoyException{
-		logger.info("[updateInvoiceCashMasterStatus][Begin]");
+	public void updateInvoiceCashMasterStatus(InvoiceCashMasterBean invoiceCashMasterBean) throws EnjoyException{
+		getLogger().info("[updateInvoiceCashMasterStatus][Begin]");
 		
 		String							hql									= null;
 		Query 							query 								= null;
@@ -359,7 +328,7 @@ public class InvoiceCashDao {
 										+ " where t.id.invoiceCode 	= :invoiceCode"
 										+ "		and t.id.tin 		= :tin";
 			
-			query = session.createQuery(hql);
+			query = createQuery(hql);
 			query.setParameter("invoiceStatus"	, invoiceCashMasterBean.getInvoiceStatus());
 			query.setParameter("invoiceCode"	, invoiceCashMasterBean.getInvoiceCode());
 			query.setParameter("tin"			, invoiceCashMasterBean.getTin());
@@ -368,91 +337,75 @@ public class InvoiceCashDao {
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			logger.info(e.getMessage());
+			getLogger().error(e);
 			throw new EnjoyException("Error updateInvoiceCashMasterStatus");
 		}finally{
 			
 			hql									= null;
 			query 								= null;
-			logger.info("[updateInvoiceCashMasterStatus][End]");
+			getLogger().info("[updateInvoiceCashMasterStatus][End]");
 		}
 	}
 	
-	public List<InvoiceCashDetailBean> getInvoiceCashDetailList(InvoiceCashDetailBean 	invoiceCashDetailBean) throws EnjoyException{
-		logger.info("[getInvoiceCashDetailList][Begin]");
+	public List<InvoiceCashDetailBean> getInvoiceCashDetailList(InvoiceCashDetailBean invoiceCashDetailBean) throws EnjoyException{
+		getLogger().info("[getInvoiceCashDetailList][Begin]");
 		
-		String						hql							= null;
-		SQLQuery 					query 						= null;
-		List<Object[]>				list						= null;
-		InvoiceCashDetailBean		bean						= null;
-		List<InvoiceCashDetailBean> invoiceCashDetailList 		= new ArrayList<InvoiceCashDetailBean>();
-		int							seq							= 0;
-		SessionFactory 				sessionFactory				= null;
-		Session 					session						= null;
+		String							hql						= null;
+		InvoiceCashDetailBean			bean					= null;
+		List<InvoiceCashDetailBean> 	invoiceCashDetailList 	= new ArrayList<InvoiceCashDetailBean>();
+		int								seq						= 0;
+		HashMap<String, Object>			param					= new HashMap<String, Object>();
+		List<String>					columnList				= new ArrayList<String>();
+		List<HashMap<String, Object>>	resultList				= null;
 		
 		try{	
-			sessionFactory 		= HibernateUtil.getSessionFactory();
-			session 			= sessionFactory.openSession();
 			hql					= "select a.*"
 									+ "	, b.productName"
 									+ "	, e.quantity as inventory"
 									+ "	, b.unitCode"
 									+ "	, c.unitName"
 									+ "	from invoicecashdetail a"
-									+ "		INNER JOIN productmaster b on b.productCode 	= a.productCode"
-									+ "		INNER JOIN unittype c on c.unitCode 		= b.unitCode"
+									+ "		INNER JOIN productmaster b on b.productCode = a.productCode and a.tin = b.tin"
+									+ "		INNER JOIN unittype c on c.unitCode = b.unitCode and a.tin = c.tin"
 									+ "		LEFT  JOIN invoicecashmaster d ON a.invoiceCode = d.invoiceCode and a.tin = d.tin"
 									+ "		LEFT JOIN	productquantity e ON d.tin = e.tin and e.productCode = a.productCode"
-									+ "	where a.invoiceCode 	= '" + invoiceCashDetailBean.getInvoiceCode() + "'"
-									+ "		and a.tin			= '" + invoiceCashDetailBean.getTin() + "'"
+									+ "	where a.invoiceCode 	= :invoiceCode"
+									+ "		and a.tin			= :tin"
 									+ "	order by a.seq asc";
 			
-			logger.info("[getInvoiceCashDetailList] hql :: " + hql);
-
-			query			= session.createSQLQuery(hql);			
-			query.addScalar("invoiceCode"	, new StringType());
-			query.addScalar("seq"			, new StringType());
-			query.addScalar("productCode"	, new StringType());
-			query.addScalar("productName"	, new StringType());
-			query.addScalar("inventory"		, new StringType());
-			query.addScalar("quantity"		, new StringType());
-			query.addScalar("pricePerUnit"	, new StringType());
-			query.addScalar("discount"		, new StringType());
-			query.addScalar("price"			, new StringType());
-			query.addScalar("unitCode"		, new StringType());
-			query.addScalar("unitName"		, new StringType());
+			//Criteria
+			param.put("invoiceCode"	, invoiceCashDetailBean.getInvoiceCode());
+			param.put("tin"			, invoiceCashDetailBean.getTin());
 			
-			list		 	= query.list();
+			//Column select
+			columnList.add("invoiceCode");
+			columnList.add("seq");
+			columnList.add("productCode");
+			columnList.add("productName");
+			columnList.add("inventory");
+			columnList.add("quantity");
+			columnList.add("pricePerUnit");
+			columnList.add("discount");
+			columnList.add("price");
+			columnList.add("unitCode");
+			columnList.add("unitName");
 			
-			logger.info("[getInvoiceCashDetailList] list.size() :: " + list.size());
+			resultList = getResult(hql, param, columnList);
 			
-			for(Object[] row:list){
+			for(HashMap<String, Object> row:resultList){
 				bean 	= new InvoiceCashDetailBean();
 				
-				logger.info("invoiceCode 	:: " + row[0]);
-				logger.info("seqDb 			:: " + row[1]);
-				logger.info("productCode 	:: " + row[2]);
-				logger.info("productName 	:: " + row[3]);
-				logger.info("inventory 		:: " + row[4]);
-				logger.info("quantity 		:: " + row[5]);
-				logger.info("pricePerUnit 	:: " + row[6]);
-				logger.info("discount 		:: " + row[7]);
-				logger.info("price 			:: " + row[8]);
-				logger.info("unitCode 		:: " + row[9]);
-				logger.info("unitName 		:: " + row[10]);
-				logger.info("seq 			:: " + seq);
-				
-				bean.setInvoiceCode			(EnjoyUtils.nullToStr(row[0]));
-				bean.setSeqDb				(EnjoyUtils.nullToStr(row[1]));
-				bean.setProductCode			(EnjoyUtils.nullToStr(row[2]));
-				bean.setProductName			(EnjoyUtils.nullToStr(row[3]));
-				bean.setInventory			(EnjoyUtils.convertFloatToDisplay(row[4], 2));
-				bean.setQuantity			(EnjoyUtils.convertFloatToDisplay(row[5], 2));
-				bean.setPricePerUnit		(EnjoyUtils.convertFloatToDisplay(row[6], 2));
-				bean.setDiscount			(EnjoyUtils.convertFloatToDisplay(row[7], 2));
-				bean.setPrice				(EnjoyUtils.convertFloatToDisplay(row[8], 2));
-				bean.setUnitCode			(EnjoyUtils.nullToStr(row[9]));
-				bean.setUnitName			(EnjoyUtils.nullToStr(row[10]));
+				bean.setInvoiceCode			(EnjoyUtils.nullToStr(row.get("invoiceCode")));
+				bean.setSeqDb				(EnjoyUtils.nullToStr(row.get("seq")));
+				bean.setProductCode			(EnjoyUtils.nullToStr(row.get("productCode")));
+				bean.setProductName			(EnjoyUtils.nullToStr(row.get("productName")));
+				bean.setInventory			(EnjoyUtils.convertFloatToDisplay(row.get("inventory"), 2));
+				bean.setQuantity			(EnjoyUtils.convertFloatToDisplay(row.get("quantity"), 2));
+				bean.setPricePerUnit		(EnjoyUtils.convertFloatToDisplay(row.get("pricePerUnit"), 2));
+				bean.setDiscount			(EnjoyUtils.convertFloatToDisplay(row.get("discount"), 2));
+				bean.setPrice				(EnjoyUtils.convertFloatToDisplay(row.get("price"), 2));
+				bean.setUnitCode			(EnjoyUtils.nullToStr(row.get("unitCode")));
+				bean.setUnitName			(EnjoyUtils.nullToStr(row.get("unitName")));
 				bean.setSeq					(EnjoyUtils.nullToStr(seq));
 				
 				invoiceCashDetailList.add(bean);
@@ -461,24 +414,20 @@ public class InvoiceCashDao {
 			}	
 			
 		}catch(Exception e){
-			logger.info("[getInvoiceCashDetailList] " + e.getMessage());
+			getLogger().error(e);
 			e.printStackTrace();
 			throw new EnjoyException("error getInvoiceCashDetailList");
 		}finally{
-			session.close();
-			
-			sessionFactory	= null;
-			session			= null;
 			hql				= null;
-			logger.info("[getInvoiceCashDetailList][End]");
+			getLogger().info("[getInvoiceCashDetailList][End]");
 		}
 		
 		return invoiceCashDetailList;
 		
 	}
 	
-	public void insertInvoiceCashDetail(Session session, InvoiceCashDetailBean 	invoiceCashDetailBean) throws EnjoyException{
-		logger.info("[insertInvoiceCashDetail][Begin]");
+	public void insertInvoiceCashDetail(InvoiceCashDetailBean 	invoiceCashDetailBean) throws EnjoyException{
+		getLogger().info("[insertInvoiceCashDetail][Begin]");
 		
 		Invoicecashdetail		invoicecashdetail		= null;
 		InvoicecashdetailPK 	id 						= null;
@@ -499,104 +448,95 @@ public class InvoiceCashDao {
 			invoicecashdetail.setDiscount			(EnjoyUtils.parseBigDecimal(invoiceCashDetailBean.getDiscount()));
 			invoicecashdetail.setPrice				(EnjoyUtils.parseBigDecimal(invoiceCashDetailBean.getPrice()));
 			
-			session.saveOrUpdate(invoicecashdetail);
+			insertData(invoicecashdetail);
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			logger.info(e.getMessage());
+			getLogger().error(e);
 			throw new EnjoyException("Error insertInvoiceCashDetail");
 		}finally{
 			id 					= null;
 			invoicecashdetail 	= null;
-			logger.info("[insertInvoiceCashDetail][End]");
+			getLogger().info("[insertInvoiceCashDetail][End]");
 		}
 	}
 	
-	public void deleteInvoiceCashDetail(Session session, String invoiceCode, String tin) throws EnjoyException{
-		logger.info("[deleteInvoiceCashDetail][Begin]");
+	public void deleteInvoiceCashDetail(String invoiceCode, String tin) throws EnjoyException{
+		getLogger().info("[deleteInvoiceCashDetail][Begin]");
 		
 		String							hql									= null;
 		Query 							query 								= null;
 		
 		try{
 			hql				= "delete Invoicecashdetail t"
-							+ " where t.id.invoiceCode	 = '" + invoiceCode + "'"
-							+ "		and t.id.tin		= '" + tin + "'";
+							+ " where t.id.invoiceCode	= :invoiceCode"
+							+ "		and t.id.tin		= :tin";
 			
-			query = session.createQuery(hql);
+			query = createQuery(hql);
+			query.setParameter("invoiceCode"	, invoiceCode);
+			query.setParameter("tin"			, tin);
 			
 			query.executeUpdate();			
 		}catch(Exception e){
 			e.printStackTrace();
-			logger.error(e);
+			getLogger().error(e);
 			throw new EnjoyException("เกิดข้อผิดพลาดในการลบข้อมูล");
 		}finally{
 			
 			hql									= null;
 			query 								= null;
-			logger.info("[deleteInvoiceCashDetail][End]");
+			getLogger().info("[deleteInvoiceCashDetail][End]");
 		}
 	}
 	
 	
 	public String genId(String invoiceType, String tin) throws EnjoyException{
-		logger.info("[genId][Begin]");
+		getLogger().info("[genId][Begin]");
 		
-		String				hql						= null;
-		List<Integer>		list					= null;
-		SQLQuery 			query 					= null;
-		SessionFactory 		sessionFactory			= null;
-		Session 			session					= null;
-		String				newId					= "";
-		String				codeDisplay				= null;
-		RefconstantcodeDao	refconstantcodeDao		= null;
-		String				id						= null;
+		String							hql						= null;
+		String							newId					= "";
+		String							codeDisplay				= null;
+		RefconstantcodeDao				refconstantcodeDao		= null;
+		String							id						= null;
+		HashMap<String, Object>			param					= new HashMap<String, Object>();
+		List<Object>					resultList				= null;
 		
 		try{
 			
-			logger.info("[genId] invoiceType :: " + invoiceType);
+			getLogger().info("[genId] invoiceType :: " + invoiceType);
 			
-			sessionFactory 		= HibernateUtil.getSessionFactory();
-			session 			= sessionFactory.openSession();
 			refconstantcodeDao 	= new RefconstantcodeDao();
 			id					= invoiceType.equals("V")?"3":"4";
-			codeDisplay			= refconstantcodeDao.getCodeDisplay(id);
+			codeDisplay			= refconstantcodeDao.getCodeDisplay(id, tin);
 			
 			hql				= "SELECT (MAX(SUBSTRING_INDEX(invoiceCode, '-', -1)) + 1) AS newId"
 							+ "	FROM invoicecashmaster"
 							+ "	WHERE"
-							+ "		SUBSTRING_INDEX(invoiceCode, '-', 1) = '" + codeDisplay + "'"
-							+ "		and tin = '" + tin + "'";
-			query			= session.createSQLQuery(hql);
+							+ "		SUBSTRING_INDEX(invoiceCode, '-', 1) = :codeDisplay"
+							+ "		and tin = :tin";
 			
+			//Criteria
+			param.put("codeDisplay"	, codeDisplay);
+			param.put("tin"			, tin);
 			
-			query.addScalar("newId"			, new IntegerType());
+			resultList = getResult(hql, param, "newId", Constants.INT_TYPE);
 			
-			list		 	= query.list();
-			
-			logger.info("[genId] PadingInvoiceCode 			:: " + ConfigFile.getPadingInvoiceCode());
-			
-			if(list!=null && list.size() > 0 && list.get(0)!=null){
-				newId = codeDisplay + "-" + String.format(ConfigFile.getPadingInvoiceCode(), list.get(0));
+			if(resultList!=null && resultList.size() > 0 && resultList.get(0)!=null){
+				newId = codeDisplay + "-" + String.format(ConfigFile.getPadingInvoiceCode(), EnjoyUtils.parseInt(resultList.get(0)));
 			}else{
 				newId = codeDisplay + "-" + String.format(ConfigFile.getPadingInvoiceCode(), 1);
 			}
 			
-			logger.info("[genId] newId 			:: " + newId);
+			getLogger().info("[genId] newId 			:: " + newId);
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			logger.info(e.getMessage());
+			getLogger().error(e);
 			throw new EnjoyException(e.getMessage());
 		}finally{
-			
-			session.close();
-			sessionFactory	= null;
-			session			= null;
 			hql				= null;
-			list			= null;
-			query 			= null;
-			logger.info("[genId][End]");
+			refconstantcodeDao.destroySession();
+			getLogger().info("[genId][End]");
 		}
 		
 		return newId;

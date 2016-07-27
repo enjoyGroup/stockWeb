@@ -33,5 +33,12 @@ public class Constants {
 	public static final String ERR_ERROR 			= "E";
 	public static final String ERR_WARNING 			= "W";
 	
-	public static final String ADMIN				= "admin";
+	public static final int ADMIN					= 1;
+	
+	//For DB
+	public  static final int INT_TYPE         		= 1;
+	public  static final int STRING_TYPE      		= 2;
+	
+	public static final String SEND_MAIL_ID 		= "7";
+	
 }

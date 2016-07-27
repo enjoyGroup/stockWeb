@@ -10,8 +10,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -26,7 +24,6 @@ import th.go.stock.app.enjoy.form.ProductDetailsLookUpForm;
 import th.go.stock.app.enjoy.main.Constants;
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
 import th.go.stock.app.enjoy.utils.EnjoyUtils;
-import th.go.stock.app.enjoy.utils.HibernateUtil;
 import th.go.stock.web.enjoy.common.EnjoyStandardSvc;
 import th.go.stock.web.enjoy.utils.EnjoyUtil;
 
@@ -76,7 +73,6 @@ public class ProductDetailsLookUpServlet extends EnjoyStandardSvc {
  			if(this.form == null || pageAction.equals("new")) this.form = new ProductDetailsLookUpForm();
  			
  			if( pageAction.equals("") || pageAction.equals("new") ){
-// 				this.onLoad();
 				request.setAttribute("target", Constants.PAGE_URL +"/zoom/ProductDetailsLookUpScn.jsp");
  			}else if(pageAction.equals("search")){
  				this.onSearch();
@@ -101,124 +97,15 @@ public class ProductDetailsLookUpServlet extends EnjoyStandardSvc {
  			e.printStackTrace();
  			logger.info(e.getMessage());
  		}finally{
+ 			destroySession();
  			logger.info("[execute][End]");
  		}
 	}
-	
-//	private void onLoad() throws EnjoyException{
-//		logger.info("[onLoad][Begin]");
-//		
-//		try{
-//			this.initialCombo();	
-//		}catch(EnjoyException e){
-//			throw new EnjoyException(e.getMessage());
-//		}catch(Exception e){
-//			logger.info(e.getMessage());
-//			throw new EnjoyException("onLoad is error");
-//		}finally{			
-//			logger.info("[onLoad][End]");
-//		}
-//		
-//	}
-	
-//	private void initialCombo() throws EnjoyException{
-//		
-//		logger.info("[initialCombo][Begin]");
-//		
-//		try{
-//			this.setColumnList();
-//			this.setOrderByList();
-//			this.setSortByList();
-//			
-//		}catch(Exception e){
-//			logger.info(e.getMessage());
-//			throw new EnjoyException("initialCombo is error");
-//		}finally{
-//			logger.info("[initialCombo][End]");
-//		}
-//	}
-	
-//	private void setColumnList() throws EnjoyException{
-//		
-//		logger.info("[setColumnList][Begin]");
-//		
-//		List<ComboBean>			columnList = null;
-//		
-//		try{
-//			
-//			columnList = new ArrayList<ComboBean>();
-//			
-//			columnList.add(new ComboBean(""		 			, "กรุณาระบุ"));
-//			columnList.add(new ComboBean("productCode"		, "รหัสสินค้า"));
-//			columnList.add(new ComboBean("productName"		, "ชื่อสินค้า"));
-//			columnList.add(new ComboBean("productTypeName"	, "หมวดสินค้า"));
-//			columnList.add(new ComboBean("productGroupName"	, "หมู่สินค้า"));
-//			
-//			this.form.setColumnList(columnList);
-//		}
-//		catch(Exception e){
-//			logger.info(e.getMessage());
-//			throw new EnjoyException("setColumnList is error");
-//		}finally{
-//			logger.info("[setColumnList][End]");
-//		}
-//	}
-	
-//	private void setOrderByList() throws EnjoyException{
-//		
-//		logger.info("[setOrderByList][Begin]");
-//		
-//		List<ComboBean>			orderByList = null;
-//		
-//		try{
-//			
-//			orderByList = new ArrayList<ComboBean>();
-//			
-//			orderByList.add(new ComboBean("productCode"			, "รหัสสินค้า"));
-//			orderByList.add(new ComboBean("productName"			, "ชื่อสินค้า"));
-//			orderByList.add(new ComboBean("productTypeName"		, "หมวดสินค้า"));
-//			orderByList.add(new ComboBean("productGroupName"	, "หมู่สินค้า"));
-//			
-//			this.form.setOrderByList(orderByList);
-//		}
-//		catch(Exception e){
-//			logger.info(e.getMessage());
-//			throw new EnjoyException("setOrderByList is error");
-//		}finally{
-//			logger.info("[setOrderByList][End]");
-//		}
-//	}
-	
-//	private void setSortByList() throws EnjoyException{
-//		
-//		logger.info("[setSortByList][Begin]");
-//		
-//		List<ComboBean>			sortByList = null;
-//		
-//		try{
-//			
-//			sortByList = new ArrayList<ComboBean>();
-//			
-//			sortByList.add(new ComboBean("ASC", "ASC"));
-//			sortByList.add(new ComboBean("DESC", "DESC"));
-//			
-//			this.form.setSortByList(sortByList);
-//		}
-//		catch(Exception e){
-//			logger.info(e.getMessage());
-//			throw new EnjoyException("setSortByList is error");
-//		}finally{
-//			logger.info("[setSortByList][End]");
-//		}
-//	}
-	
 	
 	private void onSearch() throws EnjoyException{
 		logger.info("[onSearch][Begin]");
 		
 		ProductmasterBean 			productmasterBean	= null;
-		SessionFactory 				sessionFactory		= null;
-		Session 					session				= null;
 		List<ProductmasterBean> 	dataList 			= null;
 		int							cou					= 0;
 		int							pageNum				= 1;
@@ -229,20 +116,16 @@ public class ProductDetailsLookUpServlet extends EnjoyStandardSvc {
         HashMap						hashTable			= new HashMap();
 
 		try{
-			sessionFactory 				= HibernateUtil.getSessionFactory();
-			session 					= sessionFactory.openSession();			
-			session.beginTransaction();
-			
 			productmasterBean				= new ProductmasterBean();
 			
 			productmasterBean.setProductTypeName		(EnjoyUtils.nullToStr(this.request.getParameter("productTypeName")));
 			productmasterBean.setProductGroupName		(EnjoyUtils.nullToStr(this.request.getParameter("productGroupName")));
 			productmasterBean.setProductName			(EnjoyUtils.nullToStr(this.request.getParameter("productName")));
-//			productDetailsBean.setProductStatus			(EnjoyUtils.nullToStr(this.request.getParameter("productStatus")));
+			productmasterBean.setTin					(this.userBean.getTin());
 			
 			this.form.setProductmasterBean	(productmasterBean);
 			
-			dataList	 		= this.dao.searchByCriteria(session, productmasterBean);
+			dataList	 		= this.dao.searchByCriteria(productmasterBean);
 			
 			if(dataList.size() > 0){				
 				
@@ -291,11 +174,6 @@ public class ProductDetailsLookUpServlet extends EnjoyStandardSvc {
 			logger.info(e.getMessage());
 			throw new EnjoyException("onSearch is error");
 		}finally{
-			session.close();
-			sessionFactory	= null;
-			session			= null;
-			
-//			this.setRefference();
 			logger.info("[onSearch][End]");
 		}
 		
@@ -327,19 +205,22 @@ public class ProductDetailsLookUpServlet extends EnjoyStandardSvc {
 	private void getProductTypeNameList(){
 	   logger.info("[getProductTypeNameList][Begin]");
 	   
-	   String							productTypeName			= null;
-	   List<ComboBean> 					list 					= null;
-       JSONArray 						jSONArray 				= null;
-       JSONObject 						objDetail 				= null;
+	   String			productTypeName			= null;
+	   List<ComboBean> 	list 					= null;
+       JSONArray 		jSONArray 				= null;
+       JSONObject 		objDetail 				= null;
+       String			tin 					= null;
        
 	   try{
-		   productTypeName			= EnjoyUtils.nullToStr(this.request.getParameter("productTypeName"));
-		   jSONArray 				= new JSONArray();
+		   productTypeName	= EnjoyUtils.nullToStr(this.request.getParameter("productTypeName"));
+		   tin				= this.userBean.getTin();
+		   jSONArray 		= new JSONArray();
 		   
-		   logger.info("[getProductTypeNameList] productTypeName 			:: " + productTypeName);
+		   logger.info("[getProductTypeNameList] productTypeName 	:: " + productTypeName);
+		   logger.info("[getProductTypeNameList] tin 				:: " + tin);
 		   
 		   
-		   list 		= this.productTypeDao.productTypeNameList(productTypeName);
+		   list 		= this.productTypeDao.productTypeNameList(productTypeName, tin);
 		   
 		   for(ComboBean bean:list){
 			   objDetail 		= new JSONObject();
@@ -363,22 +244,25 @@ public class ProductDetailsLookUpServlet extends EnjoyStandardSvc {
 	private void getProductGroupNameList(){
 	   logger.info("[getProductGroupNameList][Begin]");
 	   
-	   String							productTypeName			= null;
-	   String							productGroupName		= null;
-	   List<ComboBean> 					list 					= null;
-	   JSONArray 						jSONArray 				= null;
-	   JSONObject 						objDetail 				= null;
+	   String			productTypeName			= null;
+	   String			productGroupName		= null;
+	   String			tin 					= null;
+	   List<ComboBean> 	list 					= null;
+	   JSONArray 		jSONArray 				= null;
+	   JSONObject 		objDetail 				= null;
     
 	   try{
 		   jSONArray 				= new JSONArray();
 		   productTypeName			= EnjoyUtils.nullToStr(this.request.getParameter("productTypeName"));
 		   productGroupName			= EnjoyUtils.nullToStr(this.request.getParameter("productGroupName"));
+		   tin						= this.userBean.getTin();
 		   
 		   
-		   logger.info("[getProductGroupNameList] productTypeName 			:: " + productTypeName);
-		   logger.info("[getProductGroupNameList] productGroupName 			:: " + productGroupName);
+		   logger.info("[getProductGroupNameList] productTypeName 	:: " + productTypeName);
+		   logger.info("[getProductGroupNameList] productGroupName 	:: " + productGroupName);
+		   logger.info("[getProductGroupNameList] tin 				:: " + tin);
 		   
-		   list 		= this.productGroupDao.productGroupNameList(productTypeName, productGroupName, true);
+		   list 		= this.productGroupDao.productGroupNameList(productTypeName, productGroupName, tin, true);
 		   
 		   for(ComboBean bean:list){
 			   objDetail 		= new JSONObject();
@@ -402,24 +286,27 @@ public class ProductDetailsLookUpServlet extends EnjoyStandardSvc {
 	private void getProductNameList(){
 	   logger.info("[getProductNameList][Begin]");
 	   
-	   String							productName				= null;
-	   String							productTypeName			= null;
-	   String							productGroupName		= null;
-	   List<ComboBean> 					list 					= null;
-	   JSONArray 						jSONArray 				= null;
-	   JSONObject 						objDetail 				= null;
+	   String				productName				= null;
+	   String				productTypeName			= null;
+	   String				productGroupName		= null;
+	   String				tin 					= null;
+	   List<ComboBean> 		list 					= null;
+	   JSONArray 			jSONArray 				= null;
+	   JSONObject 			objDetail 				= null;
  
 	   try{
 		   jSONArray 				= new JSONArray();
 		   productName				= EnjoyUtils.nullToStr(this.request.getParameter("productName"));
 		   productTypeName			= EnjoyUtils.nullToStr(this.request.getParameter("productTypeName"));
 		   productGroupName			= EnjoyUtils.nullToStr(this.request.getParameter("productGroupName"));
+		   tin						= this.userBean.getTin();
 		   
-		   logger.info("[getProductNameList] productName 				:: " + productName);
-		   logger.info("[getProductNameList] productTypeName 			:: " + productTypeName);
-		   logger.info("[getProductNameList] productGroupName 			:: " + productGroupName);
+		   logger.info("[getProductNameList] productName 		:: " + productName);
+		   logger.info("[getProductNameList] productTypeName 	:: " + productTypeName);
+		   logger.info("[getProductNameList] productGroupName 	:: " + productGroupName);
+		   logger.info("[getProductNameList] tin 				:: " + tin);
 		   
-		   list 		= this.dao.productNameList(productName, productTypeName, productGroupName, true);
+		   list 		= this.dao.productNameList(productName, productTypeName, productGroupName, tin, true);
 		   
 		   for(ComboBean bean:list){
 			   objDetail 		= new JSONObject();
@@ -526,6 +413,27 @@ public class ProductDetailsLookUpServlet extends EnjoyStandardSvc {
 		   this.enjoyUtil.writeMSG(obj.toString());
 		   logger.info("[checkProduct][End]");
 	   }
+	}
+
+	@Override
+	public void destroySession() {
+		this.dao.destroySession();
+        this.productTypeDao.destroySession();
+        this.productGroupDao.destroySession();
+	}
+
+	@Override
+	public void commit() {
+		this.dao.commit();
+        this.productTypeDao.commit();
+        this.productGroupDao.commit();
+	}
+
+	@Override
+	public void rollback() {
+		this.dao.rollback();
+        this.productTypeDao.rollback();
+        this.productGroupDao.rollback();
 	}
 	
 	

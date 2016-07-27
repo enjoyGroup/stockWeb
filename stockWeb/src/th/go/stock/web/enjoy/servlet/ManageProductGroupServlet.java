@@ -1,6 +1,8 @@
 package th.go.stock.web.enjoy.servlet;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -8,14 +10,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import th.go.stock.app.enjoy.bean.ComboBean;
 import th.go.stock.app.enjoy.bean.ManageProductGroupBean;
-import th.go.stock.app.enjoy.bean.ManageProductTypeBean;
 import th.go.stock.app.enjoy.bean.UserDetailsBean;
 import th.go.stock.app.enjoy.dao.ManageProductGroupDao;
 import th.go.stock.app.enjoy.dao.ManageProductTypeDao;
@@ -24,7 +28,7 @@ import th.go.stock.app.enjoy.form.ManageProductGroupForm;
 import th.go.stock.app.enjoy.main.Constants;
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
 import th.go.stock.app.enjoy.utils.EnjoyUtils;
-import th.go.stock.app.enjoy.utils.HibernateUtil;
+import th.go.stock.app.enjoy.utils.ExcelUtil;
 import th.go.stock.web.enjoy.common.EnjoyStandardSvc;
 import th.go.stock.web.enjoy.utils.EnjoyUtil;
 
@@ -57,15 +61,15 @@ public class ManageProductGroupServlet extends EnjoyStandardSvc {
          String pageAction = null; 
  		
  		try{
- 			 pageAction 				= EnjoyUtil.nullToStr(request.getParameter("pageAction"));
- 			 this.enjoyUtil 			= new EnjoyUtil(request, response);
- 			 this.request            	= request;
-             this.response           	= response;
-             this.session            	= request.getSession(false);
-             this.userBean           	= (UserDetailsBean)session.getAttribute("userBean");
-             this.form               	= (ManageProductGroupForm)session.getAttribute(FORM_NAME);
-             this.dao					= new ManageProductGroupDao();
-             this.productTypeDao		= new ManageProductTypeDao();
+ 			 pageAction 					= EnjoyUtil.nullToStr(request.getParameter("pageAction"));
+ 			 this.enjoyUtil 				= new EnjoyUtil(request, response);
+ 			 this.request            		= request;
+             this.response           		= response;
+             this.session            		= request.getSession(false);
+             this.userBean           		= (UserDetailsBean)session.getAttribute("userBean");
+             this.form               		= (ManageProductGroupForm)session.getAttribute(FORM_NAME);
+             this.dao						= new ManageProductGroupDao();
+             this.productTypeDao			= new ManageProductTypeDao();
  			
              logger.info("[execute] pageAction : " + pageAction );
              
@@ -87,6 +91,8 @@ public class ManageProductGroupServlet extends EnjoyStandardSvc {
 				this.getProductType();
 			}else if(pageAction.equals("validate")){
 				this.lp_validate();
+			}else if(pageAction.equals("uploadFile")){
+				this.lp_uploadFile();
 			}
  			
  			session.setAttribute(FORM_NAME, this.form);
@@ -98,6 +104,7 @@ public class ManageProductGroupServlet extends EnjoyStandardSvc {
  			e.printStackTrace();
  			logger.info(e.getMessage());
  		}finally{
+ 			destroySession();
  			logger.info("[execute][End]");
  		}
 	}
@@ -281,77 +288,63 @@ public class ManageProductGroupServlet extends EnjoyStandardSvc {
 	private void onSave() throws EnjoyException{
 		logger.info("[onSave][Begin]");
 		
-		SessionFactory 					sessionFactory			= null;
-		Session 						session					= null;
 		JSONObject 						obj 					= null;
 		List<ManageProductGroupBean> 	productGroupList		= null;
-		ManageProductGroupBean 			bean					= null;
+		String							tin						= null;
 		
 		try{
-			sessionFactory 				= HibernateUtil.getSessionFactory();
-			session 					= sessionFactory.openSession();
-			obj 						= new JSONObject();
-			productGroupList			= this.form.getProductGroupList();
+			obj 					= new JSONObject();
+			productGroupList		= this.form.getProductGroupList();
+			tin 					= this.userBean.getTin();
 			
-			session.beginTransaction();
+			logger.info("[onSave] tin :: " + tin);
 			
-			for(int i=0;i<productGroupList.size();i++){
-				bean = productGroupList.get(i);
+			for(ManageProductGroupBean bean:productGroupList){
+				bean.setTin(tin);
 				if(bean.getRowStatus().equals(ManageProductGroupForm.NEW)){
-					this.dao.insertProducGroup(session, bean);
+					this.dao.insertProducGroup(bean);
 				}else if(bean.getRowStatus().equals(ManageProductGroupForm.UPD) || bean.getRowStatus().equals(ManageProductGroupForm.DEL)){
-					this.dao.updateProductgroup(session, bean);
+					this.dao.updateProductgroup(bean);
 				}
 			}
 			
-			session.getTransaction().commit();
+			commit();
 			
 			obj.put(STATUS, 			SUCCESS);
 			
 		}catch(EnjoyException e){
-			session.getTransaction().rollback();
+			rollback();
 			obj.put(STATUS, 		ERROR);
 			obj.put(ERR_MSG, 		e.getMessage());
 		}catch(Exception e){
-			session.getTransaction().rollback();
+			rollback();
 			logger.info(e.getMessage());
 			e.printStackTrace();
 			obj.put(STATUS, 		ERROR);
 			obj.put(ERR_MSG, 		"onSave is error");
 		}finally{
-			
-			session.flush();
-			session.clear();
-			session.close();
-			
 			this.enjoyUtil.writeMSG(obj.toString());
-			
-			sessionFactory	= null;
-			session			= null;
 			
 			logger.info("[onSave][End]");
 		}
 	}	
 	
-	
 	private void onSearch() throws EnjoyException{
 		logger.info("[onSearch][Begin]");
 		
 		ManageProductGroupBean 			manageProductGroupBean	= null;
-		SessionFactory 					sessionFactory			= null;
-		Session 						session					= null;
 		List<ManageProductGroupBean> 	productGroupList 		= null;
 		String							productTypeName			= null;
 		String							productTypeCode			= null;
 		JSONObject 						obj 					= null;
 		String							seqTemp					= null;
+		String							tin 					= null;
 
 		try{
-			sessionFactory 				= HibernateUtil.getSessionFactory();
-			session 					= sessionFactory.openSession();			
-			obj 						= new JSONObject();
-			productTypeName				= EnjoyUtils.nullToStr(this.request.getParameter("productTypeName"));
-			productTypeCode				= this.productTypeDao.getProductTypeCode(productTypeName);
+			obj 					= new JSONObject();
+			productTypeName			= EnjoyUtils.nullToStr(this.request.getParameter("productTypeName"));
+			tin 					= this.userBean.getTin();
+			productTypeCode			= this.productTypeDao.getProductTypeCode(productTypeName, tin);
 			
 			logger.info("[onSearch] productTypeCode :: " + productTypeCode);
 			logger.info("[onSearch] productTypeName :: " + productTypeName);
@@ -364,13 +357,11 @@ public class ManageProductGroupServlet extends EnjoyStandardSvc {
 			this.form.setProductTypeName(productTypeName);
 			this.form.setChk(true);
 			
-			session.beginTransaction();
-			
 			manageProductGroupBean				= new ManageProductGroupBean();
 			manageProductGroupBean.setProductTypeCode(productTypeCode);
+			manageProductGroupBean.setTin(tin);
 			
-			
-			productGroupList	 		= this.dao.getProductGroupList(session, manageProductGroupBean);
+			productGroupList	 		= this.dao.getProductGroupList(manageProductGroupBean);
 			
 			for(ManageProductGroupBean bean:productGroupList){
 				seqTemp = bean.getSeq();
@@ -393,10 +384,6 @@ public class ManageProductGroupServlet extends EnjoyStandardSvc {
 			obj.put(STATUS, 		ERROR);
 			obj.put(ERR_MSG, 		"onSearch is error");
 		}finally{
-			session.close();
-			sessionFactory	= null;
-			session			= null;
-			
 			this.enjoyUtil.writeMSG(obj.toString());
 			
 			logger.info("[onSearch][End]");
@@ -407,18 +394,21 @@ public class ManageProductGroupServlet extends EnjoyStandardSvc {
 	private void getProductType(){
 	   logger.info("[getProductType][Begin]");
 	   
-	   String							productTypeName			= null;
-	   List<ComboBean> 					list 					= null;
-       JSONArray 						jSONArray 				= null;
-       JSONObject 						objDetail 				= null;
+	   String			productTypeName			= null;
+	   List<ComboBean> 	list 					= null;
+       JSONArray 		jSONArray 				= null;
+       JSONObject 		objDetail 				= null;
+       String			tin 					= null;
        
 	   try{
-		   productTypeName			= EnjoyUtils.nullToStr(this.request.getParameter("productTypeName"));
-		   jSONArray 				= new JSONArray();
+		   productTypeName		= EnjoyUtils.nullToStr(this.request.getParameter("productTypeName"));
+		   tin 					= this.userBean.getTin();
+		   jSONArray 			= new JSONArray();
 		   
-		   logger.info("[getProductType] productTypeName 			:: " + productTypeName);
+		   logger.info("[getProductType] productTypeName 	:: " + productTypeName);
+		   logger.info("[getProductType] tin 				:: " + tin);
 		   
-		   list 		= this.productTypeDao.productTypeNameList(productTypeName);
+		   list 		= this.productTypeDao.productTypeNameList(productTypeName, tin);
 		   
 		   for(ComboBean bean:list){
 			   objDetail 		= new JSONObject();
@@ -438,5 +428,119 @@ public class ManageProductGroupServlet extends EnjoyStandardSvc {
 		   logger.info("[getProductType][End]");
 	   }
    }
+	
+	private void lp_uploadFile() throws Exception{
+		logger.info("[lp_uploadFile][Begin]");
+		
+		boolean                 isMultipart             = ServletFileUpload.isMultipartContent(this.request);
+		List                    items                   = null;
+		Iterator                iterator                = null;
+		String                  fileName                = null;
+        File                    uploadedFile            = null;
+        long 					curr 					= System.currentTimeMillis();
+		String[]				extentArr				= null;
+		String					extent					= null;
+        Workbook 				wb						= null;
+		int 					numberOfSheets;
+		Sheet 					sheet					= null;
+		String 					sheetName 				= "";
+		Row[]   				rowArray  				= null;
+		ManageProductGroupBean	manageProductGroupBean	= null;
+		String					productGroupCode		= null;
+		String					productGroupName		= null;
+		boolean					del						= false;
+		JSONObject 				obj 					= new JSONObject();
+		JSONArray 				jSONArray 				= new JSONArray();
+		JSONObject 				objDetail 				= null;
+		
+		try{
+			if (isMultipart) {
+				items                   = (List) this.request.getAttribute(Constants.LIST_FILE);
+                iterator                = items.iterator();
+                logger.info("[lp_uploadFile] items :: " + items.size());
+			    
+			    while (iterator.hasNext()) {
+			    	FileItem item = (FileItem) iterator.next();
+			    	
+			    	logger.info("[lp_uploadFile] item.isFormField() :: " + item.isFormField());
+			    	
+			    	if (!item.isFormField()) {
+			    		fileName 			= new File(item.getName()).getName();
+			    		extentArr			= fileName.split("\\.");
+			    		extent				= extentArr[(extentArr.length - 1)];
+			    		fileName			= String.valueOf(curr) + "." + extent;
+			    		
+			    		logger.info("[lp_uploadFile] fileName :: " + fileName);
+	
+			    		uploadedFile = new File(fileName);
+			    		item.write(uploadedFile);
+			    		
+			    		wb             = ExcelUtil.getWorkbook(uploadedFile);
+			    		numberOfSheets = wb.getNumberOfSheets();
+			    		
+			    		logger.info("[lp_uploadFile] numberOfSheets :: " + numberOfSheets);
+			    		
+						for (int i = 0; i < numberOfSheets; i++) {
+							sheetName = wb.getSheetName(i);
+							sheet     = wb.getSheetAt(i);
+							rowArray  = ExcelUtil.getAllRows(sheet);
+							
+							logger.info("[lp_uploadFile] sheetName :: " + sheetName);
+							
+							for(int j=1;j<rowArray.length;j++){
+								manageProductGroupBean 	= new ManageProductGroupBean(rowArray[j]);
+								objDetail 				= new JSONObject();
+								productGroupCode		= manageProductGroupBean.getColA().getValue();
+								productGroupName		= manageProductGroupBean.getColB().getValue();
+								
+								logger.info("[lp_uploadFile] productGroupCode :: " + productGroupCode);
+								logger.info("[lp_uploadFile] productGroupName :: " + productGroupName);
+								
+								objDetail.put("productGroupCode", productGroupCode);
+								objDetail.put("productGroupName", productGroupName);
+								
+								jSONArray.add(objDetail);
+							}
+						}
+			    		
+						del = uploadedFile.delete();
+						logger.info("[lp_uploadFile] del :: " + del);
+			    		
+			         }
+			    }
+			}
+			
+			obj.put(STATUS				, SUCCESS);
+			obj.put("productGroupList"	, jSONArray);
+
+		}catch(Exception e){
+			e.printStackTrace();
+			logger.error(e);
+			obj.put(STATUS, 		ERROR);
+			obj.put(ERR_MSG, 		"uploadFile is error");
+			throw e;
+		}finally{
+			this.enjoyUtil.writeMSG(obj.toString());
+			logger.info("[lp_uploadFile][End]");
+		}
+	}
+
+	@Override
+	public void destroySession() {
+		this.dao.destroySession();
+        this.productTypeDao.destroySession();
+	}
+
+	@Override
+	public void commit() {
+		this.dao.commit();
+        this.productTypeDao.commit();
+	}
+
+	@Override
+	public void rollback() {
+		this.dao.rollback();
+        this.productTypeDao.rollback();
+	}
 
 }

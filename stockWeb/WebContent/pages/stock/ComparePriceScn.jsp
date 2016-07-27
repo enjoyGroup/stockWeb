@@ -1,6 +1,6 @@
 <%@ include file="/pages/include/checkLogin.jsp"%>
 <%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
-<%@ page import="th.go.stock.app.enjoy.bean.ComparePriceBean"%>
+<%@ page import="th.go.stock.app.enjoy.bean.ComparePriceBean,th.go.stock.app.enjoy.bean.ComboBean"%>
 <%@ page import="java.util.*"%>
 <jsp:useBean id="comparePriceForm" class="th.go.stock.app.enjoy.form.ComparePriceForm" scope="session"/>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -137,14 +137,9 @@
 			
 			$('#btnSearch').click(function(){ 
 				try{
-					if($("#productName").val().trim()==""){
-						alert("กรุณาระบุสินค้า", function() { 
-							$("#productName").focus();
-    	    		    });
-		            	//alert("กรุณาระบุสินค้า");
-		            	//$("#productName").focus();
-		                return;
-		            }
+					if(!gp_validateEmptyObj(new Array( "productName:สินค้า"))){
+						return false;
+					}
 					
 					if($("#productCode").val().trim()==""){
 						alert("ระบุชื่อสินค้าผิด", function() { 
@@ -617,7 +612,7 @@
 							        			<td align="right" width="10%">
 							        				สินค้า <span style="color: red;"><b>*</b></span> : &nbsp;
 							        			</td>
-							        			<td align="left">
+							        			<td align="left" colspan="3">
 							        				<input type='text' 
 							        					   id="productName" 
 							        					   name='productName' 
@@ -640,10 +635,10 @@
 					         				<table class="table sim-panel-result-table" id="resultData">
 												<tr height="26px;">
 													<th  style="text-align: center;" width="5%" ><B>ลำดับ</B></th>
-													<th  style="text-align: center;" width="20%"><B>บริษัท</B></th>
-													<th  style="text-align: center;" width="20%"><B>สาขา</B></th>
-													<th  style="text-align: center;" width="20%"><B>ปริมาณ</B></th>
-													<th  style="text-align: center;" width="20%"><B>ราคาที่ซื้อ</B></th>
+													<th  style="text-align: center;" width="35%"><B>บริษัท</B></th>
+													<th  style="text-align: center;" width="15%"><B>สาขา</B></th>
+													<th  style="text-align: center;" width="15%"><B>ปริมาณ</B></th>
+													<th  style="text-align: center;" width="15%"><B>ราคาที่ซื้อ</B></th>
 													<th style="text-align: center;" width="15%">Action</th>
 												</tr> 
 												<%

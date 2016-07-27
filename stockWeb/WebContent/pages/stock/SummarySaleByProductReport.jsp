@@ -9,7 +9,6 @@
 	SummarySaleByProductReportBean 			summarySaleByProductReportBean 	= summarySaleByProductReportForm.getSummarySaleByProductReportBean();
 	List<SummarySaleByProductReportBean> 	dataList 						= summarySaleByProductReportForm.getDataList();
 	String									titlePage						= summarySaleByProductReportForm.getTitlePage();
-	List<ComboBean> 						companyCombo 					= summarySaleByProductReportForm.getCompanyCombo();
 %>
 
 <html>
@@ -78,8 +77,7 @@
 						return;
 					}
 					
-					params = "tin=" 				+ $("#tin").val()
-							+ "&productName=" 		+ $("#productName").val()
+					params = "productName=" 		+ $("#productName").val()
 							+ "&invoiceDateFrom=" 	+ $("#invoiceDateFrom").val()
 							+ "&invoiceDateTo=" 	+ $("#invoiceDateTo").val();
 					
@@ -103,7 +101,7 @@
 		});
 		
 		function lp_validate(){
-			var la_validate             = new Array( "tin:บริษัทที่สังกัด", "invoiceDateFrom:วันที่เริ่มค้นหา", "invoiceDateTo:วันที่สิ้นสุดค้นหา");
+			var la_validate             = new Array( "invoiceDateFrom:วันที่เริ่มค้นหา", "invoiceDateTo:วันที่สิ้นสุดค้นหา");
 		    var lv_return				= true;
 		    
 			try{
@@ -141,32 +139,20 @@
 										<div class="panel-body" align="center">
 								        	<table width="100%" border="0" cellpadding="5" cellspacing="5">
 								        		<tr>
-								        			<td align="right" width="150px;">
-								        				บริษัทที่สังกัด <span style="color: red;"><b>*</b></span> : &nbsp;
-								        			</td>
-								        			<td align="left">
-								        				<select id="tin" name="tin" style="width: 220px;" >
-								        					<% for(ComboBean comboBean:companyCombo){ %>
-								        					<option value="<%=comboBean.getCode()%>" <%if(summarySaleByProductReportBean.getTin().equals(comboBean.getCode())){ %> selected <%} %> ><%=comboBean.getDesc()%></option>
-								        					<%} %>
-								        				</select>
-								        			</td>
 								        			<td align="right">
 								        				สินค้า :&nbsp;
 								        			</td>
-								        			<td align="left" colspan="3">
+								        			<td align="left">
 								        				<input type='text' 
 								        					   id="productName" 
 								        					   name='productName' 
 								        					   value="<%=summarySaleByProductReportBean.getProductName() %>" 
 								        					   maxlength="100" />
 								        			</td>
-								        		</tr>
-								        		<tr>
 								        			<td align="right">
 								        				วันที่ขาย <span style="color: red;"><b>*</b></span> :&nbsp;
 								        			</td>
-								        			<td align="left" colspan="5">
+								        			<td align="left" colspan="3">
 								        				<input type='text' 
 								        					   id="invoiceDateFrom" 
 								        					   name='invoiceDateFrom' 

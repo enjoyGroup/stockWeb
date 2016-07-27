@@ -10,9 +10,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-
 import th.go.stock.app.enjoy.bean.ComboBean;
 import th.go.stock.app.enjoy.bean.UserDetailsBean;
 import th.go.stock.app.enjoy.dao.UserDetailsDao;
@@ -21,7 +18,6 @@ import th.go.stock.app.enjoy.form.UserDetailsLookUpForm;
 import th.go.stock.app.enjoy.main.Constants;
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
 import th.go.stock.app.enjoy.utils.EnjoyUtils;
-import th.go.stock.app.enjoy.utils.HibernateUtil;
 import th.go.stock.web.enjoy.common.EnjoyStandardSvc;
 import th.go.stock.web.enjoy.utils.EnjoyUtil;
 
@@ -82,6 +78,7 @@ public class UserDetailsLookUpServlet extends EnjoyStandardSvc {
  			e.printStackTrace();
  			logger.info(e.getMessage());
  		}finally{
+ 			destroySession();
  			logger.info("[execute][End]");
  		}
 	}
@@ -89,15 +86,7 @@ public class UserDetailsLookUpServlet extends EnjoyStandardSvc {
 	private void onLoad() throws EnjoyException{
 		logger.info("[onLoad][Begin]");
 		
-		String tin = "";
-		
 		try{
-			tin = EnjoyUtils.nullToStr(request.getParameter("tin"));
-			
-			if(!"".equals(tin)){
-				this.form.setTin(tin);
-			}
-			
 			this.form.setLikeFlag("Y");
 			this.initialCombo();	
 		}catch(EnjoyException e){
@@ -139,7 +128,7 @@ public class UserDetailsLookUpServlet extends EnjoyStandardSvc {
 			columnList = new ArrayList<ComboBean>();
 			
 			columnList.add(new ComboBean(""		 		, "กรุณาระบุ"));
-			columnList.add(new ComboBean("userId"		, "รหัสผู้ใช้งาน"));
+			columnList.add(new ComboBean("userEmail"	, "E-mail"));
 			columnList.add(new ComboBean("userFullName"	, "ชื่อ-นามสกุล"));
 			
 			this.form.setColumnList(columnList);
@@ -162,7 +151,7 @@ public class UserDetailsLookUpServlet extends EnjoyStandardSvc {
 			
 			orderByList = new ArrayList<ComboBean>();
 			
-			orderByList.add(new ComboBean("userId"			, "รหัสผู้ใช้งาน"));
+			orderByList.add(new ComboBean("userEmail"		, "E-mail"));
 			orderByList.add(new ComboBean("userFullName"	, "ชื่อ-นามสกุล"));
 			
 			this.form.setOrderByList(orderByList);
@@ -185,8 +174,8 @@ public class UserDetailsLookUpServlet extends EnjoyStandardSvc {
 			
 			sortByList = new ArrayList<ComboBean>();
 			
-			sortByList.add(new ComboBean("ASC", "เรียงจากน้อยไปมาก"));
-			sortByList.add(new ComboBean("DESC", "เรียงจากมากไปน้อย"));
+			sortByList.add(new ComboBean("ASC"	,"เรียงจากน้อยไปมาก"));
+			sortByList.add(new ComboBean("DESC"	,"เรียงจากมากไปน้อย"));
 			
 			this.form.setSortByList(sortByList);
 		}
@@ -202,8 +191,6 @@ public class UserDetailsLookUpServlet extends EnjoyStandardSvc {
 	private void onSearch() throws EnjoyException{
 		logger.info("[onSearch][Begin]");
 		
-		SessionFactory 				sessionFactory		= null;
-		Session 					session				= null;
 		int							cou					= 0;
 		int							pageNum				= 1;
         int							totalPage			= 0;
@@ -217,7 +204,6 @@ public class UserDetailsLookUpServlet extends EnjoyStandardSvc {
     	String						sortBy				= null;
     	String						likeFlag			= null;
     	List<UserDetailsBean> 		dataList			= null;
-    	String						tin					= null;
 
 		try{
 			find						= EnjoyUtils.nullToStr(this.request.getParameter("find"));
@@ -225,26 +211,25 @@ public class UserDetailsLookUpServlet extends EnjoyStandardSvc {
 			orderBy						= EnjoyUtils.nullToStr(this.request.getParameter("orderBy"));
 			sortBy						= EnjoyUtils.nullToStr(this.request.getParameter("sortBy"));
 			likeFlag					= EnjoyUtils.chkBoxtoDb(this.request.getParameter("likeFlag"));
-			tin 						= EnjoyUtils.nullToStr(request.getParameter("tin"));
-			sessionFactory 				= HibernateUtil.getSessionFactory();
-			session 					= sessionFactory.openSession();			
-			session.beginTransaction();
 			
 			logger.info("[onSearch] find 	 	:: " + find);
 			logger.info("[onSearch] column 	 	:: " + column);
 			logger.info("[onSearch] orderBy 	:: " + orderBy);
 			logger.info("[onSearch] sortBy 	 	:: " + sortBy);
 			logger.info("[onSearch] likeFlag 	:: " + likeFlag);
-			logger.info("[onSearch] tin 		:: " + tin);
 			
 			this.form.setFind		(find);
 			this.form.setColumn		(column);
 			this.form.setOrderBy	(orderBy);
 			this.form.setSortBy		(sortBy);
 			this.form.setLikeFlag	(likeFlag);
-			this.form.setTin		(tin);
 			
-			dataList = this.dao.getUserDetailsLookUpList(session, this.form);
+			if(userBean.getUserUniqueId()!=1){
+				this.form.setTin		(userBean.getTin());
+			}else{
+				this.form.setTin		("");
+			}
+			dataList = this.dao.getUserDetailsLookUpList(this.form);
 			
 			if(dataList.size() > 0){				
 				
@@ -294,10 +279,6 @@ public class UserDetailsLookUpServlet extends EnjoyStandardSvc {
 			logger.info(e.getMessage());
 			throw new EnjoyException("onSearch is error");
 		}finally{
-			session.close();
-			sessionFactory	= null;
-			session			= null;
-			
 			this.initialCombo();
 			logger.info("[onSearch][End]");
 		}
@@ -326,6 +307,21 @@ public class UserDetailsLookUpServlet extends EnjoyStandardSvc {
 		   }
 		   
 	   }
+
+	@Override
+	public void destroySession() {
+		this.dao.destroySession();
+	}
+
+	@Override
+	public void commit() {
+		this.dao.commit();
+	}
+
+	@Override
+	public void rollback() {
+		this.dao.rollback();
+	}
 	
 	
 	

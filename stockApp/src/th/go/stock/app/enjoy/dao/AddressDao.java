@@ -1,270 +1,316 @@
 package th.go.stock.app.enjoy.dao;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
-import org.hibernate.SQLQuery;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.type.StringType;
-
 import th.go.stock.app.enjoy.bean.AddressBean;
+import th.go.stock.app.enjoy.bean.ComboBean;
 import th.go.stock.app.enjoy.exception.EnjoyException;
+import th.go.stock.app.enjoy.main.Constants;
+import th.go.stock.app.enjoy.main.DaoControl;
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
-import th.go.stock.app.enjoy.utils.HibernateUtil;
+import th.go.stock.app.enjoy.utils.EnjoyUtils;
 
-public class AddressDao {	
+public class AddressDao extends DaoControl{	
 	
 	
-	private static final EnjoyLogger logger = EnjoyLogger.getLogger(AddressDao.class);
+	public AddressDao(){
+		setLogger(EnjoyLogger.getLogger(AddressDao.class));
+		super.init();
+	}
 	
-	public List<String> provinceList(String province){
-		logger.info("[provinceList][Begin]");
+	public List<ComboBean> provinceList(String province){
+		getLogger().info("[provinceList][Begin]");
 		
-		String 						hql			 		= null;
-        SessionFactory 				sessionFactory		= null;
-		Session 					session				= null;
-		SQLQuery 					query 				= null;
-		List<String>			 	list				= null;
+		String 							hql			 	= "";
+		String 							where			= "";
+		String 							order			= "";
+		HashMap<String, Object>			param			= new HashMap<String, Object>();
+		List<String>					columnList		= new ArrayList<String>();
+		List<HashMap<String, Object>>	resultList		= null;
+		List<ComboBean>					comboList 		= new ArrayList<ComboBean>();
+		ComboBean						comboBean		= null;
 		
 		try{
-			sessionFactory 		= HibernateUtil.getSessionFactory();
-			session 			= sessionFactory.openSession();
-			hql 				= " select provinceName from province where provinceId <> 00 and provinceName like ('"+province+"%') order by provinceName asc limit 10 ";
+			hql 	= "select provinceId, provinceName "
+					+ "	from province "
+					+ "	where provinceId <> 00 ";
 			
-			logger.info("[provinceList] hql :: " + hql);
+			//Criteria
+			if(!"".equals(province)){
+				where = " and provinceName LIKE CONCAT(:provinceName, '%')";
+				param.put("provinceName"	, province);
+			}
+			order = " order by provinceName asc limit 10";
 			
-			query			= session.createSQLQuery(hql);
-			query.addScalar("provinceName"			, new StringType());
+			hql = hql + where + order;
 			
-			list		 	= query.list();
+			//Column select
+			columnList.add("provinceId");
+			columnList.add("provinceName");
+			
+			resultList = getResult(hql, param, columnList);
+			
+			for(HashMap<String, Object> row:resultList){
+				comboBean 	= new ComboBean();
+				
+				comboBean.setCode	(EnjoyUtils.nullToStr(row.get("provinceId")));
+				comboBean.setDesc	(EnjoyUtils.nullToStr(row.get("provinceName")));
+				
+				comboList.add(comboBean);
+			}
+			
 			
 		}catch(Exception e){
 			e.printStackTrace();
 		}finally{
-			session.close();
-			sessionFactory	= null;
-			session			= null;
-			logger.info("[provinceList][End]");
+			getLogger().info("[provinceList][End]");
 		}
 		
-		return list;
+		return comboList;
 	}
 	
-	public List<String> districtList(String province, String district){
-		logger.info("[districtList][Begin]");
+	public List<ComboBean> districtList(String province, String district){
+		getLogger().info("[districtList][Begin]");
 		
-		String 						hql			 		= null;
-        SessionFactory 				sessionFactory		= null;
-		Session 					session				= null;
-		SQLQuery 					query 				= null;
-		List<String>			 	list				= null;
-		List<String>			 	listReturn			= new ArrayList<String>();
-        String						provinceId			= null;
+		String 							hql			 	= "";
+		String 							where			= "";
+		String 							order			= "";
+        String							provinceId		= null;
+        HashMap<String, Object>			param			= new HashMap<String, Object>();
+		List<String>					columnList		= new ArrayList<String>();
+		List<HashMap<String, Object>>	resultList		= null;
+		List<Object>					listObj			= null;
+		List<ComboBean>					comboList 		= new ArrayList<ComboBean>();
+		ComboBean						comboBean		= null;
 		
 		try{
 			
-			sessionFactory 		= HibernateUtil.getSessionFactory();
-			session 			= sessionFactory.openSession();
-			
 			/*Begin check province section*/
-			hql 		= "select provinceId from province where provinceId <> 00 and provinceName = '"+province+"'";
+			hql 		= "select provinceId from province where provinceId <> 00 and provinceName = :provinceName";
 			
-			logger.info("[districtList] Check Province hql :: " + hql);
+			//Criteria
+			param.put("provinceName"		, province);
 			
-			query			= session.createSQLQuery(hql);
-			query.addScalar("provinceId"			, new StringType());
+			listObj = getResult(hql, param, "provinceId", Constants.STRING_TYPE);
 			
-			list		 	= query.list();
-			
-			if(list!=null && list.size() > 0){
-				provinceId = list.get(0);
+			if(listObj!=null && listObj.size() > 0){
+				provinceId = EnjoyUtils.nullToStr(listObj.get(0));
 			}
 		    /*End check province section*/
+			
+			getLogger().info("[districtList] provinceId :: " + provinceId);
 		    
 		    if(provinceId==null){
-		    	listReturn.add("กรุณาระบุจังหวัด");
+		    	comboList.add(new ComboBean("", "กรุณาระบุจังหวัด"));
 		    }else{
-		    	hql 		= "select districtName from district where districtId <> 0000 and provinceId <> 00 and districtName like ('"+district+"%') and provinceId = "+provinceId+" order by districtName asc limit 10";
+		    	param		= new HashMap<String, Object>();
+		    	columnList	= new ArrayList<String>();
+		    	hql 		= "select districtId, districtName "
+		    				+ "	from district "
+		    				+ "	where districtId <> 0000 "
+		    				+ "		and provinceId <> 00 "
+		    				+ "		and provinceId = :provinceId";
 				
-		    	logger.info("[districtList] hql :: " + hql);
+		    	//Criteria
+		    	param.put("provinceId"		, provinceId);
 		    	
-		    	query			= session.createSQLQuery(hql);
+		    	if(!"".equals(district)){
+		    		where = " and districtName LIKE CONCAT(:districtName, '%')";
+		    		param.put("districtName"	, district);
+		    	}
+		    	
+		    	order = " order by districtName asc limit 10";
+		    	
+		    	hql = hql + where + order;
 				
-				query.addScalar("districtName"			, new StringType());
+				//Column select
+				columnList.add("districtId");
+				columnList.add("districtName");
 				
-				list		 	= query.list();
+				resultList = getResult(hql, param, columnList);
 				
-				for(String districtName:list){
-					listReturn.add(districtName);
+				for(HashMap<String, Object> row:resultList){
+					comboBean 	= new ComboBean();
+					
+					comboBean.setCode	(EnjoyUtils.nullToStr(row.get("districtId")));
+					comboBean.setDesc	(EnjoyUtils.nullToStr(row.get("districtName")));
+					
+					comboList.add(comboBean);
 				}
 		    }
 			
 		}catch(Exception e){
 			e.printStackTrace();
 		}finally{
-			session.close();
-			sessionFactory	= null;
-			session			= null;
-			logger.info("[districtList][End]");
+			getLogger().info("[districtList][End]");
 		}
 		
-		return listReturn;
+		return comboList;
 	}
 	
-	public List<String> subdistrictList(String province, String district, String subdistrict){
-		logger.info("[subdistrictList][Begin]");
+	public List<ComboBean> subdistrictList(String province, String district, String subdistrict){
+		getLogger().info("[subdistrictList][Begin]");
 		
-		String 						hql			 		= null;
-        SessionFactory 				sessionFactory		= null;
-		Session 					session				= null;
-		SQLQuery 					query 				= null;
-		List<String>			 	list				= null;
-		List<String>			 	listReturn			= new ArrayList<String>();
-        String						provinceId			= null;
-        String						districtId			= null;
+		String 							hql			 	= "";
+		String 							where			= "";
+		String 							order			= "";
+        String							provinceId		= null;
+        String							districtId		= null;
+        HashMap<String, Object>			param			= new HashMap<String, Object>();
+		List<String>					columnList		= new ArrayList<String>();
+		List<HashMap<String, Object>>	resultList		= null;
+		List<Object>					listObj			= null;
+		List<ComboBean>					comboList 		= new ArrayList<ComboBean>();
+		ComboBean						comboBean		= null;
 		
 		try{
-			sessionFactory 		= HibernateUtil.getSessionFactory();
-			session 			= sessionFactory.openSession();
-			
 			/*Begin check province section*/
-			hql 		= "select provinceId from province where provinceId <> 00 and provinceName = '"+province+"'";
+			hql 		= "select provinceId from province where provinceId <> 00 and provinceName = :provinceName";
 			
-			logger.info("[subdistrictList] Check Province hql :: " + hql);
+			//Criteria
+			param.put("provinceName"		, province);
 			
-			query			= session.createSQLQuery(hql);
-			query.addScalar("provinceId"			, new StringType());
+			listObj = getResult(hql, param, "provinceId", Constants.STRING_TYPE);
 			
-			list		 	= query.list();
-			
-			if(list!=null && list.size() > 0){
-				provinceId = list.get(0);
+			if(listObj!=null && listObj.size() > 0){
+				provinceId = EnjoyUtils.nullToStr(listObj.get(0));
 			}
 		    /*End check province section*/
 		    
 		    /*Begin check district section*/
-			hql 		= "select districtId from district where districtId <> 0000 and districtName = '"+district+"'";
+			param		= new HashMap<String, Object>();
+			hql 		= "select districtId from district where districtId <> 0000 and districtName = :districtName";
 			
-			logger.info("[subdistrictList] Check District hql :: " + hql);
+			//Criteria
+			param.put("districtName"		, district);
 			
-			query			= session.createSQLQuery(hql);
-			query.addScalar("districtId"			, new StringType());
+			listObj = getResult(hql, param, "districtId", Constants.STRING_TYPE);
 			
-			list		 	= query.list();
-			
-			if(list!=null && list.size() > 0){
-				districtId = list.get(0);
+			if(listObj!=null && listObj.size() > 0){
+				districtId = EnjoyUtils.nullToStr(listObj.get(0));
 			}
 		    /*End check district section*/
 		    
 		    if(provinceId==null){
-		    	listReturn.add("กรุณาระบุจังหวัด");
+		    	comboList.add(new ComboBean("", "กรุณาระบุจังหวัด"));
 		    }else if(districtId==null){
-		    	listReturn.add("กรุณาระบุอำเภอ");
+		    	comboList.add(new ComboBean("", "กรุณาระบุอำเภอ"));
 		    }else{
-		    	hql 		= "select subdistrictName" 
+		    	param		= new HashMap<String, Object>();
+		    	columnList	= new ArrayList<String>();
+		    	hql 		= "select subdistrictId, subdistrictName" 
 								   + " from subdistrict "
 								   + "  where subdistrictId <> 000000 "
-								   + " and provinceId <> 00 "
-								   + " and districtId <> 0000 "
-								   + " and SUBSTR(subdistrictId, 5, 2) <> 00"
-								   + " and subdistrictName like ('"+subdistrict+"%') "
-								   + " and provinceId = "+provinceId
-								   + " and districtId = "+districtId
-								   + " order by subdistrictName asc limit 10";
+								   + " 		and provinceId <> 00 "
+								   + " 		and districtId <> 0000 "
+								   + " 		and SUBSTR(subdistrictId, 5, 2) <> 00"
+								   + " 		and provinceId = :provinceId"
+								   + " 		and districtId = :districtId";
 				
-		    	logger.info("[subdistrictList] subdistrict hql :: " + hql);
+		    	//Criteria
+		    	param.put("provinceId"		, provinceId);
+				param.put("districtId"		, districtId);
 				
-		    	query			= session.createSQLQuery(hql);
+		    	if(!"".equals(subdistrict)){
+		    		where = " and subdistrictName LIKE CONCAT(:subdistrictName, '%')";
+		    		param.put("subdistrictName"	, subdistrict);
+		    	}
+		    	
+		    	order = " order by subdistrictName asc limit 10";
+		    	
+		    	hql = hql + where + order;
 				
-				query.addScalar("subdistrictName"			, new StringType());
+				//Column select
+				columnList.add("subdistrictId");
+				columnList.add("subdistrictName");
 				
-				list		 	= query.list();
+				resultList = getResult(hql, param, columnList);
 				
-				for(String subdistrictName:list){
-					listReturn.add(subdistrictName);
+				for(HashMap<String, Object> row:resultList){
+					comboBean 	= new ComboBean();
+					
+					comboBean.setCode	(EnjoyUtils.nullToStr(row.get("subdistrictId")));
+					comboBean.setDesc	(EnjoyUtils.nullToStr(row.get("subdistrictName")));
+					
+					comboList.add(comboBean);
 				}
 		    }
 			
 		}catch(Exception e){
 			e.printStackTrace();
 		}finally{
-			session.close();
-			sessionFactory	= null;
-			session			= null;
-			logger.info("[subdistrictList][End]");
+			getLogger().info("[subdistrictList][End]");
 		}
 		
-		return listReturn;
+		return comboList;
 	}
 	
 	public AddressBean validateAddress(String province, String district, String subdistrict){
-		logger.info("[validateAddress][Begin]");
+		getLogger().info("[validateAddress][Begin]");
 		
-		String 						hql			 		= null;
-        SessionFactory 				sessionFactory		= null;
-		Session 					session				= null;
-		SQLQuery 					query 				= null;
-		List<String>			 	list				= null;
-        String						provinceId			= null;
-        String						districtId			= null;
-        String						subdistrictId		= null;
-        String						errMsg				= null;
-        AddressBean					addressBean			= new AddressBean();
+		String 							hql			 	= null;
+        String							provinceId		= null;
+        String							districtId		= null;
+        String							subdistrictId	= null;
+        String							errMsg			= null;
+        AddressBean						addressBean		= new AddressBean();
+        HashMap<String, Object>			param			= new HashMap<String, Object>();
+		List<Object>					resultList		= null;
 		
 		try{
-			sessionFactory 		= HibernateUtil.getSessionFactory();
-			session 			= sessionFactory.openSession();
 			/*Begin check province section*/
-			hql 		= "select provinceId from province where provinceId <> 00 and provinceName = '"+province+"'";
+			hql 		= "select provinceId from province where provinceId <> 00 and provinceName = :provinceName";
 			
-			logger.info("[validateAddress] Check Province hql :: " + hql);
+			//Criteria
+			param.put("provinceName"		, province);
 			
-			query			= session.createSQLQuery(hql);
-			query.addScalar("provinceId"			, new StringType());
+			resultList = getResult(hql, param, "provinceId", Constants.STRING_TYPE);
 			
-			list		 	= query.list();
-			
-			if(list!=null && list.size() > 0){
-				provinceId = list.get(0);
+			if(resultList!=null && resultList.size() > 0){
+				provinceId = EnjoyUtils.nullToStr(resultList.get(0));
 			}
+			
 		    if(provinceId==null)throw new EnjoyException("ระบุจังหวัดผิด");
 		    /*End check province section*/
 		    
 		    /*Begin check district section*/
-		    hql 		= "select districtId from district where districtId <> 0000 and provinceId = "+provinceId+" and districtName = '"+district+"'";
+		    param		= new HashMap<String, Object>();
+		    hql 		= "select districtId from district where districtId <> 0000 and provinceId = :provinceId and districtName = :districtName";
 			
-			logger.info("[validateAddress] Check District hql :: " + hql);
+		    //Criteria
+			param.put("provinceId"		, provinceId);
+			param.put("districtName"		, district);
 			
-			query			= session.createSQLQuery(hql);
-			query.addScalar("districtId"			, new StringType());
+			resultList = getResult(hql, param, "districtId", Constants.STRING_TYPE);
 			
-			list		 	= query.list();
-			
-			if(list!=null && list.size() > 0){
-				districtId = list.get(0);
+			if(resultList!=null && resultList.size() > 0){
+				districtId = EnjoyUtils.nullToStr(resultList.get(0));
 			}
+			
 		    if(districtId==null)throw new EnjoyException("ระบุอำเภอผิด");
 		    /*End check district section*/
 		    
 		    /*Begin check subDistrict section*/
-		    hql 		= "select subdistrictId from subdistrict where subdistrictId <> 000000 and provinceId = "+provinceId+" and districtId = "+districtId+" and subdistrictName = '"+subdistrict+"'";
+		    param		= new HashMap<String, Object>();
+		    hql 		= "select subdistrictId from subdistrict where subdistrictId <> 000000 and provinceId = :provinceId and districtId = :districtId and subdistrictName = :subdistrictName";
 			
-			logger.info("[validateAddress] Check SubDistrict hql :: " + hql);
+		    //Criteria
+			param.put("provinceId"		, provinceId);
+			param.put("districtId"		, districtId);
+			param.put("subdistrictName"	, subdistrict);
 			
-			query			= session.createSQLQuery(hql);
-			query.addScalar("subdistrictId"			, new StringType());
+			resultList = getResult(hql, param, "subdistrictId", Constants.STRING_TYPE);
 			
-			list		 	= query.list();
-			
-			if(list!=null && list.size() > 0){
-				subdistrictId = list.get(0);
+			if(resultList!=null && resultList.size() > 0){
+				subdistrictId = EnjoyUtils.nullToStr(resultList.get(0));
 			}
+			
 		    if(subdistrictId==null)throw new EnjoyException("ระบุตำบลผิด");
 		    /*End check subDistrict section*/
 		    
-		    logger.info("[validateAddress] " + provinceId + ", " + districtId + ", " + subdistrictId);
+		    getLogger().info("[validateAddress] " + provinceId + ", " + districtId + ", " + subdistrictId);
 		    
 		    addressBean.setProvinceId(provinceId);
 		    addressBean.setDistrictId(districtId);
@@ -279,125 +325,95 @@ public class AddressDao {
 			addressBean.setErrMsg(errMsg);
 			e.printStackTrace();
 		}finally{
-			session.close();
-			sessionFactory	= null;
-			session			= null;
-			logger.info("[validateAddress][End]");
+			getLogger().info("[validateAddress][End]");
 		}
 		return addressBean;
 	}
 	
 	public String getProvinceName(String provinceId){
-		logger.info("[getProvinceName][Begin]");
+		getLogger().info("[getProvinceName][Begin]");
 		
-		String 						hql			 		= null;
-        SessionFactory 				sessionFactory		= null;
-		Session 					session				= null;
-		SQLQuery 					query 				= null;
-		List<String>			 	list				= null;
-        String						provinceName		= null;
+		String 							hql			 	= null;
+        String							provinceName	= null;
+        HashMap<String, Object>			param			= new HashMap<String, Object>();
+		List<Object>					resultList		= null;
 		
 		try{
-			sessionFactory 		= HibernateUtil.getSessionFactory();
-			session 			= sessionFactory.openSession();
-			hql 		= " select provinceName from province where provinceId <> 00 and provinceId = '" + provinceId + "'";
+			hql 		= " select provinceName from province where provinceId <> 00 and provinceId = :provinceId";
 			
-			logger.info("[getProvinceName] hql :: " + hql);
+			//Criteria
+			param.put("provinceId"		, provinceId);
 			
-			query			= session.createSQLQuery(hql);
-			query.addScalar("provinceName"			, new StringType());
+			resultList = getResult(hql, param, "provinceName", Constants.STRING_TYPE);
 			
-			list		 	= query.list();
-			
-			if(list!=null && list.size() > 0){
-				provinceName = list.get(0);
+			if(resultList!=null && resultList.size() > 0){
+				provinceName = EnjoyUtils.nullToStr(resultList.get(0));
 			}
 			
 		}catch(Exception e){
 			e.printStackTrace();
 		}finally{
-			session.close();
-			sessionFactory	= null;
-			session			= null;
-			logger.info("[getProvinceName][End]");
+			getLogger().info("[getProvinceName][End]");
 		}
 		
 		return provinceName;
 	}
 	
 	public String getSubdistrictName(String subdistrictId){
-		logger.info("[getSubdistrictName][Begin]");
+		getLogger().info("[getSubdistrictName][Begin]");
 		
-		String 						hql			 		= null;
-        SessionFactory 				sessionFactory		= null;
-		Session 					session				= null;
-		SQLQuery 					query 				= null;
-		List<String>			 	list				= null;
-        String						subdistrictName		= null;
+		String 							hql			 	= null;
+        String							subdistrictName	= null;
+        HashMap<String, Object>			param			= new HashMap<String, Object>();
+		List<Object>					resultList		= null;
 		
 		try{
-			sessionFactory 		= HibernateUtil.getSessionFactory();
-			session 			= sessionFactory.openSession();
-			hql 				= " select subdistrictName from subdistrict where subdistrictId <> 00 and subdistrictId = '" + subdistrictId + "'";
+			hql 				= " select subdistrictName from subdistrict where subdistrictId <> 00 and subdistrictId = :subdistrictId";
 			
-			logger.info("[getSubdistrictName] hql :: " + hql);
+			//Criteria
+			param.put("subdistrictId"		, subdistrictId);
 			
-			query			= session.createSQLQuery(hql);
-			query.addScalar("subdistrictName"			, new StringType());
+			resultList = getResult(hql, param, "subdistrictName", Constants.STRING_TYPE);
 			
-			list		 	= query.list();
-			
-			if(list!=null && list.size() > 0){
-				subdistrictName = list.get(0);
+			if(resultList!=null && resultList.size() > 0){
+				subdistrictName = EnjoyUtils.nullToStr(resultList.get(0));
 			}
 		    
 			
 		}catch(Exception e){
 			e.printStackTrace();
 		}finally{
-			session.close();
-			sessionFactory	= null;
-			session			= null;
-			logger.info("[getSubdistrictName][End]");
+			getLogger().info("[getSubdistrictName][End]");
 		}
 		
 		return subdistrictName;
 	}
 	
 	public String getDistrictName(String districtId){
-		logger.info("[getDistrictName][Begin]");
+		getLogger().info("[getDistrictName][Begin]");
 		
-		String 						hql			 		= null;
-        SessionFactory 				sessionFactory		= null;
-		Session 					session				= null;
-		SQLQuery 					query 				= null;
-		List<String>			 	list				= null;
-        String						districtName		= null;
+		String 						hql			 	= null;
+        String						districtName	= null;
+        HashMap<String, Object>		param			= new HashMap<String, Object>();
+		List<Object>				resultList		= null;
 		
 		try{
-			sessionFactory 		= HibernateUtil.getSessionFactory();
-			session 			= sessionFactory.openSession();
-			hql 		= " select districtName from district where districtId <> 00 and districtId = '" + districtId + "'";
+			hql 		= " select districtName from district where districtId <> 00 and districtId = :districtId";
 			
-			logger.info("[getDistrictName] hql :: " + hql);
+			//Criteria
+			param.put("districtId"		, districtId);
 			
-			query			= session.createSQLQuery(hql);
-			query.addScalar("districtName"			, new StringType());
+			resultList = getResult(hql, param, "districtName", Constants.STRING_TYPE);
 			
-			list		 	= query.list();
-			
-			if(list!=null && list.size() > 0){
-				districtName = list.get(0);
+			if(resultList!=null && resultList.size() > 0){
+				districtName = EnjoyUtils.nullToStr(resultList.get(0));
 			}
 		    
 			
 		}catch(Exception e){
 			e.printStackTrace();
 		}finally{
-			session.close();
-			sessionFactory	= null;
-			session			= null;
-			logger.info("[getDistrictName][End]");
+			getLogger().info("[getDistrictName][End]");
 		}
 		
 		return districtName;

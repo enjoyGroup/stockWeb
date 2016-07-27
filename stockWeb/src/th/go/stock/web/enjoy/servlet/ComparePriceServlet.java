@@ -21,6 +21,7 @@ import th.go.stock.app.enjoy.bean.UserDetailsBean;
 import th.go.stock.app.enjoy.dao.CompanyVendorDao;
 import th.go.stock.app.enjoy.dao.ComparePriceDao;
 import th.go.stock.app.enjoy.dao.ProductDetailsDao;
+import th.go.stock.app.enjoy.dao.RelationUserAndCompanyDao;
 import th.go.stock.app.enjoy.exception.EnjoyException;
 import th.go.stock.app.enjoy.form.ComparePriceForm;
 import th.go.stock.app.enjoy.main.Constants;
@@ -112,6 +113,7 @@ public class ComparePriceServlet extends EnjoyStandardSvc {
  			e.printStackTrace();
  			logger.info(e.getMessage());
  		}finally{
+ 			destroySession();
  			logger.info("[execute][End]");
  		}
 	}
@@ -256,54 +258,43 @@ public class ComparePriceServlet extends EnjoyStandardSvc {
 	private void onSave() throws EnjoyException{
 		logger.info("[onSave][Begin]");
 		
-		SessionFactory 						sessionFactory				= null;
-		Session 							session						= null;
-		JSONObject 							obj 						= null;
-		List<ComparePriceBean> 				comparePriceList			= null;
-		int									seq							= 1;
+		JSONObject 				obj 				= null;
+		List<ComparePriceBean> 	comparePriceList	= null;
+		int						seq					= 1;
+		String					tin 				= null;
 		
 		try{
-			sessionFactory 				= HibernateUtil.getSessionFactory();
-			session 					= sessionFactory.openSession();
-			obj 						= new JSONObject();
-			comparePriceList			= this.form.getComparePriceList();
+			obj 				= new JSONObject();
+			comparePriceList	= this.form.getComparePriceList();
+			tin					= this.userBean.getTin();
 			
-			session.beginTransaction();
-			
-			this.dao.deleteCompareprice(session, this.form.getProductCode());
+			this.dao.deleteCompareprice(this.form.getProductCode(), tin);
 			
 			for(ComparePriceBean bean:comparePriceList){
 				if(!bean.getRowStatus().equals(ComparePriceForm.DEL)){
 					bean.setSeq(EnjoyUtils.nullToStr(seq));
-					this.dao.insertCompareprice(session, bean);
+					bean.setTin(tin);
+					this.dao.insertCompareprice(bean);
 					seq++;
 				}
 			}
 			
-			session.getTransaction().commit();
+			commit();
 			
 			obj.put(STATUS, 			SUCCESS);
 			
 		}catch(EnjoyException e){
-			session.getTransaction().rollback();
+			rollback();
 			obj.put(STATUS, 		ERROR);
 			obj.put(ERR_MSG, 		e.getMessage());
 		}catch(Exception e){
-			session.getTransaction().rollback();
+			rollback();
 			logger.info(e.getMessage());
 			e.printStackTrace();
 			obj.put(STATUS, 		ERROR);
 			obj.put(ERR_MSG, 		"onSave is error");
 		}finally{
-			
-			session.flush();
-			session.clear();
-			session.close();
-			
 			this.enjoyUtil.writeMSG(obj.toString());
-			
-			sessionFactory	= null;
-			session			= null;
 			
 			logger.info("[onSave][End]");
 		}
@@ -313,36 +304,33 @@ public class ComparePriceServlet extends EnjoyStandardSvc {
 	private void onSearch() throws EnjoyException{
 		logger.info("[onSearch][Begin]");
 		
-		ComparePriceBean 					comparePriceBean		= null;
-		SessionFactory 						sessionFactory			= null;
-		Session 							session					= null;
-		List<ComparePriceBean> 				comparePriceList		= null;
-		String								productCode				= null;
-		String								productName				= null;
-		JSONObject 							obj 					= null;
-		String								seqTemp					= null;
+		ComparePriceBean 			comparePriceBean	= null;
+		List<ComparePriceBean> 		comparePriceList	= null;
+		String						productCode			= null;
+		String						productName			= null;
+		JSONObject 					obj 				= null;
+		String						seqTemp				= null;
+		String						tin 				= null;
 
 		try{
-			sessionFactory 				= HibernateUtil.getSessionFactory();
-			session 					= sessionFactory.openSession();			
-			obj 						= new JSONObject();
-			productCode					= EnjoyUtils.nullToStr(this.request.getParameter("productCode"));
-			productName					= EnjoyUtils.nullToStr(this.request.getParameter("productName"));
+			obj 				= new JSONObject();
+			productCode			= EnjoyUtils.nullToStr(this.request.getParameter("productCode"));
+			productName			= EnjoyUtils.nullToStr(this.request.getParameter("productName"));
+			tin					= this.userBean.getTin();
 			
-			logger.info("[onSearch] productCode 	:: " + productCode);
-			logger.info("[onSearch] productName 	:: " + productName);
+			logger.info("[onSearch] productCode :: " + productCode);
+			logger.info("[onSearch] productName :: " + productName);
+			logger.info("[onSearch] tin 		:: " + tin);
 			
 			this.form.setProductCode(productCode);
 			this.form.setProductName(productName);
 			this.form.setChk(true);
 			
-			session.beginTransaction();
-			
 			comparePriceBean				= new ComparePriceBean();
 			comparePriceBean.setProductCode(productCode);
+			comparePriceBean.setTin(tin);
 			
-			
-			comparePriceList	 		= this.dao.searchByCriteria(session, comparePriceBean);
+			comparePriceList	 		= this.dao.searchByCriteria(comparePriceBean);
 			
 			for(ComparePriceBean bean:comparePriceList){
 				seqTemp = bean.getSeq();
@@ -365,10 +353,6 @@ public class ComparePriceServlet extends EnjoyStandardSvc {
 			obj.put(STATUS, 		ERROR);
 			obj.put(ERR_MSG, 		"onSearch is error");
 		}finally{
-			session.close();
-			sessionFactory	= null;
-			session			= null;
-			
 			this.enjoyUtil.writeMSG(obj.toString());
 			
 			logger.info("[onSearch][End]");
@@ -379,18 +363,21 @@ public class ComparePriceServlet extends EnjoyStandardSvc {
 	private void getProductNameList(){
 	   logger.info("[getProductNameList][Begin]");
 	   
-	   String							productName				= null;
-	   List<ComboBean> 					list 					= null;
-	   JSONArray 						jSONArray 				= null;
-	   JSONObject 						objDetail 				= null;
+	   String			productName			= null;
+	   List<ComboBean> 	list 				= null;
+	   JSONArray 		jSONArray 			= null;
+	   JSONObject 		objDetail 			= null;
+	   String			tin 				= null;
 	
 	   try{
-		   jSONArray 				= new JSONArray();
-		   productName				= EnjoyUtils.nullToStr(this.request.getParameter("productName"));
+		   jSONArray 	= new JSONArray();
+		   productName	= EnjoyUtils.nullToStr(this.request.getParameter("productName"));
+		   tin			= this.userBean.getTin();
 		   
-		   logger.info("[getProductNameList] productName 				:: " + productName);
+		   logger.info("[getProductNameList] productName 		:: " + productName);
+		   logger.info("[getProductNameList] tin 				:: " + tin);
 		   
-		   list 		= this.productDetailsDao.productNameList(productName, null, null, true);
+		   list 		= this.productDetailsDao.productNameList(productName, null, null, tin, true);
 		   
 		   for(ComboBean bean:list){
 			   objDetail 		= new JSONObject();
@@ -414,18 +401,21 @@ public class ComparePriceServlet extends EnjoyStandardSvc {
 	private void getVendorNameList(){
 		logger.info("[getVendorNameList][Begin]");
 	   
-	   String							vendorName				= null;
-	   List<ComboBean> 					list 					= null;
-	   JSONArray 						jSONArray 				= null;
-	   JSONObject 						objDetail 				= null;
+	   String			vendorName			= null;
+	   List<ComboBean> 	list 				= null;
+	   JSONArray 		jSONArray 			= null;
+	   JSONObject 		objDetail 			= null;
+	   String			tin 				= null;
 	
 	   try{
-		   jSONArray 				= new JSONArray();
-		   vendorName				= EnjoyUtils.nullToStr(this.request.getParameter("vendorName"));
+		   jSONArray 	= new JSONArray();
+		   vendorName	= EnjoyUtils.nullToStr(this.request.getParameter("vendorName"));
+		   tin			= this.userBean.getTin();
 		   
-		   logger.info("[getVendorNameList] vendorName 				:: " + vendorName);
+		   logger.info("[getVendorNameList] vendorName 	:: " + vendorName);
+		   logger.info("[getVendorNameList] tin 		:: " + tin);
 		   
-		   list 		= this.companyVendorDao.vendorNameList(vendorName);
+		   list 		= this.companyVendorDao.vendorNameList(vendorName, tin);
 		   
 		   for(ComboBean bean:list){
 			   objDetail 		= new JSONObject();
@@ -449,21 +439,24 @@ public class ComparePriceServlet extends EnjoyStandardSvc {
 	private void branchNameList(){
 		logger.info("[branchNameList][Begin]");
 	   
-		String							vendorName				= null;
-		String							branchName				= null;
-		List<ComboBean> 				list 					= null;
-		JSONArray 						jSONArray 				= null;
-		JSONObject 						objDetail 				= null;
+		String				vendorName			= null;
+		String				branchName			= null;
+		List<ComboBean> 	list 				= null;
+		JSONArray 			jSONArray 			= null;
+		JSONObject 			objDetail 			= null;
+		String				tin 				= null;
 	
 		try{
-			jSONArray 				= new JSONArray();
-			vendorName				= EnjoyUtils.nullToStr(this.request.getParameter("vendorName"));
-			branchName				= EnjoyUtils.nullToStr(this.request.getParameter("branchName"));
+			jSONArray 	= new JSONArray();
+			vendorName	= EnjoyUtils.nullToStr(this.request.getParameter("vendorName"));
+			branchName	= EnjoyUtils.nullToStr(this.request.getParameter("branchName"));
+			tin			= this.userBean.getTin();
 		   
-			logger.info("[branchNameList] vendorName 				:: " + vendorName);
-			logger.info("[branchNameList] branchName 				:: " + branchName);
+			logger.info("[branchNameList] vendorName 		:: " + vendorName);
+			logger.info("[branchNameList] branchName 		:: " + branchName);
+			logger.info("[branchNameList] tin 				:: " + tin);
 			
-			list 		= this.companyVendorDao.branchNameList(vendorName, branchName);
+			list 		= this.companyVendorDao.branchNameList(vendorName, branchName, tin);
 			
 			for(ComboBean bean:list){
 				objDetail 		= new JSONObject();
@@ -487,17 +480,20 @@ public class ComparePriceServlet extends EnjoyStandardSvc {
 	private void getProductDetailByName(){
 	   logger.info("[getProductDetailByName][Begin]");
 	   
-	   String							productName				= null;
-	   JSONObject 						obj		 				= null;
-	   ProductmasterBean				productmasterBean		= null;
+	   String				productName				= null;
+	   JSONObject 			obj		 				= null;
+	   ProductmasterBean	productmasterBean		= null;
+	   String				tin 					= null;
 	
 	   try{
-		   obj 				= new JSONObject();
-		   productName		= EnjoyUtils.nullToStr(this.request.getParameter("productName"));
+		   obj 			= new JSONObject();
+		   productName	= EnjoyUtils.nullToStr(this.request.getParameter("productName"));
+		   tin			= this.userBean.getTin();
 		   
-		   logger.info("[getProductDetailByName] productName 				:: " + productName);
+		   logger.info("[getProductDetailByName] productName 		:: " + productName);
+		   logger.info("[getProductDetailByName] tin 				:: " + tin);
 		   
-		   productmasterBean 		= this.productDetailsDao.getProductDetailByName(productName);
+		   productmasterBean 		= this.productDetailsDao.getProductDetailByName(productName, tin);
 		   
 		   if(productmasterBean!=null){
 			   obj.put("productCode"	,productmasterBean.getProductCode());
@@ -529,21 +525,24 @@ public class ComparePriceServlet extends EnjoyStandardSvc {
 	private void getCompanyVendorDetail(){
 	   logger.info("[getCompanyVendorDetail][Begin]");
 	   
-	   String							vendorName				= null;
-	   String							branchName				= null;
-	   JSONObject 						obj		 				= null;
-	   List<CompanyVendorBean>			companyVendorList		= null;
-	   CompanyVendorBean				companyVendorBean		= null;
+	   String					vendorName				= null;
+	   String					branchName				= null;
+	   JSONObject 				obj		 				= null;
+	   List<CompanyVendorBean>	companyVendorList		= null;
+	   CompanyVendorBean		companyVendorBean		= null;
+	   String					tin 					= null;
 	
 	   try{
 		   obj 				= new JSONObject();
 		   vendorName		= EnjoyUtils.nullToStr(this.request.getParameter("vendorName"));
 		   branchName		= EnjoyUtils.nullToStr(this.request.getParameter("branchName"));
+		   tin				= this.userBean.getTin();
 		   
-		   logger.info("[getCompanyVendorDetail] vendorName 				:: " + vendorName);
-		   logger.info("[getCompanyVendorDetail] branchName 				:: " + branchName);
+		   logger.info("[getCompanyVendorDetail] vendorName 	:: " + vendorName);
+		   logger.info("[getCompanyVendorDetail] branchName 	:: " + branchName);
+		   logger.info("[getCompanyVendorDetail] tin 			:: " + tin);
 		   
-		   companyVendorList 		= this.companyVendorDao.getCompanyVendorByName(vendorName, branchName);
+		   companyVendorList 		= this.companyVendorDao.getCompanyVendorByName(vendorName, branchName, tin);
 		   
 		   if(companyVendorList.size()==1){
 			   
@@ -603,4 +602,26 @@ public class ComparePriceServlet extends EnjoyStandardSvc {
 	   }
 	}
 
+	@Override
+	public void destroySession() {
+		this.dao.destroySession();
+        this.companyVendorDao.destroySession();
+        this.productDetailsDao.destroySession();
+	}
+
+	@Override
+	public void commit() {
+		this.dao.commit();
+        this.companyVendorDao.commit();
+        this.productDetailsDao.commit();
+	}
+
+	@Override
+	public void rollback() {
+		this.dao.rollback();
+        this.companyVendorDao.rollback();
+        this.productDetailsDao.rollback();
+	}
+
 }
+

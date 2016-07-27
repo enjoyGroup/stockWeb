@@ -21,7 +21,6 @@ import th.go.stock.app.enjoy.bean.UserDetailsBean;
 import th.go.stock.app.enjoy.dao.CompanyDetailsDao;
 import th.go.stock.app.enjoy.dao.HistoryPurchasedByProductReportDao;
 import th.go.stock.app.enjoy.dao.ProductDetailsDao;
-import th.go.stock.app.enjoy.dao.RelationUserAndCompanyDao;
 import th.go.stock.app.enjoy.exception.EnjoyException;
 import th.go.stock.app.enjoy.form.HistoryPurchasedByProductReportForm;
 import th.go.stock.app.enjoy.main.Constants;
@@ -45,7 +44,6 @@ public class HistoryPurchasedByProductReportServlet extends EnjoyStandardSvc {
     private UserDetailsBean             		userBean                    = null;
     private HistoryPurchasedByProductReportDao	dao							= null;
     private CompanyDetailsDao					companyDetailsDao			= null;
-    private RelationUserAndCompanyDao			relationUserAndCompanyDao	= null;
     private ProductDetailsDao					productDetailsDao			= null;
     private HistoryPurchasedByProductReportForm	form						= null;
     
@@ -70,7 +68,6 @@ public class HistoryPurchasedByProductReportServlet extends EnjoyStandardSvc {
              this.userBean           		= (UserDetailsBean) session.getAttribute("userBean");
              this.form               		= (HistoryPurchasedByProductReportForm) session.getAttribute(FORM_NAME);
              this.dao						= new HistoryPurchasedByProductReportDao();
-             this.relationUserAndCompanyDao = new RelationUserAndCompanyDao();
              this.productDetailsDao			= new ProductDetailsDao();
              this.companyDetailsDao			= new CompanyDetailsDao();
  			
@@ -94,7 +91,7 @@ public class HistoryPurchasedByProductReportServlet extends EnjoyStandardSvc {
  			e.printStackTrace();
  			logger.info(e.getMessage());
  		}finally{
- 			dao.destroySession();
+ 			destroySession();
  			logger.info("[execute][End]");
  		}
 	}
@@ -104,8 +101,6 @@ public class HistoryPurchasedByProductReportServlet extends EnjoyStandardSvc {
 		
 		try{		
 			this.form.setTitlePage("รายงานประวัติการซื้อตามสินค้า");
-			this.setRefference();
-			
 		}catch(Exception e){
 			logger.info(e.getMessage());
 			throw new EnjoyException("onLoad is error");
@@ -113,46 +108,6 @@ public class HistoryPurchasedByProductReportServlet extends EnjoyStandardSvc {
 			logger.info("[onLoad][End]");
 		}
 		
-	}
-	
-	private void setCompanyCombo() throws EnjoyException{
-		
-		logger.info("[setCompanyCombo][Begin]");
-		
-		List<ComboBean>			companyCombo 		= null;
-		
-		try{
-			
-			companyCombo = this.relationUserAndCompanyDao.getCompanyList(this.userBean.getUserUniqueId());
-			
-			if(companyCombo.size() > 1){
-				companyCombo.add(0, new ComboBean("", "กรุณาระบุ"));
-			}
-			
-			this.form.setCompanyCombo(companyCombo);
-		}
-		catch(Exception e){
-			logger.error(e);
-			throw new EnjoyException("setCompanyCombo is error");
-		}finally{
-			logger.info("[setCompanyCombo][End]");
-		}
-	}
-
-	private void setRefference() throws EnjoyException{
-		
-		logger.info("[setRefference][Begin]");
-		
-		try{
-			this.setCompanyCombo();
-		}catch(EnjoyException e){
-			throw new EnjoyException(e.getMessage());
-		}catch(Exception e){
-			e.printStackTrace();
-			logger.info(e.getMessage());
-		}finally{
-			logger.info("[setRefference][End]");
-		}
 	}
 	
 	private void showData() throws EnjoyException{
@@ -175,7 +130,7 @@ public class HistoryPurchasedByProductReportServlet extends EnjoyStandardSvc {
 		byte[] 										bytes							= null;
 
 		try{
-			tin 			= EnjoyUtils.nullToStr(this.request.getParameter("tin"));
+			tin 			= this.userBean.getTin();
 			reciveDateFrom 	= EnjoyUtils.nullToStr(this.request.getParameter("reciveDateFrom"));
 			reciveDateTo 	= EnjoyUtils.nullToStr(this.request.getParameter("reciveDateTo"));
 			productName 	= EnjoyUtils.nullToStr(this.request.getParameter("productName"));
@@ -259,18 +214,20 @@ public class HistoryPurchasedByProductReportServlet extends EnjoyStandardSvc {
 	private void getProductNameList(){
 	   logger.info("[getProductNameList][Begin]");
 	   
-	   String							productName				= null;
-	   List<ComboBean> 					list 					= null;
-	   JSONArray 						jSONArray 				= null;
-	   JSONObject 						objDetail 				= null;
+	   String			productName		= null;
+	   List<ComboBean> 	list 			= null;
+	   JSONArray 		jSONArray 		= null;
+	   JSONObject 		objDetail 		= null;
+	   String			tin 			= null;
 	
 	   try{
-		   jSONArray 				= new JSONArray();
-		   productName				= EnjoyUtils.nullToStr(this.request.getParameter("productName"));
+		   jSONArray 		= new JSONArray();
+		   productName		= EnjoyUtils.nullToStr(this.request.getParameter("productName"));
+		   tin				= this.userBean.getTin();
 		   
 		   logger.info("[getProductNameList] productName 				:: " + productName);
 		   
-		   list 		= this.productDetailsDao.productNameList(productName, null, null, true);
+		   list 		= this.productDetailsDao.productNameList(productName, null, null, tin, true);
 		   
 		   for(ComboBean bean:list){
 			   objDetail 		= new JSONObject();
@@ -289,6 +246,27 @@ public class HistoryPurchasedByProductReportServlet extends EnjoyStandardSvc {
 	   }finally{
 		   logger.info("[getProductNameList][End]");
 	   }
+	}
+
+	@Override
+	public void destroySession() {
+		this.dao.destroySession();
+        this.productDetailsDao.destroySession();
+        this.companyDetailsDao.destroySession();
+	}
+
+	@Override
+	public void commit() {
+		this.dao.commit();
+        this.productDetailsDao.commit();
+        this.companyDetailsDao.commit();
+	}
+
+	@Override
+	public void rollback() {
+		this.dao.rollback();
+        this.productDetailsDao.rollback();
+        this.companyDetailsDao.rollback();
 	}
 
 	

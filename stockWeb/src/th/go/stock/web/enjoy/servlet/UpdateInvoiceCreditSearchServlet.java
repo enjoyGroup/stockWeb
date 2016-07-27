@@ -10,24 +10,19 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import th.go.stock.app.enjoy.bean.ComboBean;
 import th.go.stock.app.enjoy.bean.CustomerDetailsBean;
 import th.go.stock.app.enjoy.bean.InvoiceCreditMasterBean;
 import th.go.stock.app.enjoy.bean.UserDetailsBean;
 import th.go.stock.app.enjoy.dao.CustomerDetailsDao;
 import th.go.stock.app.enjoy.dao.InvoiceCreditDao;
-import th.go.stock.app.enjoy.dao.RelationUserAndCompanyDao;
 import th.go.stock.app.enjoy.exception.EnjoyException;
 import th.go.stock.app.enjoy.form.UpdateInvoiceCreditSearchForm;
 import th.go.stock.app.enjoy.main.Constants;
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
 import th.go.stock.app.enjoy.utils.EnjoyUtils;
-import th.go.stock.app.enjoy.utils.HibernateUtil;
 import th.go.stock.web.enjoy.common.EnjoyStandardSvc;
 import th.go.stock.web.enjoy.utils.EnjoyUtil;
 
@@ -45,7 +40,6 @@ public class UpdateInvoiceCreditSearchServlet extends EnjoyStandardSvc {
     private UserDetailsBean             	userBean                    = null;
     private InvoiceCreditDao				invoiceCreditDao			= null;
     private CustomerDetailsDao				customerDetailsDao			= null;
-    private RelationUserAndCompanyDao		relationUserAndCompanyDao	= null;
     private UpdateInvoiceCreditSearchForm	form						= null;
     
 	@Override
@@ -70,7 +64,6 @@ public class UpdateInvoiceCreditSearchServlet extends EnjoyStandardSvc {
              this.form               		= (UpdateInvoiceCreditSearchForm) session.getAttribute(FORM_NAME);
              this.invoiceCreditDao			= new InvoiceCreditDao();
              this.customerDetailsDao		= new CustomerDetailsDao();
-             this.relationUserAndCompanyDao = new RelationUserAndCompanyDao();
  			
              logger.info("[execute] pageAction : " + pageAction );
              
@@ -94,6 +87,7 @@ public class UpdateInvoiceCreditSearchServlet extends EnjoyStandardSvc {
  			e.printStackTrace();
  			logger.info(e.getMessage());
  		}finally{
+ 			destroySession();
  			logger.info("[execute][End]");
  		}
 	}
@@ -103,7 +97,6 @@ public class UpdateInvoiceCreditSearchServlet extends EnjoyStandardSvc {
 		
 		try{		
 			this.form.setTitlePage("ปรับปรุงงบการขายเงินเชื่อ");
-			this.setRefference();
 			
 		}catch(Exception e){
 			logger.info(e.getMessage());
@@ -114,52 +107,10 @@ public class UpdateInvoiceCreditSearchServlet extends EnjoyStandardSvc {
 		
 	}
 	
-	private void setRefference() throws EnjoyException{
-		
-		logger.info("[setRefference][Begin]");
-		
-		try{
-			this.setCompanyCombo();
-		}catch(EnjoyException e){
-			throw new EnjoyException(e.getMessage());
-		}catch(Exception e){
-			e.printStackTrace();
-			logger.info(e.getMessage());
-		}finally{
-			logger.info("[setRefference][End]");
-		}
-	}
-	
-	private void setCompanyCombo() throws EnjoyException{
-		
-		logger.info("[setCompanyCombo][Begin]");
-		
-		List<ComboBean>			companyCombo 		= null;
-		
-		try{
-			
-			companyCombo = this.relationUserAndCompanyDao.getCompanyList(this.userBean.getUserUniqueId());
-			
-			if(companyCombo.size() > 1){
-				companyCombo.add(0, new ComboBean("", "กรุณาระบุ"));
-			}
-			
-			this.form.setCompanyCombo(companyCombo);
-		}
-		catch(Exception e){
-			logger.error(e);
-			throw new EnjoyException("setCompanyCombo is error");
-		}finally{
-			logger.info("[setCompanyCombo][End]");
-		}
-	}
-	
 	private void onSearch() throws EnjoyException{
 		logger.info("[onSearch][Begin]");
 		
 		InvoiceCreditMasterBean 		invoiceCreditMasterBean	= null;
-		SessionFactory 					sessionFactory			= null;
-		Session 						session					= null;
 		List<InvoiceCreditMasterBean> 	dataList 				= null;
 		int								cou						= 0;
 		int								pageNum					= 1;
@@ -170,21 +121,17 @@ public class UpdateInvoiceCreditSearchServlet extends EnjoyStandardSvc {
         HashMap						  	hashTable				= new HashMap();
 
 		try{
-			sessionFactory 				= HibernateUtil.getSessionFactory();
-			session 					= sessionFactory.openSession();			
-			session.beginTransaction();
-			
 			invoiceCreditMasterBean		= new InvoiceCreditMasterBean();
 			
 			invoiceCreditMasterBean.setInvoiceCode		(EnjoyUtils.nullToStr(this.request.getParameter("invoiceCode")));
-			invoiceCreditMasterBean.setTin				(EnjoyUtils.nullToStr(this.request.getParameter("tin")));
+			invoiceCreditMasterBean.setTin				(this.userBean.getTin());
 			invoiceCreditMasterBean.setInvoiceDateForm	(EnjoyUtils.nullToStr(this.request.getParameter("invoiceDateForm")));
 			invoiceCreditMasterBean.setInvoiceDateTo	(EnjoyUtils.nullToStr(this.request.getParameter("invoiceDateTo")));
 			invoiceCreditMasterBean.setCusFullName		(EnjoyUtils.nullToStr(this.request.getParameter("cusFullName")));
 			
 			this.form.setInvoiceCreditMasterBean(invoiceCreditMasterBean);
 			
-			dataList	 		= this.invoiceCreditDao.searchByCriteriaForCredit(session, invoiceCreditMasterBean);
+			dataList	 		= this.invoiceCreditDao.searchByCriteriaForCredit(invoiceCreditMasterBean);
 			
 			if(dataList.size() > 0){				
 				
@@ -233,10 +180,6 @@ public class UpdateInvoiceCreditSearchServlet extends EnjoyStandardSvc {
 			logger.info(e.getMessage());
 			throw new EnjoyException("onSearch is error");
 		}finally{
-			session.close();
-			sessionFactory	= null;
-			session			= null;
-			
 			logger.info("[onSearch][End]");
 		}
 		
@@ -268,6 +211,7 @@ public class UpdateInvoiceCreditSearchServlet extends EnjoyStandardSvc {
 	   logger.info("[getCusFullName][Begin]");
 	   
 	   String						cusFullName			= null;
+	   String						tin					= null;
 	   List<CustomerDetailsBean> 	list 				= null;
        JSONArray 					jSONArray 			= null;
        JSONObject 					objDetail 			= null;
@@ -275,12 +219,15 @@ public class UpdateInvoiceCreditSearchServlet extends EnjoyStandardSvc {
        
 	   try{
 		   cusFullName			= EnjoyUtils.nullToStr(this.request.getParameter("cusFullName"));
+		   tin					= this.userBean.getTin();
 		   jSONArray 			= new JSONArray();
 		   customerDetailsBean	= new CustomerDetailsBean();
 		   
-		   logger.info("[getCusFullName] cusFullName 			:: " + cusFullName);
+		   logger.info("[getCusFullName] cusFullName 	:: " + cusFullName);
+		   logger.info("[getCusFullName] tin 			:: " + tin);
 		   
 		   customerDetailsBean.setFullName(cusFullName);
+		   customerDetailsBean.setTin(tin);
 		   
 		   list 		= this.customerDetailsDao.getCusFullName(customerDetailsBean);
 		   
@@ -301,6 +248,24 @@ public class UpdateInvoiceCreditSearchServlet extends EnjoyStandardSvc {
 	   }finally{
 		   logger.info("[getCusFullName][End]");
 	   }
+	}
+
+	@Override
+	public void destroySession() {
+		this.invoiceCreditDao.destroySession();
+        this.customerDetailsDao.destroySession();
+	}
+
+	@Override
+	public void commit() {
+		this.invoiceCreditDao.commit();
+        this.customerDetailsDao.commit();
+	}
+
+	@Override
+	public void rollback() {
+		this.invoiceCreditDao.rollback();
+        this.customerDetailsDao.rollback();
 	}	
 	
 	
@@ -308,3 +273,4 @@ public class UpdateInvoiceCreditSearchServlet extends EnjoyStandardSvc {
 	
 	
 }
+

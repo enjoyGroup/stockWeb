@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.hibernate.Session;
-
 import th.go.stock.app.enjoy.bean.ProductQuanHistoryBean;
 import th.go.stock.app.enjoy.exception.EnjoyException;
 import th.go.stock.app.enjoy.main.DaoControl;
@@ -21,7 +19,7 @@ public class ProductQuanHistoryDao extends DaoControl {
 		super.init();
 	}
 	
-	public void insert(Session session, ProductQuanHistoryBean bean) throws EnjoyException{
+	public void insert(ProductQuanHistoryBean bean) throws EnjoyException{
 		getLogger().info("[insert][Begin]");
 		
 		Productquanhistory 	productquanhistory 	= null;
@@ -40,7 +38,7 @@ public class ProductQuanHistoryDao extends DaoControl {
 			productquanhistory.setQuantityMinus	(EnjoyUtils.parseBigDecimal(bean.getQuantityMinus()));
 			productquanhistory.setQuantityTotal	(EnjoyUtils.parseBigDecimal(bean.getQuantityTotal()));
 			
-			session.saveOrUpdate(productquanhistory);
+			insertData(productquanhistory);
 			
 		}catch(Exception e){
 			e.printStackTrace();
@@ -52,7 +50,7 @@ public class ProductQuanHistoryDao extends DaoControl {
 	}
 	
 	
-	public List<ProductQuanHistoryBean> searchByCriteria(ProductQuanHistoryBean 	criteria) throws EnjoyException{
+	public List<ProductQuanHistoryBean> searchByCriteria(ProductQuanHistoryBean criteria) throws EnjoyException{
 		getLogger().info("[searchByCriteria][Begin]");
 		
 		String							hql					= null;
@@ -70,9 +68,9 @@ public class ProductQuanHistoryDao extends DaoControl {
 			
 			hql					= "select  a.formRef, a.hisDate, b.productName, a.quantityPlus, a.quantityMinus, a.quantityTotal"
 									+ " from productquanhistory a"
-									+ " 	inner JOIN productmaster b on a.productCode = b. productCode"
-									+ " 	inner JOIN productgroup c on a.productGroup = c.productGroupCode"
-									+ " 	inner JOIN productype d on a.productType = d.productTypeCode"
+									+ " 	inner JOIN productmaster b on a.productCode = b. productCode and a.tin = b.tin"
+									+ " 	inner JOIN productgroup c on c.productTypeCode = a.productType and a.productGroup = c.productGroupCode and a.tin = c.tin"
+									+ " 	inner JOIN productype d on a.productType = d.productTypeCode and a.tin = d.tin"
 									+ " where a.tin = :tin"
 									+ " 	and a.hisDate >= STR_TO_DATE(:hisDateFrom	, '%Y%m%d')"
 									+ " 	and a.hisDate <= STR_TO_DATE(:hisDateTo	, '%Y%m%d')";

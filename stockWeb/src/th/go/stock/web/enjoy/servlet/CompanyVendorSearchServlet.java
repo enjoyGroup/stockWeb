@@ -10,9 +10,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-
 import th.go.stock.app.enjoy.bean.CompanyVendorBean;
 import th.go.stock.app.enjoy.bean.UserDetailsBean;
 import th.go.stock.app.enjoy.dao.CompanyVendorDao;
@@ -21,7 +18,6 @@ import th.go.stock.app.enjoy.form.CompanyVendorSearchForm;
 import th.go.stock.app.enjoy.main.Constants;
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
 import th.go.stock.app.enjoy.utils.EnjoyUtils;
-import th.go.stock.app.enjoy.utils.HibernateUtil;
 import th.go.stock.web.enjoy.common.EnjoyStandardSvc;
 import th.go.stock.web.enjoy.utils.EnjoyUtil;
 
@@ -53,14 +49,14 @@ public class CompanyVendorSearchServlet extends EnjoyStandardSvc {
          String pageAction = null; 
  		
  		try{
- 			 pageAction 				= EnjoyUtil.nullToStr(request.getParameter("pageAction"));
- 			 this.enjoyUtil 			= new EnjoyUtil(request, response);
- 			 this.request            	= request;
-             this.response           	= response;
-             this.session            	= request.getSession(false);
-             this.userBean           	= (UserDetailsBean) session.getAttribute("userBean");
-             this.form               	= (CompanyVendorSearchForm) session.getAttribute(FORM_NAME);
-             this.dao					= new CompanyVendorDao();
+ 			 pageAction 					= EnjoyUtil.nullToStr(request.getParameter("pageAction"));
+ 			 this.enjoyUtil 				= new EnjoyUtil(request, response);
+ 			 this.request            		= request;
+             this.response           		= response;
+             this.session            		= request.getSession(false);
+             this.userBean           		= (UserDetailsBean) session.getAttribute("userBean");
+             this.form               		= (CompanyVendorSearchForm) session.getAttribute(FORM_NAME);
+             this.dao						= new CompanyVendorDao();
  			
              logger.info("[execute] pageAction : " + pageAction );
              
@@ -82,6 +78,7 @@ public class CompanyVendorSearchServlet extends EnjoyStandardSvc {
  			e.printStackTrace();
  			logger.info(e.getMessage());
  		}finally{
+ 			destroySession();
  			logger.info("[execute][End]");
  		}
 	}
@@ -90,7 +87,7 @@ public class CompanyVendorSearchServlet extends EnjoyStandardSvc {
 		logger.info("[onLoad][Begin]");
 		
 		try{
-			this.form.setTitlePage("ค้นหาบริษัทสั่งซื้อ");			
+			this.form.setTitlePage("ค้นหาบริษัทสั่งซื้อ");	
 		}catch(Exception e){
 			logger.info(e.getMessage());
 			throw new EnjoyException("onLoad is error");
@@ -104,8 +101,6 @@ public class CompanyVendorSearchServlet extends EnjoyStandardSvc {
 		logger.info("[onSearch][Begin]");
 		
 		CompanyVendorBean 			companyVendorBean	= null;
-		SessionFactory 				sessionFactory		= null;
-		Session 					session				= null;
 		List<CompanyVendorBean> 	dataList 			= null;
 		int							cou					= 0;
 		int							pageNum				= 1;
@@ -116,20 +111,17 @@ public class CompanyVendorSearchServlet extends EnjoyStandardSvc {
         HashMap						hashTable			= new HashMap();
 
 		try{
-			sessionFactory 				= HibernateUtil.getSessionFactory();
-			session 					= sessionFactory.openSession();			
-			session.beginTransaction();
-			
 			companyVendorBean				= new CompanyVendorBean();
 			
 			companyVendorBean.setVendorName			(EnjoyUtils.nullToStr(this.request.getParameter("vendorName")));
 			companyVendorBean.setBranchName			(EnjoyUtils.nullToStr(this.request.getParameter("branchName")));
 			companyVendorBean.setTin				(EnjoyUtils.nullToStr(this.request.getParameter("tin")));
 			companyVendorBean.setTel				(EnjoyUtils.nullToStr(this.request.getParameter("tel")));
+			companyVendorBean.setTinCompany			(this.userBean.getTin());
 			
 			this.form.setCompanyVendorBean(companyVendorBean);
 			
-			dataList	 		= this.dao.searchByCriteria(session, companyVendorBean);
+			dataList	 		= this.dao.searchByCriteria(companyVendorBean);
 			
 			if(dataList.size() > 0){				
 				
@@ -178,15 +170,9 @@ public class CompanyVendorSearchServlet extends EnjoyStandardSvc {
 			logger.info(e.getMessage());
 			throw new EnjoyException("onSearch is error");
 		}finally{
-			session.close();
-			sessionFactory	= null;
-			session			= null;
-			
 			logger.info("[onSearch][End]");
 		}
-		
 	}
-	
 	
 	private void lp_getPage(){
 		   logger.info("[lp_getPage][Begin]");
@@ -209,6 +195,21 @@ public class CompanyVendorSearchServlet extends EnjoyStandardSvc {
 		   }
 		   
 	   }
+
+	@Override
+	public void destroySession() {
+		this.dao.destroySession();
+	}
+
+	@Override
+	public void commit() {
+		this.dao.commit();
+	}
+
+	@Override
+	public void rollback() {
+		this.dao.rollback();
+	}
 	
 	
 	

@@ -8,8 +8,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.json.simple.JSONObject;
 
 import th.go.stock.app.enjoy.bean.ManageUnitTypeBean;
@@ -19,7 +17,7 @@ import th.go.stock.app.enjoy.exception.EnjoyException;
 import th.go.stock.app.enjoy.form.ManageUnitTypeForm;
 import th.go.stock.app.enjoy.main.Constants;
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
-import th.go.stock.app.enjoy.utils.HibernateUtil;
+import th.go.stock.app.enjoy.utils.EnjoyUtils;
 import th.go.stock.web.enjoy.common.EnjoyStandardSvc;
 import th.go.stock.web.enjoy.utils.EnjoyUtil;
 
@@ -48,17 +46,17 @@ public class ManageUnitTypeServlet extends EnjoyStandardSvc {
 	private void doProcess(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		logger.info("[execute][Begin]");
 		
-         String pageAction = null; 
+        String pageAction = null; 
  		
  		try{
- 			 pageAction 				= EnjoyUtil.nullToStr(request.getParameter("pageAction"));
- 			 this.enjoyUtil 			= new EnjoyUtil(request, response);
- 			 this.request            	= request;
-             this.response           	= response;
-             this.session            	= request.getSession(false);
-             this.userBean           	= (UserDetailsBean)session.getAttribute("userBean");
-             this.form               	= (ManageUnitTypeForm)session.getAttribute(FORM_NAME);
-             this.dao					= new ManageUnitTypeDao();
+ 			 pageAction 					= EnjoyUtil.nullToStr(request.getParameter("pageAction"));
+ 			 this.enjoyUtil 				= new EnjoyUtil(request, response);
+ 			 this.request            		= request;
+             this.response           		= response;
+             this.session            		= request.getSession(false);
+             this.userBean           		= (UserDetailsBean)session.getAttribute("userBean");
+             this.form               		= (ManageUnitTypeForm)session.getAttribute(FORM_NAME);
+             this.dao						= new ManageUnitTypeDao();
  			
              logger.info("[execute] pageAction : " + pageAction );
              
@@ -86,6 +84,7 @@ public class ManageUnitTypeServlet extends EnjoyStandardSvc {
  			e.printStackTrace();
  			logger.info(e.getMessage());
  		}finally{
+ 			destroySession();
  			logger.info("[execute][End]");
  		}
 	}
@@ -93,15 +92,33 @@ public class ManageUnitTypeServlet extends EnjoyStandardSvc {
 	private void onLoad() throws EnjoyException{
 		logger.info("[onLoad][Begin]");
 		
-		SessionFactory 				sessionFactory			= null;
-		Session 					session					= null;
+		try{
+			onSearch();
+			
+		}catch(EnjoyException e){
+			throw new EnjoyException(e.getMessage());
+		}catch(Exception e){
+			logger.info(e.getMessage());
+			throw new EnjoyException("onLoad is error");
+		}finally{
+			logger.info("[onLoad][End]");
+		}
+		
+	}
+	
+	private void onSearch() throws EnjoyException{
+		logger.info("[onSearch][Begin]");
+		
+		JSONObject 					obj 					= null;
 		List<ManageUnitTypeBean> 	unitTypeList			= null;
 		String						seqTemp					= null;
-		
+		String 						tin 					= null;
+
 		try{
-			sessionFactory 				= HibernateUtil.getSessionFactory();
-			session 					= sessionFactory.openSession();
-			unitTypeList				= this.dao.getUnitTypeList(session);
+			obj 	= new JSONObject();
+			tin 	= this.userBean.getTin();
+			
+			unitTypeList				= this.dao.getUnitTypeList(tin);
 			
 			for(ManageUnitTypeBean bean:unitTypeList){
 				seqTemp = bean.getSeq();
@@ -113,16 +130,20 @@ public class ManageUnitTypeServlet extends EnjoyStandardSvc {
 				this.form.setSeqTemp(seqTemp);
 			}
 			
+			obj.put(STATUS, 			SUCCESS);
+			
 		}catch(EnjoyException e){
-			throw new EnjoyException(e.getMessage());
+			obj.put(STATUS, 		ERROR);
+			obj.put(ERR_MSG, 		e.getMessage());
 		}catch(Exception e){
 			logger.info(e.getMessage());
-			throw new EnjoyException("onLoad is error");
+			e.printStackTrace();
+			obj.put(STATUS, 		ERROR);
+			obj.put(ERR_MSG, 		"onSearch is error");
 		}finally{
-			session.close();
-			sessionFactory	= null;
-			session			= null;
-			logger.info("[onLoad][End]");
+			this.enjoyUtil.writeMSG(obj.toString());
+			
+			logger.info("[onSearch][End]");
 		}
 		
 	}
@@ -253,84 +274,66 @@ public class ManageUnitTypeServlet extends EnjoyStandardSvc {
 	private void onSave() throws EnjoyException{
 		logger.info("[onSave][Begin]");
 		
-		SessionFactory 					sessionFactory			= null;
-		Session 						session					= null;
 		JSONObject 						obj 					= null;
 		List<ManageUnitTypeBean> 		unitTypeList			= null;
-		int								chk						= 0;
-		ManageUnitTypeBean 				bean					= null;
-		ManageUnitTypeBean 				beanTemp				= null;
+		String							tin						= null;
+		int								unitCode				= 1;
+		boolean							chkFlag					= true;
 		
 		try{
-			sessionFactory 				= HibernateUtil.getSessionFactory();
-			session 					= sessionFactory.openSession();
-			obj 						= new JSONObject();
-			unitTypeList				= this.form.getUnitTypeList();
+			obj 				= new JSONObject();
+			unitTypeList		= this.form.getUnitTypeList();
+			tin 				= this.userBean.getTin();
 			
-			session.beginTransaction();
-			
-			for(int i=0;i<unitTypeList.size();i++){
-				bean = unitTypeList.get(i);
+			for(ManageUnitTypeBean bean:unitTypeList){
+				bean.setTin(tin);
 				if(bean.getRowStatus().equals(ManageUnitTypeForm.NEW)){
-					
-//					for(int j=(i+1);j<unitTypeList.size();j++){
-//						beanTemp = unitTypeList.get(j);
-//						if(beanTemp.getRowStatus().equals(ManageUnitTypeForm.NEW) && bean.getUnitName().equals(beanTemp.getUnitName())){
-//							throw new EnjoyException("ชื่อหน่วยสินค้าห้ามซ้ำ");
-//						}
-//					}
-//					
-//					chk = this.dao.checkDupUnitName(session, bean.getUnitName(), "");
-//					
-//					logger.info("[onSave] " + bean.getUnitName() + " chk :: " + chk);
-//					
-//					if(chk > 0){
-//						throw new EnjoyException("ชื่อหน่วยสินค้าห้ามซ้ำ");
-//					}
-					
-					this.dao.insertUnitType(session, bean);
+					if(chkFlag==true){
+						unitCode = this.dao.genId(tin);
+						chkFlag  = false;
+					}else{
+						unitCode++;
+					}
+					bean.setUnitCode(EnjoyUtils.nullToStr(unitCode));
+					this.dao.insertUnitType(bean);
 				}else if(bean.getRowStatus().equals(ManageUnitTypeForm.UPD) || bean.getRowStatus().equals(ManageUnitTypeForm.DEL)){
-					
-//					if(bean.getRowStatus().equals(ManageUnitTypeForm.UPD)){
-//						chk = this.dao.checkDupUnitName(session, bean.getUnitName(), bean.getUnitCode());
-//						
-//						logger.info("[onSave] UPD " + bean.getUnitName() + " chk :: " + chk);
-//						
-//						if(chk > 0){
-//							throw new EnjoyException("ชื่อหน่วยสินค้าห้ามซ้ำ");
-//						}
-//					}
-					
-					this.dao.updateUnitType(session, bean);
+					this.dao.updateUnitType(bean);
 				}
 			}
 			
-			session.getTransaction().commit();
+			commit();
 			
 			obj.put(STATUS, 			SUCCESS);
 			
 		}catch(EnjoyException e){
-			session.getTransaction().rollback();
+			rollback();
 			obj.put(STATUS, 		ERROR);
 			obj.put(ERR_MSG, 		e.getMessage());
 		}catch(Exception e){
-			session.getTransaction().rollback();
+			rollback();
 			logger.error(e);
 			e.printStackTrace();
 			obj.put(STATUS, 		ERROR);
 			obj.put(ERR_MSG, 		"onSave is error");
 		}finally{
-			
-			session.flush();
-			session.clear();
-			session.close();
-			
 			this.enjoyUtil.writeMSG(obj.toString());
-			
-			sessionFactory	= null;
-			session			= null;
 			
 			logger.info("[onSave][End]");
 		}
+	}
+
+	@Override
+	public void destroySession() {
+		this.dao.destroySession();
+	}
+
+	@Override
+	public void commit() {
+		this.dao.commit();
+	}
+
+	@Override
+	public void rollback() {
+		this.dao.rollback();
 	}	
 }

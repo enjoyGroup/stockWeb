@@ -1,6 +1,7 @@
 package th.go.stock.app.enjoy.utils;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -10,8 +11,6 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
-
-import th.go.stock.app.enjoy.main.ConfigFile;
 
 public class EnjoyUtils {
 	

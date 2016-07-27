@@ -38,6 +38,7 @@ public class CustomerDetailsBean {
 	private String fullName;
 	private String customerStatusName;
 	private String groupSalePrice;
+	private String tin;
 	
 	public CustomerDetailsBean(){
 		this.cusCode 			= "";
@@ -74,6 +75,7 @@ public class CustomerDetailsBean {
 		this.fullName 			= "";
 		this.customerStatusName = "";
 		this.groupSalePrice		= "";
+		this.tin				= "";
 	}
 	
 	public String getCusCode() {
@@ -403,5 +405,13 @@ public class CustomerDetailsBean {
 
 	public void setGroupSalePrice(String groupSalePrice) {
 		this.groupSalePrice = groupSalePrice;
+	}
+
+	public String getTin() {
+		return tin;
+	}
+
+	public void setTin(String tin) {
+		this.tin = tin;
 	}
 }

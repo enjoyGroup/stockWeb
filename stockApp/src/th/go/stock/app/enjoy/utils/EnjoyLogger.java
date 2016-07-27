@@ -20,21 +20,21 @@ public class EnjoyLogger {
   }
  
 	private static void configRoot(Properties prop, boolean logFileFlag){
-	  
-		if (logFileFlag) {	
-			prop.put("log4j.rootLogger", "INFO, xDefault");
-			prop.put("log4j.appender.xDefault"			, "org.apache.log4j.RollingFileAppender");
-//			prop.put("log4j.appender.xDefault"			, "org.apache.log4j.DailyRollingFileAppender");
-			prop.put("log4j.appender.xDefault.file"		, ConfigFile.getPathLog() + "/System.log.txt");
-			prop.put("log4j.appender.xDefault.datePattern", "'.'yyyy-MM-dd");
-			prop.put("log4j.appender.xDefault.layout"					, "org.apache.log4j.PatternLayout");
-			prop.put("log4j.appender.xDefault.layout.ConversionPattern"	, "%d [%t] %-5p %c - %m%n");
-		}
-		else {	
-			prop.put("log4j.appender.xDefault.layout"					, "org.apache.log4j.PatternLayout");
-			prop.put("log4j.appender.xDefault.layout.ConversionPattern"	, "%d [%t] %-5p %c - %m%n");
-			prop.put("log4j.appender.xDefault"			, "org.apache.log4j.ConsoleAppender");// write on console
-		}
+		 prop.put("log4j.rootLogger", "INFO, xDefault");
+		 
+		 System.out.println("[configRoot] logFileFlag :: " + logFileFlag);
+		 
+		 if (logFileFlag) {	
+			 prop.put("log4j.appender.xDefault", "org.apache.log4j.DailyRollingFileAppender");
+			 prop.put("log4j.appender.xDefault.file", ConfigFile.getPathLog() + "/System.log.txt");
+			 prop.put("log4j.appender.xDefault.datePattern", "'.'yyyy-MM-dd");
+		 }else {	
+			 prop.put("log4j.appender.xDefault", "org.apache.log4j.ConsoleAppender");
+		 }
+		 
+		 prop.put("log4j.appender.xDefault.layout", "org.apache.log4j.PatternLayout");
+		 prop.put("log4j.appender.xDefault.layout.ConversionPattern", "%d [%t] %-5p %c - %m%n");
+		    
 	}
 
   //****************************************************************************

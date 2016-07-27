@@ -3,21 +3,25 @@ package th.go.stock.app.enjoy.bean;
 
 public class RefconstantcodeBean {
 	private String id;
+	private String tin;
 	private String codeDisplay;
 	private String codeNameTH;
 	private String codeNameEN;
 	private String rowStatus;
 	private String flagYear;
 	private String flagEdit;
+	private String typeTB;
 	
 	public RefconstantcodeBean(){
 		this.id 				= "";
+		this.tin 				= "";
 		this.codeDisplay 		= "";
 		this.codeNameTH			= "";
 		this.codeNameEN 		= "";
 		this.rowStatus			= "";
 		this.flagYear			= "N";
 		this.flagEdit			= "N";
+		this.typeTB				= "";
 	}
 
 	public String getId() {
@@ -74,5 +78,21 @@ public class RefconstantcodeBean {
 
 	public void setFlagEdit(String flagEdit) {
 		this.flagEdit = flagEdit;
+	}
+
+	public String getTin() {
+		return tin;
+	}
+
+	public void setTin(String tin) {
+		this.tin = tin;
+	}
+
+	public String getTypeTB() {
+		return typeTB;
+	}
+
+	public void setTypeTB(String typeTB) {
+		this.typeTB = typeTB;
 	}
 }

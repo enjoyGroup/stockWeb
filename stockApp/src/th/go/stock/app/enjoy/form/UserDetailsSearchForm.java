@@ -126,7 +126,5 @@ public class UserDetailsSearchForm {
 	public void setHashTable(HashMap hashTable) {
 		this.hashTable = hashTable;
 	}
-	
-	
-	
+
 }

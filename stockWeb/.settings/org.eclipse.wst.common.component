@@ -47,6 +47,24 @@
         <dependent-module archiveName="antlr-2.7.7.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/stockApp/lib/antlr-2.7.7.jar">
             <dependency-type>uses</dependency-type>
         </dependent-module>
+        <dependent-module archiveName="poi-3.8-20120326.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/workspace/stockWeb/stockWeb/stockApp/lib/poi-3.8-20120326.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="poi-ooxml-schemas-3.8-20120326.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/workspace/stockWeb/stockWeb/stockApp/lib/poi-ooxml-schemas-3.8-20120326.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="commons-fileupload-1.2.2.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/workspace/stockWeb/stockWeb/stockApp/lib/commons-fileupload-1.2.2.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="poi-ooxml-3.8-20120326.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/workspace/stockWeb/stockWeb/stockApp/lib/poi-ooxml-3.8-20120326.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="commons-io-2.0.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/workspace/stockWeb/stockWeb/stockApp/lib/commons-io-2.0.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xmlbeans-2.3.0.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/workspace/stockWeb/stockWeb/stockApp/lib/xmlbeans-2.3.0.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
         <property name="context-root" value="stockWeb"/>
         <property name="java-output-path" value="/stockWeb/build/classes"/>
     </wb-module>

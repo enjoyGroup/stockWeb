@@ -11,20 +11,30 @@ public class RefconstantcodeMaintananceForm {
 	public static final String EDIT = "EDIT";
 	public static final String DEL 	= "DEL";
 	
-	private List<RefconstantcodeBean> 			refconstantcodeList;
+	private List<RefconstantcodeBean> 			section1List;
+	private List<RefconstantcodeBean> 			section2List;
 	private String								titlePage;
 	
 	public RefconstantcodeMaintananceForm(){
-		this.refconstantcodeList 		= new ArrayList<RefconstantcodeBean>();
-		this.titlePage					= "";
+		this.section1List 		= new ArrayList<RefconstantcodeBean>();
+		this.section2List 		= new ArrayList<RefconstantcodeBean>();
+		this.titlePage			= "";
 	}
 
-	public List<RefconstantcodeBean> getRefconstantcodeList() {
-		return refconstantcodeList;
+	public List<RefconstantcodeBean> getSection1List() {
+		return section1List;
 	}
 
-	public void setRefconstantcodeList(List<RefconstantcodeBean> refconstantcodeList) {
-		this.refconstantcodeList = refconstantcodeList;
+	public void setSection1List(List<RefconstantcodeBean> section1List) {
+		this.section1List = section1List;
+	}
+
+	public List<RefconstantcodeBean> getSection2List() {
+		return section2List;
+	}
+
+	public void setSection2List(List<RefconstantcodeBean> section2List) {
+		this.section2List = section2List;
 	}
 
 	public String getTitlePage() {

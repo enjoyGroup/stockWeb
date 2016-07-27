@@ -1,126 +1,125 @@
 package th.go.stock.app.enjoy.dao;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 
 import th.go.stock.app.enjoy.bean.PagesDetailBean;
 import th.go.stock.app.enjoy.bean.UserPrivilegeBean;
-import th.go.stock.app.enjoy.model.Refpagedetail;
-import th.go.stock.app.enjoy.model.Userprivilege;
+import th.go.stock.app.enjoy.main.DaoControl;
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
-import th.go.stock.app.enjoy.utils.HibernateUtil;
+import th.go.stock.app.enjoy.utils.EnjoyUtils;
 
-public class UserPrivilegeDao {
+public class UserPrivilegeDao extends DaoControl{
 	
-	private static final EnjoyLogger logger = EnjoyLogger.getLogger(UserPrivilegeDao.class);
+	public UserPrivilegeDao(){
+		setLogger(EnjoyLogger.getLogger(UserPrivilegeDao.class));
+		super.init();
+	}
 	
 	public List<UserPrivilegeBean> userPrivilegeListSelect(String privilegeCode){
-		logger.info("[UserPrivilegeDao][userPrivilegeListSelect][Begin]");
+		getLogger().info("[UserPrivilegeDao][userPrivilegeListSelect][Begin]");
 		
-		SessionFactory 				sessionFactory			= null;
-		Session 					session					= null;
-		List<UserPrivilegeBean> 	userPrivilegeBeanList	= null;
-		UserPrivilegeBean 			userPrivilegeBean 		= null;
-		List<Userprivilege> 		userPrivilegeList		= null;
-		Userprivilege 				userprivilege			= null;
-		String						hql						= null;
-		String[]					arrPrivilegeCode		= null;				
-		int							maxArrPrivilegeCode		= 0;
-		int							maxRecord				= 0;
+		List<UserPrivilegeBean> 		userPrivilegeBeanList	= null;
+		UserPrivilegeBean 				userPrivilegeBean 		= null;
+		String							hql						= null;
+		String[]						arrPrivilegeCode		= null;				
+		int								maxArrPrivilegeCode		= 0;
+		HashMap<String, Object>			param					= new HashMap<String, Object>();
+		List<String>					columnList				= new ArrayList<String>();
+		List<HashMap<String, Object>>	resultList				= null;
+		
 		try{
-		    sessionFactory 		  = HibernateUtil.getSessionFactory();
-			session 			  = sessionFactory.openSession();
 			arrPrivilegeCode	  = privilegeCode.split("\\,");
 			maxArrPrivilegeCode   = arrPrivilegeCode.length;
 			userPrivilegeBeanList = new ArrayList<UserPrivilegeBean>();
 			
-			for(int i=0;i<maxArrPrivilegeCode;i++){			
-				hql					= "from Userprivilege where privilegeCode = '" + arrPrivilegeCode[i] + "'";  // จะได้ 1 รายการเสมอ
-				userPrivilegeList 	= session.createQuery(hql).list();			
-				maxRecord      		= userPrivilegeList.size();
+			for(int i=0;i<maxArrPrivilegeCode;i++){
+				param				= new HashMap<String, Object>();
+				columnList			= new ArrayList<String>();
+				hql					= "select * from userprivilege where privilegeCode = :privilegeCode";  // จะได้ 1 รายการเสมอ
 				
-				for(int j=0;j<maxRecord;j++){
-					userprivilege		= userPrivilegeList.get(j);
+				//Criteria
+				param.put("privilegeCode", arrPrivilegeCode[i]);
+				
+				//Column select
+				columnList.add("privilegeCode");
+				columnList.add("privilegeName");
+				columnList.add("pagesCode");
+				
+				
+				resultList = getResult(hql, param, columnList);		
+				
+				for(HashMap<String, Object> row:resultList){
 					userPrivilegeBean	= new UserPrivilegeBean();
 					
-					logger.debug("[UserPrivilegeDao][userPrivilegeListSelect] userprivilege.getPrivilegeCode() 		:: " + userprivilege.getPrivilegeCode());
-					logger.debug("[UserPrivilegeDao][userPrivilegeListSelect] userprivilege.getPrivilegeName() 		:: " + userprivilege.getPrivilegeName());
-					
-					userPrivilegeBean.setPrivilegeCode(userprivilege.getPrivilegeCode());
-					userPrivilegeBean.setPrivilegeName(userprivilege.getPrivilegeName());
-					userPrivilegeBean.setPagesDetail((ArrayList<PagesDetailBean>) pagesDetailListSelect(userprivilege.getPagesCode()));
+					userPrivilegeBean.setPrivilegeCode(EnjoyUtils.nullToStr(row.get("privilegeCode")));
+					userPrivilegeBean.setPrivilegeName(EnjoyUtils.nullToStr(row.get("privilegeName")));
+					userPrivilegeBean.setPagesDetail((ArrayList<PagesDetailBean>) pagesDetailListSelect(EnjoyUtils.nullToStr(row.get("pagesCode"))));
 					userPrivilegeBeanList.add(userPrivilegeBean);
 				}
 			}
 		}catch(Exception e){
 			e.printStackTrace();
+			getLogger().error(e);
 		}finally{
-			session.close();
-			sessionFactory	= null;
-			session			= null;
-//			userdetailList	= null;
-//			userdetail		= null;
 			hql				= null;
-			logger.info("[UserPrivilegeDao][userPrivilegeListSelect][End]");
+			getLogger().info("[UserPrivilegeDao][userPrivilegeListSelect][End]");
 		}
 		
 		return userPrivilegeBeanList;
 	}
 	
 	public List<PagesDetailBean> pagesDetailListSelect(String pageCodes){
-		logger.info("[UserPrivilegeDao][pagesDetailListSelect][Begin]");
+		getLogger().info("[UserPrivilegeDao][pagesDetailListSelect][Begin]");
 		
-		SessionFactory 				sessionFactory			= null;
-		Session 					session					= null;
-		List<PagesDetailBean> 		pagesDetailBeanList		= null;
-		PagesDetailBean 			pagesDetailBean 		= null;
-		List<Refpagedetail> 		refpagedetailList		= null;
-		Refpagedetail 				refpagedetail			= null;
-		String						hql						= null;
-		String[]					arrPageCodes			= null;				
-		int							maxArrPageCodes			= 0;
-		int							maxRecord				= 0;
+		List<PagesDetailBean> 			pagesDetailBeanList		= null;
+		PagesDetailBean 				pagesDetailBean 		= null;
+		String							hql						= null;
+		String[]						arrPageCodes			= null;				
+		int								maxArrPageCodes			= 0;
+		HashMap<String, Object>			param					= new HashMap<String, Object>();
+		List<String>					columnList				= new ArrayList<String>();
+		List<HashMap<String, Object>>	resultList				= null;
+		
 		try{
-		    sessionFactory 		  = HibernateUtil.getSessionFactory();
-			session 			  = sessionFactory.openSession();
 			arrPageCodes		  = pageCodes.split("\\,");
 			maxArrPageCodes   	  = arrPageCodes.length;
 			pagesDetailBeanList   = new ArrayList<PagesDetailBean>();
 			
-			for(int i=0;i<maxArrPageCodes;i++){			
-				hql					= "from Refpagedetail where pageCodes = '" + arrPageCodes[i] + "'";  // จะได้ 1 รายการเสมอ
-				refpagedetailList 	= session.createQuery(hql).list();			
-				maxRecord      		= refpagedetailList.size();
+			for(int i=0;i<maxArrPageCodes;i++){
+				param				= new HashMap<String, Object>();
+				columnList			= new ArrayList<String>();
+				hql					= "select * from refpagedetails where pageCodes = :pageCodes";  // จะได้ 1 รายการเสมอ
 				
-				for(int j=0;j<maxRecord;j++){
-					refpagedetail		= refpagedetailList.get(j);
+				//Criteria
+				param.put("pageCodes", arrPageCodes[i]);
+				
+				//Column select
+				columnList.add("pageCodes");
+				columnList.add("pageNames");
+				columnList.add("pathPages");
+				
+				resultList = getResult(hql, param, columnList);		
+				
+				for(HashMap<String, Object> row:resultList){
 					pagesDetailBean		= new PagesDetailBean();
 					
-					logger.debug("[UserPrivilegeDao][pagesDetailListSelect] refpagedetail.getPageCodes() 		:: " + refpagedetail.getPageCodes());
-					logger.debug("[UserPrivilegeDao][pagesDetailListSelect] refpagedetail.getPageNames() 		:: " + refpagedetail.getPageNames());
-					logger.debug("[UserPrivilegeDao][pagesDetailListSelect] refpagedetail.getPathPages() 		:: " + refpagedetail.getPathPages());
+					pagesDetailBean.setPageCodes(EnjoyUtils.nullToStr(row.get("pageCodes")));
+					pagesDetailBean.setPageNames(EnjoyUtils.nullToStr(row.get("pageNames")));
+					pagesDetailBean.setPathPages(EnjoyUtils.nullToStr(row.get("pathPages")));
 					
-					pagesDetailBean.setPageCodes(refpagedetail.getPageCodes());
-					pagesDetailBean.setPageNames(refpagedetail.getPageNames());
-					pagesDetailBean.setPathPages(refpagedetail.getPathPages());
 					pagesDetailBeanList.add(pagesDetailBean);
 				}
 			}
 		}catch(Exception e){
 			e.printStackTrace();
+			getLogger().error(e);
 		}finally{
-			session.close();
-			sessionFactory			= null;
-			session					= null;
 			pagesDetailBean 		= null;
-			refpagedetailList		= null;
-			refpagedetail			= null;
 			hql						= null;
 			arrPageCodes			= null;				
-			logger.info("[UserPrivilegeDao][pagesDetailListSelect][End]");
+			getLogger().info("[UserPrivilegeDao][pagesDetailListSelect][End]");
 		}
 		
 		return pagesDetailBeanList;

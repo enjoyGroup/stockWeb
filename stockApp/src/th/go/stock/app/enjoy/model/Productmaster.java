@@ -14,8 +14,8 @@ import java.math.BigDecimal;
 public class Productmaster implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	@Id
-	private String productCode;
+	@EmbeddedId
+	private ProductmasterPK id;
 
 	private BigDecimal costPrice;
 
@@ -42,12 +42,12 @@ public class Productmaster implements Serializable {
 	public Productmaster() {
 	}
 
-	public String getProductCode() {
-		return this.productCode;
+	public ProductmasterPK getId() {
+		return this.id;
 	}
 
-	public void setProductCode(String productCode) {
-		this.productCode = productCode;
+	public void setId(ProductmasterPK id) {
+		this.id = id;
 	}
 
 	public BigDecimal getCostPrice() {

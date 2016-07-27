@@ -13,8 +13,8 @@ import javax.persistence.*;
 public class Productype implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	@Id
-	private String productTypeCode;
+	@EmbeddedId
+	private ProductypePK id;
 
 	private String productTypeName;
 
@@ -23,12 +23,12 @@ public class Productype implements Serializable {
 	public Productype() {
 	}
 
-	public String getProductTypeCode() {
-		return this.productTypeCode;
+	public ProductypePK getId() {
+		return this.id;
 	}
 
-	public void setProductTypeCode(String productTypeCode) {
-		this.productTypeCode = productTypeCode;
+	public void setId(ProductypePK id) {
+		this.id = id;
 	}
 
 	public String getProductTypeName() {

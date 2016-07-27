@@ -11,6 +11,7 @@ public class SummarySaleByCustomerReportBean {
 	private String discount;
 	private String cusName;
 	private String cusCode;
+	private String tin;
 	
 	public SummarySaleByCustomerReportBean(){
 		this.productName 		= "";
@@ -22,6 +23,7 @@ public class SummarySaleByCustomerReportBean {
 		this.discount 			= "0.00";
 		this.cusName 			= "";
 		this.cusCode			= "";
+		this.tin				= "";
 	}
 
 	public String getProductName() {
@@ -94,5 +96,13 @@ public class SummarySaleByCustomerReportBean {
 
 	public void setCusCode(String cusCode) {
 		this.cusCode = cusCode;
+	}
+
+	public String getTin() {
+		return tin;
+	}
+
+	public void setTin(String tin) {
+		this.tin = tin;
 	}
 }

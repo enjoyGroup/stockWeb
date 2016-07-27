@@ -2,73 +2,76 @@
 package th.go.stock.app.enjoy.dao;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.hibernate.Query;
-import org.hibernate.SQLQuery;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.type.IntegerType;
-import org.hibernate.type.StringType;
 
 import th.go.stock.app.enjoy.bean.ComparePriceBean;
 import th.go.stock.app.enjoy.exception.EnjoyException;
+import th.go.stock.app.enjoy.main.Constants;
+import th.go.stock.app.enjoy.main.DaoControl;
 import th.go.stock.app.enjoy.model.Compareprice;
 import th.go.stock.app.enjoy.model.ComparepricePK;
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
 import th.go.stock.app.enjoy.utils.EnjoyUtils;
-import th.go.stock.app.enjoy.utils.HibernateUtil;
 
-public class ComparePriceDao {
+public class ComparePriceDao extends DaoControl{
 	
-	private static final EnjoyLogger logger = EnjoyLogger.getLogger(ComparePriceDao.class);
+	public ComparePriceDao(){
+		setLogger(EnjoyLogger.getLogger(ComparePriceDao.class));
+		super.init();
+	}
 	
-	public List<ComparePriceBean> searchByCriteria(	Session 			session, 
-													ComparePriceBean 	comparePriceBean) throws EnjoyException{
-		logger.info("[searchByCriteria][Begin]");
+	public List<ComparePriceBean> searchByCriteria(ComparePriceBean comparePriceBean) throws EnjoyException{
+		getLogger().info("[searchByCriteria][Begin]");
 		
-		String								hql							= null;
-		SQLQuery 							query 						= null;
-		List<Object[]>						list						= null;
-		ComparePriceBean					bean						= null;
-		List<ComparePriceBean> 				comparePriceList 			= new ArrayList<ComparePriceBean>();
-		int									seq							= 0;
+		String								hql					= null;
+		ComparePriceBean					bean				= null;
+		List<ComparePriceBean> 				comparePriceList 	= new ArrayList<ComparePriceBean>();
+		int									seq					= 0;
+		HashMap<String, Object>				param				= new HashMap<String, Object>();
+		List<String>						columnList			= new ArrayList<String>();
+		List<HashMap<String, Object>>		resultList			= null;
 		
 		try{	
 			hql					= "select a.productCode, b.productName, a.seq, a.vendorCode, c.vendorName, c.branchName, a.quantity, a.price"
 									+ "	from compareprice a, productmaster b, companyvendor c"
-									+ "	where b.productCode = a.productCode"
-										+ " AND c.vendorCode = a.vendorCode"
-										+ " AND a.productCode = '" + comparePriceBean.getProductCode() + "'"
+									+ "	where b.productCode 	= a.productCode"
+									+ "		and b.tin			= a.tin"
+									+ " 	AND c.vendorCode 	= a.vendorCode"
+									+ "		and c.tinCompany	= a.tin"
+									+ " 	AND a.productCode 	= :productCode"
+									+ "		and a.tin			= :tin"
 									+ " order by a.seq asc";
 			
-			logger.info("[searchByCriteria] hql :: " + hql);
+			//Criteria
+			param.put("productCode"	, comparePriceBean.getProductCode());
+			param.put("tin"			, comparePriceBean.getTin());
+			
+			//Column select
+			columnList.add("productCode");
+			columnList.add("productName");
+			columnList.add("vendorCode");
+			columnList.add("vendorName");
+			columnList.add("branchName");
+			columnList.add("seq");
+			columnList.add("quantity");
+			columnList.add("price");
 
-			query			= session.createSQLQuery(hql);			
-			query.addScalar("productCode"		, new StringType());
-			query.addScalar("productName"		, new StringType());
-			query.addScalar("vendorCode"		, new StringType());
-			query.addScalar("vendorName"		, new StringType());
-			query.addScalar("branchName"		, new StringType());
-			query.addScalar("seq"				, new StringType());
-			query.addScalar("quantity"			, new StringType());
-			query.addScalar("price"				, new StringType());
+			resultList = getResult(hql, param, columnList);
 			
-			list		 	= query.list();
-			
-			logger.info("[searchByCriteria] list.size() :: " + list.size());
-			
-			for(Object[] row:list){
+			for(HashMap<String, Object> row:resultList){
 				bean 	= new ComparePriceBean();
 				
-				bean.setProductCode	(EnjoyUtils.nullToStr(row[0]));
-				bean.setProductName	(EnjoyUtils.nullToStr(row[1]));
-				bean.setVendorCode	(EnjoyUtils.nullToStr(row[2]));
-				bean.setVendorName	(EnjoyUtils.nullToStr(row[3]));
-				bean.setBranchName	(EnjoyUtils.nullToStr(row[4]));
-				bean.setSeqDb		(EnjoyUtils.nullToStr(row[5]));
-				bean.setQuantity	(EnjoyUtils.convertFloatToDisplay(row[6], 2));
-				bean.setPrice		(EnjoyUtils.convertFloatToDisplay(row[7], 2));
+				bean.setProductCode	(EnjoyUtils.nullToStr(row.get("productCode")));
+				bean.setProductName	(EnjoyUtils.nullToStr(row.get("productName")));
+				bean.setVendorCode	(EnjoyUtils.nullToStr(row.get("vendorCode")));
+				bean.setVendorName	(EnjoyUtils.nullToStr(row.get("vendorName")));
+				bean.setBranchName	(EnjoyUtils.nullToStr(row.get("branchName")));
+				bean.setSeqDb		(EnjoyUtils.nullToStr(row.get("seq")));
+				bean.setQuantity	(EnjoyUtils.convertFloatToDisplay(row.get("quantity"), 2));
+				bean.setPrice		(EnjoyUtils.convertFloatToDisplay(row.get("price"), 2));
 				bean.setSeq			(EnjoyUtils.nullToStr(seq));
 				
 				comparePriceList.add(bean);
@@ -76,20 +79,20 @@ public class ComparePriceDao {
 			}	
 			
 		}catch(Exception e){
-			logger.info("[searchByCriteria] " + e.getMessage());
+			getLogger().error(e);
 			e.printStackTrace();
 			throw new EnjoyException("error searchByCriteria");
 		}finally{
 			hql						= null;
-			logger.info("[searchByCriteria][End]");
+			getLogger().info("[searchByCriteria][End]");
 		}
 		
 		return comparePriceList;
 		
 	}
 	
-	public void insertCompareprice(Session session, ComparePriceBean comparePriceBean) throws EnjoyException{
-		logger.info("[insertCompareprice][Begin]");
+	public void insertCompareprice(ComparePriceBean comparePriceBean) throws EnjoyException{
+		getLogger().info("[insertCompareprice][Begin]");
 		
 		Compareprice	compareprice	= null;
 		ComparepricePK	pk				= null;
@@ -100,6 +103,7 @@ public class ComparePriceDao {
 			pk				= new ComparepricePK();
 			
 			pk.setProductCode(comparePriceBean.getProductCode());
+			pk.setTin(comparePriceBean.getTin());
 			pk.setSeq(EnjoyUtils.parseInt(comparePriceBean.getSeq()));
 			
 			compareprice.setId(pk);
@@ -107,199 +111,167 @@ public class ComparePriceDao {
 			compareprice.setQuantity(EnjoyUtils.parseBigDecimal(comparePriceBean.getQuantity()));
 			compareprice.setPrice(EnjoyUtils.parseBigDecimal(comparePriceBean.getPrice()));
 			
-			session.saveOrUpdate(compareprice);
+			insertData(compareprice);
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			logger.info(e.getMessage());
+			getLogger().error(e);
 			throw new EnjoyException("Error insertCompareprice");
 		}finally{
 			compareprice = null;
 			pk			 = null;
-			logger.info("[insertCompareprice][End]");
+			getLogger().info("[insertCompareprice][End]");
 		}
 	}
 	
-	public int couVenderInThisProduct(String productCode, String vendorCode) throws EnjoyException{
-		logger.info("[couVenderInThisProduct][Begin]");
+	public int couVenderInThisProduct(String productCode, String vendorCode, String tin) throws EnjoyException{
+		getLogger().info("[couVenderInThisProduct][Begin]");
 		
-		String			hql					= null;
-		SQLQuery 		query 				= null;
-		SessionFactory 	sessionFactory		= null;
-		Session 		session				= null;
-		List<Integer>	list				= null;
-		int				cou					= 0;
-		
+		String							hql					= null;
+		int								cou					= 0;
+		HashMap<String, Object>			param				= new HashMap<String, Object>();
+		List<Object>					resultList			= null;
 		
 		try{
-			sessionFactory 		= HibernateUtil.getSessionFactory();
-			session 			= sessionFactory.openSession();
-			
 			hql		= "select count(*) cou from compareprice"
-						+ " where productCode	= '" + productCode + "'"
-						+ "		and vendorCode	= '" + vendorCode + "'";
+						+ " where productCode	= :productCode"
+						+ "		and tin			= :tin"
+						+ "		and vendorCode	= :vendorCode";
 			
-			query			= session.createSQLQuery(hql);
+			//Criteria
+			param.put("productCode"	, productCode);
+			param.put("tin"			, tin);
+			param.put("vendorCode"	, vendorCode);
 			
-			query.addScalar("cou"			, new IntegerType());
+			resultList = getResult(hql, param, "cou", Constants.INT_TYPE);
 			
-			list		 	= query.list();
-			
-			if(list!=null && list.size() > 0){
-				cou = EnjoyUtils.parseInt(list.get(0));
+			if(resultList!=null && resultList.size() > 0){
+				cou = EnjoyUtils.parseInt(resultList.get(0));
 			}
 			
-			logger.info("[couVenderInThisProduct] cou 			:: " + cou);
+			getLogger().info("[couVenderInThisProduct] cou 			:: " + cou);
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			logger.info(e.getMessage());
+			getLogger().error(e);
 			throw new EnjoyException("Error couVenderInThisProduct");
 		}finally{
-			session.flush();
-			session.clear();
-			session.close();
-			
-			sessionFactory	= null;
-			session			= null;
 			hql				= null;
-			query 			= null;
-			logger.info("[couVenderInThisProduct][End]");
+			getLogger().info("[couVenderInThisProduct][End]");
 		}
 		
 		return cou;
 	}
 	
-	public int getNewSeqInThisProduct(String productCode) throws EnjoyException{
-		logger.info("[getNewSeqInThisProduct][Begin]");
+	public int getNewSeqInThisProduct(String productCode, String tin) throws EnjoyException{
+		getLogger().info("[getNewSeqInThisProduct][Begin]");
 		
-		String			hql					= null;
-		SQLQuery 		query 				= null;
-		SessionFactory 	sessionFactory		= null;
-		Session 		session				= null;
-		List<Integer>	list				= null;
-		int				newSeq				= 0;
+		String							hql					= null;
+		int								newSeq				= 1;
+		HashMap<String, Object>			param				= new HashMap<String, Object>();
+		List<Object>					resultList			= null;
 		
 		
 		try{
-			sessionFactory 		= HibernateUtil.getSessionFactory();
-			session 			= sessionFactory.openSession();
-			
 			hql		= "select (max(seq) + 1) newSeq from compareprice"
-					+ " where productCode	= '" + productCode + "'";
+					+ " where productCode	= :productCode"
+					+ "		and tin			= :tin";
 			
-			query			= session.createSQLQuery(hql);
+			//Criteria
+			param.put("productCode"	, productCode);
+			param.put("tin"			, tin);
 			
-			query.addScalar("newSeq"			, new IntegerType());
+			resultList = getResult(hql, param, "newSeq", Constants.INT_TYPE);
 			
-			list		 	= query.list();
-			
-			if(list!=null && list.size() > 0){
-				newSeq = EnjoyUtils.parseInt(list.get(0));
+			if(resultList!=null && resultList.size() > 0){
+				newSeq = EnjoyUtils.parseInt(resultList.get(0))==0?1:EnjoyUtils.parseInt(resultList.get(0));
 			}
 			
-			logger.info("[getNewSeqInThisProduct] newSeq :: " + newSeq);
+			getLogger().info("[getNewSeqInThisProduct] newSeq :: " + newSeq);
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			logger.info(e.getMessage());
+			getLogger().error(e);
 			throw new EnjoyException("Error getNewSeqInThisProduct");
 		}finally{
-			session.flush();
-			session.clear();
-			session.close();
-			
-			sessionFactory	= null;
-			session			= null;
 			hql				= null;
-			query 			= null;
-			logger.info("[getNewSeqInThisProduct][End]");
+			getLogger().info("[getNewSeqInThisProduct][End]");
 		}
 		
 		return newSeq;
 	}
 	
-	public void deleteCompareprice(Session session, String productCode) throws EnjoyException{
-		logger.info("[deleteCompareprice][Begin]");
+	public void deleteCompareprice(String productCode, String tin) throws EnjoyException{
+		getLogger().info("[deleteCompareprice][Begin]");
 		
 		String							hql									= null;
 		Query 							query 								= null;
 		
 		try{
-			hql				= "delete Compareprice t"
-							+ " where t.id.productCode	 = '" + productCode + "'";
+			hql				= "delete Compareprice t where t.id.productCode	 = :productCode and tin = :tin";
 			
-			query = session.createQuery(hql);
+			query = createQuery(hql);
+			
+			query.setParameter("productCode", productCode);
+			query.setParameter("tin"		, tin);
 			
 			query.executeUpdate();			
 		}catch(Exception e){
 			e.printStackTrace();
-			logger.info(e.getMessage());
+			getLogger().error(e);
 			throw new EnjoyException("เกิดข้อผิดพลาดในการลบข้อมูล");
 		}finally{
 			
 			hql									= null;
 			query 								= null;
-			logger.info("[deleteCompareprice][End]");
+			getLogger().info("[deleteCompareprice][End]");
 		}
 	}
 	
 	public String getPrice(ComparePriceBean comparePriceBean) throws EnjoyException{
-		logger.info("[getPrice][Begin]");
+		getLogger().info("[getPrice][Begin]");
 		
-		String			hql					= null;
-		List<String>	list				= null;
-		SQLQuery 		query 				= null;
-		String 			price				= "0.00";
-		SessionFactory 	sessionFactory		= null;
-		Session 		session				= null;
-		String			productCode			= "";
-		String			vendorCode			= "";
-		double			quantity			= 0;
-		
+		String						hql					= null;
+		String 						price				= "0.00";
+		String						productCode			= "";
+		String						vendorCode			= "";
+		double						quantity			= 0;
+		HashMap<String, Object>		param				= new HashMap<String, Object>();
+		List<Object>				resultList			= null;
 		
 		try{
-			sessionFactory 		= HibernateUtil.getSessionFactory();
-			session 			= sessionFactory.openSession();
 			productCode			= EnjoyUtils.nullToStr(comparePriceBean.getProductCode());
 			vendorCode			= EnjoyUtils.nullToStr(comparePriceBean.getVendorCode());
 			quantity			= EnjoyUtils.parseDouble(comparePriceBean.getQuantity());
 			
 			hql		= "select price from compareprice"
-					+ "		where productCode = '" + productCode + "'"
-					+ "			and vendorCode = '" + vendorCode + "'"
-					+ "			and quantity <= " + quantity
+					+ "		where productCode 	= :productCode"
+					+ "			and tin			= :tin"
+					+ "			and vendorCode 	= :vendorCode"
+					+ "			and quantity 	<= :quantity"
 					+ "		order by quantity ASC"
 					+ "		LIMIT 1";
 			
-			query			= session.createSQLQuery(hql);
+			//Criteria
+			param.put("productCode"	, productCode);
+			param.put("tin"			, comparePriceBean.getTin());
+			param.put("vendorCode"	, vendorCode);
+			param.put("quantity"	, quantity);
 			
-			query.addScalar("price"			, new StringType());
+			resultList = getResult(hql, param, "price", Constants.STRING_TYPE);
 			
-			list		 	= query.list();
-			
-			if(list!=null && list.size() > 0){
-				price = EnjoyUtils.convertFloatToDisplay(list.get(0), 2);
+			if(resultList!=null && resultList.size() > 0){
+				price = EnjoyUtils.convertFloatToDisplay(resultList.get(0), 2);
 			}
 			
-			logger.info("[getPrice] price 			:: " + price);
-			
-			
+			getLogger().info("[getPrice] price 			:: " + price);
 			
 		}catch(Exception e){
-			logger.info(e.getMessage());
+			getLogger().info(e.getMessage());
 			throw new EnjoyException(e.getMessage());
 		}finally{
-			session.flush();
-			session.clear();
-			session.close();
-			
 			hql				= null;
-			list			= null;
-			query 			= null;
-			sessionFactory	= null;
-			session			= null;
-			logger.info("[getPrice][End]");
+			getLogger().info("[getPrice][End]");
 		}
 		
 		return price;

@@ -1,6 +1,6 @@
 <%@ include file="/pages/include/checkLogin.jsp"%>
 <%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
-<%@ page import="th.go.stock.app.enjoy.bean.ManageUnitTypeBean"%>
+<%@ page import="th.go.stock.app.enjoy.bean.ManageUnitTypeBean,th.go.stock.app.enjoy.bean.ComboBean"%>
 <%@ page import="java.util.*"%>
 <jsp:useBean id="manageUnitTypeForm" class="th.go.stock.app.enjoy.form.ManageUnitTypeForm" scope="session"/>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -22,11 +22,7 @@
 		var gv_checkFormatIdNumber 	= false;
 		
 		$(document).ready(function(){
-			//gp_progressBarOn();
-			
 			gv_service 		= "service=" + $('#service').val();
-			
-			//gp_progressBarOff();
 			
 		});
 		

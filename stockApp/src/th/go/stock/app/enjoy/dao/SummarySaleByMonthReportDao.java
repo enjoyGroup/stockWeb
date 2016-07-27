@@ -29,20 +29,22 @@ public class SummarySaleByMonthReportDao extends DaoControl {
 		HashMap<String, Object>				param					= new HashMap<String, Object>();
 		List<String>						columnList				= new ArrayList<String>();
 		List<HashMap<String, Object>>		resultList				= null;
+		String								cusName					= null;
 		
 		try{	
 			invoiceDateFrom 	= EnjoyUtils.dateThaiToDb(criteria.getInvoiceDateFrom());
 			invoiceDateTo		= EnjoyUtils.dateThaiToDb(criteria.getInvoiceDateTo());
 			
-			hql					= "select CONCAT(b.cusName, ' ', b.cusSurname, ' (', b.branchName, ')') as cusName"
+			hql					= "select CONCAT(b.cusName, ' ', b.cusSurname) as cusName"
+									+ " , b.branchName"
 									+ " , d.productName"
 									+ " , sum(c.quantity) as quantity"
 									+ " , SUM(c.price) - SUM(c.discount) as price"
-									+ " from invoicecashmaster a, customer b, invoicecashdetail c, productmaster d"
-									+ " where a.cusCode = b.cusCode"
-									+ "		and a.invoiceCode = c.invoiceCode"
-									+ "		and c.productCode = d.productCode"
-									+ "		and a.tin 			= :tin"
+									+ " from invoicecashmaster a"
+									+ "		inner join customer b on b.cusCode = a.cusCode and b.tin = a.tin"
+									+ "		inner join invoicecashdetail c on c.invoiceCode = a.invoiceCode and c.tin = a.tin"
+									+ "		inner join productmaster d on d.productCode = c.productCode and d.tin = c.tin"
+									+ " where a.tin 			= :tin"
 									+ " 	and a.invoiceDate >= STR_TO_DATE(:invoiceDateFrom	, '%Y%m%d')"
 									+ " 	and a.invoiceDate <= STR_TO_DATE(:invoiceDateTo		, '%Y%m%d')"
 									+ " GROUP BY CONCAT(b.cusName, ' ', b.cusSurname, ' (', b.branchName, ')'),d.productName"
@@ -53,6 +55,7 @@ public class SummarySaleByMonthReportDao extends DaoControl {
 			param.put("invoiceDateTo"	, invoiceDateTo);
 			
 			columnList.add("cusName");
+			columnList.add("branchName");
 			columnList.add("productName");
 			columnList.add("quantity");
 			columnList.add("price");
@@ -61,8 +64,12 @@ public class SummarySaleByMonthReportDao extends DaoControl {
 
 			for(HashMap<String, Object> row:resultList){
 				bean 	= new SummarySaleByMonthReportBean();
+				cusName	= EnjoyUtils.nullToStr(row.get("cusName"));
+				if(!"".equals(EnjoyUtils.nullToStr(row.get("branchName")))){
+					cusName += "(" + EnjoyUtils.nullToStr(row.get("branchName")) + ")";
+				}
 				
-				bean.setCusName		(EnjoyUtils.nullToStr(row.get("cusName")));
+				bean.setCusName		(cusName);
 				bean.setProductName	(EnjoyUtils.nullToStr(row.get("productName")));
 				bean.setQuantity	(EnjoyUtils.convertFloatToDisplay(row.get("quantity"), 2));
 				bean.setPrice		(EnjoyUtils.convertFloatToDisplay(row.get("price"), 2));

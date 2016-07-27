@@ -2,44 +2,43 @@
 package th.go.stock.app.enjoy.dao;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.hibernate.Query;
-import org.hibernate.SQLQuery;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.type.IntegerType;
-import org.hibernate.type.StringType;
 
 import th.go.stock.app.enjoy.bean.ComboBean;
 import th.go.stock.app.enjoy.bean.ReciveOrdeDetailBean;
 import th.go.stock.app.enjoy.bean.ReciveOrderMasterBean;
 import th.go.stock.app.enjoy.exception.EnjoyException;
 import th.go.stock.app.enjoy.main.ConfigFile;
+import th.go.stock.app.enjoy.main.Constants;
+import th.go.stock.app.enjoy.main.DaoControl;
 import th.go.stock.app.enjoy.model.Reciveordedetail;
 import th.go.stock.app.enjoy.model.ReciveordedetailPK;
 import th.go.stock.app.enjoy.model.Reciveordermaster;
 import th.go.stock.app.enjoy.model.ReciveordermasterPK;
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
 import th.go.stock.app.enjoy.utils.EnjoyUtils;
-import th.go.stock.app.enjoy.utils.HibernateUtil;
 
-public class ReciveStockDao {
+public class ReciveStockDao extends DaoControl{
 	
-	private static final EnjoyLogger logger = EnjoyLogger.getLogger(ReciveStockDao.class);
+	public ReciveStockDao(){
+		setLogger(EnjoyLogger.getLogger(ReciveStockDao.class));
+		super.init();
+	}
 	
-	
-	public List<ReciveOrderMasterBean> searchByCriteria(	Session 				session, 
-															ReciveOrderMasterBean 	reciveOrderMasterBean) throws EnjoyException{
-		logger.info("[searchByCriteria][Begin]");
+	public List<ReciveOrderMasterBean> searchByCriteria(ReciveOrderMasterBean 	reciveOrderMasterBean) throws EnjoyException{
+		getLogger().info("[searchByCriteria][Begin]");
 		
-		String						hql						= null;
-		SQLQuery 					query 					= null;
-		List<Object[]>				list					= null;
-		ReciveOrderMasterBean		bean					= null;
-		List<ReciveOrderMasterBean> reciveOrderMasterList 	= new ArrayList<ReciveOrderMasterBean>();
-		String 						reciveDateFrom			= null;
-		String 						reciveDateTo			= null;
+		String							hql						= null;
+		ReciveOrderMasterBean			bean					= null;
+		List<ReciveOrderMasterBean> 	reciveOrderMasterList 	= new ArrayList<ReciveOrderMasterBean>();
+		String 							reciveDateFrom			= null;
+		String 							reciveDateTo			= null;
+		HashMap<String, Object>			param					= new HashMap<String, Object>();
+		List<String>					columnList				= new ArrayList<String>();
+		List<HashMap<String, Object>>	resultList				= null;
 		
 		try{	
 			
@@ -50,168 +49,145 @@ public class ReciveStockDao {
 								+ "	from reciveordermaster a, userdetails b, refreciveorderstatus c"
 								+ "	where a.userUniqueId 	= b.userUniqueId"
 								+ " 	and a.reciveStatus 	= c.reciveStatusCode"
-								+ "		and a.tin			= '" + reciveOrderMasterBean.getTin() + "'";
+								+ "		and a.tin			= :tin";
+			
+			//Criteria
+			param.put("tin"	, reciveOrderMasterBean.getTin());
 			
 			if(!reciveOrderMasterBean.getReciveNo().equals("")){
-				hql += " and a.reciveNo like ('" + reciveOrderMasterBean.getReciveNo() + "%')";
+				hql += " and a.reciveNo LIKE CONCAT(:reciveNo, '%')";
+				param.put("reciveNo"	, reciveOrderMasterBean.getReciveNo());
 			}
 			
 			if(!reciveDateFrom.equals("")){
-				hql += " and a.reciveDate >= STR_TO_DATE('" + reciveDateFrom + "', '%Y%m%d')";
+				hql += " and a.reciveDate >= STR_TO_DATE(:reciveDateFrom, '%Y%m%d')";
+				param.put("reciveDateFrom"	, reciveDateFrom);
 			}
 			
 			if(!reciveDateTo.equals("")){
-				hql += " and a.reciveDate <= STR_TO_DATE('" + reciveDateTo + "', '%Y%m%d')";
+				hql += " and a.reciveDate <= STR_TO_DATE(:reciveDateTo, '%Y%m%d')";
+				param.put("reciveDateTo"	, reciveDateTo);
 			}
 			
 			if(!reciveOrderMasterBean.getReciveStatus().equals("")){
-				hql += " and a.reciveStatus = '" + reciveOrderMasterBean.getReciveStatus() + "'";
+				hql += " and a.reciveStatus = :reciveStatus";
+				param.put("reciveStatus"	, reciveOrderMasterBean.getReciveStatus());
 			}
 			
-			logger.info("[searchByCriteria] hql :: " + hql);
-
-			query			= session.createSQLQuery(hql);			
-			query.addScalar("reciveNo"			, new StringType());
-			query.addScalar("reciveDate"		, new StringType());
-			query.addScalar("usrName"			, new StringType());
-			query.addScalar("reciveStatus"		, new StringType());
-			query.addScalar("reciveStatusName"	, new StringType());
-			query.addScalar("tin"				, new StringType());
+			//Column select
+			columnList.add("reciveNo");
+			columnList.add("reciveDate");
+			columnList.add("usrName");
+			columnList.add("reciveStatus");
+			columnList.add("reciveStatusName");
+			columnList.add("tin");
 			
-			list		 	= query.list();
+			resultList = getResult(hql, param, columnList);
 			
-			logger.info("[searchByCriteria] list.size() :: " + list.size());
-			
-			for(Object[] row:list){
+			for(HashMap<String, Object> row:resultList){
 				bean 	= new ReciveOrderMasterBean();
 				
-				logger.info("reciveNo 			:: " + row[0]);
-				logger.info("reciveDate 		:: " + row[1]);
-				logger.info("usrName 			:: " + row[2]);
-				logger.info("reciveStatus 		:: " + row[3]);
-				logger.info("reciveStatusName 	:: " + row[4]);
-				logger.info("tin 				:: " + row[5]);
-				
-				bean.setReciveNo			(EnjoyUtils.nullToStr(row[0]));
-				bean.setReciveDate			(EnjoyUtils.dateToThaiDisplay(row[1]));
-				bean.setUsrName				(EnjoyUtils.nullToStr(row[2]));
-				bean.setReciveStatus		(EnjoyUtils.nullToStr(row[3]));
-				bean.setReciveStatusDesc	(EnjoyUtils.nullToStr(row[4]));
-				bean.setTin					(EnjoyUtils.nullToStr(row[5]));
+				bean.setReciveNo			(EnjoyUtils.nullToStr(row.get("reciveNo")));
+				bean.setReciveDate			(EnjoyUtils.dateToThaiDisplay(row.get("reciveDate")));
+				bean.setUsrName				(EnjoyUtils.nullToStr(row.get("usrName")));
+				bean.setReciveStatus		(EnjoyUtils.nullToStr(row.get("reciveStatus")));
+				bean.setReciveStatusDesc	(EnjoyUtils.nullToStr(row.get("reciveStatusName")));
+				bean.setTin					(EnjoyUtils.nullToStr(row.get("tin")));
 				
 				reciveOrderMasterList.add(bean);
 			}	
 			
 		}catch(Exception e){
-			logger.error(e);
+			getLogger().error(e);
 			e.printStackTrace();
 			throw new EnjoyException("error searchByCriteria");
 		}finally{
 			hql						= null;
-			logger.info("[searchByCriteria][End]");
+			getLogger().info("[searchByCriteria][End]");
 		}
 		
 		return reciveOrderMasterList;
 		
 	}
 	
-	public ReciveOrderMasterBean getReciveOrderMaster(	Session 				session, 
-														ReciveOrderMasterBean 	reciveOrderMasterBean) throws EnjoyException{
-		logger.info("[getReciveOrderMaster][Begin]");
+	public ReciveOrderMasterBean getReciveOrderMaster(ReciveOrderMasterBean reciveOrderMasterBean) throws EnjoyException{
+		getLogger().info("[getReciveOrderMaster][Begin]");
 		
-		String						hql						= null;
-		SQLQuery 					query 					= null;
-		List<Object[]>				list					= null;
-		ReciveOrderMasterBean		bean					= null;
+		String							hql						= null;
+		ReciveOrderMasterBean			bean					= null;
+		HashMap<String, Object>			param					= new HashMap<String, Object>();
+		List<String>					columnList				= new ArrayList<String>();
+		List<HashMap<String, Object>>	resultList				= null;
 		
 		try{		
 			hql		= "select *"
 					+ "	from reciveordermaster"
-					+ "	where reciveNo 	= '" + reciveOrderMasterBean.getReciveNo() + "'"
-					+ "		and tin 	= '" + reciveOrderMasterBean.getTin() + "'";
+					+ "	where reciveNo 	= :reciveNo"
+					+ "		and tin 	= :tin";
 			
-			logger.info("[getReciveOrderMaster] hql :: " + hql);
-
-			query			= session.createSQLQuery(hql);			
-			query.addScalar("reciveNo"			, new StringType());
-			query.addScalar("reciveDate"		, new StringType());
-			query.addScalar("reciveType"		, new StringType());
-			query.addScalar("creditDay"			, new StringType());
-			query.addScalar("creditExpire"		, new StringType());
-			query.addScalar("vendorCode"		, new StringType());
-			query.addScalar("branchName"		, new StringType());
-			query.addScalar("billNo"			, new StringType());
-			query.addScalar("priceType"			, new StringType());
-			query.addScalar("reciveStatus"		, new StringType());
-			query.addScalar("userUniqueId"		, new StringType());
-			query.addScalar("reciveAmount"		, new StringType());
-			query.addScalar("reciveDiscount"	, new StringType());
-			query.addScalar("reciveVat"			, new StringType());
-			query.addScalar("reciveTotal"		, new StringType());
-			query.addScalar("tin"				, new StringType());
+			//Criteria
+			param.put("reciveNo", reciveOrderMasterBean.getReciveNo());
+			param.put("tin"		, reciveOrderMasterBean.getTin());
 			
-			list		 	= query.list();
+			//Column select
+			columnList.add("reciveNo");
+			columnList.add("reciveDate");
+			columnList.add("reciveType");
+			columnList.add("creditDay");
+			columnList.add("creditExpire");
+			columnList.add("vendorCode");
+			columnList.add("branchName");
+			columnList.add("billNo");
+			columnList.add("priceType");
+			columnList.add("reciveStatus");
+			columnList.add("userUniqueId");
+			columnList.add("reciveAmount");
+			columnList.add("reciveDiscount");
+			columnList.add("reciveVat");
+			columnList.add("reciveTotal");
+			columnList.add("tin");
 			
-			logger.info("[getReciveOrderMaster] list.size() :: " + list.size());
+			resultList = getResult(hql, param, columnList);
 			
-			if(list.size()==1){
-				for(Object[] row:list){
+			if(resultList.size()==1){
+				for(HashMap<String, Object> row:resultList){
 					bean 	= new ReciveOrderMasterBean();
 					
-					logger.info("reciveNo 				:: " + row[0]);
-					logger.info("reciveDate 			:: " + row[1]);
-					logger.info("reciveType 			:: " + row[2]);
-					logger.info("creditDay 				:: " + row[3]);
-					logger.info("creditExpire 			:: " + row[4]);
-					logger.info("vendorCode 			:: " + row[5]);
-					logger.info("branchName 			:: " + row[6]);
-					logger.info("billNo 				:: " + row[7]);
-					logger.info("priceType 				:: " + row[8]);
-					logger.info("reciveStatus 			:: " + row[9]);
-					logger.info("userUniqueId 			:: " + row[10]);
-					logger.info("reciveAmount 			:: " + row[11]);
-					logger.info("reciveDiscount 		:: " + row[12]);
-					logger.info("reciveVat 				:: " + row[13]);
-					logger.info("reciveTotal 			:: " + row[14]);
-					logger.info("tin 					:: " + row[15]);
-					
-					bean.setReciveNo				(EnjoyUtils.nullToStr(row[0]));
-					bean.setReciveDate				(EnjoyUtils.dateToThaiDisplay(row[1]));
-					bean.setReciveType				(EnjoyUtils.nullToStr(row[2]));
-					bean.setCreditDay				(EnjoyUtils.nullToStr(row[3]));
-					bean.setCreditExpire			(EnjoyUtils.dateToThaiDisplay(row[4]));
-					bean.setVendorCode				(EnjoyUtils.nullToStr(row[5]));
-					bean.setBranchName				(EnjoyUtils.nullToStr(row[6]));
-					bean.setBillNo					(EnjoyUtils.nullToStr(row[7]));
-					bean.setPriceType				(EnjoyUtils.nullToStr(row[8]));
-					bean.setReciveStatus			(EnjoyUtils.nullToStr(row[9]));
-					bean.setUserUniqueId			(EnjoyUtils.nullToStr(row[10]));
-					bean.setReciveAmount			(EnjoyUtils.convertFloatToDisplay(row[11], 2));
-					bean.setReciveDiscount			(EnjoyUtils.convertFloatToDisplay(row[12], 2));
-					bean.setReciveVat				(EnjoyUtils.convertFloatToDisplay(row[13], 2));
-					bean.setReciveTotal				(EnjoyUtils.convertFloatToDisplay(row[14], 2));
-					bean.setTin						(EnjoyUtils.nullToStr(row[15]));
+					bean.setReciveNo				(EnjoyUtils.nullToStr(row.get("reciveNo")));
+					bean.setReciveDate				(EnjoyUtils.dateToThaiDisplay(row.get("reciveDate")));
+					bean.setReciveType				(EnjoyUtils.nullToStr(row.get("reciveType")));
+					bean.setCreditDay				(EnjoyUtils.nullToStr(row.get("creditDay")));
+					bean.setCreditExpire			(EnjoyUtils.dateToThaiDisplay(row.get("creditExpire")));
+					bean.setVendorCode				(EnjoyUtils.nullToStr(row.get("vendorCode")));
+					bean.setBranchName				(EnjoyUtils.nullToStr(row.get("branchName")));
+					bean.setBillNo					(EnjoyUtils.nullToStr(row.get("billNo")));
+					bean.setPriceType				(EnjoyUtils.nullToStr(row.get("priceType")));
+					bean.setReciveStatus			(EnjoyUtils.nullToStr(row.get("reciveStatus")));
+					bean.setUserUniqueId			(EnjoyUtils.nullToStr(row.get("userUniqueId")));
+					bean.setReciveAmount			(EnjoyUtils.convertFloatToDisplay(row.get("reciveAmount"), 2));
+					bean.setReciveDiscount			(EnjoyUtils.convertFloatToDisplay(row.get("reciveDiscount"), 2));
+					bean.setReciveVat				(EnjoyUtils.convertFloatToDisplay(row.get("reciveVat"), 2));
+					bean.setReciveTotal				(EnjoyUtils.convertFloatToDisplay(row.get("reciveTotal"), 2));
+					bean.setTin						(EnjoyUtils.nullToStr(row.get("tin")));
 					
 				}	
 			}
 			
-			
-			
 		}catch(Exception e){
-			logger.info("[getReciveOrderMaster] " + e.getMessage());
+			getLogger().error(e);
 			e.printStackTrace();
 			throw new EnjoyException("error getReciveOrderMaster");
 		}finally{
 			hql						= null;
-			logger.info("[getReciveOrderMaster][End]");
+			getLogger().info("[getReciveOrderMaster][End]");
 		}
 		
 		return bean;
 		
 	}
 	
-	public void insertReciveordermaster(Session session, ReciveOrderMasterBean 		reciveOrderMasterBean) throws EnjoyException{
-		logger.info("[insertReciveordermaster][Begin]");
+	public void insertReciveordermaster(ReciveOrderMasterBean 		reciveOrderMasterBean) throws EnjoyException{
+		getLogger().info("[insertReciveordermaster][Begin]");
 		
 		Reciveordermaster	reciveordermaster	= null;//genReciveNo
 		ReciveordermasterPK	id					= null;
@@ -240,21 +216,21 @@ public class ReciveStockDao {
 			reciveordermaster.setReciveVat				(EnjoyUtils.parseBigDecimal(reciveOrderMasterBean.getReciveVat()));
 			reciveordermaster.setReciveTotal			(EnjoyUtils.parseBigDecimal(reciveOrderMasterBean.getReciveTotal()));
 			
-			session.saveOrUpdate(reciveordermaster);
+			insertData(reciveordermaster);
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			logger.info(e.getMessage());
+			getLogger().error(e);
 			throw new EnjoyException("Error insertReciveordermaster");
 		}finally{
 			
 			reciveordermaster = null;
-			logger.info("[insertReciveordermaster][End]");
+			getLogger().info("[insertReciveordermaster][End]");
 		}
 	}
 	
-	public void updateReciveOrderMaster(Session session, ReciveOrderMasterBean 		reciveOrderMasterBean) throws EnjoyException{
-		logger.info("[updateReciveOrderMaster][Begin]");
+	public void updateReciveOrderMaster(ReciveOrderMasterBean 		reciveOrderMasterBean) throws EnjoyException{
+		getLogger().info("[updateReciveOrderMaster][Begin]");
 		
 		String							hql									= null;
 		Query 							query 								= null;
@@ -277,7 +253,7 @@ public class ReciveStockDao {
 										+ " where t.id.reciveNo = :reciveNo"
 										+ "		and t.id.tin 	= :tin";
 			
-			query = session.createQuery(hql);
+			query = createQuery(hql);
 			query.setParameter("reciveDate"			, reciveOrderMasterBean.getReciveDate());
 			query.setParameter("reciveType"			, reciveOrderMasterBean.getReciveType());
 			query.setParameter("creditDay"			, EnjoyUtils.parseInt(reciveOrderMasterBean.getCreditDay()));
@@ -299,18 +275,18 @@ public class ReciveStockDao {
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			logger.info(e.getMessage());
+			getLogger().error(e);
 			throw new EnjoyException("Error updateReciveOrderMaster");
 		}finally{
 			
 			hql									= null;
 			query 								= null;
-			logger.info("[updateReciveOrderMaster][End]");
+			getLogger().info("[updateReciveOrderMaster][End]");
 		}
 	}
 	
-	public void updateReciveOrderMasterSpecial(Session session, ReciveOrderMasterBean 		reciveOrderMasterBean) throws EnjoyException{
-		logger.info("[updateReciveOrderMaster][Begin]");
+	public void updateReciveOrderMasterSpecial(ReciveOrderMasterBean 		reciveOrderMasterBean) throws EnjoyException{
+		getLogger().info("[updateReciveOrderMaster][Begin]");
 		
 		String							hql									= null;
 		Query 							query 								= null;
@@ -322,7 +298,7 @@ public class ReciveStockDao {
 										+ " where t.id.reciveNo = :reciveNo"
 										+ "		and t.id.tin 	= :tin";
 			
-			query = session.createQuery(hql);
+			query = createQuery(hql);
 			query.setParameter("reciveDate"			, reciveOrderMasterBean.getReciveDate());
 			query.setParameter("reciveStatus"		, reciveOrderMasterBean.getReciveStatus());
 			query.setParameter("userUniqueId"		, EnjoyUtils.parseInt(reciveOrderMasterBean.getUserUniqueId()));
@@ -333,26 +309,26 @@ public class ReciveStockDao {
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			logger.info(e.getMessage());
+			getLogger().error(e);
 			throw new EnjoyException("Error updateReciveOrderMaster");
 		}finally{
 			
 			hql									= null;
 			query 								= null;
-			logger.info("[updateReciveOrderMaster][End]");
+			getLogger().info("[updateReciveOrderMaster][End]");
 		}
 	}
 
-	public List<ReciveOrdeDetailBean> getReciveOrdeDetailList( Session 					session
-															  ,ReciveOrdeDetailBean 	reciveOrdeDetailBean) throws EnjoyException{
-		logger.info("[getReciveOrdeDetailList][Begin]");
+	public List<ReciveOrdeDetailBean> getReciveOrdeDetailList(ReciveOrdeDetailBean 	reciveOrdeDetailBean) throws EnjoyException{
+		getLogger().info("[getReciveOrdeDetailList][Begin]");
 		
-		String						hql							= null;
-		SQLQuery 					query 						= null;
-		List<Object[]>				list						= null;
-		ReciveOrdeDetailBean		bean						= null;
-		List<ReciveOrdeDetailBean> 	reciveOrdeDetailList 		= new ArrayList<ReciveOrdeDetailBean>();
-		int							seq							= 0;
+		String							hql						= null;
+		ReciveOrdeDetailBean			bean					= null;
+		List<ReciveOrdeDetailBean> 		reciveOrdeDetailList 	= new ArrayList<ReciveOrdeDetailBean>();
+		int								seq						= 0;
+		HashMap<String, Object>			param					= new HashMap<String, Object>();
+		List<String>					columnList				= new ArrayList<String>();
+		List<HashMap<String, Object>>	resultList				= null;
 		
 		try{	
 			hql					= "select a.reciveNo"
@@ -367,60 +343,47 @@ public class ReciveStockDao {
 									+ "	, a.discountRate"
 									+ "	, a.costPrice"
 								+ "	from reciveordedetail a"
-									+ "	inner JOIN productmaster b on b.productCode 	= a.productCode"
-									+ "	inner JOIN unittype c on  b.unitCode 	= c.unitCode"
+									+ "	inner JOIN productmaster b on b.productCode = a.productCode and a.tin = b.tin"
+									+ "	inner JOIN unittype c on  b.unitCode = c.unitCode and a.tin = c.tin"
 									+ "	LEFT JOIN reciveordermaster d on a.reciveNo = d.reciveNo and a.tin = d.tin"
 									+ "	LEFT JOIN productquantity e on a.productCode = e.productCode AND d.tin = e.tin"
-								+ "	where a.reciveNo 	= '" + reciveOrdeDetailBean.getReciveNo() + "'"
-								+ "		and a.tin		= '" + reciveOrdeDetailBean.getTin() + "'"
+								+ "	where a.reciveNo 	= :reciveNo"
+								+ "		and a.tin		= :tin"
 								+ "	order by a.seq asc";
 			
-			logger.info("[getReciveOrdeDetailList] hql :: " + hql);
-
-			query			= session.createSQLQuery(hql);			
-			query.addScalar("reciveNo"		, new StringType());
-			query.addScalar("seq"			, new StringType());
-			query.addScalar("productCode"	, new StringType());
-			query.addScalar("productName"	, new StringType());
-			query.addScalar("inventory"		, new StringType());
-			query.addScalar("quantity"		, new StringType());
-			query.addScalar("unitCode"		, new StringType());
-			query.addScalar("unitName"		, new StringType());
-			query.addScalar("price"			, new StringType());
-			query.addScalar("discountRate"	, new StringType());
-			query.addScalar("costPrice"		, new StringType());
+			//Criteria
+			param.put("reciveNo"	, reciveOrdeDetailBean.getReciveNo());
+			param.put("tin"			, reciveOrdeDetailBean.getTin());
 			
-			list		 	= query.list();
+			//Column select
+			columnList.add("reciveNo");
+			columnList.add("seq");
+			columnList.add("productCode");
+			columnList.add("productName");
+			columnList.add("inventory");
+			columnList.add("quantity");
+			columnList.add("unitCode");
+			columnList.add("unitName");
+			columnList.add("price");
+			columnList.add("discountRate");
+			columnList.add("costPrice");
 			
-			logger.info("[getReciveOrdeDetailList] list.size() :: " + list.size());
+			resultList = getResult(hql, param, columnList);
 			
-			for(Object[] row:list){
+			for(HashMap<String, Object> row:resultList){
 				bean 	= new ReciveOrdeDetailBean();
 				
-				logger.info("reciveNo 		:: " + row[0]);
-				logger.info("seqDb 			:: " + row[1]);
-				logger.info("productCode 	:: " + row[2]);
-				logger.info("productName 	:: " + row[3]);
-				logger.info("inventory 		:: " + row[4]);
-				logger.info("quantity 		:: " + row[5]);
-				logger.info("unitCode 		:: " + row[6]);
-				logger.info("unitName 		:: " + row[7]);
-				logger.info("price 			:: " + row[8]);
-				logger.info("discountRate 	:: " + row[9]);
-				logger.info("costPrice 		:: " + row[10]);
-				logger.info("seq 			:: " + seq);
-				
-				bean.setReciveNo			(EnjoyUtils.nullToStr(row[0]));
-				bean.setSeqDb				(EnjoyUtils.nullToStr(row[1]));
-				bean.setProductCode			(EnjoyUtils.nullToStr(row[2]));
-				bean.setProductName			(EnjoyUtils.nullToStr(row[3]));
-				bean.setInventory			(EnjoyUtils.convertFloatToDisplay(row[4], 2));
-				bean.setQuantity			(EnjoyUtils.convertFloatToDisplay(row[5], 2));
-				bean.setUnitCode			(EnjoyUtils.nullToStr(row[6]));
-				bean.setUnitName			(EnjoyUtils.nullToStr(row[7]));
-				bean.setPrice				(EnjoyUtils.convertFloatToDisplay(row[8], 2));
-				bean.setDiscountRate		(EnjoyUtils.convertFloatToDisplay(row[9], 2));
-				bean.setCostPrice			(EnjoyUtils.convertFloatToDisplay(row[10], 2));
+				bean.setReciveNo			(EnjoyUtils.nullToStr(row.get("reciveNo")));
+				bean.setSeqDb				(EnjoyUtils.nullToStr(row.get("seq")));
+				bean.setProductCode			(EnjoyUtils.nullToStr(row.get("productCode")));
+				bean.setProductName			(EnjoyUtils.nullToStr(row.get("productName")));
+				bean.setInventory			(EnjoyUtils.convertFloatToDisplay(row.get("inventory"), 2));
+				bean.setQuantity			(EnjoyUtils.convertFloatToDisplay(row.get("quantity"), 2));
+				bean.setUnitCode			(EnjoyUtils.nullToStr(row.get("unitCode")));
+				bean.setUnitName			(EnjoyUtils.nullToStr(row.get("unitName")));
+				bean.setPrice				(EnjoyUtils.convertFloatToDisplay(row.get("price"), 2));
+				bean.setDiscountRate		(EnjoyUtils.convertFloatToDisplay(row.get("discountRate"), 2));
+				bean.setCostPrice			(EnjoyUtils.convertFloatToDisplay(row.get("costPrice"), 2));
 				bean.setSeq					(EnjoyUtils.nullToStr(seq));
 				
 				reciveOrdeDetailList.add(bean);
@@ -429,20 +392,20 @@ public class ReciveStockDao {
 			}	
 			
 		}catch(Exception e){
-			logger.info("[getReciveOrdeDetailList] " + e.getMessage());
+			getLogger().error(e);
 			e.printStackTrace();
 			throw new EnjoyException("error getReciveOrdeDetailList");
 		}finally{
 			hql						= null;
-			logger.info("[getReciveOrdeDetailList][End]");
+			getLogger().info("[getReciveOrdeDetailList][End]");
 		}
 		
 		return reciveOrdeDetailList;
 		
 	}
 	
-	public void insertReciveOrdeDetail(Session session, ReciveOrdeDetailBean 		reciveOrdeDetailBean) throws EnjoyException{
-		logger.info("[insertReciveOrdeDetail][Begin]");
+	public void insertReciveOrdeDetail(ReciveOrdeDetailBean reciveOrdeDetailBean) throws EnjoyException{
+		getLogger().info("[insertReciveOrdeDetail][Begin]");
 		
 		Reciveordedetail		reciveordedetail		= null;
 		ReciveordedetailPK 		id 					= null;
@@ -463,132 +426,82 @@ public class ReciveStockDao {
 			reciveordedetail.setDiscountRate		(EnjoyUtils.parseBigDecimal(reciveOrdeDetailBean.getDiscountRate()));
 			reciveordedetail.setCostPrice			(EnjoyUtils.parseBigDecimal(reciveOrdeDetailBean.getCostPrice()));
 			
-			session.saveOrUpdate(reciveordedetail);
+			insertData(reciveordedetail);
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			logger.info(e.getMessage());
+			getLogger().info(e.getMessage());
 			throw new EnjoyException("Error insertReciveOrdeDetail");
 		}finally{
 			id 					= null;
 			reciveordedetail 	= null;
-			logger.info("[insertReciveOrdeDetail][End]");
+			getLogger().info("[insertReciveOrdeDetail][End]");
 		}
 	}
 	
-	public void deleteReciveordedetail(Session session, String reciveNo, String tin) throws EnjoyException{
-		logger.info("[deleteReciveordedetail][Begin]");
+	public void deleteReciveordedetail(String reciveNo, String tin) throws EnjoyException{
+		getLogger().info("[deleteReciveordedetail][Begin]");
 		
 		String							hql									= null;
 		Query 							query 								= null;
 		
 		try{
 			hql				= "delete Reciveordedetail t"
-							+ " where t.id.reciveNo	 = '" + reciveNo + "'"
-							+ "		and t.id.tin	 = '" + tin + "'";
+							+ " where t.id.reciveNo	 = :reciveNo"
+							+ "		and t.id.tin	 = :tin";
 			
-			query = session.createQuery(hql);
+			query = createQuery(hql);
+			query.setParameter("reciveNo"	, reciveNo);
+			query.setParameter("tin"		, tin);
 			
 			query.executeUpdate();			
 		}catch(Exception e){
 			e.printStackTrace();
-			logger.info(e.getMessage());
+			getLogger().error(e);
 			throw new EnjoyException("เกิดข้อผิดพลาดในการลบข้อมูล");
 		}finally{
 			
 			hql									= null;
 			query 								= null;
-			logger.info("[deleteReciveordedetail][End]");
+			getLogger().info("[deleteReciveordedetail][End]");
 		}
 	}
 	
-//	public int genId(Session session) throws EnjoyException{
-//		logger.info("[genId][Begin]");
-//		
-//		String							hql									= null;
-//		List<Integer>			 		list								= null;
-//		SQLQuery 						query 								= null;
-//		int 							result								= 0;
-//		
-//		
-//		try{
-//			
-//			hql				= "select max(reciveNo) lastId from reciveordermaster";
-//			query			= session.createSQLQuery(hql);
-//			
-//			query.addScalar("lastId"			, new IntegerType());
-//			
-//			list		 	= query.list();
-//			
-//			if(list!=null && list.size() > 0){
-//				result = list.get(0)==null?0:list.get(0);
-//			}
-//			
-//			logger.info("[genId] result 			:: " + result);
-//			
-//			result++;
-//			
-//		}catch(Exception e){
-//			e.printStackTrace();
-//			logger.info(e.getMessage());
-//			throw new EnjoyException(e.getMessage());
-//		}finally{
-//			
-//			hql									= null;
-//			list								= null;
-//			query 								= null;
-//			logger.info("[genId][End]");
-//		}
-//		
-//		return result;
-//	}
-	
 	/*ดึงสถานะมาอยู่ใน Combo*/
 	public List<ComboBean> getRefReciveOrderStatusCombo() throws EnjoyException{
-		logger.info("[getRefReciveOrderStatusCombo][Begin]");
+		getLogger().info("[getRefReciveOrderStatusCombo][Begin]");
 		
-		String						hql						= null;
-		SQLQuery 					query 					= null;
-		List<Object[]>				list					= null;
-		ComboBean					comboBean				= null;
-		List<ComboBean> 			comboList				= new ArrayList<ComboBean>();
-		SessionFactory 				sessionFactory			= null;
-		Session 					session					= null;
+		String							hql						= null;
+		ComboBean						comboBean				= null;
+		List<ComboBean> 				comboList				= new ArrayList<ComboBean>();
+		HashMap<String, Object>			param					= new HashMap<String, Object>();
+		List<String>					columnList				= new ArrayList<String>();
+		List<HashMap<String, Object>>	resultList				= null;
 		
 		try{
-			sessionFactory 	= HibernateUtil.getSessionFactory();
-			session 		= sessionFactory.openSession();
 			hql				= "select * from refreciveorderstatus order by reciveStatusCode asc";
-			query			= session.createSQLQuery(hql);
-			query.addScalar("reciveStatusCode"		, new StringType());
-			query.addScalar("reciveStatusName"		, new StringType());
 			
-			list		 	= query.list();
+			//Column select
+			columnList.add("reciveStatusCode");
+			columnList.add("reciveStatusName");
 			
-//			comboList.add(new ComboBean("", "กรุณาระบุ"));
-			for(Object[] row:list){
+			resultList = getResult(hql, param, columnList);
+			
+			for(HashMap<String, Object> row:resultList){
 				comboBean = new ComboBean();
 				
-				logger.info("[getRefReciveOrderStatusCombo] reciveStatusCode :: " + row[0]);
-				logger.info("[getRefReciveOrderStatusCombo] reciveStatusName :: " + row[1]);
-				
-				comboBean.setCode(EnjoyUtils.nullToStr(row[0]));
-				comboBean.setDesc(EnjoyUtils.nullToStr(row[1]));
+				comboBean.setCode(EnjoyUtils.nullToStr(row.get("reciveStatusCode")));
+				comboBean.setDesc(EnjoyUtils.nullToStr(row.get("reciveStatusName")));
 				
 				comboList.add(comboBean);
 			}
 			
-			
 		}catch(Exception e){
-			logger.info("[getRefReciveOrderStatusCombo] " + e.getMessage());
+			getLogger().error(e);
 			throw new EnjoyException("เกิดข้อผิดพลาดในการดึงสถานะมาอยู่ใน Combo");
 		}finally{
-			session.close();
-			
 			hql				= null;
-			sessionFactory	= null;
-			session			= null;
-			logger.info("[getRefReciveOrderStatusCombo][End]");
+			getLogger().info("[getRefReciveOrderStatusCombo][End]");
 		}
 		
 		return comboList;
@@ -596,56 +509,47 @@ public class ReciveStockDao {
 	}
 	
 	public String genReciveNo(String tin) throws EnjoyException{
-		logger.info("[genReciveNo][Begin]");
+		getLogger().info("[genReciveNo][Begin]");
 		
-		String				hql						= null;
-		List<Integer>		list					= null;
-		SQLQuery 			query 					= null;
-		SessionFactory 		sessionFactory			= null;
-		Session 			session					= null;
-		String				newId					= "";
-		String				codeDisplay				= null;
-		RefconstantcodeDao	refconstantcodeDao		= null;
+		String							hql						= null;
+		String							newId					= "";
+		String							codeDisplay				= null;
+		RefconstantcodeDao				refconstantcodeDao		= null;
+		HashMap<String, Object>			param					= new HashMap<String, Object>();
+		List<Object>					resultList				= null;
 		
 		try{
-			sessionFactory 		= HibernateUtil.getSessionFactory();
-			session 			= sessionFactory.openSession();
 			refconstantcodeDao 	= new RefconstantcodeDao();
-			codeDisplay			= refconstantcodeDao.getCodeDisplay("2");
+			codeDisplay			= refconstantcodeDao.getCodeDisplay("2", tin);
 			
 			hql				= "SELECT (MAX(SUBSTRING_INDEX(reciveNo, '-', -1)) + 1) AS newId"
 							+ "	FROM reciveordermaster"
 							+ "	WHERE"
-							+ "		SUBSTRING_INDEX(reciveNo, '-', 1) = '" + codeDisplay + "'"
-							+ "		and tin = '" + tin + "'";
-			query			= session.createSQLQuery(hql);
+							+ "		SUBSTRING_INDEX(reciveNo, '-', 1) = :codeDisplay"
+							+ "		and tin = :tin";
 			
+			//Criteria
+			param.put("codeDisplay"	, codeDisplay);
+			param.put("tin"			, tin);
 			
-			query.addScalar("newId"			, new IntegerType());
+			resultList = getResult(hql, param, "newId", Constants.INT_TYPE);
 			
-			list		 	= query.list();
-			
-			if(list!=null && list.size() > 0 && list.get(0)!=null){
-				newId = codeDisplay + "-" + String.format(ConfigFile.getPadingReciveNo(), list.get(0));
+			if(resultList!=null && resultList.size() > 0 && resultList.get(0)!=null){
+				newId = codeDisplay + "-" + String.format(ConfigFile.getPadingReciveNo(), EnjoyUtils.parseInt(resultList.get(0)));
 			}else{
 				newId = codeDisplay + "-" + String.format(ConfigFile.getPadingReciveNo(), 1);
 			}
 			
-			logger.info("[genReciveNo] newId 			:: " + newId);
+			getLogger().info("[genReciveNo] newId 			:: " + newId);
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			logger.info(e.getMessage());
-			throw new EnjoyException(e.getMessage());
+			getLogger().error(e);
+			throw new EnjoyException("genReciveNo error");
 		}finally{
-			
-			session.close();
-			sessionFactory	= null;
-			session			= null;
 			hql				= null;
-			list			= null;
-			query 			= null;
-			logger.info("[genReciveNo][End]");
+			refconstantcodeDao.destroySession();
+			getLogger().info("[genReciveNo][End]");
 		}
 		
 		return newId;

@@ -14,65 +14,24 @@
 
 		$(document).ready(function(){
 			gv_service 		= "service=" + $('#service').val();
-			$('#menu1').ptMenu();
 			
 			$('#btnSave').click(function(){
-			    var lv_oldUserPassword			= null;
-			    var lv_newUserPassword			= null;
-			    var lv_confirmUserPassword		= null;
+			    var la_validate             = new Array( "oldUserPassword:รหัสผ่านเดิม"	
+														, "newUserPassword:รหัสผ่านใหม่"
+														, "confirmUserPassword:ยื่นยันรหัสผ่าน");
 			    
 			    try{
-			    	lv_oldUserPassword 		= gp_trim($("#oldUserPassword").val());
-					lv_newUserPassword 		= gp_trim($("#newUserPassword").val());
-					lv_confirmUserPassword 	= gp_trim($("#confirmUserPassword").val());
-					
-					if(lv_oldUserPassword == "") {
-						alert("กรุณาระบุรหัสผ่านเดิมก่อนทำการบันทึก", function() { 
-							$("#oldUserPassword").focus();
-		    		    });
-						//alert("กรุณาระบุรหัสผ่านเดิมก่อนทำการบันทึก");
-						//$("#oldUserPassword").focus();
-						return;
-					} else if(lv_newUserPassword == "") {
-						alert("กรุณาระบุรหัสผ่านใหม่ก่อนทำการบันทึก", function() { 
-							$("#newUserPassword").focus();
-		    		    });
-						//alert("กรุณาระบุรหัสผ่านใหม่ก่อนทำการบันทึก");
-						//$("#newUserPassword").focus();
-						return;
-					}else if(lv_confirmUserPassword == "") {
-						alert("กรุณาระบุยืนยันรหัสผ่านก่อนทำการบันทึก", function() { 
-							$("#confirmUserPassword").focus();
-		    		    });
-						//alert("กรุณาระบุยืนยันรหัสผ่านก่อนทำการบันทึก");
-						//$("#confirmUserPassword").focus();
-						return;
+					if(!gp_validateEmptyObj(la_validate)){
+						return false;
 					}
 					
-					if(lv_newUserPassword != lv_confirmUserPassword){
+					if(gp_trim($("#newUserPassword").val()) != gp_trim($("#confirmUserPassword").val())){
 						alert("ยืนยันรหัสผ่านไม่ตรงกับรหัสผ่านใหม่ กรุณาระบุใหม่อีกครั้ง", function() { 
 							$("#confirmUserPassword").focus();
 		    		    });
-						//alert("ยืนยันรหัสผ่านไม่ตรงกับรหัสผ่านใหม่ กรุณาระบุใหม่อีกครั้ง");
-						//$("#confirmUserPassword").focus();
 						return;
 					}
 			    	
-//					document.getElementById("pageAction").value 	= "save";
-//			    	params 	= $('#frm').serialize();
-/*
-			    	$.ajax({
-						async:false,
-			            type: "POST",
-			            url: gv_url,
-			            data: params,
-			            beforeSend: "",
-			            success: function(data){
-			            	alert(data)
-			            	//window.location.replace('/motorcyclesWeb/pages/motor/SummarySaleDetailScn.jsp');
-			            }
-			        });
-*/
 					$.ajax({
 						async:true,
 			            type: "POST",
@@ -84,7 +43,7 @@
 			            	var status				= null;
 			            	
 			            	try{
-			            		gp_progressBarOff();
+			            		//gp_progressBarOff();
 			            		
 			            		jsonObj = JSON.parse(data);
 			            		status	= jsonObj.status;
@@ -158,10 +117,10 @@
 						</div>
           					<div class="panel-body">
               					<div class="col-md-2 col-lg-2 " align="center">
-								<img src="<%=imgURL%>/em_man.png" class="img-circle">
-							</div>
-              						<div class=" col-md-8 col-lg-8 "> 
-									<table class="table" style="border-bottom-color: white;">
+									<img src="<%=imgURL%>/em_man.png" class="img-circle">
+								</div>
+             					<div class=" col-md-8 col-lg-8 "> 
+									<table class="table" border="0" style="border: 0px;">
 										<tr>
 											<td><label class="control-label" style="text-align:right">รหัสผ่านเดิม<span style="color: red;"><b>*</b></span> : </label></td>
 											<td class="no-padd-left">

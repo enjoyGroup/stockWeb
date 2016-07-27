@@ -9,8 +9,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -29,13 +27,11 @@ import th.go.stock.app.enjoy.dao.ProductDetailsDao;
 import th.go.stock.app.enjoy.dao.ProductQuanHistoryDao;
 import th.go.stock.app.enjoy.dao.ProductquantityDao;
 import th.go.stock.app.enjoy.dao.ReciveStockDao;
-import th.go.stock.app.enjoy.dao.RelationUserAndCompanyDao;
 import th.go.stock.app.enjoy.exception.EnjoyException;
 import th.go.stock.app.enjoy.form.ReciveStockMaintananceForm;
 import th.go.stock.app.enjoy.main.Constants;
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
 import th.go.stock.app.enjoy.utils.EnjoyUtils;
-import th.go.stock.app.enjoy.utils.HibernateUtil;
 import th.go.stock.web.enjoy.common.EnjoyStandardSvc;
 import th.go.stock.web.enjoy.utils.EnjoyUtil;
 
@@ -57,7 +53,6 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
     private ProductDetailsDao				productDetailsDao			= null;
     private ComparePriceDao					comparePriceDao				= null;
     private ProductquantityDao				productquantityDao			= null;
-    private RelationUserAndCompanyDao		relationUserAndCompanyDao	= null;
     private ProductQuanHistoryDao			productQuanHistoryDao		= null;
     
 	@Override
@@ -85,7 +80,6 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
              this.productDetailsDao			= new ProductDetailsDao();
              this.comparePriceDao			= new ComparePriceDao();
              this.productquantityDao		= new ProductquantityDao();
-             this.relationUserAndCompanyDao = new RelationUserAndCompanyDao();
              this.productQuanHistoryDao		= new ProductQuanHistoryDao();
  			
              logger.info("[execute] pageAction : " + pageAction );
@@ -96,7 +90,7 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
  				this.onLoad();
  				request.setAttribute("target", Constants.PAGE_URL +"/ReciveStockMaintananceScn.jsp");
  			}else if(pageAction.equals("getDetail")){
- 				this.getDetail("0", "0");
+ 				this.getDetail("0");
  				request.setAttribute("target", Constants.PAGE_URL +"/ReciveStockMaintananceScn.jsp");
  			}else if(pageAction.equals("save")){
 				this.onSave();
@@ -131,7 +125,7 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
  			e.printStackTrace();
  			logger.info(e.getMessage());
  		}finally{
- 			productQuanHistoryDao.destroySession();
+ 			destroySession();
  			logger.info("[execute][End]");
  		}
 	}
@@ -173,7 +167,6 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 		
 		try{
 			this.setStatusCombo();
-			this.setCompanyCombo();
 		}catch(EnjoyException e){
 			throw new EnjoyException(e.getMessage());
 		}catch(Exception e){
@@ -204,50 +197,21 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 		}
 	}
 	
-	private void setCompanyCombo() throws EnjoyException{
-		
-		logger.info("[setCompanyCombo][Begin]");
-		
-		List<ComboBean>			companyCombo 		= null;
-		
-		try{
-			
-			companyCombo = this.relationUserAndCompanyDao.getCompanyList(this.userBean.getUserUniqueId());
-			
-			if(companyCombo.size() > 1){
-				companyCombo.add(0, new ComboBean("", "กรุณาระบุ"));
-			}
-			
-			this.form.setCompanyCombo(companyCombo);
-		}
-		catch(Exception e){
-			logger.error(e);
-			throw new EnjoyException("setCompanyCombo is error");
-		}finally{
-			logger.info("[setCompanyCombo][End]");
-		}
-	}
-	
-	private void getDetail(String reciveNo, String tin) throws EnjoyException{
+	private void getDetail(String reciveNo) throws EnjoyException{
 		logger.info("[getDetail][Begin]");
 		
 		ReciveOrderMasterBean 			reciveOrderMasterBean		= null;
 		ReciveOrderMasterBean 			reciveOrderMasterBeanDb		= null;
-		SessionFactory 					sessionFactory				= null;
-		Session 						session						= null;
 		String							seqTemp						= null;
 		CompanyVendorBean 				companyVendorBean			= null;
 		CompanyVendorBean 				companyVendorBeanDb			= null;
 		ReciveOrdeDetailBean			reciveOrdeDetailBean		= null;
 		List<ReciveOrdeDetailBean> 		reciveOrdeDetailList		= null;
+		String 							tin 						= null;
 		
 		try{
-			sessionFactory 		= HibernateUtil.getSessionFactory();
-			session 			= sessionFactory.openSession();
 			reciveNo			= reciveNo.equals("0")?EnjoyUtil.nullToStr(request.getParameter("reciveNo")):reciveNo;
-			tin					= tin.equals("0")?EnjoyUtil.nullToStr(request.getParameter("tin")):tin;
-			
-			session.beginTransaction();
+			tin					= this.userBean.getTin();
 			
 			logger.info("[getDetail] reciveNo :: " + reciveNo);
 			
@@ -255,7 +219,7 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 			reciveOrderMasterBean.setReciveNo	(reciveNo);
 			reciveOrderMasterBean.setTin		(tin);
 			
-			reciveOrderMasterBeanDb				= this.dao.getReciveOrderMaster(session, reciveOrderMasterBean);
+			reciveOrderMasterBeanDb				= this.dao.getReciveOrderMaster(reciveOrderMasterBean);
 			
 			this.form.setPageMode(ReciveStockMaintananceForm.EDIT);
 			this.form.setTitlePage("แก้ไขรายการในสต๊อกสินค้า");
@@ -267,7 +231,7 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 				
 				reciveOrdeDetailBean.setReciveNo(reciveNo);
 				reciveOrdeDetailBean.setTin		(tin);
-				reciveOrdeDetailList = this.dao.getReciveOrdeDetailList(session, reciveOrdeDetailBean);
+				reciveOrdeDetailList = this.dao.getReciveOrdeDetailList(reciveOrdeDetailBean);
 				
 				for(ReciveOrdeDetailBean bean:reciveOrdeDetailList){
 					seqTemp = bean.getSeq();
@@ -280,7 +244,8 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 				}
 				companyVendorBean = new CompanyVendorBean();
 				companyVendorBean.setVendorCode(reciveOrderMasterBeanDb.getVendorCode());
-				companyVendorBeanDb					= this.companyVendorDao.getCompanyVendor(session, companyVendorBean);
+				companyVendorBean.setTinCompany(tin);
+				companyVendorBeanDb					= this.companyVendorDao.getCompanyVendor(companyVendorBean);
 				
 				this.form.setCompanyVendorBean		(companyVendorBeanDb);
 				this.form.setReciveOrderMasterBean	(reciveOrderMasterBeanDb);
@@ -294,12 +259,7 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 			logger.info(e.getMessage());
 			throw new EnjoyException("getDetail is error");
 		}finally{
-			session.close();
-			
 			this.setRefference();
-			
-			sessionFactory	= null;
-			session			= null;
 			logger.info("[getDetail][End]");
 		}
 		
@@ -325,8 +285,6 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 		String				 		reciveVat					= null;
 		String				 		reciveTotal					= null;
 		String						currReciveStatus			= null;
-		SessionFactory 				sessionFactory				= null;
-		Session 					session						= null;
 		JSONObject 					obj 						= null;
 		ReciveOrderMasterBean  		reciveOrderMasterBean		= null;
 		List<ReciveOrdeDetailBean> 	reciveOrdeDetailList		= null;
@@ -335,13 +293,14 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 		double						quantity					= 0;
 		ComparePriceBean 			comparePriceBean 			= null;
 		int							cou							= 0;
-		int							comparePriceSeq				= 0;
+		int							comparePriceSeq				= 1;
 		ProductquantityBean			productquantityBean			= null;
 		String						tin							= null;
 		String						quantityDb					= null;
 		ProductQuanHistoryBean		productQuanHistoryBean		= null;
 		ProductmasterBean 			productmasterBean			= null;
 		ProductmasterBean 			productmasterBeanDb			= null;
+		boolean						chkFlag						= true;
 		
 		try{
 			pageMode 					= EnjoyUtil.nullToStr(request.getParameter("pageMode"));
@@ -360,14 +319,12 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 			reciveVat 					= EnjoyUtil.nullToStr(request.getParameter("reciveVat"));
 			reciveTotal 				= EnjoyUtil.nullToStr(request.getParameter("reciveTotal"));
 			currReciveStatus 			= EnjoyUtil.nullToStr(request.getParameter("currReciveStatus"));
-			tin 						= EnjoyUtil.nullToStr(request.getParameter("tin"));
-			sessionFactory 				= HibernateUtil.getSessionFactory();
-			session 					= sessionFactory.openSession();
+			tin 						= this.userBean.getTin();
 			obj 						= new JSONObject();
 			reciveOrderMasterBean		= new ReciveOrderMasterBean();
 			reciveOrdeDetailList		= this.form.getReciveOrdeDetailList();
 			
-			session.beginTransaction();
+			logger.info("[onSave] reciveStatus :: " + reciveStatus);
 			
 			/*Begin Section รายละเอียดใบสั่งซื้อ*/
 			if(pageMode.equals(ReciveStockMaintananceForm.NEW)){
@@ -390,7 +347,7 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 				reciveOrderMasterBean.setReciveTotal			(reciveTotal);
 				reciveOrderMasterBean.setTin					(tin);
 				
-				this.dao.insertReciveordermaster(session, reciveOrderMasterBean);
+				this.dao.insertReciveordermaster(reciveOrderMasterBean);
 			}else{
 				
 				if(reciveStatus.equals("") || reciveStatus.equals("1") || reciveStatus.equals("2")){
@@ -411,7 +368,7 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 					reciveOrderMasterBean.setReciveTotal			(reciveTotal);
 					reciveOrderMasterBean.setTin					(tin);
 					
-					this.dao.updateReciveOrderMaster(session, reciveOrderMasterBean);
+					this.dao.updateReciveOrderMaster(reciveOrderMasterBean);
 				}else{
 					reciveOrderMasterBean.setReciveNo				(reciveNo);
 					reciveOrderMasterBean.setTin					(tin);
@@ -419,14 +376,14 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 					reciveOrderMasterBean.setUserUniqueId			(String.valueOf(this.userBean.getUserUniqueId()));
 					reciveOrderMasterBean.setReciveStatus			(reciveStatus);
 					
-					this.dao.updateReciveOrderMasterSpecial(session, reciveOrderMasterBean);
+					this.dao.updateReciveOrderMasterSpecial(reciveOrderMasterBean);
 				}
 			}
 			/*End Section รายละเอียดใบสั่งซื้อ*/
 			
 			/*Begin Section รายการสินค้า*/
 			if(reciveStatus.equals("") || reciveStatus.equals("1") || reciveStatus.equals("2")){
-				this.dao.deleteReciveordedetail(session, reciveNo, tin);
+				this.dao.deleteReciveordedetail(reciveNo, tin);
 				
 				for(int i=0;i<reciveOrdeDetailList.size();i++){
 					bean = reciveOrdeDetailList.get(i);
@@ -434,23 +391,30 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 						bean.setReciveNo(reciveNo);
 						bean.setTin		(tin);
 						bean.setSeqDb	(String.valueOf(seqDb));
-						this.dao.insertReciveOrdeDetail(session, bean);
+						this.dao.insertReciveOrdeDetail(bean);
 						seqDb++;
 						
 						/*Begin Update เปรียบเทียบราคา*/
-						cou = this.comparePriceDao.couVenderInThisProduct(bean.getProductCode(), vendorCode);
+						cou = this.comparePriceDao.couVenderInThisProduct(bean.getProductCode(), vendorCode, tin);
 						
 						if(cou==0){
 							comparePriceBean = new ComparePriceBean();
-							comparePriceSeq = this.comparePriceDao.getNewSeqInThisProduct(bean.getProductCode());
+							
+							if(chkFlag==true){
+								comparePriceSeq = this.comparePriceDao.getNewSeqInThisProduct(bean.getProductCode(), tin);
+								chkFlag  = false;
+							}else{
+								comparePriceSeq++;
+							}
 							
 							comparePriceBean.setProductCode	(bean.getProductCode());
+							comparePriceBean.setTin			(tin);
 							comparePriceBean.setSeq			(EnjoyUtil.nullToStr(comparePriceSeq));
 							comparePriceBean.setVendorCode	(vendorCode);
 							comparePriceBean.setQuantity	(bean.getQuantity());
 							comparePriceBean.setPrice		(bean.getPrice());
 							
-							this.comparePriceDao.insertCompareprice(session, comparePriceBean);
+							this.comparePriceDao.insertCompareprice(comparePriceBean);
 						}
 						/*End Update เปรียบเทียบราคา*/
 						
@@ -461,7 +425,7 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 				
 				bean.setReciveNo(reciveNo);
 				bean.setTin		(tin);
-				reciveOrdeDetailList = this.dao.getReciveOrdeDetailList(session, bean);
+				reciveOrdeDetailList = this.dao.getReciveOrdeDetailList(bean);
 				
 				for(ReciveOrdeDetailBean beanTemp:reciveOrdeDetailList){
 					if(reciveStatus.equals("3")){
@@ -472,14 +436,16 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 						
 						quantityDb = this.productquantityDao.getProductquantity(productquantityBean);
 						
+						logger.info("quantityDb :: " + quantityDb);
+						
 						if(quantityDb==null){
-							quantity =  EnjoyUtils.parseDouble("0.00");
+							quantity =  EnjoyUtils.parseDouble(beanTemp.getQuantity());
 							productquantityBean.setQuantity(String.valueOf(quantity));
-							this.productquantityDao.insertProductquantity(session, productquantityBean);
+							this.productquantityDao.insertProductquantity(productquantityBean);
 						}else{
 							quantity =  EnjoyUtils.parseDouble(quantityDb) +  EnjoyUtils.parseDouble(beanTemp.getQuantity());
 							productquantityBean.setQuantity(String.valueOf(quantity));
-							this.productquantityDao.updateProductquantity(session, productquantityBean);
+							this.productquantityDao.updateProductquantity(productquantityBean);
 						}
 						
 						/*Begin ส่วนประวัตเพิ่มลดสินค้า*/
@@ -488,7 +454,8 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 						
 						productmasterBean = new ProductmasterBean();
 						productmasterBean.setProductCode(beanTemp.getProductCode());
-						productmasterBeanDb = productDetailsDao.getProductDetail(session, productmasterBean);
+						productmasterBean.setTin(tin);
+						productmasterBeanDb = productDetailsDao.getProductDetail(productmasterBean);
 						if(productmasterBeanDb!=null){
 							productQuanHistoryBean.setProductType(productmasterBeanDb.getProductTypeCode());
 							productQuanHistoryBean.setProductGroup(productmasterBeanDb.getProductGroupCode());
@@ -503,7 +470,7 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 						productQuanHistoryBean.setQuantityMinus("0.00");
 						productQuanHistoryBean.setQuantityTotal(String.valueOf(quantity));
 						
-						productQuanHistoryDao.insert(session, productQuanHistoryBean);
+						productQuanHistoryDao.insert(productQuanHistoryBean);
 						/*End ส่วนประวัตเพิ่มลดสินค้า*/
 						
 					}else if(currReciveStatus.equals("3") && reciveStatus.equals("4")){
@@ -517,11 +484,11 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 						if(quantityDb==null){
 							quantity =  EnjoyUtils.parseDouble("0.00");
 							productquantityBean.setQuantity(String.valueOf(quantity));
-							this.productquantityDao.insertProductquantity(session, productquantityBean);
+							this.productquantityDao.insertProductquantity(productquantityBean);
 						}else{
 							quantity	=  EnjoyUtils.parseDouble(quantityDb) -  EnjoyUtils.parseDouble(beanTemp.getQuantity());
 							productquantityBean.setQuantity(String.valueOf(quantity));
-							this.productquantityDao.updateProductquantity(session, productquantityBean);
+							this.productquantityDao.updateProductquantity(productquantityBean);
 						}
 						
 						/*Begin ส่วนประวัตเพิ่มลดสินค้า*/
@@ -530,7 +497,8 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 						
 						productmasterBean = new ProductmasterBean();
 						productmasterBean.setProductCode(beanTemp.getProductCode());
-						productmasterBeanDb = productDetailsDao.getProductDetail(session, productmasterBean);
+						productmasterBean.setTin(tin);
+						productmasterBeanDb = productDetailsDao.getProductDetail(productmasterBean);
 						if(productmasterBeanDb!=null){
 							productQuanHistoryBean.setProductType(productmasterBeanDb.getProductTypeCode());
 							productQuanHistoryBean.setProductGroup(productmasterBeanDb.getProductGroupCode());
@@ -545,39 +513,31 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 						productQuanHistoryBean.setQuantityMinus(beanTemp.getQuantity());
 						productQuanHistoryBean.setQuantityTotal(String.valueOf(quantity));
 						
-						productQuanHistoryDao.insert(session, productQuanHistoryBean);
+						productQuanHistoryDao.insert(productQuanHistoryBean);
 						/*End ส่วนประวัตเพิ่มลดสินค้า*/
 					}
 				}
 			}
 			/*End Section รายการสินค้า*/
 			
-			session.getTransaction().commit();
+			commit();
 			
 			obj.put(STATUS, 		SUCCESS);
 			obj.put("reciveNo", 	reciveNo);
 			obj.put("tin", 			tin);
 			
 		}catch(EnjoyException e){
-			session.getTransaction().rollback();
+			rollback();
 			obj.put(STATUS, 		ERROR);
 			obj.put(ERR_MSG, 		e.getMessage());
 		}catch(Exception e){
-			session.getTransaction().rollback();
+			rollback();
 			logger.error(e);
 			e.printStackTrace();
 			obj.put(STATUS, 		ERROR);
 			obj.put(ERR_MSG, 		"onSave is error");
 		}finally{
-			
-			session.flush();
-			session.clear();
-			session.close();
-			
 			this.enjoyUtil.writeMSG(obj.toString());
-			
-			sessionFactory	= null;
-			session			= null;
 			
 			logger.info("[onSave][End]");
 		}
@@ -735,18 +695,21 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 	private void getProductNameList(){
 	   logger.info("[getProductNameList][Begin]");
 	   
-	   String							productName				= null;
-	   List<ComboBean> 					list 					= null;
-	   JSONArray 						jSONArray 				= null;
-	   JSONObject 						objDetail 				= null;
+	   String				productName			= null;
+	   List<ComboBean> 		list 				= null;
+	   JSONArray 			jSONArray 			= null;
+	   JSONObject 			objDetail 			= null;
+	   String				tin 				= null;
 	
 	   try{
-		   jSONArray 				= new JSONArray();
-		   productName				= EnjoyUtils.nullToStr(this.request.getParameter("productName"));
+		   jSONArray 		= new JSONArray();
+		   productName		= EnjoyUtils.nullToStr(this.request.getParameter("productName"));
+		   tin				= this.userBean.getTin();
 		   
-		   logger.info("[getProductNameList] productName 				:: " + productName);
+		   logger.info("[getProductNameList] productName 		:: " + productName);
+		   logger.info("[getProductNameList] tin 				:: " + tin);
 		   
-		   list 		= this.productDetailsDao.productNameList(productName, null, null, true);
+		   list 		= this.productDetailsDao.productNameList(productName, null, null, tin, true);
 		   
 		   for(ComboBean bean:list){
 			   objDetail 		= new JSONObject();
@@ -786,17 +749,18 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 		   productName		= EnjoyUtils.nullToStr(this.request.getParameter("productName"));
 		   vendorCode		= EnjoyUtils.nullToStr(this.request.getParameter("vendorCode"));
 		   quantity			= EnjoyUtils.nullToStr(this.request.getParameter("quantity"));
-		   tin				= EnjoyUtils.nullToStr(this.request.getParameter("tin"));
+		   tin				= this.userBean.getTin();
 		   
 		   logger.info("[getProductDetailByName] productName 				:: " + productName);
 		   
-		   productmasterBean 		= this.productDetailsDao.getProductDetailByName(productName);
+		   productmasterBean 		= this.productDetailsDao.getProductDetailByName(productName, tin);
 		   
 		   if(productmasterBean!=null && !tin.equals("")){
 			   comparePriceBean = new ComparePriceBean();
 			   comparePriceBean.setProductCode(productmasterBean.getProductCode());
 			   comparePriceBean.setVendorCode(vendorCode);
 			   comparePriceBean.setQuantity(quantity);
+			   comparePriceBean.setTin(tin);
 			   
 			   price = this.comparePriceDao.getPrice(comparePriceBean);
 			   
@@ -837,18 +801,21 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 	private void getVendorNameList(){
 		logger.info("[getVendorNameList][Begin]");
 	   
-	   String							vendorName				= null;
-	   List<ComboBean> 					list 					= null;
-	   JSONArray 						jSONArray 				= null;
-	   JSONObject 						objDetail 				= null;
+	   String				vendorName				= null;
+	   List<ComboBean> 		list 					= null;
+	   JSONArray 			jSONArray 				= null;
+	   JSONObject 			objDetail 				= null;
+	   String				tin 					= null;
 	
 	   try{
-		   jSONArray 				= new JSONArray();
-		   vendorName				= EnjoyUtils.nullToStr(this.request.getParameter("vendorName"));
+		   jSONArray 	= new JSONArray();
+		   vendorName	= EnjoyUtils.nullToStr(this.request.getParameter("vendorName"));
+		   tin			= this.userBean.getTin();
 		   
-		   logger.info("[getVendorNameList] vendorName 				:: " + vendorName);
+		   logger.info("[getVendorNameList] vendorName 		:: " + vendorName);
+		   logger.info("[getVendorNameList] tin 			:: " + tin);
 		   
-		   list 		= this.companyVendorDao.vendorNameList(vendorName);
+		   list 		= this.companyVendorDao.vendorNameList(vendorName, tin);
 		   
 		   for(ComboBean bean:list){
 			   objDetail 		= new JSONObject();
@@ -872,21 +839,24 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 	private void branchNameList(){
 		logger.info("[branchNameList][Begin]");
 	   
-	   String							vendorName				= null;
-	   String							branchName				= null;
-	   List<ComboBean> 					list 					= null;
-	   JSONArray 						jSONArray 				= null;
-	   JSONObject 						objDetail 				= null;
+	   String				vendorName				= null;
+	   String				branchName				= null;
+	   List<ComboBean> 		list 					= null;
+	   JSONArray 			jSONArray 				= null;
+	   JSONObject 			objDetail 				= null;
+	   String				tin 					= null;
 	
 	   try{
-		   jSONArray 				= new JSONArray();
-		   vendorName				= EnjoyUtils.nullToStr(this.request.getParameter("vendorName"));
-		   branchName				= EnjoyUtils.nullToStr(this.request.getParameter("branchName"));
+		   jSONArray 	= new JSONArray();
+		   vendorName	= EnjoyUtils.nullToStr(this.request.getParameter("vendorName"));
+		   branchName	= EnjoyUtils.nullToStr(this.request.getParameter("branchName"));
+		   tin			= this.userBean.getTin();
 		   
-		   logger.info("[branchNameList] vendorName 				:: " + vendorName);
-		   logger.info("[branchNameList] branchName 				:: " + branchName);
+		   logger.info("[branchNameList] vendorName :: " + vendorName);
+		   logger.info("[branchNameList] branchName :: " + branchName);
+		   logger.info("[branchNameList] tin 		:: " + tin);
 		   
-		   list 		= this.companyVendorDao.branchNameList(vendorName, branchName);
+		   list 		= this.companyVendorDao.branchNameList(vendorName, branchName, tin);
 		   
 		   for(ComboBean bean:list){
 			   objDetail 		= new JSONObject();
@@ -915,16 +885,19 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 	   JSONObject 						obj		 				= null;
 	   List<CompanyVendorBean>			companyVendorList		= null;
 	   CompanyVendorBean				companyVendorBean		= null;
+	   String							tin						= null;
 	
 	   try{
 		   obj 				= new JSONObject();
 		   vendorName		= EnjoyUtils.nullToStr(this.request.getParameter("vendorName"));
 		   branchName		= EnjoyUtils.nullToStr(this.request.getParameter("branchName"));
+		   tin				= this.userBean.getTin();
 		   
-		   logger.info("[getCompanyVendorDetail] vendorName 				:: " + vendorName);
-		   logger.info("[getCompanyVendorDetail] branchName 				:: " + branchName);
+		   logger.info("[getCompanyVendorDetail] vendorName 		:: " + vendorName);
+		   logger.info("[getCompanyVendorDetail] branchName 		:: " + branchName);
+		   logger.info("[getCompanyVendorDetail] tin 				:: " + tin);
 		   
-		   companyVendorList 		= this.companyVendorDao.getCompanyVendorByName(vendorName, branchName);
+		   companyVendorList 		= this.companyVendorDao.getCompanyVendorByName(vendorName, branchName, tin);
 		   
 		   if(companyVendorList.size()==1){
 			   
@@ -1025,15 +998,18 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 		String				price				= "0.00";
 		ComparePriceBean 	comparePriceBean 	= null;
 		String				vendorCode			= null;
+		String				tin					= null;
 		
 		try {
 			obj 			= new JSONObject();
 			productCode 	= EnjoyUtils.nullToStr(this.request.getParameter("productCode"));
 			quantity 		= EnjoyUtil.nullToStr(request.getParameter("quantity"));
 			vendorCode 		= EnjoyUtil.nullToStr(request.getParameter("vendorCode"));
+			tin				= this.userBean.getTin();
 			
 			comparePriceBean = new ComparePriceBean();
 			comparePriceBean.setProductCode(productCode);
+			comparePriceBean.setTin(tin);
 			comparePriceBean.setQuantity(quantity);
 			comparePriceBean.setVendorCode(vendorCode);
 			
@@ -1051,6 +1027,36 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 			this.enjoyUtil.writeMSG(obj.toString());
 			logger.info("[getPrice][End]");
 		}
+	}
+
+	@Override
+	public void destroySession() {
+		this.dao.destroySession();
+        this.companyVendorDao.destroySession();
+        this.productDetailsDao.destroySession();
+        this.comparePriceDao.destroySession();
+        this.productquantityDao.destroySession();
+        this.productQuanHistoryDao.destroySession();
+	}
+
+	@Override
+	public void commit() {
+		this.dao.commit();
+        this.companyVendorDao.commit();
+        this.productDetailsDao.commit();
+        this.comparePriceDao.commit();
+        this.productquantityDao.commit();
+        this.productQuanHistoryDao.commit();
+	}
+
+	@Override
+	public void rollback() {
+		this.dao.rollback();
+        this.companyVendorDao.rollback();
+        this.productDetailsDao.rollback();
+        this.comparePriceDao.rollback();
+        this.productquantityDao.rollback();
+        this.productQuanHistoryDao.rollback();
 	}
 	 	
 	

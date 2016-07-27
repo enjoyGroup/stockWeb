@@ -350,13 +350,11 @@ function gp_checkAmtOnly(ao_obj, av_num){
 		
 		if(gp_replaceComma(ao_obj.value).length > av_num){
 			
-			alert("ระบุได้สูงสุด " + av_num-1 + " ตัวอักษร", function() { 
-				eval("$('#" + ao_obj.id + "').focus().select();");
+			alert("ระบุได้สูงสุด " + (av_num-1) + " ตัวอักษร", function() { 
+				$("#" + ao_obj.id).focus().select();
+				//eval("$('#" + ao_obj.id + "').focus().select();");
 		    });
 			
-//			alert("ระบุได้สูงสุด " + av_num-1 + " ตัวอักษร");
-//			//ao_obj.select();
-//			eval("$('#" + ao_obj.id + "').focus().select();");
 			return false;
 		}
 		
@@ -1020,7 +1018,7 @@ window.confirm = function(message, successCallback, nonSuccessCallback){
 	    });
 };
 
-function gp_dialogPopUp(av_path, av_title){
+function gp_dialogPopUp(av_path, av_title, callFunction){
 	
 	//var lo_dialog = null;
 	var lo_iframe = null;
@@ -1052,6 +1050,9 @@ function gp_dialogPopUp(av_path, av_title){
 	      close: function() {
 	    	  gp_progressBarOff();
 	    	  $( "#dialog" ).removeClass( "zoom" );
+	    	  if(callFunction!=null && callFunction != 'undefined'){
+	    		  callFunction();
+	    	  }
 	        },
 	      title: av_title,
 	      buttons: null,
@@ -1070,6 +1071,46 @@ function gp_dialogPopUp(av_path, av_title){
 		lo_dialog.dialog("option", "title", av_title);
 		lo_dialog.append(lo_iframe).dialog( "open" );
 		event.preventDefault();*/
+		
+	}catch(e){
+		alert("alert :: " + e);
+	}
+}
+
+function gp_dialogPopUpHtml(av_html, av_title, w, h){
+	
+	try{
+		w = w==null || w==""?1050:w;
+		h = h==null || h==""?600:h;
+		
+		
+		$( "#dialog" ).empty();
+		
+		gp_progressBarOn();
+		
+		$( "#dialog" )
+		    .html(av_html)
+		    .dialog({
+	      autoOpen: true,
+	      height: h,
+	      width: w,
+	      show: {
+	        effect: "clip",
+	        duration: 300
+	      },
+	      hide: {
+	        effect: "clip",
+	        duration: 300
+	      },
+	      close: function() {
+	    	  gp_progressBarOff();
+	    	  $( "#dialog" ).removeClass( "zoom" );
+	        },
+	      title: av_title,
+	      buttons: null,
+	      draggable: false,
+	      dialogClass: 'zoom'
+	    });
 		
 	}catch(e){
 		alert("alert :: " + e);

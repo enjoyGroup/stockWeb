@@ -1,5 +1,9 @@
 package th.go.stock.app.enjoy.bean;
 
+import org.apache.poi.ss.usermodel.Row;
+
+import th.go.stock.app.enjoy.utils.ExcelField;
+
 
 
 public class ManageProductTypeBean {
@@ -9,6 +13,9 @@ public class ManageProductTypeBean {
 	private String productTypeStatus;
 	private String rowStatus;
 	private String seq;
+	private String tin;
+	private ExcelField colA;
+	private ExcelField colB;
 	
 	
 	public ManageProductTypeBean(){
@@ -17,8 +24,13 @@ public class ManageProductTypeBean {
 		this.productTypeStatus 		= "";
 		this.rowStatus 				= "";
 		this.seq 					= "";
+		this.tin					= "";
 	}
-
+	
+	public ManageProductTypeBean(Row row){
+		this.colA			= new ExcelField(row, ".*", 0);
+		this.colB			= new ExcelField(row, ".*", 1);
+	}
 
 	public String getProductTypeCode() {
 		return productTypeCode;
@@ -67,5 +79,31 @@ public class ManageProductTypeBean {
 
 	public void setSeq(String seq) {
 		this.seq = seq;
+	}
+
+
+	public String getTin() {
+		return tin;
+	}
+
+
+	public void setTin(String tin) {
+		this.tin = tin;
+	}
+
+	public ExcelField getColA() {
+		return colA;
+	}
+
+	public void setColA(ExcelField colA) {
+		this.colA = colA;
+	}
+
+	public ExcelField getColB() {
+		return colB;
+	}
+
+	public void setColB(ExcelField colB) {
+		this.colB = colB;
 	}
 }

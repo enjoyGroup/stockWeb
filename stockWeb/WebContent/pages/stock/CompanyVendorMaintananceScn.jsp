@@ -1,15 +1,14 @@
 <%@ include file="/pages/include/checkLogin.jsp"%>
 <%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
-<%@ page import="th.go.stock.app.enjoy.bean.CompanyVendorBean"%>
+<%@ page import="th.go.stock.app.enjoy.bean.CompanyVendorBean,th.go.stock.app.enjoy.bean.ComboBean"%>
 <%@ page import="java.util.*"%>
 <jsp:useBean id="companyVendorMaintananceForm" class="th.go.stock.app.enjoy.form.CompanyVendorMaintananceForm" scope="session"/>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
 <%
-	String 						pageMode 				= companyVendorMaintananceForm.getPageMode();
-	String						titlePage				= companyVendorMaintananceForm.getTitlePage();
-	CompanyVendorBean 			companyVendorBean 		= companyVendorMaintananceForm.getCompanyVendorBean();
-
+	String 						pageMode 			= companyVendorMaintananceForm.getPageMode();
+	String						titlePage			= companyVendorMaintananceForm.getTitlePage();
+	CompanyVendorBean 			companyVendorBean 	= companyVendorMaintananceForm.getCompanyVendorBean();
 
 %>
 
@@ -136,7 +135,7 @@
 		
 		
 		function lp_validate(){
-			var la_validate             = new Array( "vendorName:บริษัท"	
+			var la_validate             = new Array("vendorName:บริษัท"	
 													, "branchName:สาขา"
 													, "provinceName:จังหวัด"
 													, "districtName:อำเภอ/เขต"
@@ -394,237 +393,237 @@
 									</div>
 				         			<div class="panel-body">
 				            			<table class="table user-register-table" style="border-bottom-color: white;">
-												<tr>
-									        		<td align="right">
-														บริษัท<span style="color: red;"><b>*</b></span> :
-													</td>
-								        			<td align="left">
-								        				<input type='text' 
-								        					   id="vendorName" 
-								        					   name='vendorName' 
-								        					   value="<%=companyVendorBean.getVendorName() %>" 
-								        					   maxlength="100" 
-								        					   onblur="lp_getCompanyVendorDetail();"
-								        					   style="width: 220px;" />
-								        			</td>
-								        			<td align="right">
-														สาขา<span style="color: red;"><b>*</b></span> :
-													</td>
-								        			<td align="left" colspan="3">
-								        				<input type='text' 
-								        					   id="branchName" 
-								        					   name='branchName' 
-								        					   value="<%=companyVendorBean.getBranchName() %>" 
-								        					   maxlength="30" 
-								        					   onblur="lp_getCompanyVendorDetail();"
-								        					   style="width: 220px;" />
-								        			</td>
-									        	</tr>
-									        	<tr>
-								        			<td align="right">
-														เลขประจำตัวผู้เสียภาษี :
-													</td>
-								        			<td align="left" colspan="5">
-								        				<input  type="text" 
-								        						id="tin" 
-								        						name="tin" 
-								        						class="numberOnly"
-								        						style="width: 200px;"
-								        						onblur="lp_checkIdNumber();"
-								        						value="<%=companyVendorBean.getTin()%>" 
-								        						maxlength="13"  />
-								        				&nbsp;
-								        				<span id="inValidSpan"></span>
-								        			</td>
-									        	</tr>
-								        		<tr>
-													<td align="right">
-														บ้านเลขที่ :
-													</td>
-													<td align="left">
-														<input  type="text"
-																id="houseNumber" 
-																name="houseNumber"
-																size="5"
-																maxlength="10" 
-																value="<%=companyVendorBean.getHouseNumber() %>" />
-													</td>
-													<td align="right">
-														หมู่ที่:
-													</td>
-													<td align="left" colspan="3">
-														<input type="text"
-															   id="mooNumber" 
-															   name="mooNumber"
-															   size="5"
-															   maxlength="10" 
-															   value="<%=companyVendorBean.getMooNumber() %>" />
-													</td>
-												</tr>
-								        		<tr>
-													<td align="right">
-														อาคาร:
-													</td>
-													<td colspan="5" align="left" >
-														<input  type="text" 
-																id="buildingName" 
-																name="buildingName"
-																maxlength="200" 
+											<tr>
+								        		<td align="right">
+													บริษัท<span style="color: red;"><b>*</b></span> :
+												</td>
+							        			<td align="left">
+							        				<input type='text' 
+							        					   id="vendorName" 
+							        					   name='vendorName' 
+							        					   value="<%=companyVendorBean.getVendorName() %>" 
+							        					   maxlength="100" 
+							        					   onblur="lp_getCompanyVendorDetail();"
+							        					   style="width: 220px;" />
+							        			</td>
+							        			<td align="right">
+													สาขา<span style="color: red;"><b>*</b></span> :
+												</td>
+							        			<td align="left" colspan="3">
+							        				<input type='text' 
+							        					   id="branchName" 
+							        					   name='branchName' 
+							        					   value="<%=companyVendorBean.getBranchName() %>" 
+							        					   maxlength="30" 
+							        					   onblur="lp_getCompanyVendorDetail();"
+							        					   style="width: 220px;" />
+							        			</td>
+								        	</tr>
+								        	<tr>
+							        			<td align="right">
+													เลขประจำตัวผู้เสียภาษี :
+												</td>
+							        			<td align="left" colspan="5">
+							        				<input  type="text" 
+							        						id="tin" 
+							        						name="tin" 
+							        						class="numberOnly"
+							        						style="width: 200px;"
+							        						onblur="lp_checkIdNumber();"
+							        						value="<%=companyVendorBean.getTin()%>" 
+							        						maxlength="13"  />
+							        				&nbsp;
+							        				<span id="inValidSpan"></span>
+							        			</td>
+								        	</tr>
+							        		<tr>
+												<td align="right">
+													บ้านเลขที่ :
+												</td>
+												<td align="left">
+													<input  type="text"
+															id="houseNumber" 
+															name="houseNumber"
+															size="5"
+															maxlength="10" 
+															value="<%=companyVendorBean.getHouseNumber() %>" />
+												</td>
+												<td align="right">
+													หมู่ที่:
+												</td>
+												<td align="left" colspan="3">
+													<input type="text"
+														   id="mooNumber" 
+														   name="mooNumber"
+														   size="5"
+														   maxlength="10" 
+														   value="<%=companyVendorBean.getMooNumber() %>" />
+												</td>
+											</tr>
+							        		<tr>
+												<td align="right">
+													อาคาร:
+												</td>
+												<td colspan="5" align="left" >
+													<input  type="text" 
+															id="buildingName" 
+															name="buildingName"
+															maxlength="200" 
+															style="width: 220px;"
+															value="<%=companyVendorBean.getBuildingName()%>"
+													/>
+												</td>													
+											</tr>
+											<tr>
+												<td align="right">
+													ตรอกซอย:
+												</td>
+												<td align="left" >
+													<input  type="text" 
+															id="soiName" 
+															name="soiName"
+															maxlength="250" 
+															style="width: 220px;"
+															value="<%=companyVendorBean.getSoiName() %>"
+													/>
+												</td>
+												<td align="right">
+													ถนน:
+												</td>
+												<td align="left" colspan="3">
+													<input  type="text" 
+															id="streetName" 
+															name="streetName"
+															maxlength="250" 
+															style="width: 220px;"
+															value="<%=companyVendorBean.getStreetName() %>"
+													/>
+												</td>
+											</tr>
+											<tr>
+												<td align="right">
+													จังหวัด<span style="color: red;"><b>*</b></span> :
+												</td>
+												<td align="left" >
+													<input  type="text" 
+															id="provinceName" 
+															name="provinceName"
+															placeholder="จังหวัด"
+															style="width: 220px;"
+															value="<%=companyVendorBean.getProvinceName() %>"
+													/>
+												</td>
+												<td align="right">
+													อำเภอ/เขต<span style="color: red;"><b>*</b></span> :
+												</td>
+												<td align="left" colspan="3">
+													<input  type="text"
+															id="districtName" 
+															name="districtName"
+															placeholder="อำเภอ"
+															style="width: 220px;"
+															value="<%=companyVendorBean.getDistrictName() %>"
+													/>
+												</td>
+											</tr>
+							        		<tr>
+												<td align="right">
+													ตำบล/แขวง<span style="color: red;"><b>*</b></span> :
+												</td>
+												<td align="left" >
+													<input  type="text"
+																id="subdistrictName" 
+																name="subdistrictName"
+																placeholder="ตำบล"
 																style="width: 220px;"
-																value="<%=companyVendorBean.getBuildingName()%>"
+																value="<%=companyVendorBean.getSubdistrictName() %>"
 														/>
-													</td>													
-												</tr>
-												<tr>
-													<td align="right">
-														ตรอกซอย:
-													</td>
-													<td align="left" >
-														<input  type="text" 
-																id="soiName" 
-																name="soiName"
-																maxlength="250" 
-																style="width: 220px;"
-																value="<%=companyVendorBean.getSoiName() %>"
-														/>
-													</td>
-													<td align="right">
-														ถนน:
-													</td>
-													<td align="left" colspan="3">
-														<input  type="text" 
-																id="streetName" 
-																name="streetName"
-																maxlength="250" 
-																style="width: 220px;"
-																value="<%=companyVendorBean.getStreetName() %>"
-														/>
-													</td>
-												</tr>
-												<tr>
-													<td align="right">
-														จังหวัด<span style="color: red;"><b>*</b></span> :
-													</td>
-													<td align="left" >
-														<input  type="text" 
-																id="provinceName" 
-																name="provinceName"
-																placeholder="จังหวัด"
-																style="width: 220px;"
-																value="<%=companyVendorBean.getProvinceName() %>"
-														/>
-													</td>
-													<td align="right">
-														อำเภอ/เขต<span style="color: red;"><b>*</b></span> :
-													</td>
-													<td align="left" colspan="3">
-														<input  type="text"
-																id="districtName" 
-																name="districtName"
-																placeholder="อำเภอ"
-																style="width: 220px;"
-																value="<%=companyVendorBean.getDistrictName() %>"
-														/>
-													</td>
-												</tr>
-								        		<tr>
-													<td align="right">
-														ตำบล/แขวง<span style="color: red;"><b>*</b></span> :
-													</td>
-													<td align="left" >
-														<input  type="text"
-																	id="subdistrictName" 
-																	name="subdistrictName"
-																	placeholder="ตำบล"
-																	style="width: 220px;"
-																	value="<%=companyVendorBean.getSubdistrictName() %>"
-															/>
-													</td>
-													<td align="right">
-														รหัสไปรษณีย์<span style="color: red;"><b>*</b></span> :
-													</td>
-													<td align="left" colspan="3">
-														<input  type="text" 
-																size="7"
-																id="postCode" 
-																name="postCode"
-																maxlength="5"
-																placeholder="รหัสไปรษณ๊ย์"
-																onchange="lp_onBlurPostCode();"
-																value="<%=companyVendorBean.getPostCode() %>"
-														/>
-													</td>
-												</tr>
-								        		<tr>
-								        			<td align="right">
-								        				เบอร์โทร<span style="color: red;"><b>*</b></span> :
-								        			</td>
-								        			<td align="left">
-								        				<input  type="text" 
-								        						id="tel" 
-								        						name="tel" 
-								        						class="telOnly"
-								        						style="width: 220px;"
-								        						value="<%=companyVendorBean.getTel()%>" 
-								        						maxlength="50"  />
-								        			</td>
-								        			<td align="right">
-								        				เบอร์ Fax :
-								        			</td>
-								        			<td align="left">
-								        				<input  type="text" 
-								        						id="fax" 
-								        						name="fax" 
-								        						class="telOnly"
-								        						style="width: 220px;"
-								        						value="<%=companyVendorBean.getFax()%>" 
-								        						maxlength="50" />
-								        			</td>
-								        			<td align="right">
-								        				E-mail :
-								        			</td>
-								        			<td align="left">
-								        				<input  type="text" 
-								        						id="email" 
-								        						name="email" 
-								        						style="width: 220px;"
-								        						value="<%=companyVendorBean.getEmail()%>" 
-								        						maxlength="200"  />
-								        			</td>
-								        		</tr>
-								        		<tr>
-								        			<td align="right">
-								        				หมายเหต :
-								        			</td>
-								        			<td align="left" colspan="5">
-								        				<textarea rows="4" style="width: 500px;" id="remark" name="remark" ><%=companyVendorBean.getRemark()%></textarea>
-								        			</td>
-								        		</tr>
-								        		<tr>
-								        			<td align="right" colspan="6">
-								        				<br/>
-								        				<input type="button" id="btnSave" class="btn btn-sm btn-warning" value='บันทึก' onclick="lp_save();" />&nbsp;&nbsp;&nbsp;
-				   										<input type="button" id="btnReset" onclick="lp_reset();" class="btn btn-sm btn-danger" value='เริ่มใหม่' />
-								        			</td>
-								        		</tr>
-									        </table>
-										</div>
-									</div>          
-								</div>
-							</section>
+												</td>
+												<td align="right">
+													รหัสไปรษณีย์<span style="color: red;"><b>*</b></span> :
+												</td>
+												<td align="left" colspan="3">
+													<input  type="text" 
+															size="7"
+															id="postCode" 
+															name="postCode"
+															maxlength="5"
+															placeholder="รหัสไปรษณ๊ย์"
+															onchange="lp_onBlurPostCode();"
+															value="<%=companyVendorBean.getPostCode() %>"
+													/>
+												</td>
+											</tr>
+							        		<tr>
+							        			<td align="right">
+							        				เบอร์โทร<span style="color: red;"><b>*</b></span> :
+							        			</td>
+							        			<td align="left">
+							        				<input  type="text" 
+							        						id="tel" 
+							        						name="tel" 
+							        						class="telOnly"
+							        						style="width: 220px;"
+							        						value="<%=companyVendorBean.getTel()%>" 
+							        						maxlength="50"  />
+							        			</td>
+							        			<td align="right">
+							        				เบอร์ Fax :
+							        			</td>
+							        			<td align="left">
+							        				<input  type="text" 
+							        						id="fax" 
+							        						name="fax" 
+							        						class="telOnly"
+							        						style="width: 220px;"
+							        						value="<%=companyVendorBean.getFax()%>" 
+							        						maxlength="50" />
+							        			</td>
+							        			<td align="right">
+							        				E-mail :
+							        			</td>
+							        			<td align="left">
+							        				<input  type="text" 
+							        						id="email" 
+							        						name="email" 
+							        						style="width: 220px;"
+							        						value="<%=companyVendorBean.getEmail()%>" 
+							        						maxlength="200"  />
+							        			</td>
+							        		</tr>
+							        		<tr>
+							        			<td align="right">
+							        				หมายเหต :
+							        			</td>
+							        			<td align="left" colspan="5">
+							        				<textarea rows="4" style="width: 500px;" id="remark" name="remark" ><%=companyVendorBean.getRemark()%></textarea>
+							        			</td>
+							        		</tr>
+							        		<tr>
+							        			<td align="right" colspan="6">
+							        				<br/>
+							        				<input type="button" id="btnSave" class="btn btn-sm btn-warning" value='บันทึก' onclick="lp_save();" />&nbsp;&nbsp;&nbsp;
+			   										<input type="button" id="btnReset" onclick="lp_reset();" class="btn btn-sm btn-danger" value='เริ่มใหม่' />
+							        			</td>
+							        		</tr>
+								        </table>
+									</div>
+								</div>          
+							</div>
 						</section>
 					</section>
-					<a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
 				</section>
+				<a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
 			</section>
 		</section>
-		<div id="dialog" title="Look up"></div>
-		<div align="center" class="FreezeScreen" style="display:none;">
-        	<center>
-        		<img id="imgProgress" valign="center" src="<%=imgURL%>/loading36.gif" alt="" />
-        		<span style="font-weight: bold;font-size: large;color: black;">Loading...</span>
-        	</center>
-    	</div>
+	</section>
+	<div id="dialog" title="Look up"></div>
+	<div align="center" class="FreezeScreen" style="display:none;">
+       	<center>
+       		<img id="imgProgress" valign="center" src="<%=imgURL%>/loading36.gif" alt="" />
+       		<span style="font-weight: bold;font-size: large;color: black;">Loading...</span>
+       	</center>
+   	</div>
 	</form>	
 </body>
 </html>

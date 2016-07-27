@@ -9,7 +9,6 @@
 	ProductQuanHistoryBean 			productQuanHistoryBean 	= stockMovingReportForm.getProductQuanHistoryBean();
 	List<ProductQuanHistoryBean> 	dataList 				= stockMovingReportForm.getDataList();
 	String							titlePage				= stockMovingReportForm.getTitlePage();
-	List<ComboBean> 				companyCombo 			= stockMovingReportForm.getCompanyCombo();
 %>
 
 <html>
@@ -143,8 +142,7 @@
 						return;
 					}
 					
-					params = "tin=" 				+ $("#tin").val()
-							+ "&hisDateFrom=" 		+ $("#hisDateFrom").val()
+					params = "hisDateFrom=" 		+ $("#hisDateFrom").val()
 							+ "&hisDateTo=" 		+ $("#hisDateTo").val()
 							+ "&productTypeName=" 	+ $("#productTypeName").val()
 							+ "&productGroupName=" 	+ $("#productGroupName").val()
@@ -170,7 +168,7 @@
 		});
 		
 		function lp_validate(){
-			var la_validate             = new Array( "tin:บริษัทที่สังกัด", "hisDateFrom:วันที่เริ่มค้นหา", "hisDateTo:วันที่สิ้นสุดค้นหา");
+			var la_validate             = new Array( "hisDateFrom:วันที่เริ่มค้นหา", "hisDateTo:วันที่สิ้นสุดค้นหา");
 		    var lv_return				= true;
 		    
 			try{
@@ -208,20 +206,10 @@
 										<div class="panel-body" align="center">
 								        	<table width="100%" border="0" cellpadding="5" cellspacing="5">
 								        		<tr>
-								        			<td align="right" width="150px;">
-								        				บริษัทที่สังกัด <span style="color: red;"><b>*</b></span> : &nbsp;
-								        			</td>
-								        			<td align="left">
-								        				<select id="tin" name="tin" style="width: 220px;" >
-								        					<% for(ComboBean comboBean:companyCombo){ %>
-								        					<option value="<%=comboBean.getCode()%>" <%if(productQuanHistoryBean.getTin().equals(comboBean.getCode())){ %> selected <%} %> ><%=comboBean.getDesc()%></option>
-								        					<%} %>
-								        				</select>
-								        			</td>
 								        			<td align="right">
 								        				วันที่ขาย <span style="color: red;"><b>*</b></span> :&nbsp;
 								        			</td>
-								        			<td align="left" colspan="3">
+								        			<td align="left" colspan="5">
 								        				<input type='text' 
 								        					   id="hisDateFrom" 
 								        					   name='hisDateFrom' 

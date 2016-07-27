@@ -1,6 +1,6 @@
 <%@ include file="/pages/include/checkLogin.jsp"%>
 <%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
-<%@ page import="th.go.stock.app.enjoy.bean.CompanyVendorBean"%>
+<%@ page import="th.go.stock.app.enjoy.bean.CompanyVendorBean,th.go.stock.app.enjoy.bean.ComboBean"%>
 <%@ page import="java.util.*"%>
 <jsp:useBean id="companyVendorSearchForm" class="th.go.stock.app.enjoy.form.CompanyVendorSearchForm" scope="session"/>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -37,8 +37,10 @@
 			//gp_progressBarOff();
 			
 			 
-			$('#btnSearch').click(function(){ 
+			$('#btnSearch').click(function(){
+				
 				try{
+					
 					$.ajax({
 						async:true,
 			            type: "POST",

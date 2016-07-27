@@ -2,65 +2,66 @@
 package th.go.stock.app.enjoy.dao;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.hibernate.Query;
-import org.hibernate.SQLQuery;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.type.IntegerType;
-import org.hibernate.type.StringType;
 
 import th.go.stock.app.enjoy.bean.ComboBean;
 import th.go.stock.app.enjoy.bean.ManageUnitTypeBean;
 import th.go.stock.app.enjoy.exception.EnjoyException;
+import th.go.stock.app.enjoy.main.Constants;
+import th.go.stock.app.enjoy.main.DaoControl;
 import th.go.stock.app.enjoy.model.Unittype;
+import th.go.stock.app.enjoy.model.UnittypePK;
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
 import th.go.stock.app.enjoy.utils.EnjoyUtils;
-import th.go.stock.app.enjoy.utils.HibernateUtil;
 
-public class ManageUnitTypeDao {
+public class ManageUnitTypeDao extends DaoControl{
 	
-	private static final EnjoyLogger logger = EnjoyLogger.getLogger(ManageUnitTypeDao.class);
+	public ManageUnitTypeDao(){
+		setLogger(EnjoyLogger.getLogger(ManageUnitTypeDao.class));
+		super.init();
+	}
 	
-	public List<ManageUnitTypeBean> getUnitTypeList(	Session 					session) throws EnjoyException{
-		logger.info("[getUnitTypeList][Begin]");
+	public List<ManageUnitTypeBean> getUnitTypeList(String tin) throws EnjoyException{
+		getLogger().info("[getUnitTypeList][Begin]");
 		
-		String						hql							= null;
-		SQLQuery 					query 						= null;
-		List<Object[]>				list						= null;
-		ManageUnitTypeBean			bean						= null;
-		List<ManageUnitTypeBean> 	manageUnitTypeList 			= new ArrayList<ManageUnitTypeBean>();
-		int							seq							= 0;
+		String							hql							= null;
+		ManageUnitTypeBean				bean						= null;
+		List<ManageUnitTypeBean> 		manageUnitTypeList 			= new ArrayList<ManageUnitTypeBean>();
+		int								seq							= 0;
+		HashMap<String, Object>			param						= new HashMap<String, Object>();
+		List<String>					columnList					= new ArrayList<String>();
+		List<HashMap<String, Object>>	resultList					= null;
 		
 		try{	
 			hql					= "select * "
 								+ "	from unittype"
-								+ "	where unitStatus = 'A' order by unitCode asc";
+								+ "	where unitStatus 	= 'A'"
+								+ "		and tin 		= :tin"
+								+ "	order by unitCode asc";
 			
-			logger.info("[getUnitTypeList] hql :: " + hql);
+			//Criteria
+			param.put("tin"	, tin);
 
-			query			= session.createSQLQuery(hql);			
-			query.addScalar("unitCode"		, new StringType());
-			query.addScalar("unitName"		, new StringType());
-			query.addScalar("unitStatus"	, new StringType());
+			//Column select
+			columnList.add("unitCode");
+			columnList.add("tin");
+			columnList.add("unitName");
+			columnList.add("unitStatus");
 			
-			list		 	= query.list();
+			resultList = getResult(hql, param, columnList);
+
 			
-			logger.info("[getUnitTypeList] list.size() :: " + list.size());
-			
-			for(Object[] row:list){
+			for(HashMap<String, Object> row:resultList){
 				bean 	= new ManageUnitTypeBean();
 				
-				logger.info("unitCode 		:: " + row[0]);
-				logger.info("unitName 		:: " + row[1]);
-				logger.info("unitStatus 	:: " + row[2]);
-				logger.info("seq 			:: " + seq);
-				
-				bean.setUnitCode			(EnjoyUtils.nullToStr(row[0]));
-				bean.setUnitName			(EnjoyUtils.nullToStr(row[1]));
-				bean.setUnitStatus			(EnjoyUtils.nullToStr(row[2]));
-				bean.setSeq					(EnjoyUtils.nullToStr(seq));
+				bean.setUnitCode	(EnjoyUtils.nullToStr(row.get("unitCode")));
+				bean.setTin			(EnjoyUtils.nullToStr(row.get("tin")));
+				bean.setUnitName	(EnjoyUtils.nullToStr(row.get("unitName")));
+				bean.setUnitStatus	(EnjoyUtils.nullToStr(row.get("unitStatus")));
+				bean.setSeq			(EnjoyUtils.nullToStr(seq));
 				
 				manageUnitTypeList.add(bean);
 				seq++;
@@ -68,45 +69,49 @@ public class ManageUnitTypeDao {
 			}	
 			
 		}catch(Exception e){
-			logger.info("[getUnitTypeList] " + e.getMessage());
+			getLogger().error(e);
 			e.printStackTrace();
 			throw new EnjoyException("error getUnitTypeList");
 		}finally{
 			hql						= null;
-			logger.info("[getUnitTypeList][End]");
+			getLogger().info("[getUnitTypeList][End]");
 		}
 		
 		return manageUnitTypeList;
 		
 	}
 	
-	public void insertUnitType(Session session, ManageUnitTypeBean manageUnitTypeBean) throws EnjoyException{
-		logger.info("[insertUnitType][Begin]");
+	public void insertUnitType(ManageUnitTypeBean manageUnitTypeBean) throws EnjoyException{
+		getLogger().info("[insertUnitType][Begin]");
 		
-		Unittype	unittype						= null;
+		Unittype	unittype	= new Unittype();
+		UnittypePK 	id			= new UnittypePK();
 		
 		try{
 			
-			unittype = new Unittype();
+//			id.setUnitCode	(this.genId(manageUnitTypeBean.getTin()));
+			id.setUnitCode	(EnjoyUtils.parseInt(manageUnitTypeBean.getUnitCode()));
+			id.setTin		(manageUnitTypeBean.getTin());
 			
-			unittype.setUnitName			(manageUnitTypeBean.getUnitName());
-			unittype.setUnitStatus			(manageUnitTypeBean.getUnitStatus());
+			unittype.setId			(id);
+			unittype.setUnitName	(manageUnitTypeBean.getUnitName());
+			unittype.setUnitStatus	(manageUnitTypeBean.getUnitStatus());
 			
-			session.saveOrUpdate(unittype);
+			insertData(unittype);
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			logger.error(e);
+			getLogger().error(e);
 			throw new EnjoyException("Error insertUnitType");
 		}finally{
 			
 			unittype = null;
-			logger.info("[insertUnitType][End]");
+			getLogger().info("[insertUnitType][End]");
 		}
 	}
 	
-	public void updateUnitType(Session session, ManageUnitTypeBean manageUnitTypeBean) throws EnjoyException{
-		logger.info("[updateUnitType][Begin]");
+	public void updateUnitType(ManageUnitTypeBean manageUnitTypeBean) throws EnjoyException{
+		getLogger().info("[updateUnitType][Begin]");
 		
 		String							hql									= null;
 		Query 							query 								= null;
@@ -114,155 +119,187 @@ public class ManageUnitTypeDao {
 		try{
 			hql				= "update Unittype set unitName 		= :unitName"
 											+ "	,unitStatus 		= :unitStatus"
-										+ " where unitCode = :unitCode";
+										+ " where unitCode 	= :unitCode"
+										+ "		and tin		= :tin";
 			
-			query = session.createQuery(hql);
-			query.setParameter("unitName"			, manageUnitTypeBean.getUnitName());
-			query.setParameter("unitStatus"			, manageUnitTypeBean.getUnitStatus());
-			query.setParameter("unitCode"			, Integer.parseInt(manageUnitTypeBean.getUnitCode()));
+			query = createQuery(hql);
+			query.setParameter("unitName"		, manageUnitTypeBean.getUnitName());
+			query.setParameter("unitStatus"		, manageUnitTypeBean.getUnitStatus());
+			query.setParameter("unitCode"		, Integer.parseInt(manageUnitTypeBean.getUnitCode()));
+			query.setParameter("tin"			, manageUnitTypeBean.getTin());
 			
 			query.executeUpdate();
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			logger.info(e.getMessage());
+			getLogger().error(e);
 			throw new EnjoyException("Error updateUnitType");
 		}finally{
 			
 			hql									= null;
 			query 								= null;
-			logger.info("[updateUnitType][End]");
+			getLogger().info("[updateUnitType][End]");
 		}
 	}
 	
-	public int checkDupUnitName(Session session, String unitName, String unitCode) throws EnjoyException{
-		logger.info("[checkDupUnitName][Begin]");
+	public int checkDupUnitName(String unitName, String unitCode, String tin) throws EnjoyException{
+		getLogger().info("[checkDupUnitName][Begin]");
 		
-		String							hql									= null;
-		List<Integer>			 		list								= null;
-		SQLQuery 						query 								= null;
-		int 							result								= 0;
-		
+		String							hql				= null;
+		int 							result			= 0;
+		HashMap<String, Object>			param			= new HashMap<String, Object>();
+		List<Object>					resultList		= null;
 		
 		try{
-			hql				= "Select count(*) cou from unittype where unitName = '" + unitName + "' and unitStatus = 'A'";
+			hql		= "select count(*) cou "
+					+ "	from unittype "
+					+ "	where unitName 	= :unitName"
+					+ "		and tin		= :tin"
+					+ "		and unitStatus = 'A'";
+			
+			//Criteria
+			param.put("unitName", unitName);
+			param.put("tin"		, tin);
 			
 			if(unitCode!=null && !unitCode.equals("")){
-				hql += " and unitCode <> '"+unitCode+"'";
+				hql += " and unitCode <> :unitCode";
+				param.put("unitCode", unitCode);
 			}
 			
-			query			= session.createSQLQuery(hql);
+			resultList = getResult(hql, param, "cou", Constants.INT_TYPE);
 			
-			query.addScalar("cou"			, new IntegerType());
-			
-			list		 	= query.list();
-			
-			if(list!=null && list.size() > 0){
-				result = list.get(0);
+			if(resultList!=null && resultList.size() > 0){
+				result = EnjoyUtils.parseInt(resultList.get(0));
 			}
 			
-			logger.info("[checkDupUnitName] result 			:: " + result);
-			
-			
+			getLogger().info("[checkDupUnitName] result 			:: " + result);
 			
 		}catch(Exception e){
-			logger.info(e.getMessage());
-			throw new EnjoyException(e.getMessage());
+			getLogger().error(e);
+			throw new EnjoyException("checkDupUnitName error");
 		}finally{
-			
 			hql									= null;
-			list								= null;
-			query 								= null;
-			logger.info("[checkDupUnitName][End]");
+			getLogger().info("[checkDupUnitName][End]");
 		}
 		
 		return result;
 	}
 	
-	public List<ComboBean> unitNameList(String unitName){
-		logger.info("[unitNameList][Begin]");
+	public int genId(String tin) throws EnjoyException{
+		getLogger().info("[genId][Begin]");
 		
-		String 						hql			 		= null;
-        SessionFactory 				sessionFactory		= null;
-		Session 					session				= null;
-		SQLQuery 					query 				= null;
-		List<Object[]>				list				= null;
-		List<ComboBean>				comboList 			= null;
-		ComboBean					comboBean			= null;
+		String							hql				= null;
+		int 							result			= 1;
+		HashMap<String, Object>			param			= new HashMap<String, Object>();
+		List<Object>					resultList		= null;
 		
 		try{
-			sessionFactory 		= HibernateUtil.getSessionFactory();
-			session 			= sessionFactory.openSession();
-			comboList			= new ArrayList<ComboBean>();
-			hql 				= "select unitCode, unitName from unittype where unitName like ('"+unitName+"%') and unitStatus = 'A' order by unitName asc limit 10 ";
+			hql		= "select (max(unitCode) + 1) newId"
+					+ "	from unittype "
+					+ "	where tin		= :tin";
 			
-			logger.info("[productTypeNameList] hql :: " + hql);
+			//Criteria
+			param.put("tin"		, tin);
 			
-			query			= session.createSQLQuery(hql);
-			query.addScalar("unitCode"			, new StringType());
-			query.addScalar("unitName"			, new StringType());
+			resultList = getResult(hql, param, "newId", Constants.INT_TYPE);
 			
-			list		 	= query.list();
+			if(resultList!=null && resultList.size() > 0){
+				result = EnjoyUtils.parseInt(resultList.get(0))==0?1:EnjoyUtils.parseInt(resultList.get(0));
+			}
 			
-			logger.info("[unitNameList] list.size() :: " + list.size());
+			getLogger().info("[genId] newId 			:: " + result);
 			
-			for(Object[] row:list){
+		}catch(Exception e){
+			getLogger().error(e);
+			throw new EnjoyException("genId error");
+		}finally{
+			hql									= null;
+			getLogger().info("[genId][End]");
+		}
+		
+		return result;
+	}
+	
+	public List<ComboBean> unitNameList(String unitName, String tin) throws EnjoyException{
+		getLogger().info("[unitNameList][Begin]");
+		
+		String 							hql			 	= null;
+		List<ComboBean>					comboList 		= null;
+		ComboBean						comboBean		= null;
+		HashMap<String, Object>			param			= new HashMap<String, Object>();
+		List<String>					columnList		= new ArrayList<String>();
+		List<HashMap<String, Object>>	resultList		= null;
+		
+		try{
+			comboList	= new ArrayList<ComboBean>();
+			hql 		= "select unitCode, unitName "
+						+ "	from unittype "
+						+ "	where unitName LIKE CONCAT(:unitName, '%')"
+						+ "		and tin 		= :tin"
+						+ "		and unitStatus  = 'A' "
+						+ "	order by unitName asc limit 10 ";
+			
+			//Criteria
+			param.put("unitName", unitName);
+			param.put("tin"		, tin);
+
+			//Column select
+			columnList.add("unitCode");
+			columnList.add("unitName");
+			
+			resultList = getResult(hql, param, columnList);
+			
+			for(HashMap<String, Object> row:resultList){
 				comboBean 	= new ComboBean();
 				
-				logger.info("unitCode 		:: " + row[0]);
-				logger.info("unitName 		:: " + row[1]);
-				
-				comboBean.setCode				(EnjoyUtils.nullToStr(row[0]));
-				comboBean.setDesc				(EnjoyUtils.nullToStr(row[1]));
+				comboBean.setCode				(EnjoyUtils.nullToStr(row.get("unitCode")));
+				comboBean.setDesc				(EnjoyUtils.nullToStr(row.get("unitName")));
 				
 				comboList.add(comboBean);
 			}	
 			
 		}catch(Exception e){
 			e.printStackTrace();
+			getLogger().error(e);
+			throw new EnjoyException("error unitNameList");
 		}finally{
-			session.close();
-			sessionFactory	= null;
-			session			= null;
-			logger.info("[unitNameList][End]");
+			getLogger().info("[unitNameList][End]");
 		}
 		
 		return comboList;
 	}
 	
-	public String getUnitCode(String unitName){
-		logger.info("[getUnitCode][Begin]");
+	public String getUnitCode(String unitName, String tin) throws EnjoyException{
+		getLogger().info("[getUnitCode][Begin]");
 		
-		String 						hql			 		= null;
-        SessionFactory 				sessionFactory		= null;
-		Session 					session				= null;
-		SQLQuery 					query 				= null;
-		List<String>			 	list				= null;
-        String						unitCode			= null;
+		String 							hql			 	= null;
+        String							unitCode		= null;
+        HashMap<String, Object>			param			= new HashMap<String, Object>();
+		List<Object>					resultList		= null;
 		
 		try{
-			sessionFactory 		= HibernateUtil.getSessionFactory();
-			session 			= sessionFactory.openSession();
-			hql 		= " select unitCode from unittype where unitStatus = 'A' and unitName = '" + unitName + "'";
+			hql 	= "select unitCode "
+					+ "	from unittype "
+					+ "	where unitStatus 	= 'A' "
+					+ "		and unitName 	= :unitName"
+					+ "		and	tin			= :tin";
 			
-			logger.info("[getUnitCode] hql :: " + hql);
+			//Criteria
+			param.put("unitName", unitName);
+			param.put("tin"		, tin);
+
+			resultList = getResult(hql, param, "unitCode", Constants.STRING_TYPE);
 			
-			query			= session.createSQLQuery(hql);
-			query.addScalar("unitCode"			, new StringType());
-			
-			list		 	= query.list();
-			
-			if(list!=null && list.size() > 0){
-				unitCode = list.get(0);
+			if(resultList!=null && resultList.size() > 0){
+				unitCode = EnjoyUtils.nullToStr(resultList.get(0));
 			}
 			
 		}catch(Exception e){
 			e.printStackTrace();
+			getLogger().error(e);
+			throw new EnjoyException("error getUnitCode");
 		}finally{
-			session.close();
-			sessionFactory	= null;
-			session			= null;
-			logger.info("[getUnitCode][End]");
+			getLogger().info("[getUnitCode][End]");
 		}
 		
 		return unitCode;

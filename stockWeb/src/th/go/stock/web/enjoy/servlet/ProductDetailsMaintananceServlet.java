@@ -9,8 +9,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -27,7 +25,6 @@ import th.go.stock.app.enjoy.form.ProductDetailsMaintananceForm;
 import th.go.stock.app.enjoy.main.Constants;
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
 import th.go.stock.app.enjoy.utils.EnjoyUtils;
-import th.go.stock.app.enjoy.utils.HibernateUtil;
 import th.go.stock.web.enjoy.common.EnjoyStandardSvc;
 import th.go.stock.web.enjoy.utils.EnjoyUtil;
 
@@ -62,17 +59,17 @@ public class ProductDetailsMaintananceServlet extends EnjoyStandardSvc {
          String pageAction = null; 
  		
  		try{
- 			 pageAction 				= EnjoyUtil.nullToStr(request.getParameter("pageAction"));
- 			 this.enjoyUtil 			= new EnjoyUtil(request, response);
- 			 this.request            	= request;
-             this.response           	= response;
-             this.session            	= request.getSession(false);
-             this.userBean           	= (UserDetailsBean)session.getAttribute("userBean");
-             this.form               	= (ProductDetailsMaintananceForm)session.getAttribute(FORM_NAME);
-             this.dao					= new ProductDetailsDao();
-             this.productTypeDao		= new ManageProductTypeDao();
-             this.productGroupDao		= new ManageProductGroupDao();
-             this.unitTypeDao			= new ManageUnitTypeDao();
+ 			 pageAction 					= EnjoyUtil.nullToStr(request.getParameter("pageAction"));
+ 			 this.enjoyUtil 				= new EnjoyUtil(request, response);
+ 			 this.request            		= request;
+             this.response           		= response;
+             this.session            		= request.getSession(false);
+             this.userBean           		= (UserDetailsBean)session.getAttribute("userBean");
+             this.form               		= (ProductDetailsMaintananceForm)session.getAttribute(FORM_NAME);
+             this.dao						= new ProductDetailsDao();
+             this.productTypeDao			= new ManageProductTypeDao();
+             this.productGroupDao			= new ManageProductGroupDao();
+             this.unitTypeDao				= new ManageUnitTypeDao();
  			
              logger.info("[execute] pageAction : " + pageAction );
              
@@ -111,6 +108,7 @@ public class ProductDetailsMaintananceServlet extends EnjoyStandardSvc {
  			e.printStackTrace();
  			logger.info(e.getMessage());
  		}finally{
+ 			destroySession();
  			logger.info("[execute][End]");
  		}
 	}
@@ -180,25 +178,23 @@ public class ProductDetailsMaintananceServlet extends EnjoyStandardSvc {
 		
 		ProductmasterBean 			productmasterBean		= null;
 		ProductmasterBean 			productmasterBeanDb		= null;
-		SessionFactory 				sessionFactory			= null;
-		Session 					session					= null;
 		String						seqTemp					= null;
 		List<ProductdetailBean> 	productdetailList		= null;
 		ProductdetailBean 			productdetailBean		= null;
+		String						tin						= null;
 		
 		try{
-			sessionFactory 				= HibernateUtil.getSessionFactory();
-			session 					= sessionFactory.openSession();
-			productCode					= productCode.equals("0")?EnjoyUtil.nullToStr(request.getParameter("productCode")):productCode;
+			productCode			= productCode.equals("0")?EnjoyUtil.nullToStr(request.getParameter("productCode")):productCode;
+			tin					= this.userBean.getTin();
 			
-			session.beginTransaction();
-			
-			logger.info("[getDetail] productCode :: " + productCode);
+			logger.info("[getDetail] productCode 	:: " + productCode);
+			logger.info("[getDetail] tin 			:: " + tin);
 			
 			productmasterBean = new ProductmasterBean();
 			productmasterBean.setProductCode(productCode);
+			productmasterBean.setTin(tin);
 			
-			productmasterBeanDb				= this.dao.getProductDetail(session, productmasterBean);
+			productmasterBeanDb				= this.dao.getProductDetail(productmasterBean);
 			
 			this.form.setTitlePage("แก้ไขรายละเอียดสินค้า");
 			this.form.setPageMode(ProductDetailsMaintananceForm.EDIT);
@@ -209,7 +205,8 @@ public class ProductDetailsMaintananceServlet extends EnjoyStandardSvc {
 				productdetailBean = new ProductdetailBean();
 				
 				productdetailBean.setProductCode(productCode);
-				productdetailList = this.dao.getProductdetailList(session, productdetailBean);
+				productdetailBean.setTin(tin);
+				productdetailList = this.dao.getProductdetailList(productdetailBean);
 				
 				for(ProductdetailBean bean:productdetailList){
 					seqTemp = bean.getSeq();
@@ -233,12 +230,8 @@ public class ProductDetailsMaintananceServlet extends EnjoyStandardSvc {
 			logger.info(e.getMessage());
 			throw new EnjoyException("getDetail is error");
 		}finally{
-			session.close();
-			
 			this.setRefference();
 			
-			sessionFactory	= null;
-			session			= null;
 			logger.info("[getDetail][End]");
 		}
 		
@@ -255,69 +248,55 @@ public class ProductDetailsMaintananceServlet extends EnjoyStandardSvc {
 	   String						unitName					= null;
 	   String 						productCode					= null;
 	   String 						productName					= null;
+	   String						tin							= null;
 	   JSONObject 					obj 						= new JSONObject();
 	   List<ProductdetailBean> 		productdetailList			= null;
 	   ProductdetailBean			bean						= null;
 	   ProductdetailBean			beanTemp					= null;
 	   int							cou							= 0;
-	   SessionFactory 				sessionFactory				= null;
-		Session 					session						= null;
 	   
 	   try{
-		   sessionFactory 		= HibernateUtil.getSessionFactory();
-		   session 				= sessionFactory.openSession();
 		   productTypeName		= EnjoyUtils.nullToStr(this.request.getParameter("productTypeName"));
 		   productGroupName		= EnjoyUtils.nullToStr(this.request.getParameter("productGroupName"));
 		   unitName				= EnjoyUtils.nullToStr(this.request.getParameter("unitName"));
 		   productCode			= EnjoyUtils.nullToStr(this.request.getParameter("productCode"));
 		   productName			= EnjoyUtils.nullToStr(this.request.getParameter("productName"));
+		   tin					= this.userBean.getTin();
 		   productdetailList	= this.form.getProductdetailList();
 		   
-		   logger.info("[lp_validate] productTypeName 			:: " + productTypeName);
-		   logger.info("[lp_validate] productGroupName 			:: " + productGroupName);
-		   logger.info("[lp_validate] unitName 					:: " + unitName);
-		   logger.info("[lp_validate] productCode 				:: " + productCode);
-		   logger.info("[lp_validate] productName 				:: " + productName);
+		   logger.info("[lp_validate] productTypeName 	:: " + productTypeName);
+		   logger.info("[lp_validate] productGroupName 	:: " + productGroupName);
+		   logger.info("[lp_validate] unitName 			:: " + unitName);
+		   logger.info("[lp_validate] productCode 		:: " + productCode);
+		   logger.info("[lp_validate] productName 		:: " + productName);
+		   logger.info("[lp_validate] tin 				:: " + tin);
 		   
 		   if(this.form.getPageMode().equals(ProductDetailsMaintananceForm.NEW)){
-			   cou = this.dao.checkDupProductCode(session, productCode);
+			   cou = this.dao.checkDupProductCode(productCode, tin);
 			   if(cou > 0){
 				   throw new EnjoyException("รหัสสินค้าซ้ำกันกรุณาระบุใหม่");
 			   }
 		   }
 		   
-		   cou = this.dao.checkDupProductName(session, productName, productCode, this.form.getPageMode());
+		   cou = this.dao.checkDupProductName(productName, productCode, tin, this.form.getPageMode());
 		   if(cou > 0){
 			   throw new EnjoyException("ชื่อสินค้าซ้ำกันกรุณาระบุใหม่");
 		   }
 		   
-		   productTypeCode 		= this.productTypeDao.getProductTypeCode(productTypeName);
+		   productTypeCode 		= this.productTypeDao.getProductTypeCode(productTypeName, tin);
 		   if(productTypeCode==null){
 			   throw new EnjoyException("หมวดสินค้าไม่มีอยู่ในระบบ");
 		   }
 		   
-		   productGroupCode = productGroupDao.getProductGroupCode(productTypeCode, productGroupName);
+		   productGroupCode = productGroupDao.getProductGroupCode(productTypeCode, productGroupName, tin);
 		   if(productGroupCode==null){
 			   throw new EnjoyException("หมู่สินค้าไม่มีอยู่ในระบบ");
 		   }
 		   
-		   unitCode = this.unitTypeDao.getUnitCode(unitName);
+		   unitCode = this.unitTypeDao.getUnitCode(unitName, tin);
 		   if(unitCode==null){
 			   throw new EnjoyException("หน่วยสินค้าไม่มีอยู่ในระบบ");
 		   }
-		   
-//		   for(int i=0;i<productdetailList.size();i++){
-//				bean = productdetailList.get(i);
-//				if(!bean.getRowStatus().equals(ProductDetailsMaintananceForm.DEL)){
-//					
-//					for(int j=(i+1);j<productdetailList.size();j++){
-//						beanTemp = productdetailList.get(j);
-//						if(!beanTemp.getRowStatus().equals(ProductDetailsMaintananceForm.DEL) && bean.getQuanDiscount().equals(beanTemp.getQuanDiscount())){
-//							throw new EnjoyException("ปริมาณที่ซื้อซ้ำกันกรุณาระบุใหม่");
-//						}
-//					}
-//				}
-//			}
 		   
 		   obj.put(STATUS				, SUCCESS);
 		   obj.put("productTypeCode"	, productTypeCode);
@@ -333,12 +312,6 @@ public class ProductDetailsMaintananceServlet extends EnjoyStandardSvc {
 			logger.info(e.getMessage());
 			e.printStackTrace();
 	   }finally{
-		   session.flush();
-		   session.clear();
-		   session.close();
-			
-		   sessionFactory	= null;
-		   session			= null;
 		   this.enjoyUtil.writeMSG(obj.toString());
 		   logger.info("[lp_validate][End]");
 	   }
@@ -353,7 +326,6 @@ public class ProductDetailsMaintananceServlet extends EnjoyStandardSvc {
 		String						productTypeCode			= null;
 		String						productGroupCode		= null;
 		String						unitCode				= null;
-//		String						quantity				= null;
 		String						minQuan					= null;
 		String						costPrice				= null;
 		String						salePrice1				= null;
@@ -361,11 +333,7 @@ public class ProductDetailsMaintananceServlet extends EnjoyStandardSvc {
 		String						salePrice3				= null;
 		String						salePrice4				= null;
 		String						salePrice5				= null;
-//		String						startDate				= null;
-//		String						expDate					= null;
-//		String						productStatus			= null;
-		SessionFactory 				sessionFactory			= null;
-		Session 					session					= null;
+		String						tin						= null;
 		JSONObject 					obj 					= null;
 		ProductmasterBean  			productmasterBean		= null;
 		List<ProductdetailBean> 	productdetailList		= null;
@@ -379,7 +347,6 @@ public class ProductDetailsMaintananceServlet extends EnjoyStandardSvc {
 			productTypeCode 			= EnjoyUtil.nullToStr(request.getParameter("productTypeCode"));
 			productGroupCode 			= EnjoyUtil.nullToStr(request.getParameter("productGroupCode"));
 			unitCode 					= EnjoyUtil.nullToStr(request.getParameter("unitCode"));
-//			quantity 					= EnjoyUtil.nullToStr(request.getParameter("quantity"));
 			minQuan 					= EnjoyUtil.nullToStr(request.getParameter("minQuan"));
 			costPrice 					= EnjoyUtil.nullToStr(request.getParameter("costPrice"));
 			salePrice1 					= EnjoyUtil.nullToStr(request.getParameter("salePrice1"));
@@ -387,11 +354,7 @@ public class ProductDetailsMaintananceServlet extends EnjoyStandardSvc {
 			salePrice3 					= EnjoyUtil.nullToStr(request.getParameter("salePrice3"));
 			salePrice4 					= EnjoyUtil.nullToStr(request.getParameter("salePrice4"));
 			salePrice5 					= EnjoyUtil.nullToStr(request.getParameter("salePrice5"));
-//			startDate 					= EnjoyUtil.nullToStr(request.getParameter("startDate"));
-//			expDate 					= EnjoyUtil.nullToStr(request.getParameter("expDate"));
-//			productStatus 				= EnjoyUtil.nullToStr(request.getParameter("productStatus"));
-			sessionFactory 				= HibernateUtil.getSessionFactory();
-			session 					= sessionFactory.openSession();
+			tin							= this.userBean.getTin();
 			obj 						= new JSONObject();
 			productmasterBean			= new ProductmasterBean();
 			productdetailList			= this.form.getProductdetailList();
@@ -402,7 +365,6 @@ public class ProductDetailsMaintananceServlet extends EnjoyStandardSvc {
 			logger.info("[onSave] productTypeCode 		:: " + productTypeCode);
 			logger.info("[onSave] productGroupCode 		:: " + productGroupCode);
 			logger.info("[onSave] unitCode 				:: " + unitCode);
-//			logger.info("[onSave] quantity 				:: " + quantity);
 			logger.info("[onSave] minQuan 				:: " + minQuan);
 			logger.info("[onSave] costPrice 			:: " + costPrice);
 			logger.info("[onSave] salePrice1 			:: " + salePrice1);
@@ -410,16 +372,14 @@ public class ProductDetailsMaintananceServlet extends EnjoyStandardSvc {
 			logger.info("[onSave] salePrice3 			:: " + salePrice3);
 			logger.info("[onSave] salePrice4 			:: " + salePrice4);
 			logger.info("[onSave] salePrice5 			:: " + salePrice5);
-//			logger.info("[onSave] startDate 			:: " + startDate);
-//			logger.info("[onSave] expDate 				:: " + expDate);
-//			logger.info("[onSave] productStatus 		:: " + productStatus);
+			logger.info("[onSave] tin 					:: " + tin);
 			
 			productmasterBean.setProductCode(productCode);
+			productmasterBean.setTin(tin);
 			productmasterBean.setProductName(productName);
 			productmasterBean.setProductTypeCode(productTypeCode);
 			productmasterBean.setProductGroupCode(productGroupCode);
 			productmasterBean.setUnitCode(unitCode);
-//			productmasterBean.setQuantity(quantity);
 			productmasterBean.setMinQuan(minQuan);
 			productmasterBean.setCostPrice(costPrice);
 			productmasterBean.setSalePrice1(salePrice1);
@@ -427,54 +387,42 @@ public class ProductDetailsMaintananceServlet extends EnjoyStandardSvc {
 			productmasterBean.setSalePrice3(salePrice3);
 			productmasterBean.setSalePrice4(salePrice4);
 			productmasterBean.setSalePrice5(salePrice5);
-//			productDetailsBean.setStartDate(EnjoyUtils.dateFormat(startDate, "dd/MM/yyyy", "yyyyMMdd"));
-//			productDetailsBean.setExpDate(EnjoyUtils.dateFormat(expDate, "dd/MM/yyyy", "yyyyMMdd"));
-//			productDetailsBean.setProductStatus(productStatus);
-			
-			session.beginTransaction();
 			
 			if(pageMode.equals(ProductDetailsMaintananceForm.NEW)){
-				this.dao.insertProductmaster(session, productmasterBean);
+				this.dao.insertProductmaster(productmasterBean);
 			}else{
-				this.dao.updateProductmaster(session, productmasterBean);
+				this.dao.updateProductmaster(productmasterBean);
 			}
 			
-			this.dao.deleteProductdetail(session, productCode);
+			this.dao.deleteProductdetail(productCode, tin);
 			
 			for(int i=0;i<productdetailList.size();i++){
 				bean = productdetailList.get(i);
 				if(!bean.getRowStatus().equals(ProductDetailsMaintananceForm.DEL)){
 					bean.setProductCode(productCode);
+					bean.setTin(tin);
 					bean.setSeqDb(String.valueOf(seqDb));
-					this.dao.insertProductdetail(session, bean);
+					this.dao.insertProductdetail(bean);
 					seqDb++;
 				}
 			}
 			
-			session.getTransaction().commit();
+			commit();
 			
 			obj.put(STATUS, 			SUCCESS);
 			
 		}catch(EnjoyException e){
-			session.getTransaction().rollback();
+			rollback();
 			obj.put(STATUS, 		ERROR);
 			obj.put(ERR_MSG, 		e.getMessage());
 		}catch(Exception e){
-			session.getTransaction().rollback();
+			rollback();
 			logger.info(e.getMessage());
 			e.printStackTrace();
 			obj.put(STATUS, 		ERROR);
 			obj.put(ERR_MSG, 		"onSave is error");
 		}finally{
-			
-			session.flush();
-			session.clear();
-			session.close();
-			
 			this.enjoyUtil.writeMSG(obj.toString());
-			
-			sessionFactory	= null;
-			session			= null;
 			
 			logger.info("[onSave][End]");
 		}
@@ -483,19 +431,22 @@ public class ProductDetailsMaintananceServlet extends EnjoyStandardSvc {
 	private void getProductTypeNameList(){
 	   logger.info("[getProductTypeNameList][Begin]");
 	   
-	   String							productTypeName			= null;
-	   List<ComboBean> 					list 					= null;
-       JSONArray 						jSONArray 				= null;
-       JSONObject 						objDetail 				= null;
+	   String			productTypeName		= null;
+	   String			tin 				= null;
+	   List<ComboBean> 	list 				= null;
+       JSONArray 		jSONArray 			= null;
+       JSONObject 		objDetail 			= null;
        
 	   try{
-		   productTypeName			= EnjoyUtils.nullToStr(this.request.getParameter("productTypeName"));
-		   jSONArray 				= new JSONArray();
+		   productTypeName	= EnjoyUtils.nullToStr(this.request.getParameter("productTypeName"));
+		   tin				= this.userBean.getTin();
+		   jSONArray 		= new JSONArray();
 		   
-		   logger.info("[getProductTypeNameList] productTypeName 			:: " + productTypeName);
+		   logger.info("[getProductTypeNameList] productTypeName 	:: " + productTypeName);
+		   logger.info("[getProductTypeNameList] tin 				:: " + tin);
 		   
 		   
-		   list 		= this.productTypeDao.productTypeNameList(productTypeName);
+		   list 		= this.productTypeDao.productTypeNameList(productTypeName, tin);
 		   
 		   for(ComboBean bean:list){
 			   objDetail 		= new JSONObject();
@@ -519,22 +470,25 @@ public class ProductDetailsMaintananceServlet extends EnjoyStandardSvc {
    private void getProductGroupNameList(){
 	   logger.info("[getProductGroupNameList][Begin]");
 	   
-	   String							productTypeName			= null;
-	   String							productGroupName		= null;
-	   List<ComboBean> 					list 					= null;
-       JSONArray 						jSONArray 				= null;
-       JSONObject 						objDetail 				= null;
+	   String			productTypeName			= null;
+	   String			productGroupName		= null;
+	   String			tin 					= null;
+	   List<ComboBean> 	list 					= null;
+       JSONArray 		jSONArray 				= null;
+       JSONObject 		objDetail 				= null;
        
 	   try{
-		   jSONArray 				= new JSONArray();
-		   productTypeName			= EnjoyUtils.nullToStr(this.request.getParameter("productTypeName"));
-		   productGroupName			= EnjoyUtils.nullToStr(this.request.getParameter("productGroupName"));
+		   jSONArray 			= new JSONArray();
+		   productTypeName		= EnjoyUtils.nullToStr(this.request.getParameter("productTypeName"));
+		   productGroupName		= EnjoyUtils.nullToStr(this.request.getParameter("productGroupName"));
+		   tin					= this.userBean.getTin();
 		   
 		   
-		   logger.info("[getProductGroupNameList] productTypeName 			:: " + productTypeName);
-		   logger.info("[getProductGroupNameList] productGroupName 			:: " + productGroupName);
+		   logger.info("[getProductGroupNameList] productTypeName 	:: " + productTypeName);
+		   logger.info("[getProductGroupNameList] productGroupName 	:: " + productGroupName);
+		   logger.info("[getProductGroupNameList] tin 				:: " + tin);
 		   
-		   list 		= this.productGroupDao.productGroupNameList(productTypeName, productGroupName, false);
+		   list 		= this.productGroupDao.productGroupNameList(productTypeName, productGroupName, tin, false);
 		   
 		   for(ComboBean bean:list){
 			   objDetail 		= new JSONObject();
@@ -558,19 +512,22 @@ public class ProductDetailsMaintananceServlet extends EnjoyStandardSvc {
 	private void getUnitNameList(){
 	   logger.info("[getUnitNameList][Begin]");
 	   
-	   String							unitName			= null;
-	   List<ComboBean> 					list 				= null;
-       JSONArray 						jSONArray 			= null;
-       JSONObject 						objDetail 			= null;
+	   String			unitName			= null;
+	   String			tin 				= null;
+	   List<ComboBean> 	list 				= null;
+       JSONArray 		jSONArray 			= null;
+       JSONObject 		objDetail 			= null;
       
 	   try{
 		   unitName			= EnjoyUtils.nullToStr(this.request.getParameter("unitName"));
-		   jSONArray 				= new JSONArray();
+		   tin				= this.userBean.getTin();
+		   jSONArray 		= new JSONArray();
 		   
-		   logger.info("[getUnitNameList] unitName 			:: " + unitName);
+		   logger.info("[getUnitNameList] unitName 	:: " + unitName);
+		   logger.info("[getUnitNameList] tin 		:: " + tin);
 		   
 		   
-		   list 		= this.unitTypeDao.unitNameList(unitName);
+		   list 		= this.unitTypeDao.unitNameList(unitName, tin);
 		   
 		   for(ComboBean bean:list){
 			   objDetail 		= new JSONObject();
@@ -718,6 +675,30 @@ public class ProductDetailsMaintananceServlet extends EnjoyStandardSvc {
 			this.enjoyUtil.writeMSG(obj.toString());
 			logger.info("[deleteRecord][End]");
 		}
+	}
+
+	@Override
+	public void destroySession() {
+		this.dao.destroySession();
+        this.productTypeDao.destroySession();
+        this.productGroupDao.destroySession();
+        this.unitTypeDao.destroySession();
+	}
+
+	@Override
+	public void commit() {
+		this.dao.commit();
+        this.productTypeDao.commit();
+        this.productGroupDao.commit();
+        this.unitTypeDao.commit();
+	}
+
+	@Override
+	public void rollback() {
+		this.dao.rollback();
+        this.productTypeDao.rollback();
+        this.productGroupDao.rollback();
+        this.unitTypeDao.rollback();
 	}
 	
 	

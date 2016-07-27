@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import th.go.stock.app.enjoy.bean.ComboBean;
 import th.go.stock.app.enjoy.bean.InvoiceCreditMasterBean;
 
 public class UpdateInvoiceCreditSearchForm {
@@ -22,7 +21,6 @@ public class UpdateInvoiceCreditSearchForm {
 	private String							totalRecord;
 	private List<InvoiceCreditMasterBean> 	dataList;
 	private HashMap							hashTable;
-	private List<ComboBean> 				companyCombo;
 	
 	public UpdateInvoiceCreditSearchForm(){
 		this.invoiceCreditMasterBean 	= new InvoiceCreditMasterBean();
@@ -34,7 +32,6 @@ public class UpdateInvoiceCreditSearchForm {
 		this.totalRecord				= "";
 		this.dataList					= new ArrayList<InvoiceCreditMasterBean>();
 		this.hashTable					= new HashMap();
-		this.companyCombo				= new ArrayList<ComboBean>();
 	}
 
 	public InvoiceCreditMasterBean getInvoiceCreditMasterBean() {
@@ -108,13 +105,5 @@ public class UpdateInvoiceCreditSearchForm {
 
 	public void setHashTable(HashMap hashTable) {
 		this.hashTable = hashTable;
-	}
-
-	public List<ComboBean> getCompanyCombo() {
-		return companyCombo;
-	}
-
-	public void setCompanyCombo(List<ComboBean> companyCombo) {
-		this.companyCombo = companyCombo;
 	}
 }

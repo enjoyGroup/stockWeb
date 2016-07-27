@@ -9,7 +9,6 @@
 	StockBalanceReportBean 			stockBalanceReportBean 	= stockBalanceReportForm.getStockBalanceReportBean();
 	List<StockBalanceReportBean> 	dataList 				= stockBalanceReportForm.getDataList();
 	String							titlePage				= stockBalanceReportForm.getTitlePage();
-	List<ComboBean> 				companyCombo 			= stockBalanceReportForm.getCompanyCombo();
 %>
 
 <html>
@@ -104,12 +103,7 @@
 				var params = "";
 				
 				try{
-					if(!lp_validate()){
-						return;
-					}
-					
-					params = "tin=" 				+ $("#tin").val()
-							+ "&productTypeName=" 	+ $("#productTypeName").val()
+					params = "productTypeName=" 	+ $("#productTypeName").val()
 							+ "&productGroupName=" 	+ $("#productGroupName").val();
 					
 					gp_dialogPopUp(gv_url + "?" + gv_service + "&pageAction=showData&" + params, "<%=titlePage%>");
@@ -130,23 +124,6 @@
 			    }				
 			}); 
 		});
-		
-		function lp_validate(){
-			var la_validate             = new Array( "tin:บริษัทที่สังกัด");
-		    var lv_return				= true;
-		    
-			try{
-				if(!gp_validateEmptyObj(la_validate)){
-					return false;
-				}
-				
-			}catch(e){
-				alert("lp_validate :: " + e);
-				return false;
-			}
-			
-			return lv_return;
-		}
 		
 	</script>
 </head>
@@ -170,20 +147,10 @@
 										<div class="panel-body" align="center">
 								        	<table width="100%" border="0" cellpadding="5" cellspacing="5">
 								        		<tr>
-								        			<td align="right" width="150px;">
-								        				บริษัทที่สังกัด <span style="color: red;"><b>*</b></span> : &nbsp;
-								        			</td>
-								        			<td align="left">
-								        				<select id="tin" name="tin" style="width: 220px;" >
-								        					<% for(ComboBean comboBean:companyCombo){ %>
-								        					<option value="<%=comboBean.getCode()%>" <%if(stockBalanceReportBean.getTin().equals(comboBean.getCode())){ %> selected <%} %> ><%=comboBean.getDesc()%></option>
-								        					<%} %>
-								        				</select>
-								        			</td>
 								        			<td align="right">
 								        				หมวดสินค้า :&nbsp;
 								        			</td>
-								        			<td align="left" colspan="3">
+								        			<td align="left">
 								        				<input type='text'
 								        					   id="productTypeName" 
 								        					   name='productTypeName' 
@@ -191,12 +158,10 @@
 								        					   maxlength="200" 
 								        					   style="width: 220px;" />
 								        			</td>
-								        		</tr>
-								        		<tr>
 								        			<td align="right">
 								        				หมู่สินค้า :&nbsp;
 								        			</td>
-								        			<td align="left" colspan="5">
+								        			<td align="left" colspan="3">
 								        				<input type='text' 
 								        					   id="productGroupName" 
 								        					   name='productGroupName' 

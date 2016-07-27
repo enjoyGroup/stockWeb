@@ -87,5 +87,4 @@ public class ProductDetailsMaintananceForm {
 	public void setSeqTemp(String seqTemp) {
 		this.seqTemp = seqTemp;
 	}
-
 }

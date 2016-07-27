@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import th.go.stock.app.enjoy.bean.ComboBean;
-import th.go.stock.app.enjoy.bean.CustomerDetailsBean;
 import th.go.stock.app.enjoy.bean.ProductmasterBean;
 
 public class ProductDetailsSearchForm {
@@ -117,5 +115,4 @@ public class ProductDetailsSearchForm {
 	public void setRadPrint(String radPrint) {
 		this.radPrint = radPrint;
 	}
-
 }

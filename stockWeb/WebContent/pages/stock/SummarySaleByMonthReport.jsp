@@ -9,7 +9,6 @@
 	SummarySaleByMonthReportBean 		summarySaleByMonthReportBean 	= summarySaleByMonthReportForm.getSummarySaleByMonthReportBean();
 	List<SummarySaleByMonthReportBean> 	dataList 						= summarySaleByMonthReportForm.getDataList();
 	String								titlePage						= summarySaleByMonthReportForm.getTitlePage();
-	List<ComboBean> 					companyCombo 					= summarySaleByMonthReportForm.getCompanyCombo();
 %>
 
 <html>
@@ -42,8 +41,7 @@
 						return;
 					}
 					
-					params = "tin=" 			+ $("#tin").val()
-							+ "&invoiceMonth=" 	+ $("#invoiceMonth").val();
+					params = "invoiceMonth=" 	+ $("#invoiceMonth").val();
 					
 					gp_dialogPopUp(gv_url + "?" + gv_service + "&pageAction=showData&" + params, "<%=titlePage%>");
 				}catch(err){
@@ -65,7 +63,7 @@
 		});
 		
 		function lp_validate(){
-			var la_validate             = new Array( "tin:บริษัทที่สังกัด", "invoiceMonth:เดือน/ปี");
+			var la_validate             = new Array( "invoiceMonth:เดือน/ปี");
 		    var lv_return				= true;
 		    
 			try{
@@ -103,20 +101,10 @@
 										<div class="panel-body" align="center">
 								        	<table width="100%" border="0" cellpadding="5" cellspacing="5">
 								        		<tr>
-								        			<td align="right" width="150px;">
-								        				บริษัทที่สังกัด <span style="color: red;"><b>*</b></span> : &nbsp;
-								        			</td>
-								        			<td align="left">
-								        				<select id="tin" name="tin" style="width: 220px;" >
-								        					<% for(ComboBean comboBean:companyCombo){ %>
-								        					<option value="<%=comboBean.getCode()%>" <%if(summarySaleByMonthReportBean.getTin().equals(comboBean.getCode())){ %> selected <%} %> ><%=comboBean.getDesc()%></option>
-								        					<%} %>
-								        				</select>
-								        			</td>
 								        			<td align="right">
 								        				เดือน/ปี <span style="color: red;"><b>*</b></span> :&nbsp;
 								        			</td>
-								        			<td align="left" colspan="3">
+								        			<td align="left" colspan="5">
 								        				<input type='text' 
 								        					   id="invoiceMonth" 
 								        					   name='invoiceMonth' 

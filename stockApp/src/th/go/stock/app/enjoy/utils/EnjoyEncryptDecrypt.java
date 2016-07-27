@@ -25,11 +25,11 @@ public class EnjoyEncryptDecrypt {
         return md5;
     }
     
-    public static String enCryption(String userId, String pass) {
+    public static String enCryption(String userEmail, String pass) {
         String encryptedData 		= null;
         
         try {
-        	encryptedData 	= md5(userId + "%" + pass);
+        	encryptedData 	= md5(userEmail + "%" + pass);
         } catch (Exception e) {
             e.printStackTrace();
         }

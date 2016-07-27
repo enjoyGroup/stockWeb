@@ -2,134 +2,131 @@
 package th.go.stock.app.enjoy.dao;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-
-import org.hibernate.SQLQuery;
-import org.hibernate.Session;
-import org.hibernate.type.IntegerType;
-import org.hibernate.type.StringType;
 
 import th.go.stock.app.enjoy.bean.AdjustStockBean;
 import th.go.stock.app.enjoy.exception.EnjoyException;
 import th.go.stock.app.enjoy.form.AdjustStockForm;
+import th.go.stock.app.enjoy.main.Constants;
+import th.go.stock.app.enjoy.main.DaoControl;
 import th.go.stock.app.enjoy.model.Adjusthistory;
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
 import th.go.stock.app.enjoy.utils.EnjoyUtils;
 
-public class AdjustStockDao {
+public class AdjustStockDao extends DaoControl {
 	
-	private static final EnjoyLogger logger = EnjoyLogger.getLogger(AdjustStockDao.class);
+	public AdjustStockDao(){
+		setLogger(EnjoyLogger.getLogger(AdjustStockDao.class));
+		super.init();
+	}
 	
-	public List<AdjustStockBean> getAdjustHistoryList(	Session 			session, 
-														AdjustStockBean 	adjustStockBean) throws EnjoyException{
-		logger.info("[getAdjustHistoryList][Begin]");
+	public List<AdjustStockBean> getAdjustHistoryList(AdjustStockBean 	adjustStockBean) throws EnjoyException{
+		getLogger().info("[getAdjustHistoryList][Begin]");
 		
-		String								hql							= null;
-		SQLQuery 							query 						= null;
-		List<Object[]>						list						= null;
-		AdjustStockBean						bean						= null;
-		List<AdjustStockBean> 				adjustStockBeanList 		= new ArrayList<AdjustStockBean>();
+		String								hql						= null;
+		AdjustStockBean						bean					= null;
+		List<AdjustStockBean> 				adjustStockBeanList 	= new ArrayList<AdjustStockBean>();
+		HashMap<String, Object>				param					= new HashMap<String, Object>();
+		List<String>						columnList				= new ArrayList<String>();
+		List<HashMap<String, Object>>		resultList				= null;
 		
 		try{	
 			hql					= "select a.* "
 								+ "		from("
 								+ "			SELECT @rownum\\:=@rownum+1 AS rownum,t.*"
 								+ "				from (SELECT @rownum\\:=0) r, adjusthistory t"
-								+ "				where t.productCode = '"+adjustStockBean.getProductCode()+"'"
-								+ "					and t.tin = '"+adjustStockBean.getTin()+"'"
+								+ "				where t.productCode = :productCode"
+								+ "					and t.tin 		= :tin"
 								+ "				order by t.adjustDate desc, adjustNo desc"
-								+ "		) a LIMIT " + adjustStockBean.getLastOrder() + ", " + AdjustStockForm.ORDER_LIMIT;
+								+ "		) a LIMIT :limit, " + AdjustStockForm.ORDER_LIMIT;
 			
-			logger.info("[getAdjustHistoryList] hql :: " + hql);
-
-			query			= session.createSQLQuery(hql);			
-			query.addScalar("adjustNo"		, new StringType());
-			query.addScalar("adjustDate"	, new StringType());
-			query.addScalar("productCode"	, new StringType());
-			query.addScalar("quanOld"		, new StringType());
-			query.addScalar("quanNew"		, new StringType());
-			query.addScalar("remark"		, new StringType());
 			
-			list		 	= query.list();
+			param.put("productCode"	, adjustStockBean.getProductCode());
+			param.put("tin"			, adjustStockBean.getTin());
+			param.put("limit"		, adjustStockBean.getLastOrder());
 			
-			logger.info("[searchByCriteria] list.size() :: " + list.size());
+			columnList.add("adjustNo");
+			columnList.add("adjustDate");
+			columnList.add("productCode");
+			columnList.add("quanOld");
+			columnList.add("quanNew");
+			columnList.add("remark");
 			
-			for(Object[] row:list){
+			resultList = getResult(hql, param, columnList);
+			
+			for(HashMap<String, Object> row:resultList){
 				bean 	= new AdjustStockBean();
 				
-				bean.setAdjustNo			(EnjoyUtils.nullToStr(row[0]));
-				bean.setAdjustDate			(EnjoyUtils.dateToThaiDisplay(row[1]));
-				bean.setProductCode			(EnjoyUtils.nullToStr(row[2]));
-				bean.setQuanOld				(EnjoyUtils.convertFloatToDisplay(row[3], 2));
-				bean.setQuanNew				(EnjoyUtils.convertFloatToDisplay(row[4], 2));
-				bean.setRemark				(EnjoyUtils.nullToStr(row[5]));
+				bean.setAdjustNo			(EnjoyUtils.nullToStr(row.get("adjustNo")));
+				bean.setAdjustDate			(EnjoyUtils.dateToThaiDisplay(row.get("adjustDate")));
+				bean.setProductCode			(EnjoyUtils.nullToStr(row.get("productCode")));
+				bean.setQuanOld				(EnjoyUtils.convertFloatToDisplay(row.get("quanOld"), 2));
+				bean.setQuanNew				(EnjoyUtils.convertFloatToDisplay(row.get("quanNew"), 2));
+				bean.setRemark				(EnjoyUtils.nullToStr(row.get("remark")));
 				
 				adjustStockBeanList.add(bean);
 			}	
 			
 		}catch(Exception e){
-			logger.info("[getAdjustHistoryList] " + e.getMessage());
+			getLogger().info("[getAdjustHistoryList] " + e.getMessage());
 			e.printStackTrace();
 			throw new EnjoyException("error getAdjustHistoryList");
 		}finally{
 			hql						= null;
-			logger.info("[getAdjustHistoryList][End]");
+			getLogger().info("[getAdjustHistoryList][End]");
 		}
 		
 		return adjustStockBeanList;
 		
 	}
 	
-	public int checkLimitAdjustHistoryOrder(Session session, String productCode, String tin, int lastOrder) throws EnjoyException{
-		logger.info("[checkLimitAdjustHistoryOrder][Begin]");
+	public int checkLimitAdjustHistoryOrder(String productCode, String tin, int lastOrder) throws EnjoyException{
+		getLogger().info("[checkLimitAdjustHistoryOrder][Begin]");
 		
-		String							hql									= null;
-		List<Integer>			 		list								= null;
-		SQLQuery 						query 								= null;
-		int 							result								= 0;
-		
+		String							hql						= null;
+		int 							result					= 0;
+		HashMap<String, Object>			param					= new HashMap<String, Object>();
+		List<Object>					resultList				= null;
 		
 		try{
 			hql				= "select count(*) cou"
 							+ "	from("
 							+ "		SELECT @rownum\\:=@rownum+1 AS rownum,t.* "
 							+ " 		from (SELECT @rownum\\:=0) r, adjusthistory t"
-							+ " 		where t.productCode = '"+productCode+"'"
-							+ "					and t.tin = '"+tin+"'"
+							+ " 		where t.productCode = :productCode"
+							+ "					and t.tin 	= :tin"
 							+ " 		order by t.adjustDate desc, adjustNo desc"
-							+ " ) a where a.rownum > " + lastOrder;
+							+ " ) a where a.rownum > :lastOrder";
 			
-			query			= session.createSQLQuery(hql);
+			//Criteria
+			param.put("productCode"	, productCode);
+			param.put("tin"			, tin);
+			param.put("lastOrder"	, lastOrder);
 			
-			query.addScalar("cou"			, new IntegerType());
+			resultList = getResult(hql, param, "cou", Constants.INT_TYPE);
 			
-			list		 	= query.list();
-			
-			if(list!=null && list.size() > 0){
-				result = list.get(0);
+			if(resultList!=null && resultList.size() > 0){
+				result = EnjoyUtils.parseInt(resultList.get(0));
 			}
 			
-			logger.info("[checkLimitAdjustHistoryOrder] result 			:: " + result);
-			
-			
+			getLogger().info("[checkLimitAdjustHistoryOrder] result 			:: " + result);
 			
 		}catch(Exception e){
-			logger.info(e.getMessage());
+			getLogger().info(e.getMessage());
 			throw new EnjoyException(e.getMessage());
 		}finally{
 			
 			hql									= null;
-			list								= null;
-			query 								= null;
-			logger.info("[checkLimitAdjustHistoryOrder][End]");
+			getLogger().info("[checkLimitAdjustHistoryOrder][End]");
 		}
 		
 		return result;
 	}
 	
 	
-	public void insertAdjustHistory(Session session, AdjustStockBean adjustStockBean) throws EnjoyException{
-		logger.info("[insertAdjustHistory][Begin]");
+	public void insertAdjustHistory(AdjustStockBean adjustStockBean) throws EnjoyException{
+		getLogger().info("[insertAdjustHistory][Begin]");
 		
 		Adjusthistory	adjusthistory	= null;
 		
@@ -144,15 +141,15 @@ public class AdjustStockDao {
 			adjusthistory.setRemark				(adjustStockBean.getRemark());
 			adjusthistory.setTin				(adjustStockBean.getTin());
 			
-			session.saveOrUpdate(adjusthistory);
+			insertData(adjusthistory);
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			logger.info(e.getMessage());
+			getLogger().info(e.getMessage());
 			throw new EnjoyException("Error insertAdjustHistory");
 		}finally{
 			adjusthistory = null;
-			logger.info("[insertAdjustHistory][End]");
+			getLogger().info("[insertAdjustHistory][End]");
 		}
 	}
 	

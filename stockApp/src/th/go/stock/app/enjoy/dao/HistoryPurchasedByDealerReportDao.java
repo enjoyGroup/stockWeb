@@ -5,9 +5,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.hibernate.SQLQuery;
-import org.hibernate.type.StringType;
-
 import th.go.stock.app.enjoy.bean.HistoryPurchasedByDealerReportBean;
 import th.go.stock.app.enjoy.exception.EnjoyException;
 import th.go.stock.app.enjoy.main.DaoControl;
@@ -25,8 +22,6 @@ public class HistoryPurchasedByDealerReportDao extends DaoControl {
 		getLogger().info("[searchByCriteria][Begin]");
 		
 		String										hql						= null;
-		SQLQuery 									query 					= null;
-		List<Object[]>								list					= null;
 		HistoryPurchasedByDealerReportBean			bean					= null;
 		List<HistoryPurchasedByDealerReportBean> 	historyPurchasedList 	= new ArrayList<HistoryPurchasedByDealerReportBean>();
 		String 										reciveDateFrom			= null;
@@ -42,6 +37,7 @@ public class HistoryPurchasedByDealerReportDao extends DaoControl {
 			hql					= "select CONCAT(b.vendorName, '(', b.branchName, ')') as vendorName , a.reciveNo, a.reciveDate, a.reciveTotal, a.reciveDiscount"
 									+ " from reciveordermaster a, companyvendor b"
 									+ " where a.vendorCode = b.vendorCode"
+									+ "		and a.tin = b.tinCompany"
 									+ "		and a.tin = :tin"
 									+ " 	and a.reciveDate >= STR_TO_DATE(:reciveDateFrom	, '%Y%m%d')"
 									+ " 	and a.reciveDate <= STR_TO_DATE(:reciveDateTo	, '%Y%m%d')";

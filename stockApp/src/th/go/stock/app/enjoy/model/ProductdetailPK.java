@@ -14,6 +14,8 @@ public class ProductdetailPK implements Serializable {
 
 	private String productCode;
 
+	private String tin;
+
 	private int seq;
 
 	public ProductdetailPK() {
@@ -23,6 +25,12 @@ public class ProductdetailPK implements Serializable {
 	}
 	public void setProductCode(String productCode) {
 		this.productCode = productCode;
+	}
+	public String getTin() {
+		return this.tin;
+	}
+	public void setTin(String tin) {
+		this.tin = tin;
 	}
 	public int getSeq() {
 		return this.seq;
@@ -41,6 +49,7 @@ public class ProductdetailPK implements Serializable {
 		ProductdetailPK castOther = (ProductdetailPK)other;
 		return 
 			this.productCode.equals(castOther.productCode)
+			&& this.tin.equals(castOther.tin)
 			&& (this.seq == castOther.seq);
 	}
 
@@ -48,6 +57,7 @@ public class ProductdetailPK implements Serializable {
 		final int prime = 31;
 		int hash = 17;
 		hash = hash * prime + this.productCode.hashCode();
+		hash = hash * prime + this.tin.hashCode();
 		hash = hash * prime + this.seq;
 		
 		return hash;

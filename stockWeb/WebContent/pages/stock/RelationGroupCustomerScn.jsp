@@ -11,7 +11,6 @@
 	String							titlePage					= relationGroupCustomerForm.getTitlePage();
 	List<RelationGroupCustomerBean> relationGroupCustomerList 	= relationGroupCustomerForm.getRelationGroupCustomerList();
 
-
 %>
 
 <html>
@@ -26,11 +25,7 @@
 		var gv_jsonGroupSalePriceCombo 	= '<%=relationGroupCustomerForm.getJsonGroupSalePriceCombo()%>';
 		
 		$(document).ready(function(){
-			//gp_progressBarOn();
-			
 			gv_service 		= "service=" + $('#service').val();
-			
-			//gp_progressBarOff();
 			
 		});
 		

@@ -10,7 +10,6 @@
 	List<ReciveOrderMasterBean> dataList 				= reciveStockSearchForm.getDataList();
 	String						titlePage				= reciveStockSearchForm.getTitlePage();
 	List<ComboBean> 			statusCombo 			= reciveStockSearchForm.getStatusCombo();
-	List<ComboBean> 			companyCombo 			= reciveStockSearchForm.getCompanyCombo();
 %>
 
 <html>
@@ -41,9 +40,6 @@
 			 
 			$('#btnSearch').click(function(){ 
 				try{
-					if(!gp_validateEmptyObj(new Array( "tin:บริษัทที่สังกัด"))){
-						return false;
-					}
 					
 					$.ajax({
 						async:true,
@@ -75,9 +71,9 @@
 			
 		});
 		
-		function lp_sendEditPage(av_reciveNo, av_tin){
+		function lp_sendEditPage(av_reciveNo){
 			try{
-				var params = "reciveNo=" + av_reciveNo + "&tin=" + av_tin;
+				var params = "reciveNo=" + av_reciveNo;
 				window.location.replace(gv_url + "?service=servlet.ReciveStockMaintananceServlet&pageAction=getDetail&" + params);
 			}catch(e){
 				alert("lp_sendEditPage :: " + e);
@@ -171,16 +167,6 @@
 										<div class="panel-body" align="center">
 								        	<table width="100%" border="0" cellpadding="5" cellspacing="5">
 								        		<tr>
-								        			<td align="right" width="120">
-														บริษัทที่สังกัด<span style="color: red;"><b>*</b></span> :
-													</td>
-								        			<td align="left">
-								        				<select id="tin" name="tin" style="width: 220px;" >
-								        					<% for(ComboBean comboBean:companyCombo){ %>
-								        					<option value="<%=comboBean.getCode()%>" <%if(reciveOrderMasterBean.getTin().equals(comboBean.getCode())){ %> selected <%} %> ><%=comboBean.getDesc()%></option>
-								        					<%} %>
-								        				</select>
-								        			</td>
 								        			<td align="right" width="150px;">
 								        				เลขที่ใบสั่งของ  : &nbsp;
 								        			</td>
@@ -190,7 +176,7 @@
 								        			<td align="right">
 								        				วันที่สั่งของ :&nbsp;
 								        			</td>
-								        			<td align="left">
+								        			<td align="left" colspan="3">
 								        				<input type='text' 
 								        					   id="reciveDateFrom" 
 								        					   name='reciveDateFrom' 
@@ -275,7 +261,7 @@
 											if(dataList.size()>0){
 												for(ReciveOrderMasterBean bean:dataList){
 										%>
-													<tr class="rowSelect" onclick="lp_sendEditPage('<%=bean.getReciveNo()%>', '<%=bean.getTin()%>')" >
+													<tr class="rowSelect" onclick="lp_sendEditPage('<%=bean.getReciveNo()%>')" >
 														<td style="text-align:center"><%=seq%></td>
 														<td align="center"><%=bean.getReciveNo()%></td>
 														<td align="center"><%=bean.getReciveDate()%></td>

@@ -33,8 +33,6 @@ public class Userdetail implements Serializable {
 
 	private String userEmail;
 
-	private String userId;
-
 	private String userLevel;
 
 	private String userName;
@@ -104,14 +102,6 @@ public class Userdetail implements Serializable {
 
 	public void setUserEmail(String userEmail) {
 		this.userEmail = userEmail;
-	}
-
-	public String getUserId() {
-		return this.userId;
-	}
-
-	public void setUserId(String userId) {
-		this.userId = userId;
 	}
 
 	public String getUserLevel() {

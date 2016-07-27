@@ -10,20 +10,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-
 import th.go.stock.app.enjoy.bean.ComboBean;
 import th.go.stock.app.enjoy.bean.ReciveOrderMasterBean;
 import th.go.stock.app.enjoy.bean.UserDetailsBean;
 import th.go.stock.app.enjoy.dao.ReciveStockDao;
-import th.go.stock.app.enjoy.dao.RelationUserAndCompanyDao;
 import th.go.stock.app.enjoy.exception.EnjoyException;
 import th.go.stock.app.enjoy.form.ReciveStockSearchForm;
 import th.go.stock.app.enjoy.main.Constants;
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
 import th.go.stock.app.enjoy.utils.EnjoyUtils;
-import th.go.stock.app.enjoy.utils.HibernateUtil;
 import th.go.stock.web.enjoy.common.EnjoyStandardSvc;
 import th.go.stock.web.enjoy.utils.EnjoyUtil;
 
@@ -40,7 +35,6 @@ public class ReciveStockSearchServlet extends EnjoyStandardSvc {
     private HttpSession                 session                     = null;
     private UserDetailsBean             userBean                    = null;
     private ReciveStockDao				dao							= null;
-    private RelationUserAndCompanyDao	relationUserAndCompanyDao	= null;
     private ReciveStockSearchForm		form						= null;
     
 	@Override
@@ -64,7 +58,6 @@ public class ReciveStockSearchServlet extends EnjoyStandardSvc {
              this.userBean           		= (UserDetailsBean) session.getAttribute("userBean");
              this.form               		= (ReciveStockSearchForm) session.getAttribute(FORM_NAME);
              this.dao						= new ReciveStockDao();
-             this.relationUserAndCompanyDao = new RelationUserAndCompanyDao();
  			
              logger.info("[execute] pageAction : " + pageAction );
              
@@ -86,6 +79,7 @@ public class ReciveStockSearchServlet extends EnjoyStandardSvc {
  			e.printStackTrace();
  			logger.info(e.getMessage());
  		}finally{
+ 			destroySession();
  			logger.info("[execute][End]");
  		}
 	}
@@ -111,7 +105,6 @@ public class ReciveStockSearchServlet extends EnjoyStandardSvc {
 		
 		try{
 			this.setStatusCombo();
-			this.setCompanyCombo();
 		}catch(EnjoyException e){
 			throw new EnjoyException(e.getMessage());
 		}catch(Exception e){
@@ -148,36 +141,10 @@ public class ReciveStockSearchServlet extends EnjoyStandardSvc {
 		}
 	}
 	
-	private void setCompanyCombo() throws EnjoyException{
-		
-		logger.info("[setCompanyCombo][Begin]");
-		
-		List<ComboBean>			companyCombo 		= null;
-		
-		try{
-			
-			companyCombo = this.relationUserAndCompanyDao.getCompanyList(this.userBean.getUserUniqueId());
-			
-			if(companyCombo.size() > 1){
-				companyCombo.add(0, new ComboBean("", "กรุณาระบุ"));
-			}
-			
-			this.form.setCompanyCombo(companyCombo);
-		}
-		catch(Exception e){
-			logger.error(e);
-			throw new EnjoyException("setCompanyCombo is error");
-		}finally{
-			logger.info("[setCompanyCombo][End]");
-		}
-	}
-	
 	private void onSearch() throws EnjoyException{
 		logger.info("[onSearch][Begin]");
 		
 		ReciveOrderMasterBean 		reciveOrderMasterBean	= null;
-		SessionFactory 				sessionFactory			= null;
-		Session 					session					= null;
 		List<ReciveOrderMasterBean> dataList 				= null;
 		int							cou						= 0;
 		int							pageNum					= 1;
@@ -188,21 +155,17 @@ public class ReciveStockSearchServlet extends EnjoyStandardSvc {
         HashMap						hashTable				= new HashMap();
 
 		try{
-			sessionFactory 				= HibernateUtil.getSessionFactory();
-			session 					= sessionFactory.openSession();			
-			session.beginTransaction();
-			
 			reciveOrderMasterBean				= new ReciveOrderMasterBean();
 			
 			reciveOrderMasterBean.setReciveNo			(EnjoyUtils.nullToStr(this.request.getParameter("reciveNo")));
-			reciveOrderMasterBean.setTin				(EnjoyUtils.nullToStr(this.request.getParameter("tin")));
+			reciveOrderMasterBean.setTin				(this.userBean.getTin());
 			reciveOrderMasterBean.setReciveDateFrom		(EnjoyUtils.nullToStr(this.request.getParameter("reciveDateFrom")));
 			reciveOrderMasterBean.setReciveDateTo		(EnjoyUtils.nullToStr(this.request.getParameter("reciveDateTo")));
 			reciveOrderMasterBean.setReciveStatus		(EnjoyUtils.nullToStr(this.request.getParameter("reciveStatus")));
 			
 			this.form.setReciveOrderMasterBean(reciveOrderMasterBean);
 			
-			dataList	 		= this.dao.searchByCriteria(session, reciveOrderMasterBean);
+			dataList	 		= this.dao.searchByCriteria(reciveOrderMasterBean);
 			
 			if(dataList.size() > 0){				
 				
@@ -251,10 +214,6 @@ public class ReciveStockSearchServlet extends EnjoyStandardSvc {
 			logger.info(e.getMessage());
 			throw new EnjoyException("onSearch is error");
 		}finally{
-			session.close();
-			sessionFactory	= null;
-			session			= null;
-			
 			logger.info("[onSearch][End]");
 		}
 		
@@ -282,6 +241,21 @@ public class ReciveStockSearchServlet extends EnjoyStandardSvc {
 		   }
 		   
 	   }
+
+	@Override
+	public void destroySession() {
+		this.dao.destroySession();
+	}
+
+	@Override
+	public void commit() {
+		this.dao.commit();
+	}
+
+	@Override
+	public void rollback() {
+		this.dao.rollback();
+	}
 	
 	
 	

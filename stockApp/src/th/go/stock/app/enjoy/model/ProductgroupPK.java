@@ -16,6 +16,8 @@ public class ProductgroupPK implements Serializable {
 
 	private String productGroupCode;
 
+	private String tin;
+
 	public ProductgroupPK() {
 	}
 	public String getProductTypeCode() {
@@ -30,6 +32,12 @@ public class ProductgroupPK implements Serializable {
 	public void setProductGroupCode(String productGroupCode) {
 		this.productGroupCode = productGroupCode;
 	}
+	public String getTin() {
+		return this.tin;
+	}
+	public void setTin(String tin) {
+		this.tin = tin;
+	}
 
 	public boolean equals(Object other) {
 		if (this == other) {
@@ -41,7 +49,8 @@ public class ProductgroupPK implements Serializable {
 		ProductgroupPK castOther = (ProductgroupPK)other;
 		return 
 			this.productTypeCode.equals(castOther.productTypeCode)
-			&& this.productGroupCode.equals(castOther.productGroupCode);
+			&& this.productGroupCode.equals(castOther.productGroupCode)
+			&& this.tin.equals(castOther.tin);
 	}
 
 	public int hashCode() {
@@ -49,6 +58,7 @@ public class ProductgroupPK implements Serializable {
 		int hash = 17;
 		hash = hash * prime + this.productTypeCode.hashCode();
 		hash = hash * prime + this.productGroupCode.hashCode();
+		hash = hash * prime + this.tin.hashCode();
 		
 		return hash;
 	}

@@ -96,9 +96,11 @@ public class EnjoyGenericSrv extends HttpServlet {
                 redirect(response, target);
             }
         }catch(EnjoyException e){
+        	logger.error(e);
         	redirect(response, Constants.LOGIN_FAIL_URL);
  		} catch (Exception ex) {
             ex.printStackTrace();
+            logger.error(ex);
             redirect(response, Constants.ERR_PAGE_URL);
         }finally{
         	logger.info("[service][End]");

@@ -17,7 +17,7 @@ public class SendMail {
 	
 	private static final EnjoyLogger logger = EnjoyLogger.getLogger(SendMail.class);
 	
-	public void sendMail(String fullName, String userId, String userPwd, String email) throws EnjoyException{
+	public void sendMail(String fullName, String userEmail, String userPwd, String email) throws EnjoyException{
 		final String username = MailConFigFile.getMAIL_USER();
 		final String password = MailConFigFile.getMAIL_PWD();
  
@@ -37,11 +37,12 @@ public class SendMail {
 		try {
  
 			Message message = new MimeMessage(session);
-			message.setFrom(new InternetAddress(username));
+//			message.setFrom(new InternetAddress(username));
+			message.setFrom(new InternetAddress("Enjoy System"));
 			message.setRecipients(Message.RecipientType.TO,InternetAddress.parse(email));
 			message.setSubject("แจ้ง password ของคุณ " + fullName);
 			message.setText("เรียนคุณ " + fullName
-				+ "\n\n User id : " + userId
+				+ "\n\n E-mail : " + userEmail
 				+ "\n\n Password : " + userPwd);
  
 			Transport.send(message);

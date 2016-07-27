@@ -151,36 +151,24 @@
 			
 		    var lv_return				= true;
 		    var cou						= 0;
-		    //var provinceName			= "";
-		    //var districtName			= "";
-		    //var subdistrictName			= "";
 		    
 			try{
-				
-				//provinceName	= gp_trim($("#provinceName").val());
-				//districtName	= gp_trim($("#districtName").val());
-				//subdistrictName	= gp_trim($("#subdistrictName").val());
 				
 				if(!gp_validateEmptyObj(la_validate)){
 					return false;
 				}
 				
-				//alert(gp_validatePin($("#tin").val()));
 				if(gv_checkFormatTin==false){
 					alert("เลขประจำตัวผู้เสียภาษีผิด", function() { 
 						$("#tin").focus();
 	    		    });
-					//alert("เลขประจำตัวผู้เสียภาษีผิด");
-					//$("#tin").focus();
 	                return false;
 				}
 				
 				if(gv_checkDupTin==false){
 					alert("มีเลขประจำตัวผู้เสียภาษีนี้ในระบบแล้ว", function() { 
-						$("#userId").focus();
+						$("#tin").focus();
 	    		    });
-					//alert("มีเลขประจำตัวผู้เสียภาษีนี้ในระบบแล้ว");
-					//$("#userId").focus();
 					return false;
 				}
 				
@@ -188,17 +176,6 @@
 					return false;
 				}
 				
-				/*if(provinceName=="" && districtName=="" && subdistrictName==""){
-					$("#provinceCode").val("");
-        			$("#districtCode").val("");
-        			$("#subdistrictCode").val("");
-					return true;
-				}else{
-					if(provinceName=="" || districtName=="" || subdistrictName==""){
-						alert("กรุณาระบุจังหวัด อำเภอ/เขต และตำบล/แขวงให้ครบ");
-						return false;
-					}
-				}*/
 				
 				$.ajax({
 					async:false,

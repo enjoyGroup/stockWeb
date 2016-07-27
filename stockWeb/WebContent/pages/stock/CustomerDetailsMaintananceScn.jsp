@@ -14,7 +14,6 @@
 	List<ComboBean> 		groupSalePriceCombo = customerDetailsMaintananceForm.getGroupSalePriceCombo();
 	String					titlePage			= customerDetailsMaintananceForm.getTitlePage();
 
-
 %>
 
 <html>

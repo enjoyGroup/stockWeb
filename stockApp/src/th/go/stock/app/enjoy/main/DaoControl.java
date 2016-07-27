@@ -5,9 +5,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.type.IntegerType;
+import org.hibernate.type.StringType;
 
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
 import th.go.stock.app.enjoy.utils.HibernateUtil;
@@ -80,15 +83,67 @@ public class DaoControl {
 		return resultList;
 	}
 	
+	public List<Object> getResult(String hql, HashMap<String, Object> param, String column, int type) throws Exception{
+		List<Object>					list			= null;
+		SQLQuery 						query 			= null;
+		
+		try{
+			logger.info("hql 		  :: " + hql);
+			
+			query			= session.createSQLQuery(hql);
+			setCriteria(query, param);
+			
+			if(type==Constants.INT_TYPE){
+				query.addScalar(column			, new IntegerType());
+			}else if(type==Constants.STRING_TYPE){
+				query.addScalar(column			, new StringType());
+			}
+	        
+	        list		 	= query.list();
+	        
+	        logger.info("list.size :: " + list.size());
+	        
+		}catch(Exception e){
+			e.printStackTrace();
+			throw e;
+		}
+		return list;
+	}
+	
 	public void createSession(){
 		sessionFactory 		= HibernateUtil.getSessionFactory();
 		session 			= sessionFactory.openSession();
+		
+		session.beginTransaction();
 	}
 	
 	public void destroySession(){
 		session.flush();
 		session.clear();
 		session.close();
+	}
+	
+	public void commit(){
+		session.getTransaction().commit();
+	}
+	
+	public void insertData(Object obj) throws Exception{
+		session.saveOrUpdate(obj);
+	}
+	
+	public void rollback(){
+		session.getTransaction().rollback();
+	}
+	
+	public Query createQuery(String hql) throws Exception{
+		Query 	query 	= null;
+		
+		try{
+			query = session.createQuery(hql);
+		}catch(Exception e){
+			throw e;
+		}
+		return query;
 	}
 
 	public EnjoyLogger getLogger() {

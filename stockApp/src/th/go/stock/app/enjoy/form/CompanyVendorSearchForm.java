@@ -105,5 +105,4 @@ public class CompanyVendorSearchForm {
 	public void setHashTable(HashMap hashTable) {
 		this.hashTable = hashTable;
 	}
-
 }

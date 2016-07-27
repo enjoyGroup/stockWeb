@@ -3,6 +3,7 @@ package th.go.stock.app.enjoy.form;
 import java.util.ArrayList;
 import java.util.List;
 
+import th.go.stock.app.enjoy.bean.ComboBean;
 import th.go.stock.app.enjoy.bean.ComparePriceBean;
 
 public class ComparePriceForm {

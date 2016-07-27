@@ -68,6 +68,7 @@ final String pagesURL		= Constants.PAGE_URL;
 <script src="<%=jsURL%>/jquery.tablesorter.js" type="text/javascript"></script>
 <script type="text/javascript" src="<%=jsURL%>/jquery.fixedheadertable.js"></script>
 <script type="text/javascript" src="<%=jsURL%>/jquery.ui.potato.menu.js"></script>
+<script type="text/javascript" src="<%=jsURL%>/jquery.AjaxFileUpload.js"></script>
 <link rel=stylesheet href="<%=cssURL%>/jquery.ui.potato.menu.css">
 <link rel=stylesheet href="<%=cssURL%>/menu.css">    
     

@@ -7,8 +7,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.json.simple.JSONObject;
 
 import th.go.stock.app.enjoy.bean.UserDetailsBean;
@@ -19,7 +17,6 @@ import th.go.stock.app.enjoy.main.Constants;
 import th.go.stock.app.enjoy.utils.EnjoyEncryptDecrypt;
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
 import th.go.stock.app.enjoy.utils.EnjoyUtils;
-import th.go.stock.app.enjoy.utils.HibernateUtil;
 import th.go.stock.web.enjoy.common.EnjoyStandardSvc;
 import th.go.stock.web.enjoy.utils.EnjoyUtil;
 
@@ -75,6 +72,7 @@ public class ChangePasswordServlet extends EnjoyStandardSvc {
  			e.printStackTrace();
  			logger.info(e.getMessage());
  		}finally{
+ 			destroySession();
  			logger.info("[execute][End]");
  		}
 	}
@@ -101,52 +99,44 @@ public class ChangePasswordServlet extends EnjoyStandardSvc {
 		
 		String				   oldUserPassword	    = null; 
 		String				   newUserPassword	    = null; 
-		SessionFactory 		   sessionFactory		= null;
-		Session 			   session				= null;
 		UserDetailsBean 	   userDetailsBean  	= null;
 		JSONObject 			   obj 			    	= null;
 		
 		try{	 		
-			sessionFactory 		= HibernateUtil.getSessionFactory();
-			session 			= sessionFactory.openSession();
 			obj 				= new JSONObject();
-			
-			session.beginTransaction();
 			
 			oldUserPassword		= EnjoyUtils.nullToStr(this.request.getParameter("oldUserPassword"));
 			newUserPassword		= EnjoyUtils.nullToStr(this.request.getParameter("newUserPassword"));
 			userDetailsBean		= this.userBean;
 			
-			oldUserPassword		= EnjoyEncryptDecrypt.enCryption(userDetailsBean.getUserId(), oldUserPassword); // เอารหัสผ่านเดิมเข้ารหัส และนำไปเทียบว่าเท่ากับค่าเดิมหรือไม่
-			newUserPassword		= EnjoyEncryptDecrypt.enCryption(userDetailsBean.getUserId(), newUserPassword); 
-logger.info("oldUserPassword ==> " + oldUserPassword);
-logger.info("userDetailsBean.getPwd() ==> " + userDetailsBean.getPwd());
-			if (! oldUserPassword.equals(userDetailsBean.getPwd())) {
+			oldUserPassword		= EnjoyEncryptDecrypt.enCryption(userDetailsBean.getUserEmail(), oldUserPassword); // เอารหัสผ่านเดิมเข้ารหัส และนำไปเทียบว่าเท่ากับค่าเดิมหรือไม่
+			newUserPassword		= EnjoyEncryptDecrypt.enCryption(userDetailsBean.getUserEmail(), newUserPassword); 
+			
+			logger.info("[ChangePasswordServlet] oldUserPassword :: " + oldUserPassword);
+			logger.info("[ChangePasswordServlet] userDetailsBean.getPwd() :: " + userDetailsBean.getPwd());
+
+			if (!oldUserPassword.equals(userDetailsBean.getPwd())) {
 				userDetailsBean.setErrMsg("รหัสผ่านเดิมไม่ถูกต้อง");
 				throw new EnjoyException(userDetailsBean.getErrMsg());				
 			}
 			
 			userDetailsBean.setPwd(newUserPassword);
-			this.dao.updateUserPassword(session, userDetailsBean);
+			this.dao.updateUserPassword(userDetailsBean);
 			
 			obj.put(STATUS, 			SUCCESS);
 			
-			session.getTransaction().commit();
-			session.flush();			
+			commit();
 		}catch(EnjoyException e){
-			session.getTransaction().rollback();
+			rollback();
 			obj.put("status", 			"ERROR");
 			obj.put("errMsg", 			e.getMessage());
 			e.printStackTrace();
 		}catch(Exception e){
-			session.getTransaction().rollback();
+			rollback();
 			obj.put("status", 			"ERROR");
 			obj.put("errMsg", 			"เกิดข้อผิดพลาดในการเปลี่ยนรหัสผ่าน");
 			e.printStackTrace();
 		}finally{ 
-			session.close();
-			sessionFactory		= null;
-			session				= null;
 			oldUserPassword	    = null; 
 			newUserPassword	    = null; 
 			userDetailsBean  	= null;
@@ -155,5 +145,20 @@ logger.info("userDetailsBean.getPwd() ==> " + userDetailsBean.getPwd());
 
 			logger.info("[ChangePasswordServlet][saveUpdRecord][End]");
 		}
+	}
+
+	@Override
+	public void destroySession() {
+		dao.destroySession();
+	}
+
+	@Override
+	public void commit() {
+		dao.commit();
+	}
+
+	@Override
+	public void rollback() {
+		dao.rollback();
 	}
 }

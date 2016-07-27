@@ -28,7 +28,7 @@
 	<script>
 		var gv_service 			= null;
 		var gv_url 				= '<%=servURL%>/EnjoyGenericSrv';
-		var gv_checkDupUserId 	= false;
+		//var gv_checkDupUserId 	= false;
 		
 		$(document).ready(function(){
 			//gp_progressBarOn();
@@ -208,10 +208,10 @@
 								        				<input type='text' id="userName" name='userName' maxlength="50" value="<%=userDetailsBean.getUserName() %>" />
 								        			</td>
 								        			<td align="right">
-								        				User ID : &nbsp;
+								        				E-mail : &nbsp;
 								        			</td>
 								        			<td align="left">
-								        				<input type='text' id="userId" name='userId' maxlength="20" value="<%=userDetailsBean.getUserId() %>" />
+								        				<input type='text' id="userEmail" name='userEmail' maxlength="20" value="<%=userDetailsBean.getUserEmail() %>" />
 								        				&nbsp;
 								        				<span id="inValidSpan"></span>
 								        			</td>
@@ -249,16 +249,15 @@
 											<thead> 
 								               <tr>
 													<th width="5%" >ลำดับ</th>
-													<th width="20%">ชื่อ-นามสกุล</th>
-													<th width="15%">User Id</th> 
-													<th width="20%">E-mail</th>
-													<th width="20%">สถานะ</th> 
-													<th width="20%">สิทธิ์การใช้งาน</th>
+													<th width="25%">ชื่อ-นามสกุล</th>
+													<th width="20%">E-mail</th> 
+													<th width="25%">สถานะ</th> 
+													<th width="25%">สิทธิ์การใช้งาน</th>
 												</tr> 
 											</thead>
 											<tfoot>
 												<tr height="26px;">
-													<td colspan="6" align="right">
+													<td colspan="5" align="right">
 														<span style="top: -3px;">จำนวน&nbsp;</span>
 														<input type="text" id="i_txt_nvt_totalresult" name="i_txt_nvt_totalresult" style="top:0px;left:0px;width: 50px;"  readonly="readonly" value="<%=userDetailsSearchForm.getTotalRecord()%>" >
 														<span style="top: -3px;">&nbsp;รายการ&nbsp;&nbsp;</span>
@@ -286,7 +285,6 @@
 															<tr class="rowSelect" onclick="lp_sendEditPage('<%=bean.getUserUniqueId()%>', '<%=bean.getUserName()%>');" >
 																<td style="text-align:center"><%=seq%></td>
 																<td><%=bean.getUserName()%></td>
-																<td><%=bean.getUserId()%></td>
 																<td><%=bean.getUserEmail()%></td>
 																<td><%=bean.getUserStatusName()%></td>
 																<td><%=bean.getUserPrivilege()%></td>
@@ -294,7 +292,7 @@
 												<% 			seq++;
 														} 
 													} else{  %>
-														<tr height="26px;"><td colspan="6" align="center"><b>ไม่พบข้อมูลที่ระบุ</b></td></tr>
+														<tr height="26px;"><td colspan="5" align="center"><b>ไม่พบข้อมูลที่ระบุ</b></td></tr>
 												<%  } %>  
 											</tbody>
 										</table>

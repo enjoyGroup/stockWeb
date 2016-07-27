@@ -10,9 +10,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-
 import th.go.stock.app.enjoy.bean.ComboBean;
 import th.go.stock.app.enjoy.bean.CustomerDetailsBean;
 import th.go.stock.app.enjoy.bean.UserDetailsBean;
@@ -22,7 +19,6 @@ import th.go.stock.app.enjoy.form.CustomerDetailsSearchForm;
 import th.go.stock.app.enjoy.main.Constants;
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
 import th.go.stock.app.enjoy.utils.EnjoyUtils;
-import th.go.stock.app.enjoy.utils.HibernateUtil;
 import th.go.stock.web.enjoy.common.EnjoyStandardSvc;
 import th.go.stock.web.enjoy.utils.EnjoyUtil;
 
@@ -54,14 +50,14 @@ public class CustomerDetailsSearchServlet extends EnjoyStandardSvc {
          String pageAction = null; 
  		
  		try{
- 			 pageAction 				= EnjoyUtil.nullToStr(request.getParameter("pageAction"));
- 			 this.enjoyUtil 			= new EnjoyUtil(request, response);
- 			 this.request            	= request;
-             this.response           	= response;
-             this.session            	= request.getSession(false);
-             this.userBean           	= (UserDetailsBean) session.getAttribute("userBean");
-             this.form               	= (CustomerDetailsSearchForm) session.getAttribute(FORM_NAME);
-             this.dao					= new CustomerDetailsDao();
+ 			 pageAction 					= EnjoyUtil.nullToStr(request.getParameter("pageAction"));
+ 			 this.enjoyUtil 				= new EnjoyUtil(request, response);
+ 			 this.request            		= request;
+             this.response           		= response;
+             this.session            		= request.getSession(false);
+             this.userBean           		= (UserDetailsBean) session.getAttribute("userBean");
+             this.form               		= (CustomerDetailsSearchForm) session.getAttribute(FORM_NAME);
+             this.dao						= new CustomerDetailsDao();
  			
              logger.info("[execute] pageAction : " + pageAction );
              
@@ -83,6 +79,7 @@ public class CustomerDetailsSearchServlet extends EnjoyStandardSvc {
  			e.printStackTrace();
  			logger.info(e.getMessage());
  		}finally{
+ 			destroySession();
  			logger.info("[execute][End]");
  		}
 	}
@@ -101,7 +98,6 @@ public class CustomerDetailsSearchServlet extends EnjoyStandardSvc {
 		}finally{			
 			logger.info("[onLoad][End]");
 		}
-		
 	}
 	
 	private void setRefference() throws EnjoyException{
@@ -121,7 +117,6 @@ public class CustomerDetailsSearchServlet extends EnjoyStandardSvc {
 			
 			this.form.setStatusCombo(comboList);
 			
-			
 		}catch(EnjoyException e){
 			throw new EnjoyException(e.getMessage());
 		}catch(Exception e){
@@ -133,12 +128,9 @@ public class CustomerDetailsSearchServlet extends EnjoyStandardSvc {
 		}
 	}
 	
-	
 	private void onSearch(CustomerDetailsBean 	customerDetailsBean) throws EnjoyException{
 		logger.info("[onSearch][Begin]");
 		
-		SessionFactory 				sessionFactory		= null;
-		Session 					session				= null;
 		List<CustomerDetailsBean> 	dataList 			= null;
 		int							cou					= 0;
 		int							pageNum				= 1;
@@ -149,10 +141,6 @@ public class CustomerDetailsSearchServlet extends EnjoyStandardSvc {
         HashMap						hashTable			= new HashMap();
 
 		try{
-			sessionFactory 				= HibernateUtil.getSessionFactory();
-			session 					= sessionFactory.openSession();			
-			session.beginTransaction();
-			
 			if(customerDetailsBean==null){
 				customerDetailsBean				= new CustomerDetailsBean();
 				
@@ -160,11 +148,12 @@ public class CustomerDetailsSearchServlet extends EnjoyStandardSvc {
 				customerDetailsBean.setFullName			(EnjoyUtils.nullToStr(this.request.getParameter("fullName")));
 				customerDetailsBean.setCusStatus		(EnjoyUtils.nullToStr(this.request.getParameter("cusStatus")));
 				customerDetailsBean.setIdNumber			(EnjoyUtils.nullToStr(this.request.getParameter("idNumber")));
+				customerDetailsBean.setTin				(this.userBean.getTin());
 			}
 			
 			this.form.setCustomerDetailsBean(customerDetailsBean);
 			
-			dataList	 		= this.dao.searchByCriteria(session, customerDetailsBean);
+			dataList	 		= this.dao.searchByCriteria(customerDetailsBean);
 			
 			if(dataList.size() > 0){				
 				
@@ -213,14 +202,9 @@ public class CustomerDetailsSearchServlet extends EnjoyStandardSvc {
 			logger.info(e.getMessage());
 			throw new EnjoyException("onSearch is error");
 		}finally{
-			session.close();
-			sessionFactory	= null;
-			session			= null;
-			
 			this.setRefference();
 			logger.info("[onSearch][End]");
 		}
-		
 	}
 	
 	private void lp_getPage(){
@@ -244,6 +228,21 @@ public class CustomerDetailsSearchServlet extends EnjoyStandardSvc {
 	   }
 	   
    }
+
+	@Override
+	public void destroySession() {
+		this.dao.destroySession();
+	}
+
+	@Override
+	public void commit() {
+		this.dao.commit();
+	}
+
+	@Override
+	public void rollback() {
+		this.dao.rollback();
+	}
 
 	
 	

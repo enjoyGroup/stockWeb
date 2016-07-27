@@ -2,56 +2,61 @@
 package th.go.stock.app.enjoy.dao;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.hibernate.Query;
-import org.hibernate.SQLQuery;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.type.IntegerType;
-import org.hibernate.type.StringType;
 
 import th.go.stock.app.enjoy.bean.ComboBean;
 import th.go.stock.app.enjoy.bean.CompanyVendorBean;
 import th.go.stock.app.enjoy.exception.EnjoyException;
+import th.go.stock.app.enjoy.main.Constants;
+import th.go.stock.app.enjoy.main.DaoControl;
 import th.go.stock.app.enjoy.model.Companyvendor;
+import th.go.stock.app.enjoy.model.CompanyvendorPK;
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
 import th.go.stock.app.enjoy.utils.EnjoyUtils;
-import th.go.stock.app.enjoy.utils.HibernateUtil;
 
-public class CompanyVendorDao {
+public class CompanyVendorDao extends DaoControl {
 	
-	private static final EnjoyLogger logger = EnjoyLogger.getLogger(CompanyVendorDao.class);
+	public CompanyVendorDao(){
+		setLogger(EnjoyLogger.getLogger(CompanyVendorDao.class));
+		super.init();
+	}
 	
 	
-	public List<CompanyVendorBean> searchByCriteria(	Session 			session, 
-														CompanyVendorBean 	companyVendorBean) throws EnjoyException{
-		logger.info("[searchByCriteria][Begin]");
+	public List<CompanyVendorBean> searchByCriteria(CompanyVendorBean companyVendorBean) throws EnjoyException{
+		getLogger().info("[searchByCriteria][Begin]");
 		
-		String						hql						= null;
-		SQLQuery 					query 					= null;
-		List<Object[]>				list					= null;
-		CompanyVendorBean			bean					= null;
-		List<CompanyVendorBean> 	companyVendorBeanList 	= new ArrayList<CompanyVendorBean>();
-		AddressDao					addressDao				= null;
-		String						provinceCode			= null;
-		String						districtCode			= null;
-		String						subdistrictCode			= null;
-		String						provinceName			= "";
-		String						districtName			= "";
-		String						subdistrictName			= "";
+		String							hql						= null;
+		CompanyVendorBean				bean					= null;
+		List<CompanyVendorBean> 		companyVendorBeanList 	= new ArrayList<CompanyVendorBean>();
+		AddressDao						addressDao				= null;
+		String							provinceCode			= null;
+		String							districtCode			= null;
+		String							subdistrictCode			= null;
+		String							provinceName			= "";
+		String							districtName			= "";
+		String							subdistrictName			= "";
+		HashMap<String, Object>			param					= new HashMap<String, Object>();
+		List<String>					columnList				= new ArrayList<String>();
+		List<HashMap<String, Object>>	resultList				= null;
 		
 		try{	
 			addressDao 			= new AddressDao();
 			hql					= "select a.* "
 								+ "	from companyvendor a"
-								+ "	where 1=1 ";
+								+ "	where a.tinCompany = :tinCompany ";
+			
+			//Criteria
+			param.put("tinCompany"	, companyVendorBean.getTinCompany());
 			
 			if(!companyVendorBean.getVendorName().equals("***")){
 				if(companyVendorBean.getVendorName().equals("")){
 					hql += " and (a.vendorName is null or a.vendorName = '')";
 				}else{
-					hql += " and a.vendorName like ('" + companyVendorBean.getVendorName() + "%')";
+					hql += " and a.vendorName LIKE CONCAT(:vendorName, '%')";
+					param.put("vendorName"	, companyVendorBean.getVendorName());
 				}
 			}
 			
@@ -59,7 +64,8 @@ public class CompanyVendorDao {
 				if(companyVendorBean.getBranchName().equals("")){
 					hql += " and (a.branchName is null or a.branchName = '')";
 				}else{
-					hql += " and a.branchName like ('" + companyVendorBean.getBranchName() + "%')";
+					hql += " and a.branchName LIKE CONCAT(:branchName, '%')";
+					param.put("branchName"	, companyVendorBean.getBranchName());
 				}
 			}
 			
@@ -67,7 +73,8 @@ public class CompanyVendorDao {
 				if(companyVendorBean.getTin().equals("")){
 					hql += " and (a.tin is null or a.tin = '')";
 				}else{
-					hql += " and a.tin like ('" + companyVendorBean.getTin() + "%')";
+					hql += " and a.tin LIKE CONCAT(:tin, '%')";
+					param.put("tin"	, companyVendorBean.getTin());
 				}
 			}
 			
@@ -75,59 +82,39 @@ public class CompanyVendorDao {
 				if(companyVendorBean.getTel().equals("")){
 					hql += " and (a.tel is null or a.tel = '')";
 				}else{
-					hql += " and a.tel like ('" + companyVendorBean.getTel() + "%')";
+					hql += " and a.tel LIKE CONCAT(:tel, '%')";
+					param.put("tel"	, companyVendorBean.getTel());
 				}
 			}
 			
-			logger.info("[searchByCriteria] hql :: " + hql);
-
-			query			= session.createSQLQuery(hql);			
-			query.addScalar("vendorCode"			, new StringType());
-			query.addScalar("tin"					, new StringType());
-			query.addScalar("vendorName"			, new StringType());
-			query.addScalar("branchName"			, new StringType());
-			query.addScalar("buildingName"			, new StringType());
-			query.addScalar("houseNumber"			, new StringType());
-			query.addScalar("mooNumber"				, new StringType());
-			query.addScalar("soiName"				, new StringType());
-			query.addScalar("streetName"			, new StringType());
-			query.addScalar("provinceCode"			, new StringType());
-			query.addScalar("districtCode"			, new StringType());
-			query.addScalar("subdistrictCode"		, new StringType());
-			query.addScalar("postCode"				, new StringType());
-			query.addScalar("tel"					, new StringType());
-			query.addScalar("fax"					, new StringType());
-			query.addScalar("email"					, new StringType());
-			query.addScalar("remark"				, new StringType());
+			//Column select
+			columnList.add("vendorCode");
+			columnList.add("tinCompany");
+			columnList.add("tin");
+			columnList.add("vendorName");
+			columnList.add("branchName");
+			columnList.add("buildingName");
+			columnList.add("houseNumber");
+			columnList.add("mooNumber");
+			columnList.add("soiName");
+			columnList.add("streetName");
+			columnList.add("provinceCode");
+			columnList.add("districtCode");
+			columnList.add("subdistrictCode");
+			columnList.add("postCode");
+			columnList.add("tel");
+			columnList.add("fax");
+			columnList.add("email");
+			columnList.add("remark");
 			
-			list		 	= query.list();
+			resultList = getResult(hql, param, columnList);
 			
-			logger.info("[searchByCriteria] list.size() :: " + list.size());
-			
-			for(Object[] row:list){
+			for(HashMap<String, Object> row:resultList){
 				bean 	= new CompanyVendorBean();
 				
-				logger.info("vendorCode 				:: " + row[0]);
-				logger.info("vendorName 				:: " + row[1]);
-				logger.info("tin		 				:: " + row[2]);
-				logger.info("branchName 				:: " + row[3]);
-				logger.info("buildingName 				:: " + row[4]);
-				logger.info("houseNumber 				:: " + row[5]);
-				logger.info("mooNumber 					:: " + row[6]);
-				logger.info("soiName 					:: " + row[7]);
-				logger.info("streetName 				:: " + row[8]);
-				logger.info("provinceCode 				:: " + row[9]);
-				logger.info("districtCode 				:: " + row[10]);
-				logger.info("subdistrictCode 			:: " + row[11]);
-				logger.info("postCode 					:: " + row[12]);
-				logger.info("tel 						:: " + row[13]);
-				logger.info("fax 						:: " + row[14]);
-				logger.info("email 						:: " + row[15]);
-				logger.info("remark 					:: " + row[16]);
-				
-				provinceCode 		= EnjoyUtils.nullToStr(row[9]);
-				districtCode 		= EnjoyUtils.nullToStr(row[10]);
-				subdistrictCode 	= EnjoyUtils.nullToStr(row[11]);
+				provinceCode 		= EnjoyUtils.nullToStr(row.get("provinceCode"));
+				districtCode 		= EnjoyUtils.nullToStr(row.get("districtCode"));
+				subdistrictCode 	= EnjoyUtils.nullToStr(row.get("subdistrictCode"));
 				
 				if(!provinceCode.equals("") && !districtCode.equals("") && !subdistrictCode .equals("")){
 					provinceName		= EnjoyUtils.nullToStr(addressDao.getProvinceName(provinceCode));
@@ -139,115 +126,99 @@ public class CompanyVendorDao {
 					subdistrictName		= "";
 				}
 				
-				bean.setVendorCode			(EnjoyUtils.nullToStr(row[0]));
-				bean.setTin					(EnjoyUtils.nullToStr(row[1]));
-				bean.setVendorName			(EnjoyUtils.nullToStr(row[2]));
-				bean.setBranchName			(EnjoyUtils.nullToStr(row[3]));
-				bean.setBuildingName		(EnjoyUtils.nullToStr(row[4]));
-				bean.setHouseNumber			(EnjoyUtils.nullToStr(row[5]));
-				bean.setMooNumber			(EnjoyUtils.nullToStr(row[6]));
-				bean.setSoiName				(EnjoyUtils.nullToStr(row[7]));
-				bean.setStreetName			(EnjoyUtils.nullToStr(row[8]));
+				bean.setVendorCode			(EnjoyUtils.nullToStr(row.get("vendorCode")));
+				bean.setTinCompany			(EnjoyUtils.nullToStr(row.get("tinCompany")));
+				bean.setTin					(EnjoyUtils.nullToStr(row.get("tin")));
+				bean.setVendorName			(EnjoyUtils.nullToStr(row.get("vendorName")));
+				bean.setBranchName			(EnjoyUtils.nullToStr(row.get("branchName")));
+				bean.setBuildingName		(EnjoyUtils.nullToStr(row.get("buildingName")));
+				bean.setHouseNumber			(EnjoyUtils.nullToStr(row.get("houseNumber")));
+				bean.setMooNumber			(EnjoyUtils.nullToStr(row.get("mooNumber")));
+				bean.setSoiName				(EnjoyUtils.nullToStr(row.get("soiName")));
+				bean.setStreetName			(EnjoyUtils.nullToStr(row.get("streetName")));
 				bean.setProvinceCode		(provinceCode);
 				bean.setDistrictCode		(districtCode);
 				bean.setSubdistrictCode		(subdistrictCode);
 				bean.setProvinceName		(provinceName);
 				bean.setDistrictName		(districtName);
 				bean.setSubdistrictName		(subdistrictName);
-				bean.setPostCode			(EnjoyUtils.nullToStr(row[12]));
-				bean.setTel					(EnjoyUtils.nullToStr(row[13]));
-				bean.setFax					(EnjoyUtils.nullToStr(row[14]));
-				bean.setEmail				(EnjoyUtils.nullToStr(row[15]));
-				bean.setRemark				(EnjoyUtils.nullToStr(row[16]));
+				bean.setPostCode			(EnjoyUtils.nullToStr(row.get("postCode")));
+				bean.setTel					(EnjoyUtils.nullToStr(row.get("tel")));
+				bean.setFax					(EnjoyUtils.nullToStr(row.get("fax")));
+				bean.setEmail				(EnjoyUtils.nullToStr(row.get("email")));
+				bean.setRemark				(EnjoyUtils.nullToStr(row.get("remark")));
 				
 				companyVendorBeanList.add(bean);
 			}	
 			
 		}catch(Exception e){
-			logger.info("[searchByCriteria] " + e.getMessage());
+			getLogger().info("[searchByCriteria] " + e.getMessage());
 			e.printStackTrace();
 			throw new EnjoyException("error searchByCriteria");
 		}finally{
 			hql						= null;
-			logger.info("[searchByCriteria][End]");
+			addressDao.destroySession();
+			getLogger().info("[searchByCriteria][End]");
 		}
 		
 		return companyVendorBeanList;
 		
 	}
 	
-	public CompanyVendorBean getCompanyVendor	(	Session 			session, 
-													CompanyVendorBean 	companyVendorBean) throws EnjoyException{
-		logger.info("[getCompanyVendor][Begin]");
+	public CompanyVendorBean getCompanyVendor(CompanyVendorBean companyVendorBean) throws EnjoyException{
+		getLogger().info("[getCompanyVendor][Begin]");
 		
-		String						hql						= null;
-		SQLQuery 					query 					= null;
-		List<Object[]>				list					= null;
-		CompanyVendorBean			bean					= null;
-		AddressDao					addressDao				= null;
-		String						provinceCode			= null;
-		String						districtCode			= null;
-		String						subdistrictCode			= null;
-		String						provinceName			= null;
-		String						districtName			= null;
-		String						subdistrictName			= null;
+		String							hql						= null;
+		CompanyVendorBean				bean					= null;
+		AddressDao						addressDao				= null;
+		String							provinceCode			= null;
+		String							districtCode			= null;
+		String							subdistrictCode			= null;
+		String							provinceName			= null;
+		String							districtName			= null;
+		String							subdistrictName			= null;
+		HashMap<String, Object>			param					= new HashMap<String, Object>();
+		List<String>					columnList				= new ArrayList<String>();
+		List<HashMap<String, Object>>	resultList				= null;
 		
 		try{		
 			addressDao 			= new AddressDao();
 			hql					= "select *"
 								+ "	from companyvendor"
-								+ "	where vendorCode 	= '" + companyVendorBean.getVendorCode() + "'";
+								+ "	where vendorCode 	= :vendorCode"
+								+ "		and tinCompany	= :tinCompany";
 			
-			logger.info("[getReciveOrderMaster] hql :: " + hql);
-
-			query			= session.createSQLQuery(hql);			
-			query.addScalar("vendorCode"			, new StringType());
-			query.addScalar("tin"					, new StringType());
-			query.addScalar("vendorName"			, new StringType());
-			query.addScalar("branchName"			, new StringType());
-			query.addScalar("buildingName"			, new StringType());
-			query.addScalar("houseNumber"			, new StringType());
-			query.addScalar("mooNumber"				, new StringType());
-			query.addScalar("soiName"				, new StringType());
-			query.addScalar("streetName"			, new StringType());
-			query.addScalar("provinceCode"			, new StringType());
-			query.addScalar("districtCode"			, new StringType());
-			query.addScalar("subdistrictCode"		, new StringType());
-			query.addScalar("postCode"				, new StringType());
-			query.addScalar("tel"					, new StringType());
-			query.addScalar("fax"					, new StringType());
-			query.addScalar("email"					, new StringType());
-			query.addScalar("remark"				, new StringType());
+			param.put("vendorCode"	, companyVendorBean.getVendorCode());
+			param.put("tinCompany"	, companyVendorBean.getTinCompany());
+	
+			columnList.add("vendorCode");
+			columnList.add("tinCompany");
+			columnList.add("tin");
+			columnList.add("vendorName");
+			columnList.add("branchName");
+			columnList.add("buildingName");
+			columnList.add("houseNumber");
+			columnList.add("mooNumber");
+			columnList.add("soiName");
+			columnList.add("streetName");
+			columnList.add("provinceCode");
+			columnList.add("districtCode");
+			columnList.add("subdistrictCode");
+			columnList.add("postCode");
+			columnList.add("tel");
+			columnList.add("fax");
+			columnList.add("email");
+			columnList.add("remark");
 			
-			list		 	= query.list();
+			resultList = getResult(hql, param, columnList);
 			
-			logger.info("[getCompanyVendor] list.size() :: " + list.size());
-			
-			if(list.size()==1){
-				for(Object[] row:list){
+			if(resultList.size()==1){
+				for(HashMap<String, Object> row:resultList){
 					bean 	= new CompanyVendorBean();
 					
-					logger.info("vendorCode 				:: " + row[0]);
-					logger.info("vendorName 				:: " + row[1]);
-					logger.info("tin		 				:: " + row[2]);
-					logger.info("branchName 				:: " + row[3]);
-					logger.info("buildingName 				:: " + row[4]);
-					logger.info("houseNumber 				:: " + row[5]);
-					logger.info("mooNumber 					:: " + row[6]);
-					logger.info("soiName 					:: " + row[7]);
-					logger.info("streetName 				:: " + row[8]);
-					logger.info("provinceCode 				:: " + row[9]);
-					logger.info("districtCode 				:: " + row[10]);
-					logger.info("subdistrictCode 			:: " + row[11]);
-					logger.info("postCode 					:: " + row[12]);
-					logger.info("tel 						:: " + row[13]);
-					logger.info("fax 						:: " + row[14]);
-					logger.info("email 						:: " + row[15]);
-					logger.info("remark 					:: " + row[16]);
-					
-					provinceCode 		= EnjoyUtils.nullToStr(row[9]);
-					districtCode 		= EnjoyUtils.nullToStr(row[10]);
-					subdistrictCode 	= EnjoyUtils.nullToStr(row[11]);
+					provinceCode 		= EnjoyUtils.nullToStr(row.get("provinceCode"));
+					districtCode 		= EnjoyUtils.nullToStr(row.get("districtCode"));
+					subdistrictCode 	= EnjoyUtils.nullToStr(row.get("subdistrictCode"));
 					
 					if(!provinceCode.equals("") && !districtCode.equals("") && !subdistrictCode .equals("")){
 						provinceName		= EnjoyUtils.nullToStr(addressDao.getProvinceName(provinceCode));
@@ -259,55 +230,58 @@ public class CompanyVendorDao {
 						subdistrictName		= "";
 					}
 					
-					bean.setVendorCode			(EnjoyUtils.nullToStr(row[0]));
-					bean.setTin					(EnjoyUtils.formatPin(row[1]));
-					bean.setVendorName			(EnjoyUtils.nullToStr(row[2]));
-					bean.setBranchName			(EnjoyUtils.nullToStr(row[3]));
-					bean.setBuildingName		(EnjoyUtils.nullToStr(row[4]));
-					bean.setHouseNumber			(EnjoyUtils.nullToStr(row[5]));
-					bean.setMooNumber			(EnjoyUtils.nullToStr(row[6]));
-					bean.setSoiName				(EnjoyUtils.nullToStr(row[7]));
-					bean.setStreetName			(EnjoyUtils.nullToStr(row[8]));
+					bean.setVendorCode			(EnjoyUtils.nullToStr(row.get("vendorCode")));
+					bean.setTinCompany			(EnjoyUtils.nullToStr(row.get("tinCompany")));
+					bean.setTin					(EnjoyUtils.nullToStr(row.get("tin")));
+					bean.setVendorName			(EnjoyUtils.nullToStr(row.get("vendorName")));
+					bean.setBranchName			(EnjoyUtils.nullToStr(row.get("branchName")));
+					bean.setBuildingName		(EnjoyUtils.nullToStr(row.get("buildingName")));
+					bean.setHouseNumber			(EnjoyUtils.nullToStr(row.get("houseNumber")));
+					bean.setMooNumber			(EnjoyUtils.nullToStr(row.get("mooNumber")));
+					bean.setSoiName				(EnjoyUtils.nullToStr(row.get("soiName")));
+					bean.setStreetName			(EnjoyUtils.nullToStr(row.get("streetName")));
 					bean.setProvinceCode		(provinceCode);
 					bean.setDistrictCode		(districtCode);
 					bean.setSubdistrictCode		(subdistrictCode);
 					bean.setProvinceName		(provinceName);
 					bean.setDistrictName		(districtName);
 					bean.setSubdistrictName		(subdistrictName);
-					bean.setPostCode			(EnjoyUtils.nullToStr(row[12]));
-					bean.setTel					(EnjoyUtils.nullToStr(row[13]));
-					bean.setFax					(EnjoyUtils.nullToStr(row[14]));
-					bean.setEmail				(EnjoyUtils.nullToStr(row[15]));
-					bean.setRemark				(EnjoyUtils.nullToStr(row[16]));
-					
+					bean.setPostCode			(EnjoyUtils.nullToStr(row.get("postCode")));
+					bean.setTel					(EnjoyUtils.nullToStr(row.get("tel")));
+					bean.setFax					(EnjoyUtils.nullToStr(row.get("fax")));
+					bean.setEmail				(EnjoyUtils.nullToStr(row.get("email")));
+					bean.setRemark				(EnjoyUtils.nullToStr(row.get("remark")));
 				}	
 			}
 			
-			
-			
 		}catch(Exception e){
-			logger.info("[getCompanyVendor] " + e.getMessage());
+			getLogger().info("[getCompanyVendor] " + e.getMessage());
 			e.printStackTrace();
 			throw new EnjoyException("error getCompanyVendor");
 		}finally{
 			hql						= null;
-			logger.info("[getCompanyVendor][End]");
+			addressDao.destroySession();
+			getLogger().info("[getCompanyVendor][End]");
 		}
 		
 		return bean;
 		
 	}
 	
-	public void insertCompanyVendor(Session session, CompanyVendorBean 		companyVendorBean) throws EnjoyException{
-		logger.info("[insertCompanyVendor][Begin]");
+	public void insertCompanyVendor(CompanyVendorBean companyVendorBean) throws EnjoyException{
+		getLogger().info("[insertCompanyVendor][Begin]");
 		
-		Companyvendor	companyvendor						= null;
+		Companyvendor		companyvendor 	= new Companyvendor();
+		CompanyvendorPK 	id 				= new CompanyvendorPK();
+		String 				tinCompany		= null;
 		
 		try{
+			tinCompany = companyVendorBean.getTinCompany();
 			
-			companyvendor = new Companyvendor();
+			id.setVendorCode(genId(tinCompany));
+			id.setTinCompany(tinCompany);
 			
-//			companyvendor.setVendorCode		(companyVendorBean.getVendorCode());
+			companyvendor.setId				(id);
 			companyvendor.setVendorName		(companyVendorBean.getVendorName());
 			companyvendor.setTin			(companyVendorBean.getTin());
 			companyvendor.setBranchName		(companyVendorBean.getBranchName());
@@ -325,45 +299,81 @@ public class CompanyVendorDao {
 			companyvendor.setEmail			(companyVendorBean.getEmail());
 			companyvendor.setRemark			(companyVendorBean.getRemark());
 			
-			session.saveOrUpdate(companyvendor);
+			insertData(companyvendor);
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			logger.info(e.getMessage());
+			getLogger().info(e.getMessage());
 			throw new EnjoyException("Error insertCompanyVendor");
 		}finally{
 			
 			companyvendor = null;
-			logger.info("[insertCompanyVendor][End]");
+			getLogger().info("[insertCompanyVendor][End]");
 		}
 	}
 	
-	public void updateCompanyvendor(Session session, CompanyVendorBean 		companyVendorBean) throws EnjoyException{
-		logger.info("[updateReciveOrderMaster][Begin]");
+	public int genId(String tinCompany) throws EnjoyException{
+		getLogger().info("[genId][Begin]");
+		
+		String							hql				= null;
+		int 							result			= 1;
+		HashMap<String, Object>			param			= new HashMap<String, Object>();
+		List<Object>					resultList		= null;
+		
+		try{
+			hql		= "select (max(vendorCode) + 1) newId"
+					+ "	from companyvendor "
+					+ "	where tinCompany = :tinCompany";
+			
+			//Criteria
+			param.put("tinCompany"		, tinCompany);
+			
+			resultList = getResult(hql, param, "newId", Constants.INT_TYPE);
+			
+			if(resultList!=null && resultList.size() > 0){
+				result = EnjoyUtils.parseInt(resultList.get(0))==0?1:EnjoyUtils.parseInt(resultList.get(0));
+			}
+			
+			getLogger().info("[genId] newId 			:: " + result);
+			
+		}catch(Exception e){
+			getLogger().error(e);
+			throw new EnjoyException("genId error");
+		}finally{
+			hql									= null;
+			getLogger().info("[genId][End]");
+		}
+		
+		return result;
+	}
+	
+	public void updateCompanyvendor(CompanyVendorBean companyVendorBean) throws EnjoyException{
+		getLogger().info("[updateReciveOrderMaster][Begin]");
 		
 		String							hql									= null;
 		Query 							query 								= null;
 		
 		try{
-			hql				= "update  Companyvendor set vendorName 	= :vendorName"
-												+ ", tin				= :tin"
-												+ ", branchName			= :branchName"
-												+ ", buildingName		= :buildingName"
-												+ ", houseNumber		= :houseNumber"
-												+ ", mooNumber 			= :mooNumber"
-												+ ", soiName			= :soiName"
-												+ ", streetName			= :streetName"
-												+ ", provinceCode 		= :provinceCode"
-												+ ", districtCode 		= :districtCode"
-												+ ", subdistrictCode 	= :subdistrictCode"
-												+ ", postCode 			= :postCode"
-												+ ", tel 				= :tel"
-												+ ", fax 				= :fax"
-												+ ", email 				= :email"
-												+ ", remark 			= :remark"
-										+ " where vendorCode = :vendorCode";
+			hql				= "update  Companyvendor t set t.vendorName = :vendorName"
+												+ ", t.tin				= :tin"
+												+ ", t.branchName		= :branchName"
+												+ ", t.buildingName		= :buildingName"
+												+ ", t.houseNumber		= :houseNumber"
+												+ ", t.mooNumber 		= :mooNumber"
+												+ ", t.soiName			= :soiName"
+												+ ", t.streetName		= :streetName"
+												+ ", t.provinceCode 	= :provinceCode"
+												+ ", t.districtCode 	= :districtCode"
+												+ ", t.subdistrictCode 	= :subdistrictCode"
+												+ ", t.postCode 		= :postCode"
+												+ ", t.tel 				= :tel"
+												+ ", t.fax 				= :fax"
+												+ ", t.email 			= :email"
+												+ ", t.remark 			= :remark"
+										+ " where t.id.vendorCode 	= :vendorCode"
+										+ "		and t.id.tinCompany = :tinCompany";
 			
-			query = session.createQuery(hql);
+			query = createQuery(hql);
 			query.setParameter("vendorName"		, companyVendorBean.getVendorName());
 			query.setParameter("tin"			, companyVendorBean.getTin());
 			query.setParameter("branchName"		, companyVendorBean.getBranchName());
@@ -381,157 +391,141 @@ public class CompanyVendorDao {
 			query.setParameter("email"			, companyVendorBean.getEmail());
 			query.setParameter("remark"			, companyVendorBean.getRemark());
 			query.setParameter("vendorCode"		, EnjoyUtils.parseInt(companyVendorBean.getVendorCode()));
+			query.setParameter("tinCompany"		, companyVendorBean.getTinCompany());
 			
 			query.executeUpdate();
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			logger.info(e.getMessage());
+			getLogger().info(e.getMessage());
 			throw new EnjoyException("Error updateReciveOrderMaster");
 		}finally{
 			
 			hql									= null;
 			query 								= null;
-			logger.info("[updateReciveOrderMaster][End]");
+			getLogger().info("[updateReciveOrderMaster][End]");
 		}
 	}
 	
-	public int checkDupVendorName(String vendorName, String branchName, String vendorCode) throws EnjoyException{
-		logger.info("[checkDupVendorName][Begin]");
+	public int checkDupVendorName(String vendorName, String branchName, String vendorCode, String tinCompany) throws EnjoyException{
+		getLogger().info("[checkDupVendorName][Begin]");
 		
-		String							hql									= null;
-		List<Integer>			 		list								= null;
-		SQLQuery 						query 								= null;
-		int 							result								= 0;
-		SessionFactory 					sessionFactory						= null;
-		Session 						session								= null;
-		
+		String							hql					= null;
+		int 							result				= 0;
+		HashMap<String, Object>			param				= new HashMap<String, Object>();
+		List<Object>					resultList			= null;
 		
 		try{
-			sessionFactory 				= HibernateUtil.getSessionFactory();
-			session 					= sessionFactory.openSession();
-			hql	= "select count(*) cou from companyvendor where vendorName = '" + vendorName + "' and branchName = '" + branchName + "'";
+			hql	= "select count(*) cou "
+				+ "	from companyvendor "
+				+ "	where vendorName 	= :vendorName "
+				+ "		and branchName 	= :branchName"
+				+ "		and tinCompany	= :tinCompany";
+			
+			//Criteria
+			param.put("vendorName"	, vendorName);
+			param.put("branchName"	, branchName);
+			param.put("tinCompany"	, tinCompany);
 			
 			if(!vendorCode.equals("")){
-				hql += " and vendorCode <> '" + vendorCode + "'";
+				hql += " and vendorCode <> :vendorCode";
+				param.put("vendorCode"	, vendorCode);
 			}
 			
-			query			= session.createSQLQuery(hql);
+			resultList = getResult(hql, param, "cou", Constants.INT_TYPE);
 			
-			query.addScalar("cou"			, new IntegerType());
-			
-			list		 	= query.list();
-			
-			if(list!=null && list.size() > 0){
-				result = list.get(0);
+			if(resultList!=null && resultList.size() > 0){
+				result = EnjoyUtils.parseInt(resultList.get(0));
 			}
 			
-			logger.info("[checkDupVendorName] result 			:: " + result);
-			
-			
+			getLogger().info("[checkDupVendorName] result 			:: " + result);
 			
 		}catch(Exception e){
-			logger.info(e.getMessage());
+			getLogger().info(e.getMessage());
 			throw new EnjoyException(e.getMessage());
 		}finally{
-			session.close();
-			
-			sessionFactory	= null;
-			session			= null;
 			hql									= null;
-			list								= null;
-			query 								= null;
-			logger.info("[checkDupVendorName][End]");
+			getLogger().info("[checkDupVendorName][End]");
 		}
 		
 		return result;
 	}
 	
-	public int checkDupTin(String tin, String vendorCode) throws EnjoyException{
-		logger.info("[checkDupTin][Begin]");
+	public int checkDupTin(String tin, String vendorCode, String tinCompany) throws EnjoyException{
+		getLogger().info("[checkDupTin][Begin]");
 		
-		String							hql									= null;
-		List<Integer>			 		list								= null;
-		SQLQuery 						query 								= null;
-		int 							result								= 0;
-		SessionFactory 					sessionFactory						= null;
-		Session 						session								= null;
-		
+		String							hql					= null;
+		int 							result				= 0;
+		HashMap<String, Object>			param				= new HashMap<String, Object>();
+		List<Object>					resultList			= null;
 		
 		try{
-			sessionFactory 				= HibernateUtil.getSessionFactory();
-			session 					= sessionFactory.openSession();
+			hql	= "select count(*) cou "
+				+ "	from companyvendor "
+				+ "	where tin 			= :tin "
+				+ "		and tin is not null"
+				+ "		and tinCompany 	= :tinCompany";
 			
-			hql	= "select count(*) cou from companyvendor where tin = '" + tin + "' and tin is not null";
+			//Criteria
+			param.put("tin"			, tin);
+			param.put("tinCompany"	, tinCompany);
 			
 			if(!vendorCode.equals("")){
-				hql += " and vendorCode <> '" + vendorCode + "'";
+				hql += " and vendorCode <> :vendorCode";
+				param.put("vendorCode"	, vendorCode);
 			}
 			
-			query			= session.createSQLQuery(hql);
+			resultList = getResult(hql, param, "cou", Constants.INT_TYPE);
 			
-			query.addScalar("cou"			, new IntegerType());
-			
-			list		 	= query.list();
-			
-			if(list!=null && list.size() > 0){
-				result = list.get(0);
+			if(resultList!=null && resultList.size() > 0){
+				result = EnjoyUtils.parseInt(resultList.get(0));
 			}
 			
-			logger.info("[checkDupTin] result 			:: " + result);
-			
-			
+			getLogger().info("[checkDupTin] result 			:: " + result);
 			
 		}catch(Exception e){
-			logger.info(e.getMessage());
+			getLogger().info(e.getMessage());
 			throw new EnjoyException(e.getMessage());
 		}finally{
-			session.close();
-			
-			sessionFactory	= null;
-			session			= null;
 			hql				= null;
-			list			= null;
-			query 			= null;
-			logger.info("[checkDupTin][End]");
+			getLogger().info("[checkDupTin][End]");
 		}
 		
 		return result;
 	}
 	
-	public List<ComboBean> tinList(String tin){
-		logger.info("[tinList][Begin]");
+	public List<ComboBean> tinList(String tin, String tinCompany){
+		getLogger().info("[tinList][Begin]");
 		
-		String 						hql			 		= null;
-        SessionFactory 				sessionFactory		= null;
-		Session 					session				= null;
-		SQLQuery 					query 				= null;
-		List<Object[]>				list				= null;
-		List<ComboBean>				comboList 			= null;
-		ComboBean					comboBean			= null;
+		String 							hql			 		= null;
+		List<ComboBean>					comboList 			= null;
+		ComboBean						comboBean			= null;
+		HashMap<String, Object>			param				= new HashMap<String, Object>();
+		List<String>					columnList			= new ArrayList<String>();
+		List<HashMap<String, Object>>	resultList			= null;
 		
 		try{
-			sessionFactory 		= HibernateUtil.getSessionFactory();
-			session 			= sessionFactory.openSession();
-			comboList			= new ArrayList<ComboBean>();
-			hql 				= "select tin from companyvendor where tin like ('"+tin+"%') order by tin asc limit 10 ";
+			comboList	= new ArrayList<ComboBean>();
+			hql 		= "select tin "
+						+ "	from companyvendor "
+						+ "	where tin LIKE CONCAT(:tin, '%')"
+						+ "		and tinCompany = :tinCompany"
+						+ "	order by tin asc limit 10 ";
 			
-			logger.info("[tinList] hql :: " + hql);
+			//Criteria
+			param.put("tin"			, tin);
+			param.put("tinCompany"	, tinCompany);
 			
-			query			= session.createSQLQuery(hql);
-			query.addScalar("tin"			, new StringType());
+			//Column select
+			columnList.add("tin");
 			
-			list		 	= query.list();
+			resultList = getResult(hql, param, columnList);
 			
-			logger.info("[tinList] list.size() :: " + list.size());
-			
-			for(Object[] row:list){
+			for(HashMap<String, Object> row:resultList){
 				comboBean 	= new ComboBean();
 				
-				logger.info("tin 		:: " + row[0]);
-				
-				comboBean.setCode				(EnjoyUtils.nullToStr(row[0]));
-				comboBean.setDesc				(EnjoyUtils.nullToStr(row[0]));
+				comboBean.setCode				(EnjoyUtils.nullToStr(row.get("tin")));
+				comboBean.setDesc				(EnjoyUtils.nullToStr(row.get("tin")));
 				
 				comboList.add(comboBean);
 			}	
@@ -539,50 +533,45 @@ public class CompanyVendorDao {
 		}catch(Exception e){
 			e.printStackTrace();
 		}finally{
-			session.close();
-			sessionFactory	= null;
-			session			= null;
-			logger.info("[tinList][End]");
+			getLogger().info("[tinList][End]");
 		}
 		
 		return comboList;
 	}
 	
-	public List<ComboBean> vendorNameList(String vendorName){
-		logger.info("[vendorNameList][Begin]");
+	public List<ComboBean> vendorNameList(String vendorName, String tinCompany){
+		getLogger().info("[vendorNameList][Begin]");
 		
-		String 						hql			 		= null;
-        SessionFactory 				sessionFactory		= null;
-		Session 					session				= null;
-		SQLQuery 					query 				= null;
-		List<Object[]>				list				= null;
-		List<ComboBean>				comboList 			= null;
-		ComboBean					comboBean			= null;
+		String 							hql			 		= null;
+		List<ComboBean>					comboList 			= null;
+		ComboBean						comboBean			= null;
+		HashMap<String, Object>			param				= new HashMap<String, Object>();
+		List<String>					columnList			= new ArrayList<String>();
+		List<HashMap<String, Object>>	resultList			= null;
 		
 		try{
-			sessionFactory 		= HibernateUtil.getSessionFactory();
-			session 			= sessionFactory.openSession();
-			comboList			= new ArrayList<ComboBean>();
-			hql 				= "select vendorCode, vendorName from companyvendor where vendorName like ('"+vendorName+"%') order by vendorName asc limit 10 ";
+			comboList	= new ArrayList<ComboBean>();
+			hql 		= "select vendorCode, vendorName "
+						+ "	from companyvendor "
+						+ "	where vendorName LIKE CONCAT(:vendorName, '%')"
+						+ "		and tinCompany = :tinCompany"
+						+ "	order by vendorName asc limit 10 ";
 			
-			logger.info("[vendorNameList] hql :: " + hql);
+			//Criteria
+			param.put("vendorName"	, vendorName);
+			param.put("tinCompany"	, tinCompany);
 			
-			query			= session.createSQLQuery(hql);
-			query.addScalar("vendorCode"			, new StringType());
-			query.addScalar("vendorName"			, new StringType());
+			//Column select
+			columnList.add("vendorCode");
+			columnList.add("vendorName");
 			
-			list		 	= query.list();
+			resultList = getResult(hql, param, columnList);
 			
-			logger.info("[vendorNameList] list.size() :: " + list.size());
-			
-			for(Object[] row:list){
+			for(HashMap<String, Object> row:resultList){
 				comboBean 	= new ComboBean();
 				
-				logger.info("vendorCode 		:: " + row[0]);
-				logger.info("vendorName 		:: " + row[1]);
-				
-				comboBean.setCode				(EnjoyUtils.nullToStr(row[0]));
-				comboBean.setDesc				(EnjoyUtils.nullToStr(row[1]));
+				comboBean.setCode				(EnjoyUtils.nullToStr(row.get("vendorCode")));
+				comboBean.setDesc				(EnjoyUtils.nullToStr(row.get("vendorName")));
 				
 				comboList.add(comboBean);
 			}	
@@ -590,53 +579,46 @@ public class CompanyVendorDao {
 		}catch(Exception e){
 			e.printStackTrace();
 		}finally{
-			session.close();
-			sessionFactory	= null;
-			session			= null;
-			logger.info("[vendorNameList][End]");
+			getLogger().info("[vendorNameList][End]");
 		}
 		
 		return comboList;
 	}
 
-	public List<ComboBean> branchNameList(String vendorName, String branchName){
-		logger.info("[branchNameList][Begin]");
+	public List<ComboBean> branchNameList(String vendorName, String branchName, String tinCompany){
+		getLogger().info("[branchNameList][Begin]");
 		
-		String 						hql			 		= null;
-        SessionFactory 				sessionFactory		= null;
-		Session 					session				= null;
-		SQLQuery 					query 				= null;
-		List<Object[]>				list				= null;
-		List<ComboBean>				comboList 			= null;
-		ComboBean					comboBean			= null;
+		String 							hql			 		= null;
+		List<ComboBean>					comboList 			= null;
+		ComboBean						comboBean			= null;
+		HashMap<String, Object>			param				= new HashMap<String, Object>();
+		List<String>					columnList			= new ArrayList<String>();
+		List<HashMap<String, Object>>	resultList			= null;
 		
 		try{
-			sessionFactory 		= HibernateUtil.getSessionFactory();
-			session 			= sessionFactory.openSession();
 			comboList			= new ArrayList<ComboBean>();
 			hql 				= "select vendorCode, branchName from companyvendor"
-									+ " where vendorName = '"+ vendorName + "'"
-										+ " and branchName like ('"+branchName+"%')"
+									+ " where vendorName = :vendorName"
+										+ " and branchName LIKE CONCAT(:branchName, '%')"
+										+ "	and tinCompany	= :tinCompany"
 									+ " order by vendorName asc limit 10 ";
 			
-			logger.info("[branchNameList] hql :: " + hql);
+			//Criteria
+			param.put("vendorName"	, vendorName);
+			param.put("branchName"	, branchName);
+			param.put("tinCompany"	, tinCompany);
 			
-			query			= session.createSQLQuery(hql);
-			query.addScalar("vendorCode"			, new StringType());
-			query.addScalar("branchName"			, new StringType());
+			//Column select
+			columnList.add("vendorCode");
+			columnList.add("branchName");
 			
-			list		 	= query.list();
+			resultList = getResult(hql, param, columnList);
 			
-			logger.info("[branchNameList] list.size() :: " + list.size());
-			
-			for(Object[] row:list){
+			for(HashMap<String, Object> row:resultList){
 				comboBean 	= new ComboBean();
 				
-				logger.info("vendorCode 		:: " + row[0]);
-				logger.info("branchName 		:: " + row[1]);
-				
-				comboBean.setCode				(EnjoyUtils.nullToStr(row[0]));
-				comboBean.setDesc				(EnjoyUtils.nullToStr(row[1]));
+				comboBean.setCode				(EnjoyUtils.nullToStr(row.get("vendorCode")));
+				comboBean.setDesc				(EnjoyUtils.nullToStr(row.get("branchName")));
 				
 				comboList.add(comboBean);
 			}	
@@ -644,142 +626,121 @@ public class CompanyVendorDao {
 		}catch(Exception e){
 			e.printStackTrace();
 		}finally{
-			session.close();
-			sessionFactory	= null;
-			session			= null;
-			logger.info("[branchNameList][End]");
+			getLogger().info("[branchNameList][End]");
 		}
 		
 		return comboList;
 	}
 	
-	public List<CompanyVendorBean> getCompanyVendorByName( String 		vendorName
-														   ,String 		branchName) throws EnjoyException{
-		logger.info("[getCompanyVendorByName][Begin]");
+	public List<CompanyVendorBean> getCompanyVendorByName(String vendorName, String branchName, String tinCompany) throws EnjoyException{
+		getLogger().info("[getCompanyVendorByName][Begin]");
 		
-		String						hql							= null;
-		SQLQuery 					query 						= null;
-		List<Object[]>				list						= null;
-		CompanyVendorBean			bean						= null;
-		AddressDao					addressDao					= null;
-		String						provinceCode				= null;
-		String						districtCode				= null;
-		String						subdistrictCode				= null;
-		String						provinceName				= null;
-		String						districtName				= null;
-		String						subdistrictName				= null;
-		List<CompanyVendorBean> 	companyVendorList 			= new ArrayList<CompanyVendorBean>();
-		String						lv_where					= "";
-		String						lv_orderBy					= "";
-		SessionFactory 				sessionFactory				= null;
-		Session 					session						= null;
+		String							hql						= null;
+		CompanyVendorBean				bean					= null;
+		AddressDao						addressDao				= null;
+		String							provinceCode			= null;
+		String							districtCode			= null;
+		String							subdistrictCode			= null;
+		String							provinceName			= null;
+		String							districtName			= null;
+		String							subdistrictName			= null;
+		List<CompanyVendorBean> 		companyVendorList 		= new ArrayList<CompanyVendorBean>();
+		String							lv_where				= "";
+		String							lv_orderBy				= "";
+		HashMap<String, Object>			param					= new HashMap<String, Object>();
+		List<String>					columnList				= new ArrayList<String>();
+		List<HashMap<String, Object>>	resultList				= null;
 		
 		try{	
-			
-			sessionFactory 		= HibernateUtil.getSessionFactory();
-			session 			= sessionFactory.openSession();
-			
+			addressDao 			= new AddressDao();
 			hql					= "select * from companyvendor";
 			
-			lv_where = " where vendorName = '" + vendorName + "'";
+			lv_where = " where vendorName = :vendorName and tinCompany = :tinCompany";
+			param.put("vendorName"	, vendorName);
+			param.put("tinCompany"	, tinCompany);
 			
 			if(!branchName.equals("")){
-				lv_where += " and branchName = '" + branchName + "'";
+				lv_where += " and branchName = :branchName";
+				param.put("branchName"	, branchName);
 			}
 			
 			lv_orderBy = " order by vendorName asc, branchName asc";
 			
 			hql += lv_where + lv_orderBy;
 			
-			logger.info("[getCompanyVendorByName] hql :: " + hql);
+			//Column select
+			columnList.add("vendorCode");
+			columnList.add("vendorName");
+			columnList.add("tinCompany");
+			columnList.add("tin");
+			columnList.add("branchName");
+			columnList.add("buildingName");
+			columnList.add("houseNumber");
+			columnList.add("mooNumber");
+			columnList.add("soiName");
+			columnList.add("streetName");
+			columnList.add("provinceCode");
+			columnList.add("districtCode");
+			columnList.add("subdistrictCode");
+			columnList.add("postCode");
+			columnList.add("tel");
+			columnList.add("fax");
+			columnList.add("email");
+			columnList.add("remark");
 
-			query			= session.createSQLQuery(hql);			
-			query.addScalar("vendorCode"			, new StringType());
-			query.addScalar("vendorName"			, new StringType());
-			query.addScalar("tin"					, new StringType());
-			query.addScalar("branchName"			, new StringType());
-			query.addScalar("buildingName"			, new StringType());
-			query.addScalar("houseNumber"			, new StringType());
-			query.addScalar("mooNumber"				, new StringType());
-			query.addScalar("soiName"				, new StringType());
-			query.addScalar("streetName"			, new StringType());
-			query.addScalar("provinceCode"			, new StringType());
-			query.addScalar("districtCode"			, new StringType());
-			query.addScalar("subdistrictCode"		, new StringType());
-			query.addScalar("postCode"				, new StringType());
-			query.addScalar("tel"					, new StringType());
-			query.addScalar("fax"					, new StringType());
-			query.addScalar("email"					, new StringType());
-			query.addScalar("remark"				, new StringType());
+			resultList = getResult(hql, param, columnList);
 			
-			list		 	= query.list();
-			addressDao		= new AddressDao();
-			
-			logger.info("[getCompanyVendorByName] list.size() :: " + list.size());
-			
-			for(Object[] row:list){
+			for(HashMap<String, Object> row:resultList){
 				bean 	= new CompanyVendorBean();
 				
-				logger.info("vendorCode 				:: " + row[0]);
-				logger.info("vendorName 				:: " + row[1]);
-				logger.info("tin 						:: " + row[2]);
-				logger.info("branchName 				:: " + row[3]);
-				logger.info("buildingName 				:: " + row[4]);
-				logger.info("houseNumber 				:: " + row[5]);
-				logger.info("mooNumber 					:: " + row[6]);
-				logger.info("soiName 					:: " + row[7]);
-				logger.info("streetName 				:: " + row[8]);
-				logger.info("provinceCode 				:: " + row[9]);
-				logger.info("districtCode 				:: " + row[10]);
-				logger.info("subdistrictCode 			:: " + row[11]);
-				logger.info("postCode 					:: " + row[12]);
-				logger.info("tel 						:: " + row[13]);
-				logger.info("fax 						:: " + row[14]);
-				logger.info("email 						:: " + row[15]);
-				logger.info("remark 					:: " + row[16]);
+				provinceCode 		= EnjoyUtils.nullToStr(row.get("provinceCode"));
+				districtCode 		= EnjoyUtils.nullToStr(row.get("districtCode"));
+				subdistrictCode 	= EnjoyUtils.nullToStr(row.get("subdistrictCode"));
 				
-				provinceCode 		= EnjoyUtils.nullToStr(row[9]);
-				districtCode 		= EnjoyUtils.nullToStr(row[10]);
-				subdistrictCode 	= EnjoyUtils.nullToStr(row[11]);
-				provinceName		= addressDao.getProvinceName(provinceCode);
-				districtName		= addressDao.getDistrictName(districtCode);
-				subdistrictName		= addressDao.getSubdistrictName(subdistrictCode);
+				if(!provinceCode.equals("") && !districtCode.equals("") && !subdistrictCode .equals("")){
+					provinceName		= EnjoyUtils.nullToStr(addressDao.getProvinceName(provinceCode));
+					districtName		= EnjoyUtils.nullToStr(addressDao.getDistrictName(districtCode));
+					subdistrictName		= EnjoyUtils.nullToStr(addressDao.getSubdistrictName(subdistrictCode));
+				}else{
+					provinceName		= "";
+					districtName		= "";
+					subdistrictName		= "";
+				}
 				
-				bean.setVendorCode			(EnjoyUtils.nullToStr(row[0]));
-				bean.setVendorName			(EnjoyUtils.nullToStr(row[1]));
-				bean.setTin					(EnjoyUtils.nullToStr(row[2]));
-				bean.setBranchName			(EnjoyUtils.nullToStr(row[3]));
-				bean.setBuildingName		(EnjoyUtils.nullToStr(row[4]));
-				bean.setHouseNumber			(EnjoyUtils.nullToStr(row[5]));
-				bean.setMooNumber			(EnjoyUtils.nullToStr(row[6]));
-				bean.setSoiName				(EnjoyUtils.nullToStr(row[7]));
-				bean.setStreetName			(EnjoyUtils.nullToStr(row[8]));
+				bean.setVendorCode			(EnjoyUtils.nullToStr(row.get("vendorCode")));
+				bean.setTinCompany			(EnjoyUtils.nullToStr(row.get("tinCompany")));
+				bean.setTin					(EnjoyUtils.nullToStr(row.get("tin")));
+				bean.setVendorName			(EnjoyUtils.nullToStr(row.get("vendorName")));
+				bean.setBranchName			(EnjoyUtils.nullToStr(row.get("branchName")));
+				bean.setBuildingName		(EnjoyUtils.nullToStr(row.get("buildingName")));
+				bean.setHouseNumber			(EnjoyUtils.nullToStr(row.get("houseNumber")));
+				bean.setMooNumber			(EnjoyUtils.nullToStr(row.get("mooNumber")));
+				bean.setSoiName				(EnjoyUtils.nullToStr(row.get("soiName")));
+				bean.setStreetName			(EnjoyUtils.nullToStr(row.get("streetName")));
 				bean.setProvinceCode		(provinceCode);
 				bean.setDistrictCode		(districtCode);
 				bean.setSubdistrictCode		(subdistrictCode);
 				bean.setProvinceName		(provinceName);
 				bean.setDistrictName		(districtName);
 				bean.setSubdistrictName		(subdistrictName);
-				bean.setPostCode			(EnjoyUtils.nullToStr(row[12]));
-				bean.setTel					(EnjoyUtils.nullToStr(row[13]));
-				bean.setFax					(EnjoyUtils.nullToStr(row[14]));
-				bean.setEmail				(EnjoyUtils.nullToStr(row[15]));
-				bean.setRemark				(EnjoyUtils.nullToStr(row[16]));
+				bean.setPostCode			(EnjoyUtils.nullToStr(row.get("postCode")));
+				bean.setTel					(EnjoyUtils.nullToStr(row.get("tel")));
+				bean.setFax					(EnjoyUtils.nullToStr(row.get("fax")));
+				bean.setEmail				(EnjoyUtils.nullToStr(row.get("email")));
+				bean.setRemark				(EnjoyUtils.nullToStr(row.get("remark")));
 				
 				companyVendorList.add(bean);
 				
 			}	
 			
 		}catch(Exception e){
-			logger.info("[getCompanyVendorByName] " + e.getMessage());
+			getLogger().info("[getCompanyVendorByName] " + e.getMessage());
 			e.printStackTrace();
 			throw new EnjoyException("error getReciveOrdeDetailList");
 		}finally{
-			session.close();
-			sessionFactory			= null;
-			session					= null;
 			hql						= null;
-			logger.info("[getCompanyVendorByName][End]");
+			addressDao.destroySession();
+			getLogger().info("[getCompanyVendorByName][End]");
 		}
 		
 		return companyVendorList;

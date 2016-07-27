@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class UserDetailsBean {
 	
 	private int 							userUniqueId;
-	private String 							userId;
+	private String							userEmail;
 	private String 							userName;
 	private String 							userSurname;
 	private String 							userPrivilege;
@@ -16,7 +16,6 @@ public class UserDetailsBean {
 	private ArrayList<UserPrivilegeBean> 	userPrivilegeList;
 	private String 							pwd;
 	private String  						currentDate;
-	private String							userEmail;
 	private String							errMsg;
 	private String							userFullName;
 	private String							userStatusName;
@@ -24,10 +23,11 @@ public class UserDetailsBean {
 	private String							flagSalesman;
 	private String							commission;
 	private String							remark;
+	private String							tin;
+	private String							companyName;
 	
 	public UserDetailsBean(){
 		this.userUniqueId		= 0;
-		this.userId				= "";
 		this.userName			= "";
 		this.userSurname		= "";
 		this.userPrivilege		= "";
@@ -46,6 +46,8 @@ public class UserDetailsBean {
 		this.flagSalesman		= "";
 		this.commission			= "";
 		this.remark				= "";
+		this.tin				= "";
+		this.companyName		= "";
 	}
 
 	public int getUserUniqueId() {
@@ -62,14 +64,6 @@ public class UserDetailsBean {
 
 	public void setFlagChangePassword(String flagChangePassword) {
 		this.flagChangePassword = flagChangePassword;
-	}
-
-	public String getUserId() {
-		return userId;
-	}
-
-	public void setUserId(String userId) {
-		this.userId = userId;
 	}
 
 	public String getUserName() {
@@ -206,5 +200,21 @@ public class UserDetailsBean {
 
 	public void setRemark(String remark) {
 		this.remark = remark;
+	}
+
+	public String getTin() {
+		return tin;
+	}
+
+	public void setTin(String tin) {
+		this.tin = tin;
+	}
+
+	public String getCompanyName() {
+		return companyName;
+	}
+
+	public void setCompanyName(String companyName) {
+		this.companyName = companyName;
 	}
 }

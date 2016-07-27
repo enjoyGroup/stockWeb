@@ -1,7 +1,6 @@
 package th.go.stock.app.enjoy.model;
 
 import java.io.Serializable;
-
 import javax.persistence.*;
 
 
@@ -14,9 +13,8 @@ import javax.persistence.*;
 public class Companyvendor implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
-	private int vendorCode;
+	@EmbeddedId
+	private CompanyvendorPK id;
 
 	private String branchName;
 
@@ -53,12 +51,12 @@ public class Companyvendor implements Serializable {
 	public Companyvendor() {
 	}
 
-	public int getVendorCode() {
-		return this.vendorCode;
+	public CompanyvendorPK getId() {
+		return this.id;
 	}
 
-	public void setVendorCode(int vendorCode) {
-		this.vendorCode = vendorCode;
+	public void setId(CompanyvendorPK id) {
+		this.id = id;
 	}
 
 	public String getBranchName() {

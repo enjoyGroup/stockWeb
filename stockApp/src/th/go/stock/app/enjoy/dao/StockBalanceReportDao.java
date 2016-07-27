@@ -31,11 +31,11 @@ public class StockBalanceReportDao extends DaoControl {
 		try{	
 			
 			hql					= "select c.productTypeName, d.productGroupName, a.productName, b.quantity "
-									+ " from productmaster a, productquantity b, productype c, productgroup d"
-									+ " where a.productCode 	= b.productCode"
-									+ "		and a.productType 	= c.productTypeCode"
-									+ "		and a.productGroup 	= d.productGroupCode"
-									+ "		and b.tin 			= :tin";
+									+ " from productmaster a"
+									+ "		inner join productquantity b on b.productCode = a.productCode and b.tin = a.tin"
+									+ "		inner join productype c on c.productTypeCode = a.productType and c.tin = a.tin"
+									+ "		inner join productgroup d on d.productTypeCode = a.productType and d.productGroupCode = a.productGroup and d.tin and a.tin "
+									+ " where a.tin 			= :tin";
 			
 			param.put("tin"				, criteria.getTin());
 			

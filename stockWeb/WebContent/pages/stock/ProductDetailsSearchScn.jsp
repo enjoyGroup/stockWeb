@@ -8,14 +8,14 @@
 <%
 	ProductmasterBean 			productmasterBean 		= productDetailsSearchForm.getProductmasterBean();
 	List<ProductmasterBean> 	dataList 				= productDetailsSearchForm.getDataList();
-	String						titlePage				= "ค้นหารายละเอียดสินค้า";
+	String						titlePage				= productDetailsSearchForm.getTitlePage();
 %>
 
 <html>
 <head>
 	<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<title>ค้นหารายละเอียดสินค้า</title>
+	<title><%=titlePage%></title>
 	<%@ include file="/pages/include/enjoyInclude.jsp"%>
 	<style type="text/css">
 		.height250 {
@@ -40,14 +40,7 @@
 			$('#btnSearch').click(function(){ 
 				try{
 					
-					if(gp_trim($("#productTypeName").val())==""){
-						alert("กรุณาระบุหมวดสินค้า", function() { 
-							$("#productTypeName").focus();
-		    		    });
-						//alert("กรุณาระบุหมวดสินค้า");
-						//$("#productTypeName").focus();
-						return;
-					}
+					if(!gp_validateEmptyObj(new Array( "productTypeName:หมวดสินค้า"))) return false;
 					
 					$.ajax({
 						async:false,
@@ -224,18 +217,12 @@
 				
 			});
 			
-			$('#printSection').load(function(){
-				var lo_pdf = document.getElementById("printSection");
-				lo_pdf.focus();
-				lo_pdf.contentWindow.print();
-				return false;
-			});
-			
 		});
 		
 		function lp_print(){
 			var la_radPrint 	= null;
 			var lv_printType	= "";
+			var h				= "";
 			
 			try{
 				la_radPrint = document.getElementsByName("radPrint");
@@ -247,15 +234,39 @@
 					}
 				}
 				
-				$('#printSection').attr('src', gv_url + "?" + gv_service + "&pageAction=print&printType=" + lv_printType);
+				h = '<iframe name="printSection" '
+				  + '		 id="printSection"'
+				  + '		 src="'+gv_url + '?' + gv_service + '&pageAction=print&printType=' + lv_printType + '"'
+				  + '		 scrolling="yes"'
+				  + '		 frameborder="0"'
+				  + '		 width="0"'
+				  + '		 height="0">'
+				  + '</iframe>';
+				
+				$("#printDiv").html('');
+				$("#printDiv").html(h);
+				
+				$('#printSection').load(function(){
+					var lo_pdf = document.getElementById("printSection");
+					lo_pdf.focus();
+					lo_pdf.contentWindow.print();
+					return false;
+				});
+				
+				//$('#printSection').removeAttr( "src" );
+				//$('#printSection').attr('src', gv_url + "?" + gv_service + "&pageAction=print&printType=" + lv_printType);
 				
 			}catch(e){
 				alert("lp_print :: " + e);
 			}
 		}
 		
-		function lp_sendEditPage(av_val){
+		function lp_sendEditPage(av_val, e){
 			try{
+				if($(e.target).is('input[type=checkbox]')) {
+				    return;
+				}
+				
 				window.location.replace(gv_url + "?service=servlet.ProductDetailsMaintananceServlet&pageAction=getDetail&productCode=" + av_val);
 			}catch(e){
 				alert("lp_sendEditPage :: " + e);
@@ -295,12 +306,6 @@
 		            	}
 		            }
 	            });
-				
-				if (event.stopPropagation) {
-					event.stopPropagation;
-				}
-				event.cancelBubble = true;
-				return true;
 				
 			}catch(e){
 				alert("lp_setForPrint :: " + e);
@@ -490,7 +495,7 @@
 														for(int i=0;i<dataList.size();i++){
 															bean = dataList.get(i);
 												%>
-															<tr class="rowSelect" onclick="lp_sendEditPage('<%=bean.getProductCode()%>')" >
+															<tr class="rowSelect" onclick="lp_sendEditPage('<%=bean.getProductCode()%>', event);" >
 																<td style="text-align:center;">
 																	<input type="checkbox" 
 																		   id="chkBox<%=bean.getChkBoxSeq()%>" 
@@ -539,14 +544,7 @@
 				</section>
 			</section>
 		</section>
-		<iframe name="printSection" 
-				id="printSection"
-				src="" 
-				scrolling="yes"  
-				frameborder="0" 
-				width="0" 
-				height="0">
-		</iframe>
+		<div id="printDiv" style="display: none;"></div>
 		<div id="dialog" title="Look up"></div>
 		<div align="center" class="FreezeScreen" style="display:none;">
 	        <center>

@@ -35,15 +35,17 @@ public class SummarySaleByCustomerReportDao extends DaoControl {
 			invoiceDateTo		= EnjoyUtils.dateThaiToDb(criteria.getInvoiceDateTo());
 			
 			hql					= "select d.productName, a.invoiceDate, c.quantity,  c.price, c.discount"
-									+ " from invoicecashmaster a, customer b, invoicecashdetail c, productmaster d"
-									+ " where a.cusCode = b.cusCode"
-									+ "		and a.invoiceCode 	= c.invoiceCode"
-									+ "		and c.productCode 	= d.productCode"
-									+ "		and a.cusCode		= :cusCode"
+									+ " from invoicecashmaster a"
+									+ " 	inner join customer b on b.cusCode 	= a.cusCode and b.tin	= a.tin"
+									+ "		inner join invoicecashdetail c on c.invoiceCode 	= a.invoiceCode and c.tin	= a.tin"
+									+ "		inner join productmaster d  on d.productCode 	= c.productCode and d.tin	= c.tin"
+									+ "	where a.cusCode		= :cusCode"
+									+ "		and a.tin		= :tin"
 									+ " 	and a.invoiceDate >= STR_TO_DATE(:invoiceDateFrom	, '%Y%m%d')"
 									+ " 	and a.invoiceDate <= STR_TO_DATE(:invoiceDateTo	, '%Y%m%d')";
 			
 			param.put("cusCode"			, criteria.getCusCode());
+			param.put("tin"				, criteria.getTin());
 			param.put("invoiceDateFrom"	, invoiceDateFrom);
 			param.put("invoiceDateTo"	, invoiceDateTo);
 			

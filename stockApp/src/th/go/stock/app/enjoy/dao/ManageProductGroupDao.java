@@ -2,70 +2,69 @@
 package th.go.stock.app.enjoy.dao;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.hibernate.Query;
-import org.hibernate.SQLQuery;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.type.IntegerType;
-import org.hibernate.type.StringType;
 
 import th.go.stock.app.enjoy.bean.ComboBean;
 import th.go.stock.app.enjoy.bean.ManageProductGroupBean;
 import th.go.stock.app.enjoy.exception.EnjoyException;
+import th.go.stock.app.enjoy.main.Constants;
+import th.go.stock.app.enjoy.main.DaoControl;
 import th.go.stock.app.enjoy.model.Productgroup;
 import th.go.stock.app.enjoy.model.ProductgroupPK;
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
 import th.go.stock.app.enjoy.utils.EnjoyUtils;
-import th.go.stock.app.enjoy.utils.HibernateUtil;
 
-public class ManageProductGroupDao {
+public class ManageProductGroupDao extends DaoControl{
 	
-	private static final EnjoyLogger logger = EnjoyLogger.getLogger(ManageProductGroupDao.class);
+	public ManageProductGroupDao(){
+		setLogger(EnjoyLogger.getLogger(ManageProductGroupDao.class));
+		super.init();
+	}
 	
-	public List<ManageProductGroupBean> getProductGroupList( Session 					session
-															,ManageProductGroupBean 	manageProductGroupBean) throws EnjoyException{
-		logger.info("[getProductGroupList][Begin]");
+	public List<ManageProductGroupBean> getProductGroupList(ManageProductGroupBean 	manageProductGroupBean) throws EnjoyException{
+		getLogger().info("[getProductGroupList][Begin]");
 		
 		String							hql							= null;
-		SQLQuery 						query 						= null;
-		List<Object[]>					list						= null;
 		ManageProductGroupBean			bean						= null;
 		List<ManageProductGroupBean> 	manageProductGroupBeanList 	= new ArrayList<ManageProductGroupBean>();
 		int								seq							= 0;
+		HashMap<String, Object>			param						= new HashMap<String, Object>();
+		List<String>					columnList					= new ArrayList<String>();
+		List<HashMap<String, Object>>	resultList					= null;
 		
 		try{	
 			hql					= "select * "
 								+ "	from productgroup"
-								+ "	where productTypeCode = '" + manageProductGroupBean.getProductTypeCode() + "' and productGroupStatus = 'A' order by productGroupCode asc";
+								+ "	where productTypeCode 		= :productTypeCode"
+								+ "		and tin					= :tin"
+								+ "		and productGroupStatus 	= 'A' "
+								+ "	order by productGroupCode asc";
 			
-			logger.info("[getProductGroupList] hql :: " + hql);
+			//Criteria
+			param.put("productTypeCode"	, manageProductGroupBean.getProductTypeCode());
+			param.put("tin"				, manageProductGroupBean.getTin());
 
-			query			= session.createSQLQuery(hql);			
-			query.addScalar("productTypeCode"		, new StringType());
-			query.addScalar("productGroupCode"		, new StringType());
-			query.addScalar("productGroupName"		, new StringType());
-			query.addScalar("productGroupStatus"	, new StringType());
+			//Column select
+			columnList.add("productTypeCode");
+			columnList.add("productGroupCode");
+			columnList.add("tin");
+			columnList.add("productGroupName");
+			columnList.add("productGroupStatus");
 			
-			list		 	= query.list();
+			resultList = getResult(hql, param, columnList);
 			
-			logger.info("[getProductGroupList] list.size() :: " + list.size());
-			
-			for(Object[] row:list){
+			for(HashMap<String, Object> row:resultList){
 				bean 	= new ManageProductGroupBean();
 				
-				logger.info("productTypeCode 		:: " + row[0]);
-				logger.info("productGroupCode 		:: " + row[1]);
-				logger.info("productGroupName 		:: " + row[2]);
-				logger.info("productGroupStatus 	:: " + row[3]);
-				logger.info("seq 					:: " + seq);
-				
-				bean.setProductTypeCode				(EnjoyUtils.nullToStr(row[0]));
-				bean.setProductGroupCode			(EnjoyUtils.nullToStr(row[1]));
-				bean.setProductGroupName			(EnjoyUtils.nullToStr(row[2]));
-				bean.setProductGroupStatus			(EnjoyUtils.nullToStr(row[3]));
-				bean.setSeq							(EnjoyUtils.nullToStr(seq));
+				bean.setProductTypeCode		(EnjoyUtils.nullToStr(row.get("productTypeCode")));
+				bean.setProductGroupCode	(EnjoyUtils.nullToStr(row.get("productGroupCode")));
+				bean.setTin					(EnjoyUtils.nullToStr(row.get("tin")));
+				bean.setProductGroupName	(EnjoyUtils.nullToStr(row.get("productGroupName")));
+				bean.setProductGroupStatus	(EnjoyUtils.nullToStr(row.get("productGroupStatus")));
+				bean.setSeq					(EnjoyUtils.nullToStr(seq));
 				
 				manageProductGroupBeanList.add(bean);
 				seq++;
@@ -73,20 +72,20 @@ public class ManageProductGroupDao {
 			}	
 			
 		}catch(Exception e){
-			logger.info("[getProductTypeList] " + e.getMessage());
+			getLogger().error(e);
 			e.printStackTrace();
 			throw new EnjoyException("error getProductGroupList");
 		}finally{
 			hql						= null;
-			logger.info("[getProductGroupList][End]");
+			getLogger().info("[getProductGroupList][End]");
 		}
 		
 		return manageProductGroupBeanList;
 		
 	}
 	
-	public void insertProducGroup(Session session, ManageProductGroupBean manageProductGroupBean) throws EnjoyException{
-		logger.info("[insertProducGroup][Begin]");
+	public void insertProducGroup(ManageProductGroupBean manageProductGroupBean) throws EnjoyException{
+		getLogger().info("[insertProducGroup][Begin]");
 		
 		Productgroup	productgroup	= null;
 		ProductgroupPK	pk				= null;
@@ -96,173 +95,183 @@ public class ManageProductGroupDao {
 			productgroup 	= new Productgroup();
 			pk				= new ProductgroupPK();
 			
-			pk.setProductTypeCode(manageProductGroupBean.getProductTypeCode());
-			pk.setProductGroupCode(manageProductGroupBean.getProductGroupCode());
+			pk.setProductTypeCode	(manageProductGroupBean.getProductTypeCode());
+			pk.setProductGroupCode	(manageProductGroupBean.getProductGroupCode());
+			pk.setTin				(manageProductGroupBean.getTin());
 			
 			productgroup.setId(pk);
 			productgroup.setProductGroupName(manageProductGroupBean.getProductGroupName());
 			productgroup.setProductGroupStatus(manageProductGroupBean.getProductGroupStatus());
 			
-			session.saveOrUpdate(productgroup);
+			insertData(productgroup);
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			logger.info(e.getMessage());
+			getLogger().error(e);
 			throw new EnjoyException("Error insertProducGroup");
 		}finally{
 			
 			productgroup 	= null;
 			pk 				= null;
-			logger.info("[insertProducGroup][End]");
+			getLogger().info("[insertProducGroup][End]");
 		}
 	}
 	
-	public void updateProductgroup(Session session, ManageProductGroupBean manageProductGroupBean) throws EnjoyException{
-		logger.info("[updateProductgroup][Begin]");
+	public void updateProductgroup(ManageProductGroupBean manageProductGroupBean) throws EnjoyException{
+		getLogger().info("[updateProductgroup][Begin]");
 		
 		String							hql									= null;
 		Query 							query 								= null;
 		
 		try{
-			hql				= "update Productgroup t set t.productGroupName 	= :productGroupName"
-											+ "	,t.productGroupStatus 			= :productGroupStatus"
-										+ " where t.id.productTypeCode 		= :productTypeCode"
-											+ " and t.id.productGroupCode 	= :productGroupCode";
+			hql				= "update Productgroup t set "
+							+ "		t.productGroupName 		= :productGroupName"
+							+ "		,t.productGroupStatus 	= :productGroupStatus"
+							+ " where t.id.productTypeCode 		= :productTypeCode"
+							+ " 	and t.id.productGroupCode 	= :productGroupCode"
+							+ "		and t.id.tin				= :tin";
 			
-			query = session.createQuery(hql);
-			query.setParameter("productGroupName"			, manageProductGroupBean.getProductGroupName());
-			query.setParameter("productGroupStatus"			, manageProductGroupBean.getProductGroupStatus());
-			query.setParameter("productTypeCode"			, manageProductGroupBean.getProductTypeCode());
-			query.setParameter("productGroupCode"			, manageProductGroupBean.getProductGroupCode());
+			query = createQuery(hql);
+			query.setParameter("productGroupName"	, manageProductGroupBean.getProductGroupName());
+			query.setParameter("productGroupStatus"	, manageProductGroupBean.getProductGroupStatus());
+			query.setParameter("productTypeCode"	, manageProductGroupBean.getProductTypeCode());
+			query.setParameter("productGroupCode"	, manageProductGroupBean.getProductGroupCode());
+			query.setParameter("tin"				, manageProductGroupBean.getTin());
 			
 			query.executeUpdate();
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			logger.info(e.getMessage());
+			getLogger().error(e);
 			throw new EnjoyException("Error updateProductgroup");
 		}finally{
 			
 			hql									= null;
 			query 								= null;
-			logger.info("[updateProductgroup][End]");
+			getLogger().info("[updateProductgroup][End]");
 		}
 	}
 	
-	public int checkDupProductGroupCode(Session session, ManageProductGroupBean manageProductGroupBean) throws EnjoyException{
-		logger.info("[checkDupProductGroupCode][Begin]");
+	public int checkDupProductGroupCode(ManageProductGroupBean manageProductGroupBean) throws EnjoyException{
+		getLogger().info("[checkDupProductGroupCode][Begin]");
 		
-		String							hql									= null;
-		List<Integer>			 		list								= null;
-		SQLQuery 						query 								= null;
-		int 							result								= 0;
-		
+		String							hql						= null;
+		int 							result					= 0;
+		HashMap<String, Object>			param					= new HashMap<String, Object>();
+		List<Object>					resultList				= null;
 		
 		try{
 			hql				= "Select count(*) cou "
 							+ " from productgroup "
-							+ " where productTypeCode 			= '" + manageProductGroupBean.getProductTypeCode() + "' "
-									+ " and productGroupCode 	= '" + manageProductGroupBean.getProductGroupCode() + "'"
+							+ " where productTypeCode 			= :productTypeCode"
+									+ " and productGroupCode 	= :productGroupCode"
+									+ "	and tin					= :tin"
 									+ " and productGroupStatus 	= 'A'";
 			
-			query			= session.createSQLQuery(hql);
+			//Criteria
+			param.put("productTypeCode"		, manageProductGroupBean.getProductTypeCode());
+			param.put("productGroupCode"	, manageProductGroupBean.getProductGroupCode());
+			param.put("tin"					, manageProductGroupBean.getTin());
 			
-			query.addScalar("cou"			, new IntegerType());
+			resultList = getResult(hql, param, "cou", Constants.INT_TYPE);
 			
-			list		 	= query.list();
-			
-			if(list!=null && list.size() > 0){
-				result = list.get(0);
+			if(resultList!=null && resultList.size() > 0){
+				result = EnjoyUtils.parseInt(resultList.get(0));
 			}
 			
-			logger.info("[checkDupProductGroupCode] result 			:: " + result);
+			getLogger().info("[checkDupProductGroupCode] result 			:: " + result);
 			
 			
 			
 		}catch(Exception e){
-			logger.info(e.getMessage());
+			getLogger().info(e.getMessage());
 			throw new EnjoyException(e.getMessage());
 		}finally{
 			
-			hql									= null;
-			list								= null;
-			query 								= null;
-			logger.info("[checkDupProductGroupCode][End]");
+			hql		= null;
+			getLogger().info("[checkDupProductGroupCode][End]");
 		}
 		
 		return result;
 	}
 	
-	public List<ComboBean> productGroupNameList(String productTypeName, String productGroupName, boolean flag){
-		logger.info("[productGroupNameList][Begin]");
+	public List<ComboBean> productGroupNameList(String productTypeName, String productGroupName, String tin, boolean flag){
+		getLogger().info("[productGroupNameList][Begin]");
 		
-		String 						hql			 		= null;
-        SessionFactory 				sessionFactory		= null;
-		Session 					session				= null;
-		SQLQuery 					query 				= null;
-		List<String>			 	list				= null;
-        String						productTypeCode		= null;
-        List<Object[]>				listTemp			= null;
-		List<ComboBean>				comboList 			= null;
-		ComboBean					comboBean			= null;
+		String 							hql			 		= null;
+        String							productTypeCode		= null;
+		List<ComboBean>					comboList 			= null;
+		ComboBean						comboBean			= null;
+		HashMap<String, Object>			param				= new HashMap<String, Object>();
+		List<String>					columnList			= new ArrayList<String>();
+		List<HashMap<String, Object>>	resultList			= null;
+		List<Object>					listObj				= null;
 		
 		try{
-			
-			sessionFactory 		= HibernateUtil.getSessionFactory();
-			session 			= sessionFactory.openSession();
 			comboList			=  new ArrayList<ComboBean>();
 			
 			/*Begin check ProductType section*/
-			hql 				= " select productTypeCode from productype where productTypeName = '"+productTypeName+"' and productTypeStatus = 'A'";
+			hql 				= "select productTypeCode "
+								+ "	from productype "
+								+ "	where productTypeName 		= :productTypeName"
+								+ "		and tin					= :tin"
+								+ "		and productTypeStatus 	= 'A'";
 			
-			logger.info("[productGroupNameList] Check ProductType hql :: " + hql);
+			//Criteria
+			param.put("productTypeName"	, productTypeName);
+			param.put("tin"				, tin);
 			
-			query			= session.createSQLQuery(hql);
-			query.addScalar("productTypeCode"			, new StringType());
+			listObj = getResult(hql, param, "productTypeCode", Constants.STRING_TYPE);
 			
-			list		 	= query.list();
-			
-			if(list!=null && list.size()==1){
-				productTypeCode = list.get(0);
+			if(listObj!=null && listObj.size()==1){
+				productTypeCode = EnjoyUtils.nullToStr(listObj.get(0));
 			}
 		    /*End check ProductType section*/
 		    
-			hql = "";
+			hql 		= "";
+			param		= new HashMap<String, Object>();
+			
 		    if(productTypeCode!=null){
 		    	hql = " select productGroupCode, productGroupName"
 		    			+ " from productgroup"
-		    			+ " where productTypeCode = '"+productTypeCode+"'"
-		    					+ " and productGroupName like ('"+productGroupName+"%') "
-		    					+ " and productGroupStatus = 'A'"
+		    			+ " where productTypeCode 			= :productTypeCode"
+		    					+ " and productGroupName LIKE CONCAT(:productGroupName, '%')"
+		    					+ "	and tin					= :tin"
+		    					+ " and productGroupStatus 	= 'A'"
 		    			+ " order by productGroupName asc limit 10 ";
+		    	
+		    	param.put("productTypeCode"		, productTypeCode);
+		    	param.put("productGroupName"	, productGroupName);
+		    	param.put("tin"					, tin);
+		    	
 		    }else{
 		    	if(flag==true){
 		    		hql = " select productGroupCode, productGroupName"
 			    			+ " from productgroup"
-			    			+ " where"
-			    					+ " productGroupName like ('"+productGroupName+"%') "
-			    					+ " and productGroupStatus = 'A'"
+			    			+ " where productGroupName LIKE CONCAT(:productGroupName, '%')"
+			    			+ " 	and tin 				= :tin"
+			    			+ " 	and productGroupStatus 	= 'A'"
 			    			+ " order by productGroupName asc limit 10 ";
+		    		
+		    		param.put("productGroupName"	, productGroupName);
+		    		param.put("tin"					, tin);
 		    	}
 		    }
 		    
-		    logger.info("[productGroupNameList] hql :: " + hql);
+		    getLogger().info("[productGroupNameList] hql :: " + hql);
 		    
 		    if(!hql.equals("")){
-		    	query			= session.createSQLQuery(hql);
-				query.addScalar("productGroupCode"			, new StringType());
-				query.addScalar("productGroupName"			, new StringType());
+		    	//Column select
+				columnList.add("productGroupCode");
+				columnList.add("productGroupName");
+		    	
+				resultList = getResult(hql, param, columnList);
 				
-				listTemp = query.list();
-				
-				for(Object[] row:listTemp){
+				for(HashMap<String, Object> row:resultList){
 					comboBean 	= new ComboBean();
 					
-					logger.info("productGroupCode 		:: " + row[0]);
-					logger.info("productGroupName 		:: " + row[1]);
-					
-					comboBean.setCode				(EnjoyUtils.nullToStr(row[0]));
-					comboBean.setDesc				(EnjoyUtils.nullToStr(row[1]));
+					comboBean.setCode				(EnjoyUtils.nullToStr(row.get("productGroupCode")));
+					comboBean.setDesc				(EnjoyUtils.nullToStr(row.get("productGroupName")));
 					
 					comboList.add(comboBean);
 				}
@@ -270,53 +279,45 @@ public class ManageProductGroupDao {
 			
 		}catch(Exception e){
 			e.printStackTrace();
+			getLogger().error(e);
 		}finally{
-			session.close();
-			sessionFactory	= null;
-			session			= null;
-			logger.info("[productGroupNameList][End]");
+			getLogger().info("[productGroupNameList][End]");
 		}
 		
 		return comboList;
 	}
 	
-	public String getProductGroupCode(String productTypeCode, String productGroupName){
-		logger.info("[getProductGroupCode][Begin]");
+	public String getProductGroupCode(String productTypeCode, String productGroupName, String tin){
+		getLogger().info("[getProductGroupCode][Begin]");
 		
-		String 						hql			 		= null;
-        SessionFactory 				sessionFactory		= null;
-		Session 					session				= null;
-		SQLQuery 					query 				= null;
-		List<String>			 	list				= null;
-		String						productGroupCode	= null;
+		String 							hql			 		= null;
+		String							productGroupCode	= null;
+		HashMap<String, Object>			param				= new HashMap<String, Object>();
+		List<Object>					resultList			= null;
 		
 		try{
-			sessionFactory 		= HibernateUtil.getSessionFactory();
-			session 			= sessionFactory.openSession();
 			hql 		= " select productGroupCode"
 							+ "	from productgroup"
-							+ " where productGroupStatus 		= 'A' "
-								+ " and productGroupName 		= '" + productGroupName + "' "
-										+ "and productTypeCode 	= '" + productTypeCode + "'";
+							+ " where productGroupStatus 	= 'A' "
+							+ " 	and productGroupName 	= :productGroupName"
+							+ "		and productTypeCode 	= :productTypeCode"
+							+ "		and tin					= :tin";
 			
-			logger.info("[getProductGroupCode] hql :: " + hql);
+			//Criteria
+			param.put("productGroupName"	, productGroupName);
+			param.put("productTypeCode"		, productTypeCode);
+			param.put("tin"					, tin);
 			
-			query			= session.createSQLQuery(hql);
-			query.addScalar("productGroupCode"			, new StringType());
+			resultList = getResult(hql, param, "productGroupCode", Constants.STRING_TYPE);
 			
-			list		 	= query.list();
-			
-			if(list!=null && list.size() > 0){
-				productGroupCode = list.get(0);
+			if(resultList!=null && resultList.size() > 0){
+				productGroupCode = EnjoyUtils.nullToStr(resultList.get(0));
 			}
 			
 		}catch(Exception e){
 			e.printStackTrace();
 		}finally{
-			session.close();
-			sessionFactory	= null;
-			session			= null;
-			logger.info("[getProductGroupCode][End]");
+			getLogger().info("[getProductGroupCode][End]");
 		}
 		
 		return productGroupCode;

@@ -29,6 +29,7 @@ public class SummarySaleByEmployeeReportDao extends DaoControl {
 		HashMap<String, Object>					param					= new HashMap<String, Object>();
 		List<String>							columnList				= new ArrayList<String>();
 		List<HashMap<String, Object>>			resultList				= null;
+		String									cusName					= null;
 		
 		try{	
 			invoiceDateFrom 	= EnjoyUtils.dateThaiToDb(criteria.getInvoiceDateFrom());
@@ -36,13 +37,14 @@ public class SummarySaleByEmployeeReportDao extends DaoControl {
 			
 			hql					= "select a.invoiceCode"
 									+ " , a. invoiceDate"
-									+ " ,  CONCAT(b.cusName, ' ', b.cusSurname, ' (',b.branchName, ')') as cusName"
+									+ " , CONCAT(b.cusName, ' ', b.cusSurname) as cusName"
+									+ " , b.branchName"
 									+ " , a.invoiceTotal"
 									+ " , a.saleCommission"
-									+ " from invoicecashmaster a, customer b, userdetails c"
-									+ " where a.cusCode = b.cusCode"
-									+ "		and c.userUniqueId = a.saleUniqueId"
-									+ "		and a.tin 			= :tin"
+									+ " from invoicecashmaster a"
+									+ "		inner join customer b on a.cusCode = b.cusCode and a.tin = b.tin"
+									+ "		inner join userdetails c on c.userUniqueId = a.saleUniqueId"
+									+ " where a.tin 			= :tin"
 									+ " 	and a.invoiceDate >= STR_TO_DATE(:invoiceDateFrom	, '%Y%m%d')"
 									+ " 	and a.invoiceDate <= STR_TO_DATE(:invoiceDateTo	, '%Y%m%d')";
 			
@@ -60,6 +62,7 @@ public class SummarySaleByEmployeeReportDao extends DaoControl {
 			columnList.add("invoiceCode");
 			columnList.add("invoiceDate");
 			columnList.add("cusName");
+			columnList.add("branchName");
 			columnList.add("invoiceTotal");
 			columnList.add("saleCommission");
 			
@@ -67,10 +70,14 @@ public class SummarySaleByEmployeeReportDao extends DaoControl {
 
 			for(HashMap<String, Object> row:resultList){
 				bean 	= new SummarySaleByEmployeeReportBean();
+				cusName	= EnjoyUtils.nullToStr(row.get("cusName"));
+				if(!"".equals(EnjoyUtils.nullToStr(row.get("branchName")))){
+					cusName += "(" + EnjoyUtils.nullToStr(row.get("branchName")) + ")";
+				}
 				
 				bean.setInvoiceCode		(EnjoyUtils.nullToStr(row.get("invoiceCode")));
 				bean.setInvoiceDate		(EnjoyUtils.dateToThaiDisplay(row.get("invoiceDate")));
-				bean.setCusName			(EnjoyUtils.nullToStr(row.get("cusName")));
+				bean.setCusName			(cusName);
 				bean.setInvoiceTotal	(EnjoyUtils.convertFloatToDisplay(row.get("invoiceTotal"), 2));
 				bean.setSaleCommission	(EnjoyUtils.convertFloatToDisplay(row.get("saleCommission"), 2));
 				

@@ -23,7 +23,6 @@ public class InvoiceCashSearchForm {
 	private List<InvoiceCashMasterBean> dataList;
 	private HashMap						hashTable;
 	List<ComboBean>						invoiceStatusCombo;
-	private List<ComboBean> 			companyCombo;
 	
 	public InvoiceCashSearchForm(){
 		this.invoiceCashMasterBean 	= new InvoiceCashMasterBean();
@@ -36,7 +35,6 @@ public class InvoiceCashSearchForm {
 		this.dataList				= new ArrayList<InvoiceCashMasterBean>();
 		this.hashTable				= new HashMap();
 		this.invoiceStatusCombo		= new ArrayList<ComboBean>();
-		this.companyCombo			= new ArrayList<ComboBean>();
 	}
 
 	public InvoiceCashMasterBean getInvoiceCashMasterBean() {
@@ -117,13 +115,5 @@ public class InvoiceCashSearchForm {
 
 	public void setInvoiceStatusCombo(List<ComboBean> invoiceStatusCombo) {
 		this.invoiceStatusCombo = invoiceStatusCombo;
-	}
-
-	public List<ComboBean> getCompanyCombo() {
-		return companyCombo;
-	}
-
-	public void setCompanyCombo(List<ComboBean> companyCombo) {
-		this.companyCombo = companyCombo;
 	}
 }

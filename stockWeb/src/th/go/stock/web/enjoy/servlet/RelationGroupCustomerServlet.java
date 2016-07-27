@@ -9,8 +9,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -23,7 +21,6 @@ import th.go.stock.app.enjoy.form.RelationGroupCustomerForm;
 import th.go.stock.app.enjoy.main.Constants;
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
 import th.go.stock.app.enjoy.utils.EnjoyUtils;
-import th.go.stock.app.enjoy.utils.HibernateUtil;
 import th.go.stock.web.enjoy.common.EnjoyStandardSvc;
 import th.go.stock.web.enjoy.utils.EnjoyUtil;
 
@@ -55,14 +52,14 @@ public class RelationGroupCustomerServlet extends EnjoyStandardSvc {
          String pageAction = null; 
  		
  		try{
- 			 pageAction 				= EnjoyUtil.nullToStr(request.getParameter("pageAction"));
- 			 this.enjoyUtil 			= new EnjoyUtil(request, response);
- 			 this.request            	= request;
-             this.response           	= response;
-             this.session            	= request.getSession(false);
-             this.userBean           	= (UserDetailsBean)session.getAttribute("userBean");
-             this.form               	= (RelationGroupCustomerForm)session.getAttribute(FORM_NAME);
-             this.dao					= new RelationGroupCustomerDao();
+ 			 pageAction 					= EnjoyUtil.nullToStr(request.getParameter("pageAction"));
+ 			 this.enjoyUtil 				= new EnjoyUtil(request, response);
+ 			 this.request            		= request;
+             this.response           		= response;
+             this.session            		= request.getSession(false);
+             this.userBean           		= (UserDetailsBean)session.getAttribute("userBean");
+             this.form               		= (RelationGroupCustomerForm)session.getAttribute(FORM_NAME);
+             this.dao						= new RelationGroupCustomerDao();
  			
              logger.info("[execute] pageAction : " + pageAction );
              
@@ -79,7 +76,9 @@ public class RelationGroupCustomerServlet extends EnjoyStandardSvc {
 				this.updateRecord();
 			}else if(pageAction.equals("deleteRecord")){
 				this.deleteRecord();
-			}
+			}else if(pageAction.equals("search")){
+ 				this.onSearch();
+ 			}
  			
  			session.setAttribute(FORM_NAME, this.form);
  			
@@ -90,6 +89,7 @@ public class RelationGroupCustomerServlet extends EnjoyStandardSvc {
  			e.printStackTrace();
  			logger.info(e.getMessage());
  		}finally{
+ 			destroySession();
  			logger.info("[execute][End]");
  		}
 	}
@@ -158,41 +158,57 @@ public class RelationGroupCustomerServlet extends EnjoyStandardSvc {
 	private void onLoad() throws EnjoyException{
 		logger.info("[onLoad][Begin]");
 		
-		SessionFactory 						sessionFactory					= null;
-		Session 							session							= null;
-		String								seqTemp							= null;
-		RelationGroupCustomerBean			relationGroupCustomerBean		= null;
-		List<RelationGroupCustomerBean> 	relationGroupCustomerList		= null;
-		
 		try{
-			sessionFactory 				= HibernateUtil.getSessionFactory();
-			session 					= sessionFactory.openSession();
-			
-			session.beginTransaction();
-			
 			this.form.setTitlePage("กำหนดกลุ่มลูกค้า");
-			
-			relationGroupCustomerBean = new RelationGroupCustomerBean();
-			relationGroupCustomerList = this.dao.searchByCriteria(session, relationGroupCustomerBean);
-			
-			this.form.setRelationGroupCustomerList(relationGroupCustomerList);
-			
-			seqTemp = EnjoyUtil.nullToStr(this.dao.getlastId(session));
-			this.form.setSeqTemp(seqTemp);
-			
+			this.setRefference();
+			this.onSearch();
 		}catch(EnjoyException e){
 			throw new EnjoyException(e.getMessage());
 		}catch(Exception e){
 			logger.info(e.getMessage());
 			throw new EnjoyException("onLoad is error");
 		}finally{
-			session.close();
-			
-			this.setRefference();
-			
-			sessionFactory	= null;
-			session			= null;
 			logger.info("[onLoad][End]");
+		}
+		
+	}
+	
+	private void onSearch() throws EnjoyException{
+		logger.info("[onSearch][Begin]");
+		
+		JSONObject 							obj 							= null;
+		String								seqTemp							= null;
+		RelationGroupCustomerBean			relationGroupCustomerBean		= null;
+		List<RelationGroupCustomerBean> 	relationGroupCustomerList		= null;
+		String 								tin								= null;
+
+		try{
+			obj 	= new JSONObject();
+			tin 	= this.userBean.getTin();
+			
+			relationGroupCustomerBean = new RelationGroupCustomerBean();
+			relationGroupCustomerBean.setTin(tin);
+			relationGroupCustomerList = this.dao.searchByCriteria(relationGroupCustomerBean);
+			
+			this.form.setRelationGroupCustomerList(relationGroupCustomerList);
+			
+			seqTemp = EnjoyUtil.nullToStr(this.dao.getlastId(tin));
+			this.form.setSeqTemp(seqTemp);
+			
+			obj.put(STATUS, 			SUCCESS);
+			
+		}catch(EnjoyException e){
+			obj.put(STATUS, 		ERROR);
+			obj.put(ERR_MSG, 		e.getMessage());
+		}catch(Exception e){
+			logger.info(e.getMessage());
+			e.printStackTrace();
+			obj.put(STATUS, 		ERROR);
+			obj.put(ERR_MSG, 		"onSearch is error");
+		}finally{
+			this.enjoyUtil.writeMSG(obj.toString());
+			
+			logger.info("[onSearch][End]");
 		}
 		
 	}
@@ -200,18 +216,16 @@ public class RelationGroupCustomerServlet extends EnjoyStandardSvc {
 	private void onSave() throws EnjoyException{
 		logger.info("[onSave][Begin]");
 		
-		SessionFactory 						sessionFactory				= null;
-		Session 							session						= null;
 		JSONObject 							obj 						= null;
 		List<RelationGroupCustomerBean> 	relationGroupCustomerList	= null;
+		int									cusGroupCode				= 1;
+		String								tin							= null;
+		boolean								chkFlag						= true;
 		
 		try{
-			sessionFactory 				= HibernateUtil.getSessionFactory();
-			session 					= sessionFactory.openSession();
 			obj 						= new JSONObject();
 			relationGroupCustomerList	= this.form.getRelationGroupCustomerList();
-			
-			session.beginTransaction();
+			tin 						= this.userBean.getTin();
 			
 			for(RelationGroupCustomerBean bean:relationGroupCustomerList){
 				
@@ -220,43 +234,43 @@ public class RelationGroupCustomerServlet extends EnjoyStandardSvc {
 				logger.info("[onSave] groupSalePrice 	:: " + bean.getGroupSalePrice());
 				logger.info("[onSave] cusGroupCode 		:: " + bean.getCusGroupCode());
 				
+				bean.setTin(tin);
+				
 				if(!bean.getRowStatus().equals("")){
 					if(bean.getRowStatus().equals(RelationGroupCustomerForm.NEW)){
-						this.dao.insertRelationGroupCustomer(session, bean);
+						if(chkFlag==true){
+							cusGroupCode = this.dao.genId(tin);
+							chkFlag  = false;
+						}else{
+							cusGroupCode++;
+						}
+						bean.setCusGroupCode(EnjoyUtils.nullToStr(cusGroupCode));
+						this.dao.insertRelationGroupCustomer(bean);
 					}else if(bean.getRowStatus().equals(RelationGroupCustomerForm.EDIT)){
-						this.dao.updateRelationGroupCustomer(session, bean);
+						this.dao.updateRelationGroupCustomer(bean);
 					}else if(bean.getRowStatus().equals(RelationGroupCustomerForm.DEL)){
-						this.dao.rejectRelationGroupCustomer(session, bean);
+						this.dao.rejectRelationGroupCustomer(bean);
 					}
 				}
 			}
 			
-			session.getTransaction().commit();
+			commit();
 			
 			obj.put(STATUS, 			SUCCESS);
 			
 		}catch(EnjoyException e){
 			logger.error(e);
-			session.getTransaction().rollback();
+			rollback();
 			obj.put(STATUS, 		ERROR);
 			obj.put(ERR_MSG, 		e.getMessage());
 		}catch(Exception e){
-			session.getTransaction().rollback();
+			rollback();
 			logger.error(e);
 			e.printStackTrace();
 			obj.put(STATUS, 		ERROR);
 			obj.put(ERR_MSG, 		"onSave is error");
 		}finally{
-			
-			session.flush();
-			session.clear();
-			session.close();
-			
 			this.enjoyUtil.writeMSG(obj.toString());
-			
-			sessionFactory	= null;
-			session			= null;
-			
 			logger.info("[onSave][End]");
 		}
 	}	
@@ -384,6 +398,21 @@ public class RelationGroupCustomerServlet extends EnjoyStandardSvc {
 			this.enjoyUtil.writeMSG(obj.toString());
 			logger.info("[deleteRecord][End]");
 		}
+	}
+
+	@Override
+	public void destroySession() {
+		this.dao.destroySession();
+	}
+
+	@Override
+	public void commit() {
+		this.dao.commit();
+	}
+
+	@Override
+	public void rollback() {
+		this.dao.rollback();
 	}
 }
 

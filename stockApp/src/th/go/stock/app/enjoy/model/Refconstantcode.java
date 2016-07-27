@@ -13,27 +13,29 @@ import javax.persistence.*;
 public class Refconstantcode implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	@Id
-	private int id;
+	@EmbeddedId
+	private RefconstantcodePK id;
 
 	private String codeDisplay;
 
 	private String codeNameEN;
 
 	private String codeNameTH;
-	
-	private String flagYear;
-	
+
 	private String flagEdit;
+
+	private String flagYear;
+
+	private String typeTB;
 
 	public Refconstantcode() {
 	}
 
-	public int getId() {
+	public RefconstantcodePK getId() {
 		return this.id;
 	}
 
-	public void setId(int id) {
+	public void setId(RefconstantcodePK id) {
 		this.id = id;
 	}
 
@@ -61,20 +63,28 @@ public class Refconstantcode implements Serializable {
 		this.codeNameTH = codeNameTH;
 	}
 
+	public String getFlagEdit() {
+		return this.flagEdit;
+	}
+
+	public void setFlagEdit(String flagEdit) {
+		this.flagEdit = flagEdit;
+	}
+
 	public String getFlagYear() {
-		return flagYear;
+		return this.flagYear;
 	}
 
 	public void setFlagYear(String flagYear) {
 		this.flagYear = flagYear;
 	}
 
-	public String getFlagEdit() {
-		return flagEdit;
+	public String getTypeTB() {
+		return this.typeTB;
 	}
 
-	public void setFlagEdit(String flagEdit) {
-		this.flagEdit = flagEdit;
+	public void setTypeTB(String typeTB) {
+		this.typeTB = typeTB;
 	}
 
 }

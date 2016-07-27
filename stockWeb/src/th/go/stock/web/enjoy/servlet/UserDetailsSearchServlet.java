@@ -11,21 +11,18 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import th.go.stock.app.enjoy.bean.ComboBean;
 import th.go.stock.app.enjoy.bean.UserDetailsBean;
+import th.go.stock.app.enjoy.bean.UserPrivilegeBean;
 import th.go.stock.app.enjoy.dao.UserDetailsDao;
 import th.go.stock.app.enjoy.exception.EnjoyException;
 import th.go.stock.app.enjoy.form.UserDetailsSearchForm;
 import th.go.stock.app.enjoy.main.Constants;
-import th.go.stock.app.enjoy.model.Userprivilege;
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
 import th.go.stock.app.enjoy.utils.EnjoyUtils;
-import th.go.stock.app.enjoy.utils.HibernateUtil;
 import th.go.stock.web.enjoy.common.EnjoyStandardSvc;
 import th.go.stock.web.enjoy.utils.EnjoyUtil;
 
@@ -88,6 +85,7 @@ public class UserDetailsSearchServlet extends EnjoyStandardSvc {
  			e.printStackTrace();
  			logger.info(e.getMessage());
  		}finally{
+ 			destroySession();
  			logger.info("[execute][End]");
  		}
 	}
@@ -151,11 +149,8 @@ public class UserDetailsSearchServlet extends EnjoyStandardSvc {
 	private void onSearchUserDetail() throws EnjoyException{
 		logger.info("[onSearchUserDetail][Begin]");
 		
-		Userprivilege				userprivilege		= null;
-		SessionFactory 				sessionFactory		= null;
-		Session 					session				= null;
 		List<UserDetailsBean> 		listUserDetailsBean = null;
-		List<Userprivilege> 		listUserprivilege   = null;
+		List<UserPrivilegeBean> 	listUserprivilege   = null;
 		Hashtable<String, String> 	fUserprivilege		= null;
 		int							cou					= 0;
 		int							pageNum				= 1;
@@ -168,36 +163,30 @@ public class UserDetailsSearchServlet extends EnjoyStandardSvc {
 
 		try{
 			listUserDetailsBean 		= new ArrayList<UserDetailsBean>();
-			listUserprivilege   		= new ArrayList<Userprivilege>();
 			fUserprivilege				= new Hashtable<String, String>();
 
-			sessionFactory 				= HibernateUtil.getSessionFactory();
-			session 					= sessionFactory.openSession();			
-			session.beginTransaction();
-			
 			userDetailsBean				= new UserDetailsBean();
 			
-			userDetailsBean.setUserName	(EnjoyUtils.nullToStr(this.request.getParameter("userName")));
-			userDetailsBean.setUserId	(EnjoyUtils.nullToStr(this.request.getParameter("userId")));
-			userDetailsBean.setUserStatus(EnjoyUtils.nullToStr(this.request.getParameter("userStatus")));
+			userDetailsBean.setUserName		(EnjoyUtils.nullToStr(this.request.getParameter("userName")));
+			userDetailsBean.setUserEmail	(EnjoyUtils.nullToStr(this.request.getParameter("userEmail")));
+			userDetailsBean.setUserStatus	(EnjoyUtils.nullToStr(this.request.getParameter("userStatus")));
+			userDetailsBean.setTin			(this.userBean.getTin());
+			userDetailsBean.setUserUniqueId	(this.userBean.getUserUniqueId());
 			
 			this.form.setUserDetailsBean(userDetailsBean);
 			
 			logger.info("[onSearchUserDetail] userName 	 :: " + userDetailsBean.getUserName());
-			logger.info("[onSearchUserDetail] userId 	 :: " + userDetailsBean.getUserId());
+			logger.info("[onSearchUserDetail] userEmail  :: " + userDetailsBean.getUserEmail());
 			logger.info("[onSearchUserDetail] userStatus :: " + userDetailsBean.getUserStatus());
 			
 			listUserprivilege 			= this.dao.getUserprivilege();
-			for(int i=0;i<listUserprivilege.size();i++){
-				userprivilege			= listUserprivilege.get(i);
+			for(UserPrivilegeBean userprivilege :listUserprivilege){
 				fUserprivilege.put(userprivilege.getPrivilegeCode() , userprivilege.getPrivilegeName());
 			}	
-			listUserDetailsBean	 		= this.dao.getListUserdetail(session, userDetailsBean, fUserprivilege);
+			listUserDetailsBean	 		= this.dao.getListUserdetail(userDetailsBean, fUserprivilege);
 
-			//logger.info("[onSearchUserDetail] listUserDetailsBean.size :: " + listUserDetailsBean.size());
 			logger.info("[onSearchUserDetail] listUserDetailsBean :: " + listUserDetailsBean.size());
 			if(listUserDetailsBean.size() > 0){				
-				//this.form.setUserDetailsBeanList(listUserDetailsBean);		
 				
 				hashTable.put(pageNum, list);
 				for(UserDetailsBean bean:listUserDetailsBean){
@@ -244,10 +233,6 @@ public class UserDetailsSearchServlet extends EnjoyStandardSvc {
 			logger.info(e.getMessage());
 			throw new EnjoyException("onSearchUserDetail is error");
 		}finally{
-			session.close();
-			sessionFactory	= null;
-			session			= null;
-			
 			this.setRefference();
 			logger.info("[onSearchUserDetail][End]");
 		}
@@ -291,7 +276,7 @@ public class UserDetailsSearchServlet extends EnjoyStandardSvc {
 			   logger.info("[userFullNameList] userName 			:: " + userName);
 			   
 			   
-			   list 		= this.dao.userFullNameList(userName);
+			   list 		= this.dao.userFullNameList(userName, userBean.getTin(), userBean.getUserUniqueId());
 			   
 			   for(ComboBean bean:list){
 				   objDetail 		= new JSONObject();
@@ -311,6 +296,21 @@ public class UserDetailsSearchServlet extends EnjoyStandardSvc {
 			   logger.info("[userFullNameList][End]");
 		   }
 	   }
+
+	@Override
+	public void destroySession() {
+		this.dao.destroySession();
+	}
+
+	@Override
+	public void commit() {
+		this.dao.commit();
+	}
+
+	@Override
+	public void rollback() {
+		this.dao.rollback();
+	}
 	
 	
 	

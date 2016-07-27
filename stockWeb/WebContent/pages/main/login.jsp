@@ -66,112 +66,190 @@
 			}
 		</style>
 		<script language="JavaScript" type="text/JavaScript">
-		/*
-		function lp_changeEnterToTab(e)
-		{
-			var keycode =(window.event) ? event.keyCode : e.keyCode;
-			if(keycode == 13) {
-				event.keyCode = 9;
-			}
-		} */
+			var gv_service 				= null;
+			var gv_url 					= '<%=servURL%>/EnjoyGenericSrv';
 		
-		function lp_changeEnterToTab_forPWD(e)
-		{
-			var keycode =(window.event) ? event.keyCode : e.keyCode;//alert(keycode);
-			if(keycode == 13) {
-				//lp_submit_login();
-				$('#btnLogin').click();
-			}
-		} 
-		
-		$(document).ready(function(){
-			
-		    if (gp_getCookie("username") != "") {
-		    	$('#username').val(gp_getCookie("username"));
-		    	$('#user_pwd').focus();
-		    }else{
-		    	$('#username').focus();
-		    }
-			
-			$(".form-login").corner();
-			
-			$('#btnLogin').click(function(){
-				var url 	= '<%=servURL%>/EnjoyGenericSrv?service=servlet.LoginServlet';
-				var userId	= null;
-				var pass	= null;
-				var params	= null;
+			$(document).ready(function(){
 				
-				try{
-					userId 	= $('#username').val();
-					pass 	= $('#user_pwd').val();						
-					if (userId == "") {
-						alert("กรุณาระบุรหัสผู้ใช่ก่อนทำการเข้าสู่ระบบ", function() { 
-							$('#username').focus();
-		    		    });
-						//alert("กรุณาระบุรหัสผู้ใช่ก่อนทำการเข้าสู่ระบบ");
-						//$('#username').focus();
-						return false;
-					}
-					if (pass == "") {
-						alert("กรุณาระบุรหัสผ่านก่อนทำการเข้าสู่ระบบ", function() { 
-							$('#user_pwd').focus();
-		    		    });
-						//alert("กรุณาระบุรหัสผ่านก่อนทำการเข้าสู่ระบบ");
-						//$('#user_pwd').focus();
-						return false;
+				gv_service 		= "service=" + $('#service').val();
+				
+			    if (gp_getCookie("userEmail") != "") {
+			    	$('#userEmail').val(gp_getCookie("userEmail"));
+			    	$('#user_pwd').focus();
+			    }else{
+			    	$('#userEmail').focus();
+			    }
+				
+				$(".form-login").corner();
+				
+				$('#btnLogin').click(function(){
+					var userEmail	= null;
+					var pass		= null;
+					
+					try{
+						userEmail 	= $('#userEmail').val();
+						pass 		= $('#user_pwd').val();						
+						if (userEmail == "") {
+							alert("กรุณาระบุE-mailก่อนทำการเข้าสู่ระบบ", function() { 
+								$('#userEmail').focus();
+			    		    });
+							return false;
+						}
+						if (pass == "") {
+							alert("กรุณาระบุรหัสผ่านก่อนทำการเข้าสู่ระบบ", function() { 
+								$('#user_pwd').focus();
+			    		    });
+							return false;
+						}
+						
+						$.ajax({
+							async:true,
+				            type: "POST",
+				            url: gv_url,
+				            data: gv_service + "&pageAction=login&" + $('#frm').serialize(),
+				            beforeSend: gp_progressBarOn(),
+				            success: function(data){
+				            	var jsonObj 			= null;
+				            	var status				= null;
+				            	var countUserIncompany	= 0;
+				            	
+				            	try{
+				            		jsonObj = JSON.parse(data);
+				            		status	= jsonObj.status;
+				            		
+				            		if(status=="SUCCESS"){
+				            			
+				            			gp_setCookie("userEmail", userEmail, 3);
+				            			
+				            			if (jsonObj.flagChkCompany == "Y"){
+				            				window.location.replace('<%=servURL%>/EnjoyGenericSrv?service=servlet.CompanyDetailsMaintananceServlet&pageAction=new');
+				            			}else if (jsonObj.FlagChange == "Y"){
+				            				window.location.replace('<%=pagesURL%>/ChangePassScn.jsp');
+				            			} else {
+				            				countUserIncompany = parseInt(jsonObj.countUserIncompany);
+				            				
+				            				if(countUserIncompany==1){
+				            					window.location.replace('<%=servURL%>/pages/menu/index.jsp');
+				            				}else{
+				            					lp_chooseCompany(jsonObj.companyObjList);
+				            				}
+				            			}
+				            		}else{
+				            			alert(jsonObj.errMsg);
+				            		}
+				            	}catch(e){
+				            		alert("in btnLogin :: " + e);
+				            	}
+				            }
+				        });
+					}catch(err){
+						alert("btnLogin :: " + err);
 					}
 					
-					params 	= "userId=" + userId + "&passWord=" + pass;
-					$.ajax({
-						async:true,
-			            type: "POST",
-			            url: url,
-			            data: params,
-			            beforeSend: gp_progressBarOn(),
-			            success: function(data){
-			            	//gp_progressBarOff();
-			            	
-			            	var jsonObj 			= null;
-			            	var status				= null;
-		            		jsonObj = JSON.parse(data);
-		            		status	= jsonObj.status;
-		            		
-		            		if(status=="SUCCESS"){
-		            			
-		            			gp_setCookie("username", userId, 3);
-		            			
-		            			if (jsonObj.flagChkCompany == "Y"){
-		            				window.location.replace('<%=servURL%>/EnjoyGenericSrv?service=servlet.CompanyDetailsMaintananceServlet&pageAction=new');
-		            			}else if (jsonObj.FlagChange == "Y"){
-		            				window.location.replace('<%=pagesURL%>/ChangePassScn.jsp');
-		            			} else {
-		            				window.location.replace('<%=servURL%>/pages/menu/index.jsp');
-		            			}
-		            		}else{
-		            			alert(jsonObj.errMsg);
-		            		}
-			            }
-			        });
-				}catch(err){
-					alert("btnLogin :: " + err);
-				}
+				});
+				
+				$('#btnSubmit').live("click", function(){
+					try{
+						
+						if($("#tin").val()==""){
+							$("#tin").focus();
+							return false;
+						}
+						
+						$.ajax({
+							async:true,
+				            type: "POST",
+				            url: gv_url,
+				            data: gv_service + "&pageAction=setTinForTinUser&tin=" + $('#tin').val(),
+				            beforeSend: gp_progressBarOn(),
+				            success: function(data){
+				            	var jsonObj 			= null;
+				            	var status				= null;
+				            	
+				            	try{
+				            		gp_progressBarOff();
+				            		
+				            		jsonObj = JSON.parse(data);
+				            		status	= jsonObj.status;
+				            		
+				            		if(status=="SUCCESS"){
+				            			window.location.replace('<%=servURL%>/pages/menu/index.jsp');
+				            		}else{
+				            			alert(jsonObj.errMsg);
+				            		}
+				            		$( "#dialog" ).dialog( "close" );
+				            	}catch(e){
+				            		alert("in btnSubmit :: " + e);
+				            	}
+				            }
+				        });
+					}catch(err){
+						alert("btnSubmit :: " + err);
+					}
+				});
+				
+				$('#btnCancel').live("click", function(){
+					try{
+						$( "#dialog" ).dialog( "close" );
+					}catch(err){
+						alert("btnSubmit :: " + err);
+					}
+				});
 				
 			});
-		});
+			
+			function lp_changeEnterToTab_forPWD(e){
+				var keycode =(window.event) ? event.keyCode : e.keyCode;//alert(keycode);
+				if(keycode == 13) {
+					$('#btnLogin').click();
+				}
+			} 
+			
+			function lp_chooseCompany(av_companyObjList){
+				var lv_html = "";
+				var lv_select = "";
+				
+				try{
+					lv_select += '<select id="tin" name="tin" style="width:80%">';
+					lv_select += '<option value="">กรุณาระบุ</option>';
+					$.each(av_companyObjList, function(idx, obj) {
+						lv_select+= '<option value="' + obj.code + '">' + obj.desc + '</option>';
+					});
+					lv_select += '</select>';
+					
+					lv_html = '<table border="0" width="100%">'
+							 + '	<tr>'
+							 + '		<td align="center">' + lv_select + '</td>'
+							 + '	</tr>'
+							 + '	<tr><td style="height:40px;"></td></tr>'
+							 + '	<tr>'
+							 + '		<td align="center" colspan="2">'
+							 + '			<input type="button" id="btnSubmit" class="btn btn-primary btn-md" name="btnSubmit" value="ตกลง" />'
+							 + '			<input type="button" id="btnCancel" class="btn btn-primary btn-md" name="btnCancel" value="ยกเลิก" />'
+							 + '		</td>'
+							 + '	</tr>'
+							 + '</table>';
+					
+					gp_dialogPopUpHtml(lv_html, "กรุณาระบุบริษัทที่ต้องการเข้าใช้งานระบบ",350, 200);
+				}catch(e){
+					alert("lp_chooseCompany :: " + e);
+				}
+			}
 		
 		</script>	
 	</head>
 	<body>
 		<form id="frm" onsubmit="return true;" >
+			<input type="hidden" id="service" 	name="service" value="servlet.LoginServlet" />
 			<div class="container" align="center">
 			    <div class="row" align="center" style="width: 100%;">
 			        <div class="form-login">
 			           	<img src="<%=imgURL%>/logo-login.png"><br/><br/>
-			            <input id="username"  
-			            	   name="username" 
+			            <input id="userEmail"  
+			            	   name="userEmail" 
 			            	   type="text"  
-			            	   maxlength="20" 
-			            	   placeholder="username"  
+			            	   maxlength="100" 
+			            	   placeholder="E-mail"  
 			            	   onkeypress="return lp_changeEnterToTab_forPWD(event);" 
 			            	   style="width: 100%;" />
 			            <br/><br/>

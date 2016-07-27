@@ -543,277 +543,276 @@
 									</div>
 				         			<div class="panel-body">
 				         				<table class="table user-register-table" style="border-bottom-color: white;">
-												<tr>
-									        		<td align="right">
-														รหัสสินค้า <span style="color: red;"><b>*</b></span> :
-													</td>
-								        			<td align="left">
-								        				<input type='text' 
-								        					   id="productCode" 
-								        					   name='productCode' 
-								        					   value="<%=productmasterBean.getProductCode()%>" 
-								        					   maxlength="17" 
-								        					   style="width: 220px;" />
-								        			</td>
-									        	</tr>
-									        	<tr>
-									        		<td align="right">
-														ชื่อสินค้า <span style="color: red;"><b>*</b></span> :
-													</td>
-								        			<td align="left">
-								        				<input type='text' 
-								        					   id="productName" 
-								        					   name='productName' 
-								        					   value="<%=productmasterBean.getProductName()%>" 
-								        					   maxlength="255" 
-								        					   style="width: 220px;" />
-								        			</td>
-									        	</tr>
-									        	<tr>
-									        		<td align="right">
-														หมวดสินค้า <span style="color: red;"><b>*</b></span> :
-													</td>
-								        			<td align="left">
-								        				<input type='text' 
-								        					   id="productTypeName" 
-								        					   name='productTypeName' 
-								        					   value="<%=productmasterBean.getProductTypeName()%>" 
-								        					   maxlength="200" 
-								        					   style="width: 220px;" />
-								        				<input type="hidden" id="productTypeCode" name="productTypeCode" value="<%=productmasterBean.getProductTypeCode()%>" />
-								        			</td>
-									        	</tr>
-									        	<tr>
-									        		<td align="right">
-														หมู่สินค้า <span style="color: red;"><b>*</b></span> :
-													</td>
-								        			<td align="left">
-								        				<input type='text' 
-								        					   id="productGroupName" 
-								        					   name='productGroupName' 
-								        					   value="<%=productmasterBean.getProductGroupName()%>" 
-								        					   maxlength="200" 
-								        					   style="width: 220px;" />
-								        				<input type="hidden" id="productGroupCode" name="productGroupCode" value="<%=productmasterBean.getProductGroupCode()%>" />
-								        			</td>
-									        	</tr>
-									        	<tr>
-									        		<td align="right">
-														หน่วยสินค้า <span style="color: red;"><b>*</b></span> :
-													</td>
-								        			<td align="left">
-								        				<input type='text' 
-								        					   id="unitName" 
-								        					   name='unitName' 
-								        					   value="<%=productmasterBean.getUnitName()%>" 
-								        					   maxlength="200" 
-								        					   style="width: 220px;" />
-								        				<input type="hidden" id="unitCode" name="unitCode" value="<%=productmasterBean.getUnitCode()%>" />
-								        			</td>
-									        	</tr>
-									        	<tr>
-									        		<td align="right">
-														ยอดต่ำสุดที่ต้องแจ้งเตือน <span style="color: red;"><b>*</b></span> :
-													</td>
-								        			<td align="left">
-								        				<input type='text' 
-								        					   id="minQuan" 
-								        					   name='minQuan' 
-								        					   class="moneyOnly"
-								        					   onblur="gp_checkAmtOnly(this, 9);"
-								        					   value="<%=productmasterBean.getMinQuan()%>" 
-								        					   style="width: 220px;" />
-								        			</td>
-									        	</tr>
-									        	<tr>
-									        		<td align="right">
-														ราคาทุน <span style="color: red;"><b>*</b></span> :
-													</td>
-								        			<td align="left">
-								        				<input type='text' 
-								        					   id="costPrice" 
-								        					   name='costPrice' 
-								        					   class="moneyOnly"
-								        					   onblur="gp_checkAmtOnly(this, 11);"
-								        					   value="<%=productmasterBean.getCostPrice()%>" 
-								        					   style="width: 220px;" />
-								        				&nbsp;บาท
-								        			</td>
-									        	</tr>
-									        	<tr>
-									        		<td align="right">
-														ราคาขาย 1 <span style="color: red;"><b>*</b></span> :
-													</td>
-								        			<td align="left">
-								        				<input type='text' 
-								        					   id="salePrice1" 
-								        					   name='salePrice1' 
-								        					   class="moneyOnly"
-								        					   onblur="gp_checkAmtOnly(this, 11);"
-								        					   value="<%=productmasterBean.getSalePrice1()%>" 
-								        					   style="width: 220px;" />
-								        				&nbsp;บาท
-								        			</td>
-									        	</tr>
-									        	<tr>
-									        		<td align="right">
-														ราคาขาย 2 :
-													</td>
-								        			<td align="left">
-								        				<input type='text' 
-								        					   id="salePrice2" 
-								        					   name='salePrice2' 
-								        					   class="moneyOnly"
-								        					   onblur="gp_checkAmtOnly(this, 11);"
-								        					   value="<%=productmasterBean.getSalePrice2()%>" 
-								        					   style="width: 220px;" />
-								        				&nbsp;บาท
-								        			</td>
-									        	</tr>
-									        	<tr>
-									        		<td align="right">
-														ราคาขาย 3 :
-													</td>
-								        			<td align="left">
-								        				<input type='text' 
-								        					   id="salePrice3" 
-								        					   name='salePrice3' 
-								        					   class="moneyOnly"
-								        					   onblur="gp_checkAmtOnly(this, 11);"
-								        					   value="<%=productmasterBean.getSalePrice3()%>" 
-								        					   style="width: 220px;" />
-								        				&nbsp;บาท
-								        			</td>
-									        	</tr>
-									        	<tr>
-									        		<td align="right">
-														ราคาขาย 4 :
-													</td>
-								        			<td align="left">
-								        				<input type='text' 
-								        					   id="salePrice4" 
-								        					   name='salePrice4' 
-								        					   class="moneyOnly"
-								        					   onblur="gp_checkAmtOnly(this, 11);"
-								        					   value="<%=productmasterBean.getSalePrice4()%>" 
-								        					   style="width: 220px;" />
-								        				&nbsp;บาท
-								        			</td>
-									        	</tr>
-									        	<tr>
-									        		<td align="right">
-														ราคาขาย 5 :
-													</td>
-								        			<td align="left">
-								        				<input type='text' 
-								        					   id="salePrice5" 
-								        					   name='salePrice5' 
-								        					   class="moneyOnly"
-								        					   onblur="gp_checkAmtOnly(this, 11);"
-								        					   value="<%=productmasterBean.getSalePrice5()%>" 
-								        					   style="width: 220px;" />
-								        				&nbsp;บาท
-								        			</td>
-									        	</tr>
-									        	
-									        </table>
-									        <br/>
-									        <table class="table sim-panel-result-table" id="resultData">
-												<tr height="26px;">
-													<th  style="text-align: center;" width="5%" ><B>ลำดับ</B></th>
-													<th  style="text-align: center;" width="20%"><B>ปริมาณที่ซื้อ</B></th>
-													<th  style="text-align: center;" width="20%"><B>ลดจำนวนเงิน(%)</B></th>
-													<th  style="text-align: center;" width="20%"><B>วันที่มีผล</B></th>
-													<th  style="text-align: center;" width="20%"><B>วันที่สิ้นสุด</B></th>
-													<th style="text-align: center;" width="15%">Action</th>
-												</tr> 
-												<%
- 													int					  	seq		= 1;
-													for(ProductdetailBean bean:productdetailList){
-														if(!bean.getRowStatus().equals(productDetailsMaintananceForm.DEL)){
- 												%>
-												<tr>
-													<td style="text-align:center">
-														<%=seq%>
-													</td>
-													<td align="center">
-														<input type="text" 
-															   style="width: 100%" 
-															   onblur="gp_checkAmtOnly(this, 9);lp_updateRecord(<%=bean.getSeq()%>);" 
-															   id="quanDiscount<%=bean.getSeq()%>" 
-															   name="quanDiscount" 
-															   class="moneyOnly"
-															   value="<%=bean.getQuanDiscount()%>" />
-													</td>
-													<td align="left">
-														<input type="text" 
-															   style="width: 100%" 
-															   onblur="gp_checkAmtOnly(this, 9);lp_updateRecord(<%=bean.getSeq()%>);" 
-															   id="discountRate<%=bean.getSeq()%>" 
-															   name="discountRate" 
-															   class="moneyOnly"
-															   value="<%=bean.getDiscountRate()%>" />
-													</td>
-													<td align="left">
-														<input type='text' 
-								        					   id="startDate<%=bean.getSeq()%>" 
-								        					   name='startDate' 
-								        					   placeholder="DD/MM/YYYY"
-								        					   class="dateFormat"
-								        					   onchange="gp_checkDate(this);lp_updateRecord(<%=bean.getSeq()%>);"
-								        					   value="<%=bean.getStartDate() %>" 
-								        					   style="width: 100px;" />
-													</td>
-													<td align="left">
-														<input type='text' 
-								        					   id="expDate<%=bean.getSeq()%>" 
-								        					   name='expDate' 
-								        					   placeholder="DD/MM/YYYY"
-								        					   class="dateFormat"
-								        					   onchange="gp_checkDate(this);lp_updateRecord(<%=bean.getSeq()%>);"
-								        					   value="<%=bean.getExpDate() %>" 
-								        					   style="width: 100px;" />
-													</td>
-													<td align="center">
-														<img alt="ลบ" title="ลบ" src="<%=imgURL%>/wrong.png" width="24" height="24" border="0" onclick="lp_deleteRecord(this, '<%=bean.getSeq()%>');" />
-														<input type="hidden" id="seq<%=bean.getSeq()%>" name="seq" value="<%=bean.getSeq()%>" />
-													</td>
-												</tr>
-												<% seq++;}}%>
-												<tr>
-													<td colspan="5">&nbsp;</td>
-													<td align="center">
-														<img alt="เพิ่ม" title="เพิ่ม" src="<%=imgURL%>/Add.png" width="24" height="24" border="0" onclick="lp_newRecord(this);" />
-													</td>
-												</tr>
-											</table>
-											<br/>
-											<table width="100%" border="0">
-												<tr>
-								        			<td align="center">
-								        				<br/>
-								        				<input type="button" id="btnSave" class="btn btn-sm btn-warning" value='บันทึก' onclick="lp_save();" />&nbsp;&nbsp;&nbsp;
-				   										<input type="button" id="btnReset" onclick="lp_reset();" class="btn btn-sm btn-danger" value='เริ่มใหม่' />
-								        			</td>
-								        		</tr>
-											</table>
-										</div>
-									</div>          
-								</div>
-							</section>
+											<tr>
+								        		<td align="right">
+													รหัสสินค้า <span style="color: red;"><b>*</b></span> :
+												</td>
+							        			<td align="left">
+							        				<input type='text' 
+							        					   id="productCode" 
+							        					   name='productCode' 
+							        					   value="<%=productmasterBean.getProductCode()%>" 
+							        					   maxlength="17" 
+							        					   style="width: 220px;" />
+							        			</td>
+								        	</tr>
+								        	<tr>
+								        		<td align="right">
+													ชื่อสินค้า <span style="color: red;"><b>*</b></span> :
+												</td>
+							        			<td align="left">
+							        				<input type='text' 
+							        					   id="productName" 
+							        					   name='productName' 
+							        					   value="<%=productmasterBean.getProductName()%>" 
+							        					   maxlength="255" 
+							        					   style="width: 220px;" />
+							        			</td>
+								        	</tr>
+								        	<tr>
+								        		<td align="right">
+													หมวดสินค้า <span style="color: red;"><b>*</b></span> :
+												</td>
+							        			<td align="left">
+							        				<input type='text' 
+							        					   id="productTypeName" 
+							        					   name='productTypeName' 
+							        					   value="<%=productmasterBean.getProductTypeName()%>" 
+							        					   maxlength="200" 
+							        					   style="width: 220px;" />
+							        				<input type="hidden" id="productTypeCode" name="productTypeCode" value="<%=productmasterBean.getProductTypeCode()%>" />
+							        			</td>
+								        	</tr>
+								        	<tr>
+								        		<td align="right">
+													หมู่สินค้า <span style="color: red;"><b>*</b></span> :
+												</td>
+							        			<td align="left">
+							        				<input type='text' 
+							        					   id="productGroupName" 
+							        					   name='productGroupName' 
+							        					   value="<%=productmasterBean.getProductGroupName()%>" 
+							        					   maxlength="200" 
+							        					   style="width: 220px;" />
+							        				<input type="hidden" id="productGroupCode" name="productGroupCode" value="<%=productmasterBean.getProductGroupCode()%>" />
+							        			</td>
+								        	</tr>
+								        	<tr>
+								        		<td align="right">
+													หน่วยสินค้า <span style="color: red;"><b>*</b></span> :
+												</td>
+							        			<td align="left">
+							        				<input type='text' 
+							        					   id="unitName" 
+							        					   name='unitName' 
+							        					   value="<%=productmasterBean.getUnitName()%>" 
+							        					   maxlength="200" 
+							        					   style="width: 220px;" />
+							        				<input type="hidden" id="unitCode" name="unitCode" value="<%=productmasterBean.getUnitCode()%>" />
+							        			</td>
+								        	</tr>
+								        	<tr>
+								        		<td align="right">
+													ยอดต่ำสุดที่ต้องแจ้งเตือน <span style="color: red;"><b>*</b></span> :
+												</td>
+							        			<td align="left">
+							        				<input type='text' 
+							        					   id="minQuan" 
+							        					   name='minQuan' 
+							        					   class="moneyOnly"
+							        					   onblur="gp_checkAmtOnly(this, 9);"
+							        					   value="<%=productmasterBean.getMinQuan()%>" 
+							        					   style="width: 220px;" />
+							        			</td>
+								        	</tr>
+								        	<tr>
+								        		<td align="right">
+													ราคาทุน <span style="color: red;"><b>*</b></span> :
+												</td>
+							        			<td align="left">
+							        				<input type='text' 
+							        					   id="costPrice" 
+							        					   name='costPrice' 
+							        					   class="moneyOnly"
+							        					   onblur="gp_checkAmtOnly(this, 11);"
+							        					   value="<%=productmasterBean.getCostPrice()%>" 
+							        					   style="width: 220px;" />
+							        				&nbsp;บาท
+							        			</td>
+								        	</tr>
+								        	<tr>
+								        		<td align="right">
+													ราคาขาย 1 <span style="color: red;"><b>*</b></span> :
+												</td>
+							        			<td align="left">
+							        				<input type='text' 
+							        					   id="salePrice1" 
+							        					   name='salePrice1' 
+							        					   class="moneyOnly"
+							        					   onblur="gp_checkAmtOnly(this, 11);"
+							        					   value="<%=productmasterBean.getSalePrice1()%>" 
+							        					   style="width: 220px;" />
+							        				&nbsp;บาท
+							        			</td>
+								        	</tr>
+								        	<tr>
+								        		<td align="right">
+													ราคาขาย 2 :
+												</td>
+							        			<td align="left">
+							        				<input type='text' 
+							        					   id="salePrice2" 
+							        					   name='salePrice2' 
+							        					   class="moneyOnly"
+							        					   onblur="gp_checkAmtOnly(this, 11);"
+							        					   value="<%=productmasterBean.getSalePrice2()%>" 
+							        					   style="width: 220px;" />
+							        				&nbsp;บาท
+							        			</td>
+								        	</tr>
+								        	<tr>
+								        		<td align="right">
+													ราคาขาย 3 :
+												</td>
+							        			<td align="left">
+							        				<input type='text' 
+							        					   id="salePrice3" 
+							        					   name='salePrice3' 
+							        					   class="moneyOnly"
+							        					   onblur="gp_checkAmtOnly(this, 11);"
+							        					   value="<%=productmasterBean.getSalePrice3()%>" 
+							        					   style="width: 220px;" />
+							        				&nbsp;บาท
+							        			</td>
+								        	</tr>
+								        	<tr>
+								        		<td align="right">
+													ราคาขาย 4 :
+												</td>
+							        			<td align="left">
+							        				<input type='text' 
+							        					   id="salePrice4" 
+							        					   name='salePrice4' 
+							        					   class="moneyOnly"
+							        					   onblur="gp_checkAmtOnly(this, 11);"
+							        					   value="<%=productmasterBean.getSalePrice4()%>" 
+							        					   style="width: 220px;" />
+							        				&nbsp;บาท
+							        			</td>
+								        	</tr>
+								        	<tr>
+								        		<td align="right">
+													ราคาขาย 5 :
+												</td>
+							        			<td align="left">
+							        				<input type='text' 
+							        					   id="salePrice5" 
+							        					   name='salePrice5' 
+							        					   class="moneyOnly"
+							        					   onblur="gp_checkAmtOnly(this, 11);"
+							        					   value="<%=productmasterBean.getSalePrice5()%>" 
+							        					   style="width: 220px;" />
+							        				&nbsp;บาท
+							        			</td>
+								        	</tr>
+								        </table>
+								        <br/>
+								        <table class="table sim-panel-result-table" id="resultData">
+											<tr height="26px;">
+												<th  style="text-align: center;" width="5%" ><B>ลำดับ</B></th>
+												<th  style="text-align: center;" width="20%"><B>ปริมาณที่ซื้อ</B></th>
+												<th  style="text-align: center;" width="20%"><B>ลดจำนวนเงิน(%)</B></th>
+												<th  style="text-align: center;" width="20%"><B>วันที่มีผล</B></th>
+												<th  style="text-align: center;" width="20%"><B>วันที่สิ้นสุด</B></th>
+												<th style="text-align: center;" width="15%">Action</th>
+											</tr> 
+											<%
+													int					  	seq		= 1;
+												for(ProductdetailBean bean:productdetailList){
+													if(!bean.getRowStatus().equals(productDetailsMaintananceForm.DEL)){
+												%>
+											<tr>
+												<td style="text-align:center">
+													<%=seq%>
+												</td>
+												<td align="center">
+													<input type="text" 
+														   style="width: 100%" 
+														   onblur="gp_checkAmtOnly(this, 9);lp_updateRecord(<%=bean.getSeq()%>);" 
+														   id="quanDiscount<%=bean.getSeq()%>" 
+														   name="quanDiscount" 
+														   class="moneyOnly"
+														   value="<%=bean.getQuanDiscount()%>" />
+												</td>
+												<td align="left">
+													<input type="text" 
+														   style="width: 100%" 
+														   onblur="gp_checkAmtOnly(this, 9);lp_updateRecord(<%=bean.getSeq()%>);" 
+														   id="discountRate<%=bean.getSeq()%>" 
+														   name="discountRate" 
+														   class="moneyOnly"
+														   value="<%=bean.getDiscountRate()%>" />
+												</td>
+												<td align="left">
+													<input type='text' 
+							        					   id="startDate<%=bean.getSeq()%>" 
+							        					   name='startDate' 
+							        					   placeholder="DD/MM/YYYY"
+							        					   class="dateFormat"
+							        					   onchange="gp_checkDate(this);lp_updateRecord(<%=bean.getSeq()%>);"
+							        					   value="<%=bean.getStartDate() %>" 
+							        					   style="width: 100px;" />
+												</td>
+												<td align="left">
+													<input type='text' 
+							        					   id="expDate<%=bean.getSeq()%>" 
+							        					   name='expDate' 
+							        					   placeholder="DD/MM/YYYY"
+							        					   class="dateFormat"
+							        					   onchange="gp_checkDate(this);lp_updateRecord(<%=bean.getSeq()%>);"
+							        					   value="<%=bean.getExpDate() %>" 
+							        					   style="width: 100px;" />
+												</td>
+												<td align="center">
+													<img alt="ลบ" title="ลบ" src="<%=imgURL%>/wrong.png" width="24" height="24" border="0" onclick="lp_deleteRecord(this, '<%=bean.getSeq()%>');" />
+													<input type="hidden" id="seq<%=bean.getSeq()%>" name="seq" value="<%=bean.getSeq()%>" />
+												</td>
+											</tr>
+											<% seq++;}}%>
+											<tr>
+												<td colspan="5">&nbsp;</td>
+												<td align="center">
+													<img alt="เพิ่ม" title="เพิ่ม" src="<%=imgURL%>/Add.png" width="24" height="24" border="0" onclick="lp_newRecord(this);" />
+												</td>
+											</tr>
+										</table>
+										<br/>
+										<table width="100%" border="0">
+											<tr>
+							        			<td align="center">
+							        				<br/>
+							        				<input type="button" id="btnSave" class="btn btn-sm btn-warning" value='บันทึก' onclick="lp_save();" />&nbsp;&nbsp;&nbsp;
+			   										<input type="button" id="btnReset" onclick="lp_reset();" class="btn btn-sm btn-danger" value='เริ่มใหม่' />
+							        			</td>
+							        		</tr>
+										</table>
+									</div>
+								</div>          
+							</div>
 						</section>
 					</section>
-					<a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
 				</section>
+				<a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
 			</section>
 		</section>
-		<div id="dialog" title="Look up"></div>
-		<div align="center" class="FreezeScreen" style="display:none;">
-        	<center>
-        		<img id="imgProgress" valign="center" src="<%=imgURL%>/loading36.gif" alt="" />
-        		<span style="font-weight: bold;font-size: large;color: black;">Loading...</span>
-        	</center>
-    	</div>
-	</form>	
+	</section>
+	<div id="dialog" title="Look up"></div>
+	<div align="center" class="FreezeScreen" style="display:none;">
+       	<center>
+       		<img id="imgProgress" valign="center" src="<%=imgURL%>/loading36.gif" alt="" />
+       		<span style="font-weight: bold;font-size: large;color: black;">Loading...</span>
+       	</center>
+   	</div>
+</form>	
 </body>
 </html>

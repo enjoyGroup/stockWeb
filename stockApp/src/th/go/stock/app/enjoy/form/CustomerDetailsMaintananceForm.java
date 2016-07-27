@@ -95,5 +95,4 @@ public class CustomerDetailsMaintananceForm {
 	public void setGroupSalePriceCombo(List<ComboBean> groupSalePriceCombo) {
 		this.groupSalePriceCombo = groupSalePriceCombo;
 	}
-	
 }

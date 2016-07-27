@@ -9,8 +9,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -28,7 +26,6 @@ import th.go.stock.app.enjoy.form.CustomerDetailsMaintananceForm;
 import th.go.stock.app.enjoy.main.Constants;
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
 import th.go.stock.app.enjoy.utils.EnjoyUtils;
-import th.go.stock.app.enjoy.utils.HibernateUtil;
 import th.go.stock.web.enjoy.common.EnjoyStandardSvc;
 import th.go.stock.web.enjoy.utils.EnjoyUtil;
 
@@ -107,6 +104,7 @@ public class CustomerDetailsMaintananceServlet extends EnjoyStandardSvc {
  			e.printStackTrace();
  			logger.info(e.getMessage());
  		}finally{
+ 			destroySession();
  			logger.info("[execute][End]");
  		}
 	}
@@ -142,12 +140,10 @@ public class CustomerDetailsMaintananceServlet extends EnjoyStandardSvc {
 		logger.info("[setRefference][Begin]");
 		
 		try{
-			
 			this.setCusStatus();
 			this.setSexCombo();
 			this.setIdTypeCombo();
 			this.setGroupSalePriceCombo();
-			
 			
 		}catch(EnjoyException e){
 			throw new EnjoyException(e.getMessage());
@@ -237,17 +233,14 @@ public class CustomerDetailsMaintananceServlet extends EnjoyStandardSvc {
 		logger.info("[setGroupSalePriceCombo][Begin]");
 		
 		List<ComboBean>					combo 						= null;
-		SessionFactory 					sessionFactory				= null;
-		Session 						session						= null;
 		List<RelationGroupCustomerBean> list 						= null;
 		RelationGroupCustomerBean		relationGroupCustomerBean 	= null;
 		
 		try{
-			sessionFactory 					= HibernateUtil.getSessionFactory();
-			session 						= sessionFactory.openSession();
-			combo 					= new ArrayList<ComboBean>();
+			combo 							= new ArrayList<ComboBean>();
 			relationGroupCustomerBean 		= new RelationGroupCustomerBean();
-			list							= this.relationGroupCustomerDao.searchByCriteria(session, relationGroupCustomerBean);
+			relationGroupCustomerBean.setTin(this.userBean.getTin());
+			list							= this.relationGroupCustomerDao.searchByCriteria(relationGroupCustomerBean);
 			
 			combo.add(new ComboBean(""	, "กรุณาเลือก"));
 			for(RelationGroupCustomerBean bean:list){
@@ -260,9 +253,6 @@ public class CustomerDetailsMaintananceServlet extends EnjoyStandardSvc {
 			logger.info(e.getMessage());
 			throw new EnjoyException("setGroupSalePriceCombo is error");
 		}finally{
-			session.close();
-			sessionFactory	= null;
-			session			= null;
 			logger.info("[setGroupSalePriceCombo][End]");
 		}
 	}
@@ -272,14 +262,18 @@ public class CustomerDetailsMaintananceServlet extends EnjoyStandardSvc {
 		
 		CustomerDetailsBean 	customerDetailsBean		= null;
 		CustomerDetailsBean 	customerDetailsBeanDb	= null;
+		String					tin						= null;
 		
 		try{
-			cusCode						= cusCode.equals("0")?EnjoyUtil.nullToStr(request.getParameter("cusCode")):cusCode;
+			cusCode	= cusCode.equals("0")?EnjoyUtil.nullToStr(request.getParameter("cusCode")):cusCode;
+			tin		= this.userBean.getTin();
 			
 			logger.info("[getDetail] cusCode :: " + cusCode);
+			logger.info("[getDetail] tin :: " + tin);
 			
 			customerDetailsBean = new CustomerDetailsBean();
 			customerDetailsBean.setCusCode(cusCode);
+			customerDetailsBean.setTin(tin);
 			
 			customerDetailsBeanDb				= this.dao.getCustomerDetail(customerDetailsBean);
 			
@@ -324,6 +318,7 @@ public class CustomerDetailsMaintananceServlet extends EnjoyStandardSvc {
 	   String				branchNameTmp				= "";
 	   JSONObject 			obj 						= new JSONObject();
 	   AddressBean			addressBean					= null;
+	   String				tin							= null;
 	   
 	   try{
 		   provinceName		= EnjoyUtils.nullToStr(this.request.getParameter("provinceName"));
@@ -335,6 +330,7 @@ public class CustomerDetailsMaintananceServlet extends EnjoyStandardSvc {
 		   cusName 			= EnjoyUtil.nullToStr(request.getParameter("cusName"));
 		   cusSurname 		= EnjoyUtil.nullToStr(request.getParameter("cusSurname"));
 		   branchName 		= EnjoyUtil.nullToStr(request.getParameter("branchName"));
+		   tin 				= this.userBean.getTin();
 		   
 		   logger.info("[lp_validate] provinceName 			:: " + provinceName);
 		   logger.info("[lp_validate] districtName 			:: " + districtName);
@@ -345,15 +341,16 @@ public class CustomerDetailsMaintananceServlet extends EnjoyStandardSvc {
 		   logger.info("[lp_validate] cusName 				:: " + cusName);
 		   logger.info("[lp_validate] cusSurname 			:: " + cusSurname);
 		   logger.info("[lp_validate] branchName 			:: " + branchName);
+		   logger.info("[lp_validate] tin 					:: " + tin);
 		   
 		   if(!idType.equals("0")){
-			   if(this.dao.checkDupIdNumber(idNumber, cusCode) > 0){
+			   if(this.dao.checkDupIdNumber(idNumber, cusCode, tin) > 0){
 				   obj.put(ERR_TYPE, 			"E");
 				   throw new EnjoyException("เลขที่บัตร " + idNumber + " มีอยู่ในระบบแล้ว");
 			   }
 		   }
 		   
-		   if(this.dao.checkDupCusName(cusName, cusSurname, branchName, cusCode) > 0){
+		   if(this.dao.checkDupCusName(cusName, cusSurname, branchName, cusCode, tin) > 0){
 			   if(!branchName.equals("")){
 				   branchNameTmp = " สาขา " + branchName;
 			   }
@@ -437,8 +434,7 @@ public class CustomerDetailsMaintananceServlet extends EnjoyStandardSvc {
 		String				expDate 				= null;
 		String				point 					= null;
 		String				remark 					= null;
-		SessionFactory 		sessionFactory			= null;
-		Session 			session					= null;
+		String				tin 					= null;
 		JSONObject 			obj 					= null;
 		CustomerDetailsBean customerDetailsBean		= null;
 		
@@ -472,8 +468,7 @@ public class CustomerDetailsMaintananceServlet extends EnjoyStandardSvc {
 			expDate 					= EnjoyUtil.nullToStr(request.getParameter("expDate"));
 			point 						= EnjoyUtil.nullToStr(request.getParameter("point"));
 			remark 						= EnjoyUtil.nullToStr(request.getParameter("remark"));
-			sessionFactory 				= HibernateUtil.getSessionFactory();
-			session 					= sessionFactory.openSession();
+			tin 						= this.userBean.getTin();
 			obj 						= new JSONObject();
 			customerDetailsBean			= new CustomerDetailsBean();
 			
@@ -506,6 +501,7 @@ public class CustomerDetailsMaintananceServlet extends EnjoyStandardSvc {
 			logger.info("[onSave] expDate 				:: " + expDate);
 			logger.info("[onSave] point 				:: " + point);
 			logger.info("[onSave] remark 				:: " + remark);
+			logger.info("[onSave] tin 					:: " + tin);
 			
 			customerDetailsBean.setCusCode				(cusCode);
 			customerDetailsBean.setCusName				(cusName);
@@ -535,40 +531,30 @@ public class CustomerDetailsMaintananceServlet extends EnjoyStandardSvc {
 			customerDetailsBean.setExpDate				(EnjoyUtils.dateThaiToDb(expDate));
 			customerDetailsBean.setPoint				(point);
 			customerDetailsBean.setRemark				(remark);
-			
-			session.beginTransaction();
+			customerDetailsBean.setTin					(tin);
 			
 			if(pageMode.equals(CompanyDetailsMaintananceForm.NEW)){
-				this.dao.insertCustomerDetails(session, customerDetailsBean);
+				this.dao.insertCustomerDetails(customerDetailsBean);
 			}else{
-				this.dao.updateCustomerDetail(session, customerDetailsBean);
+				this.dao.updateCustomerDetail(customerDetailsBean);
 			}
 			
-			session.getTransaction().commit();
+			commit();
 			
 			obj.put(STATUS				, SUCCESS);
 			
 		}catch(EnjoyException e){
-			session.getTransaction().rollback();
+			rollback();
 			obj.put(STATUS, 		ERROR);
 			obj.put(ERR_MSG, 		e.getMessage());
 		}catch(Exception e){
-			session.getTransaction().rollback();
+			rollback();
 			logger.info(e.getMessage());
 			e.printStackTrace();
 			obj.put(STATUS, 		ERROR);
 			obj.put(ERR_MSG, 		"onSave is error");
 		}finally{
-			
-			session.flush();
-			session.clear();
-			session.close();
-			
-//			this.getDetail(cusCode);
 			this.enjoyUtil.writeMSG(obj.toString());
-			
-			sessionFactory	= null;
-			session			= null;
 			
 			logger.info("[onSave][End]");
 		}
@@ -605,34 +591,27 @@ public class CustomerDetailsMaintananceServlet extends EnjoyStandardSvc {
 //   }
 	
 	private void lp_province(){
-	   logger.info("[lp_province][Begin]");
+	   logger.info("[lp_search][Begin]");
 	   
-	   String							provinceName			= null;
-       List<String> 					list 					= new ArrayList<String>();
-       CustomerDetailsBean 				customerDetailsBean		= null;
-       JSONArray 						jSONArray 				= null;
-       JSONObject 						objDetail 				= null;
-       int								id						= 0;
+	   String				provinceName		= null;
+       List<ComboBean> 		list 				= null;
+       JSONArray 			jSONArray 			= new JSONArray();
+       JSONObject 			objDetail 			= null;
        
 	   try{
 		   provinceName				= EnjoyUtils.nullToStr(this.request.getParameter("provinceName"));
-		   customerDetailsBean		= this.form.getCustomerDetailsBean();
-		   jSONArray 			= new JSONArray();
 		   
 		   logger.info("[lp_province] provinceName 			:: " + provinceName);
 		   
-		   customerDetailsBean.setProvinceName(provinceName);
-		   
 		   list 		= this.addressDao.provinceList(provinceName);
 		   
-		   for(String province:list){
+		   for(ComboBean bean:list){
 			   objDetail 		= new JSONObject();
 			   
-			   objDetail.put("id"			,id);
-			   objDetail.put("value"		,province);
+			   objDetail.put("id"			,bean.getCode());
+			   objDetail.put("value"		,bean.getDesc());
 			   
 			   jSONArray.add(objDetail);
-			   id++;
 		   }
 		   
 		   this.enjoyUtil.writeMSG(jSONArray.toString());
@@ -645,31 +624,34 @@ public class CustomerDetailsMaintananceServlet extends EnjoyStandardSvc {
 	   }
    }
 	   
-   private void lp_district(){
+	private void lp_district(){
 	   logger.info("[lp_district][Begin]");
 	   
-	   String							provinceName			= null;
-	   String							districtName			= null;
-       List<String> 					list 					= new ArrayList<String>();
-       String[]							strArray				= null;
-       CustomerDetailsBean 				customerDetailsBean		= null;
-       
+	   String				provinceName		= null;
+	   String				districtName		= null;
+	   List<ComboBean> 		list 				= null;
+	   JSONArray 			jSONArray 			= new JSONArray();
+	   JSONObject 			objDetail 			= null;
+    
 	   try{
 		   provinceName					= EnjoyUtils.nullToStr(this.request.getParameter("provinceName"));
 		   districtName					= EnjoyUtils.nullToStr(this.request.getParameter("districtName"));
-		   customerDetailsBean			= this.form.getCustomerDetailsBean();
-		   
-		   customerDetailsBean.setProvinceName(provinceName);
-		   customerDetailsBean.setDistrictName(districtName);
 		   
 		   logger.info("[lp_district] provinceName 			:: " + provinceName);
 		   logger.info("[lp_district] districtName 			:: " + districtName);
 		   
 		   list 		= this.addressDao.districtList(provinceName, districtName);
-		   strArray 	= new String[list.size()];
-		   strArray 	= list.toArray(strArray); 
 		   
-		   this.enjoyUtil.writeJsonMSG((String[]) strArray);
+		   for(ComboBean bean:list){
+			   objDetail 		= new JSONObject();
+			   
+			   objDetail.put("id"			,bean.getCode());
+			   objDetail.put("value"		,bean.getDesc());
+			   
+			   jSONArray.add(objDetail);
+		   }
+		   
+		   this.enjoyUtil.writeMSG(jSONArray.toString());
 		   
 	   }catch(Exception e){
 		   e.printStackTrace();
@@ -677,37 +659,39 @@ public class CustomerDetailsMaintananceServlet extends EnjoyStandardSvc {
 	   }finally{
 		   logger.info("[lp_district][End]");
 	   }
-   }
-   
-   private void lp_subdistrict(){
+	}
+
+	private void lp_subdistrict(){
 	   logger.info("[subdistrict][Begin]");
 	   
-	   String							provinceName			= null;
-	   String							districtName			= null;
-	   String							subdistrictName			= null;
-       List<String> 					list 					= new ArrayList<String>();
-       String[]							strArray				= null;
-       CustomerDetailsBean 				customerDetailsBean		= null;
-       
+	   String				provinceName		= null;
+	   String				districtName		= null;
+	   String				subdistrictName		= null;
+	   List<ComboBean> 		list 				= null;
+	   JSONArray 			jSONArray 			= new JSONArray();
+	   JSONObject 			objDetail 			= null;
+    
 	   try{
 		   provinceName					= EnjoyUtils.nullToStr(this.request.getParameter("provinceName"));
 		   districtName					= EnjoyUtils.nullToStr(this.request.getParameter("districtName"));
 		   subdistrictName				= EnjoyUtils.nullToStr(this.request.getParameter("subdistrictName"));
-		   customerDetailsBean			= this.form.getCustomerDetailsBean();
-		   
-		   customerDetailsBean.setProvinceName(provinceName);
-		   customerDetailsBean.setDistrictName(districtName);
-		   customerDetailsBean.setSubdistrictName(subdistrictName);
 		   
 		   logger.info("[lp_district] provinceName 			:: " + provinceName);
 		   logger.info("[lp_district] districtName 			:: " + districtName);
 		   logger.info("[lp_subdistrict] subdistrict 		:: " + subdistrictName);
 		   
 		   list 		= this.addressDao.subdistrictList(provinceName, districtName, subdistrictName);
-		   strArray 	= new String[list.size()];
-		   strArray 	= list.toArray(strArray); 
 		   
-		   this.enjoyUtil.writeJsonMSG((String[]) strArray);
+		   for(ComboBean bean:list){
+			   objDetail 		= new JSONObject();
+			   
+			   objDetail.put("id"			,bean.getCode());
+			   objDetail.put("value"		,bean.getDesc());
+			   
+			   jSONArray.add(objDetail);
+		   }
+		   
+		   this.enjoyUtil.writeMSG(jSONArray.toString());
 		   
 	   }catch(Exception e){
 		   e.printStackTrace();
@@ -715,7 +699,29 @@ public class CustomerDetailsMaintananceServlet extends EnjoyStandardSvc {
 	   }finally{
 		   logger.info("[lp_subdistrict][End]");
 	   }
-   }
+	}
+
+	@Override
+	public void destroySession() {
+		this.dao.destroySession();
+        this.addressDao.destroySession();
+        this.relationGroupCustomerDao.destroySession();
+	}
+	
+	@Override
+	public void commit() {
+		this.dao.commit();
+        this.addressDao.commit();
+        this.relationGroupCustomerDao.commit();
+	}
+	
+	@Override
+	public void rollback() {
+		this.dao.rollback();
+        this.addressDao.rollback();
+        this.relationGroupCustomerDao.rollback();
+	}
 	 	
 	
 }
+

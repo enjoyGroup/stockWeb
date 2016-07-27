@@ -10,8 +10,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -21,13 +19,11 @@ import th.go.stock.app.enjoy.bean.InvoiceCashMasterBean;
 import th.go.stock.app.enjoy.bean.UserDetailsBean;
 import th.go.stock.app.enjoy.dao.CustomerDetailsDao;
 import th.go.stock.app.enjoy.dao.InvoiceCashDao;
-import th.go.stock.app.enjoy.dao.RelationUserAndCompanyDao;
 import th.go.stock.app.enjoy.exception.EnjoyException;
 import th.go.stock.app.enjoy.form.InvoiceCashSearchForm;
 import th.go.stock.app.enjoy.main.Constants;
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
 import th.go.stock.app.enjoy.utils.EnjoyUtils;
-import th.go.stock.app.enjoy.utils.HibernateUtil;
 import th.go.stock.web.enjoy.common.EnjoyStandardSvc;
 import th.go.stock.web.enjoy.utils.EnjoyUtil;
 
@@ -45,7 +41,6 @@ public class InvoiceCashSearchServlet extends EnjoyStandardSvc {
     private UserDetailsBean             userBean                    = null;
     private InvoiceCashDao				dao							= null;
     private CustomerDetailsDao			customerDetailsDao			= null;
-    private RelationUserAndCompanyDao	relationUserAndCompanyDao	= null;
     private InvoiceCashSearchForm		form						= null;
     
 	@Override
@@ -70,7 +65,6 @@ public class InvoiceCashSearchServlet extends EnjoyStandardSvc {
              this.form               		= (InvoiceCashSearchForm) session.getAttribute(FORM_NAME);
              this.dao						= new InvoiceCashDao();
              this.customerDetailsDao		= new CustomerDetailsDao();
-             this.relationUserAndCompanyDao = new RelationUserAndCompanyDao();
  			
              logger.info("[execute] pageAction : " + pageAction );
              
@@ -94,6 +88,7 @@ public class InvoiceCashSearchServlet extends EnjoyStandardSvc {
  			e.printStackTrace();
  			logger.info(e.getMessage());
  		}finally{
+ 			destroySession();
  			logger.info("[execute][End]");
  		}
 	}
@@ -146,7 +141,6 @@ public class InvoiceCashSearchServlet extends EnjoyStandardSvc {
 		
 		try{
 			this.setInvoiceStatusCombo();
-			this.setCompanyCombo();
 		}catch(EnjoyException e){
 			throw new EnjoyException(e.getMessage());
 		}catch(Exception e){
@@ -157,36 +151,10 @@ public class InvoiceCashSearchServlet extends EnjoyStandardSvc {
 		}
 	}
 	
-	private void setCompanyCombo() throws EnjoyException{
-		
-		logger.info("[setCompanyCombo][Begin]");
-		
-		List<ComboBean>			companyCombo 		= null;
-		
-		try{
-			
-			companyCombo = this.relationUserAndCompanyDao.getCompanyList(this.userBean.getUserUniqueId());
-			
-			if(companyCombo.size() > 1){
-				companyCombo.add(0, new ComboBean("", "กรุณาระบุ"));
-			}
-			
-			this.form.setCompanyCombo(companyCombo);
-		}
-		catch(Exception e){
-			logger.error(e);
-			throw new EnjoyException("setCompanyCombo is error");
-		}finally{
-			logger.info("[setCompanyCombo][End]");
-		}
-	}
-	
 	private void onSearch() throws EnjoyException{
 		logger.info("[onSearch][Begin]");
 		
 		InvoiceCashMasterBean 		invoiceCashMasterBean	= null;
-		SessionFactory 				sessionFactory			= null;
-		Session 					session					= null;
 		List<InvoiceCashMasterBean> dataList 				= null;
 		int							cou						= 0;
 		int							pageNum					= 1;
@@ -197,13 +165,9 @@ public class InvoiceCashSearchServlet extends EnjoyStandardSvc {
         HashMap						hashTable				= new HashMap();
 
 		try{
-			sessionFactory 				= HibernateUtil.getSessionFactory();
-			session 					= sessionFactory.openSession();			
-			session.beginTransaction();
-			
 			invoiceCashMasterBean				= new InvoiceCashMasterBean();
 			
-			invoiceCashMasterBean.setTin				(EnjoyUtils.nullToStr(this.request.getParameter("tin")));
+			invoiceCashMasterBean.setTin				(this.userBean.getTin());
 			invoiceCashMasterBean.setInvoiceCode		(EnjoyUtils.nullToStr(this.request.getParameter("invoiceCode")));
 			invoiceCashMasterBean.setInvoiceDateForm	(EnjoyUtils.nullToStr(this.request.getParameter("invoiceDateForm")));
 			invoiceCashMasterBean.setInvoiceDateTo		(EnjoyUtils.nullToStr(this.request.getParameter("invoiceDateTo")));
@@ -212,7 +176,7 @@ public class InvoiceCashSearchServlet extends EnjoyStandardSvc {
 			
 			this.form.setInvoiceCashMasterBean(invoiceCashMasterBean);
 			
-			dataList	 		= this.dao.searchByCriteria(session, invoiceCashMasterBean);
+			dataList	 		= this.dao.searchByCriteria(invoiceCashMasterBean);
 			
 			if(dataList.size() > 0){				
 				
@@ -261,10 +225,6 @@ public class InvoiceCashSearchServlet extends EnjoyStandardSvc {
 			logger.info(e.getMessage());
 			throw new EnjoyException("onSearch is error");
 		}finally{
-			session.close();
-			sessionFactory	= null;
-			session			= null;
-			
 			logger.info("[onSearch][End]");
 		}
 		
@@ -296,6 +256,7 @@ public class InvoiceCashSearchServlet extends EnjoyStandardSvc {
 	   logger.info("[getCusFullName][Begin]");
 	   
 	   String						cusFullName			= null;
+	   String						tin					= null;
 	   List<CustomerDetailsBean> 	list 				= null;
        JSONArray 					jSONArray 			= null;
        JSONObject 					objDetail 			= null;
@@ -303,12 +264,15 @@ public class InvoiceCashSearchServlet extends EnjoyStandardSvc {
        
 	   try{
 		   cusFullName			= EnjoyUtils.nullToStr(this.request.getParameter("cusFullName"));
+		   tin					= this.userBean.getTin();
 		   jSONArray 			= new JSONArray();
 		   customerDetailsBean	= new CustomerDetailsBean();
 		   
-		   logger.info("[getCusFullName] cusFullName 			:: " + cusFullName);
+		   logger.info("[getCusFullName] cusFullName 	:: " + cusFullName);
+		   logger.info("[getCusFullName] tin 			:: " + tin);
 		   
 		   customerDetailsBean.setFullName(cusFullName);
+		   customerDetailsBean.setTin(tin);
 		   
 		   list 		= this.customerDetailsDao.getCusFullName(customerDetailsBean);
 		   
@@ -329,6 +293,24 @@ public class InvoiceCashSearchServlet extends EnjoyStandardSvc {
 	   }finally{
 		   logger.info("[getCusFullName][End]");
 	   }
+	}
+
+	@Override
+	public void destroySession() {
+		this.dao.destroySession();
+        this.customerDetailsDao.destroySession();
+	}
+
+	@Override
+	public void commit() {
+		this.dao.commit();
+        this.customerDetailsDao.commit();
+	}
+
+	@Override
+	public void rollback() {
+		this.dao.rollback();
+        this.customerDetailsDao.rollback();
 	}	
 	
 	

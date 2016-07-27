@@ -10,8 +10,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -24,7 +22,6 @@ import th.go.stock.app.enjoy.form.CompanyDetailsSearchForm;
 import th.go.stock.app.enjoy.main.Constants;
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
 import th.go.stock.app.enjoy.utils.EnjoyUtils;
-import th.go.stock.app.enjoy.utils.HibernateUtil;
 import th.go.stock.web.enjoy.common.EnjoyStandardSvc;
 import th.go.stock.web.enjoy.utils.EnjoyUtil;
 
@@ -89,6 +86,7 @@ public class CompanyDetailsSearchServlet extends EnjoyStandardSvc {
  			e.printStackTrace();
  			logger.info(e.getMessage());
  		}finally{
+ 			destroySession();
  			logger.info("[execute][End]");
  		}
 	}
@@ -163,8 +161,6 @@ public class CompanyDetailsSearchServlet extends EnjoyStandardSvc {
 		logger.info("[onSearch][Begin]");
 		
 		CompanyDetailsBean 			companyDetailsBean	= null;
-		SessionFactory 				sessionFactory		= null;
-		Session 					session				= null;
 		List<CompanyDetailsBean> 	dataList 			= null;
 		int							cou					= 0;
 		int							pageNum				= 1;
@@ -175,10 +171,6 @@ public class CompanyDetailsSearchServlet extends EnjoyStandardSvc {
         HashMap						hashTable			= new HashMap();
 
 		try{
-			sessionFactory 				= HibernateUtil.getSessionFactory();
-			session 					= sessionFactory.openSession();			
-			session.beginTransaction();
-			
 			companyDetailsBean				= new CompanyDetailsBean();
 			
 			companyDetailsBean.setTin			(EnjoyUtils.nullToStr(this.request.getParameter("tin")));
@@ -187,7 +179,7 @@ public class CompanyDetailsSearchServlet extends EnjoyStandardSvc {
 			
 			this.form.setCompanyDetailsBean(companyDetailsBean);
 			
-			dataList	 		= this.dao.searchByCriteria(session, companyDetailsBean);
+			dataList	 		= this.dao.searchByCriteria(companyDetailsBean);
 			
 			if(dataList.size() > 0){				
 				
@@ -236,16 +228,10 @@ public class CompanyDetailsSearchServlet extends EnjoyStandardSvc {
 			logger.info(e.getMessage());
 			throw new EnjoyException("onSearch is error");
 		}finally{
-			session.close();
-			sessionFactory	= null;
-			session			= null;
-			
 			this.setRefference();
 			logger.info("[onSearch][End]");
 		}
-		
 	}
-	
 	
 	private void lp_getPage(){
 		   logger.info("[lp_getPage][Begin]");
@@ -340,6 +326,21 @@ public class CompanyDetailsSearchServlet extends EnjoyStandardSvc {
 			   logger.info("[getTinList][End]");
 		   }
 	   }
+
+	@Override
+	public void destroySession() {
+		this.dao.destroySession();
+	}
+
+	@Override
+	public void commit() {
+		this.dao.commit();
+	}
+
+	@Override
+	public void rollback() {
+		this.dao.rollback();
+	}
 		
 	
 	

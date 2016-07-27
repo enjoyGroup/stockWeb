@@ -9,7 +9,6 @@
 	SummarySaleByDayReportBean 			summarySaleByDayReportBean 	= summarySaleByDayReportForm.getSummarySaleByDayReportBean();
 	List<SummarySaleByDayReportBean> 	dataList 					= summarySaleByDayReportForm.getDataList();
 	String								titlePage					= summarySaleByDayReportForm.getTitlePage();
-	List<ComboBean> 					companyCombo 				= summarySaleByDayReportForm.getCompanyCombo();
 %>
 
 <html>
@@ -42,8 +41,7 @@
 						return;
 					}
 					
-					params = "tin=" 				+ $("#tin").val()
-							+ "&invoiceDateFrom=" 	+ $("#invoiceDateFrom").val()
+					params = "invoiceDateFrom=" 	+ $("#invoiceDateFrom").val()
 							+ "&invoiceDateTo=" 	+ $("#invoiceDateTo").val();
 					
 					gp_dialogPopUp(gv_url + "?" + gv_service + "&pageAction=showData&" + params, "<%=titlePage%>");
@@ -66,7 +64,7 @@
 		});
 		
 		function lp_validate(){
-			var la_validate             = new Array( "tin:บริษัทที่สังกัด", "invoiceDateFrom:วันที่เริ่มค้นหา", "invoiceDateTo:วันที่สิ้นสุดค้นหา");
+			var la_validate             = new Array( "invoiceDateFrom:วันที่เริ่มค้นหา", "invoiceDateTo:วันที่สิ้นสุดค้นหา");
 		    var lv_return				= true;
 		    
 			try{
@@ -104,20 +102,10 @@
 										<div class="panel-body" align="center">
 								        	<table width="100%" border="0" cellpadding="5" cellspacing="5">
 								        		<tr>
-								        			<td align="right" width="150px;">
-								        				บริษัทที่สังกัด <span style="color: red;"><b>*</b></span> : &nbsp;
-								        			</td>
-								        			<td align="left">
-								        				<select id="tin" name="tin" style="width: 220px;" >
-								        					<% for(ComboBean comboBean:companyCombo){ %>
-								        					<option value="<%=comboBean.getCode()%>" <%if(summarySaleByDayReportBean.getTin().equals(comboBean.getCode())){ %> selected <%} %> ><%=comboBean.getDesc()%></option>
-								        					<%} %>
-								        				</select>
-								        			</td>
 								        			<td align="right">
 								        				วันที่ขาย <span style="color: red;"><b>*</b></span> :&nbsp;
 								        			</td>
-								        			<td align="left" colspan="3">
+								        			<td align="left" colspan="5">
 								        				<input type='text' 
 								        					   id="invoiceDateFrom" 
 								        					   name='invoiceDateFrom' 

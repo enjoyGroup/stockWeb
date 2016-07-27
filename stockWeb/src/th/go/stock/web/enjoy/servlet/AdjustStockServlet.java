@@ -8,8 +8,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -18,19 +16,16 @@ import th.go.stock.app.enjoy.bean.ComboBean;
 import th.go.stock.app.enjoy.bean.ProductQuanHistoryBean;
 import th.go.stock.app.enjoy.bean.ProductmasterBean;
 import th.go.stock.app.enjoy.bean.ProductquantityBean;
-import th.go.stock.app.enjoy.bean.ReciveOrderMasterBean;
 import th.go.stock.app.enjoy.bean.UserDetailsBean;
 import th.go.stock.app.enjoy.dao.AdjustStockDao;
 import th.go.stock.app.enjoy.dao.ProductDetailsDao;
 import th.go.stock.app.enjoy.dao.ProductQuanHistoryDao;
 import th.go.stock.app.enjoy.dao.ProductquantityDao;
-import th.go.stock.app.enjoy.dao.RelationUserAndCompanyDao;
 import th.go.stock.app.enjoy.exception.EnjoyException;
 import th.go.stock.app.enjoy.form.AdjustStockForm;
 import th.go.stock.app.enjoy.main.Constants;
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
 import th.go.stock.app.enjoy.utils.EnjoyUtils;
-import th.go.stock.app.enjoy.utils.HibernateUtil;
 import th.go.stock.web.enjoy.common.EnjoyStandardSvc;
 import th.go.stock.web.enjoy.utils.EnjoyUtil;
 
@@ -50,7 +45,6 @@ public class AdjustStockServlet extends EnjoyStandardSvc {
     private ProductDetailsDao				productDetailsDao			= null;
     private AdjustStockForm					form						= null;
     private ProductquantityDao				productquantityDao			= null;
-    private RelationUserAndCompanyDao		relationUserAndCompanyDao	= null;
     private ProductQuanHistoryDao			productQuanHistoryDao		= null;
     
 	@Override
@@ -76,7 +70,6 @@ public class AdjustStockServlet extends EnjoyStandardSvc {
              this.dao						= new AdjustStockDao();
              this.productDetailsDao			= new ProductDetailsDao();
              this.productquantityDao		= new ProductquantityDao();
-             this.relationUserAndCompanyDao = new RelationUserAndCompanyDao();
              this.productQuanHistoryDao		= new ProductQuanHistoryDao();
  			
              logger.info("[execute] pageAction : " + pageAction );
@@ -84,7 +77,6 @@ public class AdjustStockServlet extends EnjoyStandardSvc {
  			if(this.form == null || pageAction.equals("new")) this.form = new AdjustStockForm();
  			
  			if( pageAction.equals("") || pageAction.equals("new") ){
- 				this.onLoad();
  				request.setAttribute("target", Constants.PAGE_URL +"/AdjustStockScn.jsp");
  			}else if(pageAction.equals("save")){
 				this.onSave();
@@ -105,79 +97,14 @@ public class AdjustStockServlet extends EnjoyStandardSvc {
  			e.printStackTrace();
  			logger.info(e.getMessage());
  		}finally{
- 			productQuanHistoryDao.destroySession();
+ 			destroySession();
  			logger.info("[execute][End]");
  		}
-	}
-	
-	
-	private void onLoad() throws EnjoyException{
-		logger.info("[onLoad][Begin]");
-		
-		
-		ReciveOrderMasterBean 		reciveOrderMasterBean = null;;
-		
-		try{
-			
-			this.setRefference();
-			
-		}catch(EnjoyException e){
-			throw new EnjoyException(e.getMessage());
-		}catch(Exception e){
-			logger.error(e);
-			throw new EnjoyException("onLoad is error");
-		}finally{
-			
-			logger.info("[onLoad][End]");
-		}
-		
-	}
-	
-	private void setRefference() throws EnjoyException{
-		
-		logger.info("[setRefference][Begin]");
-		
-		try{
-			this.setCompanyCombo();
-		}catch(EnjoyException e){
-			throw new EnjoyException(e.getMessage());
-		}catch(Exception e){
-			e.printStackTrace();
-			logger.error(e);
-		}finally{
-			logger.info("[setRefference][End]");
-		}
-	}
-	
-	private void setCompanyCombo() throws EnjoyException{
-		
-		logger.info("[setCompanyCombo][Begin]");
-		
-		List<ComboBean>			companyCombo 		= null;
-		
-		try{
-			
-			companyCombo = this.relationUserAndCompanyDao.getCompanyList(this.userBean.getUserUniqueId());
-			
-			if(companyCombo.size() > 1){
-				companyCombo.add(0, new ComboBean("", "กรุณาระบุ"));
-			}
-			
-			this.form.setCompanyCombo(companyCombo);
-		}
-		catch(Exception e){
-			logger.error(e);
-			throw new EnjoyException("setCompanyCombo is error");
-		}finally{
-			logger.info("[setCompanyCombo][End]");
-		}
 	}
 	
 	private void onSave() throws EnjoyException{
 		logger.info("[onSave][Begin]");
 		
-		SessionFactory 				sessionFactory				= null;
-		Session 					session						= null;
 		JSONObject 					obj 						= null;
 		String						productCode					= null;
 		String						quanOld						= null;
@@ -193,18 +120,14 @@ public class AdjustStockServlet extends EnjoyStandardSvc {
 		ProductmasterBean 			productmasterBeanDb			= null;
 		
 		try{
-			sessionFactory 				= HibernateUtil.getSessionFactory();
-			session 					= sessionFactory.openSession();
 			obj 						= new JSONObject();
 			productCode					= EnjoyUtils.nullToStr(this.request.getParameter("productCode"));
 			quanOld						= EnjoyUtils.nullToStr(this.request.getParameter("quanOld"));
 			quanNew						= EnjoyUtils.nullToStr(this.request.getParameter("quanNew"));
 			remark						= EnjoyUtils.nullToStr(this.request.getParameter("remark"));
 			quantity					= EnjoyUtils.nullToStr(this.request.getParameter("quantity"));
-			tin 						= EnjoyUtil.nullToStr(this.request.getParameter("tin"));
+			tin 						= this.userBean.getTin();
 			adjustStockBean				= this.form.getAdjustStockBean();
-			
-			session.beginTransaction();
 			
 			productquantityBean = new ProductquantityBean();
 			productquantityBean.setProductCode(productCode);
@@ -214,9 +137,9 @@ public class AdjustStockServlet extends EnjoyStandardSvc {
 			quantityDb = this.productquantityDao.getProductquantity(productquantityBean);
 			
 			if(quantityDb==null){
-				this.productquantityDao.insertProductquantity(session, productquantityBean);
+				this.productquantityDao.insertProductquantity(productquantityBean);
 			}else{
-				this.productquantityDao.updateProductquantity(session, productquantityBean);
+				this.productquantityDao.updateProductquantity(productquantityBean);
 			}
 			
 			/*Begin ส่วนประวัตเพิ่มลดสินค้า*/
@@ -225,7 +148,7 @@ public class AdjustStockServlet extends EnjoyStandardSvc {
 			
 			productmasterBean = new ProductmasterBean();
 			productmasterBean.setProductCode(productCode);
-			productmasterBeanDb = productDetailsDao.getProductDetail(session, productmasterBean);
+			productmasterBeanDb = productDetailsDao.getProductDetail(productmasterBean);
 			if(productmasterBeanDb!=null){
 				productQuanHistoryBean.setProductType(productmasterBeanDb.getProductTypeCode());
 				productQuanHistoryBean.setProductGroup(productmasterBeanDb.getProductGroupCode());
@@ -246,7 +169,7 @@ public class AdjustStockServlet extends EnjoyStandardSvc {
 			}
 			productQuanHistoryBean.setQuantityTotal(String.valueOf(quantity));
 			
-			productQuanHistoryDao.insert(session, productQuanHistoryBean);
+			productQuanHistoryDao.insert(productQuanHistoryBean);
 			/*End ส่วนประวัตเพิ่มลดสินค้า*/
 			
 			adjustStockBean.setAdjustDate(EnjoyUtils.currDateThai());
@@ -256,33 +179,24 @@ public class AdjustStockServlet extends EnjoyStandardSvc {
 			adjustStockBean.setRemark(remark);
 			adjustStockBean.setTin(tin);
 			
-			this.dao.insertAdjustHistory(session, adjustStockBean);
+			this.dao.insertAdjustHistory(adjustStockBean);
 			
-			session.getTransaction().commit();
+			this.commit();
 			
 			obj.put(STATUS, 			SUCCESS);
 			
 		}catch(EnjoyException e){
-			session.getTransaction().rollback();
+			this.rollback();
 			obj.put(STATUS, 		ERROR);
 			obj.put(ERR_MSG, 		e.getMessage());
 		}catch(Exception e){
-			session.getTransaction().rollback();
+			this.rollback();
 			logger.error(e);
 			e.printStackTrace();
 			obj.put(STATUS, 		ERROR);
 			obj.put(ERR_MSG, 		"onSave is error");
 		}finally{
-			
-			session.flush();
-			session.clear();
-			session.close();
-			
 			this.enjoyUtil.writeMSG(obj.toString());
-			
-			sessionFactory	= null;
-			session			= null;
-			
 			logger.info("[onSave][End]");
 		}
 	}	
@@ -291,8 +205,6 @@ public class AdjustStockServlet extends EnjoyStandardSvc {
 		logger.info("[onSearch][Begin]");
 		
 		AdjustStockBean 				adjustStockBean					= null;
-		SessionFactory 					sessionFactory					= null;
-		Session 						session							= null;
 		List<AdjustStockBean> 			adjustHistoryListList			= null;
 		String							productName						= null;
 		ProductmasterBean				productmasterBean				= null;
@@ -304,12 +216,10 @@ public class AdjustStockServlet extends EnjoyStandardSvc {
 		String							inventory						= "";
 
 		try{
-			sessionFactory 				= HibernateUtil.getSessionFactory();
-			session 					= sessionFactory.openSession();			
 			obj 						= new JSONObject();
 			productName					= EnjoyUtils.nullToStr(this.request.getParameter("productName"));
-			tin							= EnjoyUtils.nullToStr(this.request.getParameter("tin"));
-			productmasterBean			= this.productDetailsDao.getProductDetailByName(productName);
+			tin							= this.userBean.getTin();
+			productmasterBean			= this.productDetailsDao.getProductDetailByName(productName, tin);
 			adjustStockBean				= new AdjustStockBean();
 			
 			if(productmasterBean==null){
@@ -330,10 +240,8 @@ public class AdjustStockServlet extends EnjoyStandardSvc {
 			
 			this.form.setChk(true);
 			
-			session.beginTransaction();
-			
-			limitAdjustHistoryOrder = this.dao.checkLimitAdjustHistoryOrder(session, productmasterBean.getProductCode(), tin, adjustStockBean.getLastOrder());
-			adjustHistoryListList	= this.dao.getAdjustHistoryList(session, adjustStockBean);
+			limitAdjustHistoryOrder = this.dao.checkLimitAdjustHistoryOrder(productmasterBean.getProductCode(), tin, adjustStockBean.getLastOrder());
+			adjustHistoryListList	= this.dao.getAdjustHistoryList(adjustStockBean);
 			
 			if(limitAdjustHistoryOrder > AdjustStockForm.ORDER_LIMIT){
 				lastOrder = EnjoyUtils.parseInt(adjustStockBean.getLastOrder()) + AdjustStockForm.ORDER_LIMIT;
@@ -355,12 +263,6 @@ public class AdjustStockServlet extends EnjoyStandardSvc {
 			obj.put(STATUS, 		ERROR);
 			obj.put(ERR_MSG, 		"onSearch is error");
 		}finally{
-			session.close();
-			sessionFactory	= null;
-			session			= null;
-			
-			setRefference();
-			
 			this.enjoyUtil.writeMSG(obj.toString());
 			
 			logger.info("[onSearch][End]");
@@ -371,18 +273,21 @@ public class AdjustStockServlet extends EnjoyStandardSvc {
 	private void getProductNameList(){
 	   logger.info("[getProductNameList][Begin]");
 	   
-	   String							productName				= null;
-	   List<ComboBean> 					list 					= null;
-	   JSONArray 						jSONArray 				= null;
-	   JSONObject 						objDetail 				= null;
+	   String				productName		= null;
+	   String				tin				= null;
+	   List<ComboBean> 		list 			= null;
+	   JSONArray 			jSONArray 		= null;
+	   JSONObject 			objDetail 		= null;
 	
 	   try{
-		   jSONArray 				= new JSONArray();
-		   productName				= EnjoyUtils.nullToStr(this.request.getParameter("productName"));
+		   jSONArray 		= new JSONArray();
+		   productName		= EnjoyUtils.nullToStr(this.request.getParameter("productName"));
+		   tin				= this.userBean.getTin();
 		   
-		   logger.info("[getProductNameList] productName 				:: " + productName);
+		   logger.info("[getProductNameList] productName :: " + productName);
+		   logger.info("[getProductNameList] tin :: " + tin);
 		   
-		   list 		= this.productDetailsDao.productNameList(productName, null, null, true);
+		   list 		= this.productDetailsDao.productNameList(productName, null, null, tin, true);
 		   
 		   for(ComboBean bean:list){
 			   objDetail 		= new JSONObject();
@@ -409,8 +314,6 @@ public class AdjustStockServlet extends EnjoyStandardSvc {
 		String 					lastOrder	 					= null;
 		int						limitAdjustHistoryOrder			= 0;
 		String					productCode						= null;
-		SessionFactory 			sessionFactory					= null;
-		Session 				session							= null;
 		JSONObject 				obj 							= null;
 		JSONObject 				objDetail 						= null;
 		JSONArray 				jSONArray 						= null;
@@ -419,18 +322,14 @@ public class AdjustStockServlet extends EnjoyStandardSvc {
 		String					tin								= null;
 		
 		try{
-			sessionFactory 		= HibernateUtil.getSessionFactory();
-			session 			= sessionFactory.openSession();
 			obj 				= new JSONObject();
 			jSONArray 			= new JSONArray();
 			lastOrder 			= EnjoyUtils.nullToStr(this.request.getParameter("lastOrder"));
 			productCode 		= EnjoyUtils.nullToStr(this.request.getParameter("productCode"));
-			tin 				= EnjoyUtils.nullToStr(this.request.getParameter("tin"));
+			tin 				= this.userBean.getTin();
 			
-			session.beginTransaction();
-			
-			limitAdjustHistoryOrder 	= this.dao.checkLimitAdjustHistoryOrder(session, productCode, tin, EnjoyUtils.parseInt(lastOrder));
-			adjustHistoryList			= this.dao.getAdjustHistoryList(session, this.form.getAdjustStockBean());
+			limitAdjustHistoryOrder 	= this.dao.checkLimitAdjustHistoryOrder(productCode, tin, EnjoyUtils.parseInt(lastOrder));
+			adjustHistoryList			= this.dao.getAdjustHistoryList(this.form.getAdjustStockBean());
 			
 			for(AdjustStockBean bean:adjustHistoryList){
 				objDetail = new JSONObject();
@@ -465,13 +364,33 @@ public class AdjustStockServlet extends EnjoyStandardSvc {
 			obj.put(STATUS, 		ERROR);
 			obj.put(ERR_MSG, 		"loadNextRangeOrder is error");
 		}finally{
-			session.close();
-			sessionFactory	= null;
-			session			= null;
-			
 			this.enjoyUtil.writeMSG(obj.toString());
 			logger.info("[loadNextRangeOrder][End]");
 		}
+	}
+
+	@Override
+	public void destroySession() {
+		this.dao.destroySession();
+        this.productDetailsDao.destroySession();
+        this.productquantityDao.destroySession();
+        this.productQuanHistoryDao.destroySession();
+	}
+
+	@Override
+	public void commit() {
+		this.dao.commit();
+        this.productDetailsDao.commit();
+        this.productquantityDao.commit();
+        this.productQuanHistoryDao.commit();
+	}
+
+	@Override
+	public void rollback() {
+		this.dao.rollback();
+        this.productDetailsDao.rollback();
+        this.productquantityDao.rollback();
+        this.productQuanHistoryDao.rollback();
 	}
 	
 }

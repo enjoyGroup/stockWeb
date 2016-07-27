@@ -27,8 +27,8 @@
 				console.log('cancelling: ');
 				console.log(this);
 			},
-			validate_extensions : true,
-			valid_extensions : [ 'jpg', 'jpeg' ],
+			validate_extensions : null,
+			valid_extensions : null,
 			submit_button : null
 		};
 
@@ -156,7 +156,7 @@
 				var wrapElement = function(element) {
 					// Create an iframe to submit through, using a semi-unique ID
 					var frame_id = 'ajaxUploader-iframe-' + Math
-							.round(new Date().getTime() / 1000)
+							.round(new Date().getTime() / 1000);
 					$('body').after(
 							'<iframe width="0" height="0" style="display:none;" name="'
 									+ frame_id + '" id="' + frame_id + '"/>');
@@ -171,7 +171,7 @@
 										return '<form action="'
 												+ settings.action
 												+ '" method="POST" enctype="multipart/form-data" target="'
-												+ frame_id + '" />'
+												+ frame_id + '" />';
 									})
 							// Insert <input type='hidden'>'s for each param
 							.before(

@@ -29,18 +29,20 @@ public class SummarySaleByDayReportDao extends DaoControl {
 		HashMap<String, Object>				param					= new HashMap<String, Object>();
 		List<String>						columnList				= new ArrayList<String>();
 		List<HashMap<String, Object>>		resultList				= null;
+		String								cusName					= null;
 		
 		try{	
 			invoiceDateFrom 	= EnjoyUtils.dateThaiToDb(criteria.getInvoiceDateFrom());
 			invoiceDateTo		= EnjoyUtils.dateThaiToDb(criteria.getInvoiceDateTo());
 			
 			hql					= "select a.invoiceCode"
-									+ " , CONCAT(b.cusName, ' ', b.cusSurname, ' (', b.branchName, ')') as cusName"
+									+ " , CONCAT(b.cusName, ' ', b.cusSurname) as cusName"
+									+ " , b.branchName"
 									+ " , a.invoiceDate"
 									+ " , a.invoiceTotal"
 									+ " , a.remark"
 									+ " from invoicecashmaster a, customer b"
-									+ " where a.cusCode = b.cusCode"
+									+ " where a.cusCode = b.cusCode and a.tin = b.tin"
 									+ "		and a.tin 			= :tin"
 									+ " 	and a.invoiceDate >= STR_TO_DATE(:invoiceDateFrom	, '%Y%m%d')"
 									+ " 	and a.invoiceDate <= STR_TO_DATE(:invoiceDateTo		, '%Y%m%d')";
@@ -53,6 +55,7 @@ public class SummarySaleByDayReportDao extends DaoControl {
 			
 			columnList.add("invoiceCode");
 			columnList.add("cusName");
+			columnList.add("branchName");
 			columnList.add("invoiceDate");
 			columnList.add("invoiceTotal");
 			columnList.add("remark");
@@ -61,9 +64,13 @@ public class SummarySaleByDayReportDao extends DaoControl {
 
 			for(HashMap<String, Object> row:resultList){
 				bean 	= new SummarySaleByDayReportBean();
+				cusName	= EnjoyUtils.nullToStr(row.get("cusName"));
+				if(!"".equals(EnjoyUtils.nullToStr(row.get("branchName")))){
+					cusName += "(" + EnjoyUtils.nullToStr(row.get("branchName")) + ")";
+				}
 				
 				bean.setInvoiceCode	(EnjoyUtils.nullToStr(row.get("invoiceCode")));
-				bean.setCusName		(EnjoyUtils.nullToStr(row.get("cusName")));
+				bean.setCusName		(cusName);
 				bean.setInvoiceDate	(EnjoyUtils.dateToThaiDisplay(row.get("invoiceDate")));
 				bean.setInvoiceTotal(EnjoyUtils.convertFloatToDisplay(row.get("invoiceTotal"), 2));
 				bean.setRemark		(EnjoyUtils.nullToStr(row.get("remark")));

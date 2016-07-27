@@ -1,5 +1,9 @@
 package th.go.stock.app.enjoy.bean;
 
+import org.apache.poi.ss.usermodel.Row;
+
+import th.go.stock.app.enjoy.utils.ExcelField;
+
 
 
 public class ProductmasterBean {
@@ -19,14 +23,24 @@ public class ProductmasterBean {
 	private String salePrice3;
 	private String salePrice4;
 	private String salePrice5;
-//	private String startDate;
-//	private String expDate;
-//	private String quantity;
-//	private String productStatus;
 	/*Begin สำหรับหน้า Search*/
 	private String chkBox;
 	private String chkBoxSeq;
 	/*End สำหรับหน้า Search*/
+	private String tin;
+	private String rowStatus;
+	private String seq;
+	private String quantity;
+	private ExcelField colA;
+	private ExcelField colB;
+	private ExcelField colC;
+	private ExcelField colD;
+	private ExcelField colE;
+	private ExcelField colF;
+	private ExcelField colG;
+	private ExcelField colH;
+	private ExcelField colI;
+	private ExcelField colJ;
 	
 	public ProductmasterBean(){
 		this.productCode 		= "";
@@ -44,12 +58,25 @@ public class ProductmasterBean {
 		this.salePrice3 		= "0.00";
 		this.salePrice4 		= "0.00";
 		this.salePrice5 		= "0.00";
-//		this.startDate 			= "";
-//		this.expDate 			= "";
-//		this.quantity 			= "0";
-//		this.productStatus 		= "";
 		this.chkBox 			= "N";
 		this.chkBoxSeq 			= "0";
+		this.tin				= "";
+		this.rowStatus			= "";
+		this.seq				= "0";
+		this.quantity			= "0.00";
+	}
+	
+	public ProductmasterBean(Row row){
+		this.colA			= new ExcelField(row, ".*", 0);
+		this.colB			= new ExcelField(row, ".*", 1);
+		this.colC			= new ExcelField(row, ".*", 2);
+		this.colD			= new ExcelField(row, ".*", 3);
+		this.colE			= new ExcelField(row, ".*", 4);
+		this.colF			= new ExcelField(row, ".*", 5);
+		this.colG			= new ExcelField(row, ".*", 6);
+		this.colH			= new ExcelField(row, ".*", 7);
+		this.colI			= new ExcelField(row, ".*", 8);
+		this.colJ			= new ExcelField(row, ".*", 9);
 	}
 
 	public String getProductCode() {
@@ -172,14 +199,6 @@ public class ProductmasterBean {
 		this.salePrice5 = salePrice5;
 	}
 
-//	public String getQuantity() {
-//		return quantity;
-//	}
-//
-//	public void setQuantity(String quantity) {
-//		this.quantity = quantity;
-//	}
-
 	public String getChkBox() {
 		return chkBox;
 	}
@@ -196,4 +215,115 @@ public class ProductmasterBean {
 		this.chkBoxSeq = chkBoxSeq;
 	}
 
+	public String getTin() {
+		return tin;
+	}
+
+	public void setTin(String tin) {
+		this.tin = tin;
+	}
+
+	public String getRowStatus() {
+		return rowStatus;
+	}
+
+	public void setRowStatus(String rowStatus) {
+		this.rowStatus = rowStatus;
+	}
+
+	public String getSeq() {
+		return seq;
+	}
+
+	public void setSeq(String seq) {
+		this.seq = seq;
+	}
+
+	public String getQuantity() {
+		return quantity;
+	}
+
+	public void setQuantity(String quantity) {
+		this.quantity = quantity;
+	}
+
+	public ExcelField getColA() {
+		return colA;
+	}
+
+	public void setColA(ExcelField colA) {
+		this.colA = colA;
+	}
+
+	public ExcelField getColB() {
+		return colB;
+	}
+
+	public void setColB(ExcelField colB) {
+		this.colB = colB;
+	}
+
+	public ExcelField getColC() {
+		return colC;
+	}
+
+	public void setColC(ExcelField colC) {
+		this.colC = colC;
+	}
+
+	public ExcelField getColD() {
+		return colD;
+	}
+
+	public void setColD(ExcelField colD) {
+		this.colD = colD;
+	}
+
+	public ExcelField getColE() {
+		return colE;
+	}
+
+	public void setColE(ExcelField colE) {
+		this.colE = colE;
+	}
+
+	public ExcelField getColF() {
+		return colF;
+	}
+
+	public void setColF(ExcelField colF) {
+		this.colF = colF;
+	}
+
+	public ExcelField getColG() {
+		return colG;
+	}
+
+	public void setColG(ExcelField colG) {
+		this.colG = colG;
+	}
+
+	public ExcelField getColH() {
+		return colH;
+	}
+
+	public void setColH(ExcelField colH) {
+		this.colH = colH;
+	}
+
+	public ExcelField getColI() {
+		return colI;
+	}
+
+	public void setColI(ExcelField colI) {
+		this.colI = colI;
+	}
+
+	public ExcelField getColJ() {
+		return colJ;
+	}
+
+	public void setColJ(ExcelField colJ) {
+		this.colJ = colJ;
+	}
 }

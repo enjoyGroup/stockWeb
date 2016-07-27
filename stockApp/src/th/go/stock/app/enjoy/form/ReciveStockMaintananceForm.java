@@ -25,7 +25,6 @@ public class ReciveStockMaintananceForm {
 	private String						titlePage;
 	private List<ReciveOrdeDetailBean> 	reciveOrdeDetailList;
 	private String						seqTemp;
-	private List<ComboBean> 			companyCombo;
 	
 	public ReciveStockMaintananceForm(){
 		this.reciveOrderMasterBean 		= new ReciveOrderMasterBean();
@@ -36,7 +35,6 @@ public class ReciveStockMaintananceForm {
 		this.titlePage					= "";
 		this.reciveOrdeDetailList		= new ArrayList<ReciveOrdeDetailBean>();
 		this.seqTemp					= "0";
-		this.companyCombo				= new ArrayList<ComboBean>();
 	}
 
 	public ReciveOrderMasterBean getReciveOrderMasterBean() {
@@ -102,13 +100,5 @@ public class ReciveStockMaintananceForm {
 
 	public void setSeqTemp(String seqTemp) {
 		this.seqTemp = seqTemp;
-	}
-
-	public List<ComboBean> getCompanyCombo() {
-		return companyCombo;
-	}
-
-	public void setCompanyCombo(List<ComboBean> companyCombo) {
-		this.companyCombo = companyCombo;
 	}
 }

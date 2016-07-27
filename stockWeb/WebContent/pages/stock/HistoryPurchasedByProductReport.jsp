@@ -9,7 +9,6 @@
 	HistoryPurchasedByProductReportBean 		historyPurchasedByProductReportBean = historyPurchasedByProductReportForm.getHistoryPurchasedByProductReportBean();
 	List<HistoryPurchasedByProductReportBean> 	dataList 							= historyPurchasedByProductReportForm.getDataList();
 	String										titlePage							= historyPurchasedByProductReportForm.getTitlePage();
-	List<ComboBean> 							companyCombo 						= historyPurchasedByProductReportForm.getCompanyCombo();
 %>
 
 <html>
@@ -78,8 +77,7 @@
 						return;
 					}
 					
-					params = "tin=" 				+ $("#tin").val()
-							+ "&productName=" 		+ $("#productName").val()
+					params = "productName=" 		+ $("#productName").val()
 							+ "&reciveDateFrom=" 	+ $("#reciveDateFrom").val()
 							+ "&reciveDateTo=" 		+ $("#reciveDateTo").val();
 					
@@ -103,7 +101,7 @@
 		});
 		
 		function lp_validate(){
-			var la_validate             = new Array( "tin:บริษัทที่สังกัด", "reciveDateFrom:วันที่เริ่มค้นหา", "reciveDateTo:วันที่สิ้นสุดค้นหา");
+			var la_validate             = new Array( "reciveDateFrom:วันที่เริ่มค้นหา", "reciveDateTo:วันที่สิ้นสุดค้นหา");
 		    var lv_return				= true;
 		    
 			try{
@@ -141,20 +139,10 @@
 										<div class="panel-body" align="center">
 								        	<table width="100%" border="0" cellpadding="5" cellspacing="5">
 								        		<tr>
-								        			<td align="right" width="150px;">
-								        				บริษัทที่สังกัด <span style="color: red;"><b>*</b></span> : &nbsp;
-								        			</td>
-								        			<td align="left">
-								        				<select id="tin" name="tin" style="width: 220px;" >
-								        					<% for(ComboBean comboBean:companyCombo){ %>
-								        					<option value="<%=comboBean.getCode()%>" <%if(historyPurchasedByProductReportBean.getTin().equals(comboBean.getCode())){ %> selected <%} %> ><%=comboBean.getDesc()%></option>
-								        					<%} %>
-								        				</select>
-								        			</td>
 								        			<td align="right">
 								        				สินค้า :&nbsp;
 								        			</td>
-								        			<td align="left" colspan="3">
+								        			<td align="left" colspan="5">
 								        				<input type='text' 
 								        					   id="productName" 
 								        					   name='productName' 

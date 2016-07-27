@@ -1,12 +1,11 @@
 package th.go.stock.app.enjoy.form;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import th.go.stock.app.enjoy.bean.ComboBean;
 import th.go.stock.app.enjoy.bean.UserDetailsBean;
-import th.go.stock.app.enjoy.model.Userprivilege;
+import th.go.stock.app.enjoy.bean.UserPrivilegeBean;
 
 public class UserDetailsMaintananceForm {
 	
@@ -16,22 +15,22 @@ public class UserDetailsMaintananceForm {
 	
 	private UserDetailsBean 		userDetailsBean;
 	private List<ComboBean> 		statusCombo;
-	private List<Userprivilege> 	userprivilegeList;
+	private List<UserPrivilegeBean> userprivilegeList;
 	private List<UserDetailsBean> 	userDetailsBeanList;
-	private List<ComboBean> 		companyCombo;
 	private String					errMsg;
 	private String					pageMode;
 	private String					titlePage;
+	private String					sendMailFlag;
 	
 	public UserDetailsMaintananceForm(){
 		this.userDetailsBean 		= new UserDetailsBean();
 		this.statusCombo			= new ArrayList<ComboBean>();
-		this.userprivilegeList		= new ArrayList<Userprivilege>();
+		this.userprivilegeList		= new ArrayList<UserPrivilegeBean>();
 		this.userDetailsBeanList	= new ArrayList<UserDetailsBean>();
-		this.companyCombo			= new ArrayList<ComboBean>();
 		this.errMsg					= "";
 		this.pageMode				= NEW;
 		this.titlePage				= "";
+		this.sendMailFlag			= "N";
 	}
 
 	public UserDetailsBean getUserDetailsBean() {
@@ -48,14 +47,6 @@ public class UserDetailsMaintananceForm {
 
 	public void setStatusCombo(List<ComboBean> statusCombo) {
 		this.statusCombo = statusCombo;
-	}
-
-	public List<Userprivilege> getUserprivilegeList() {
-		return userprivilegeList;
-	}
-
-	public void setUserprivilegeList(List<Userprivilege> userprivilegeList) {
-		this.userprivilegeList = userprivilegeList;
 	}
 
 	public List<UserDetailsBean> getUserDetailsBeanList() {
@@ -90,12 +81,20 @@ public class UserDetailsMaintananceForm {
 		this.titlePage = titlePage;
 	}
 
-	public List<ComboBean> getCompanyCombo() {
-		return companyCombo;
+	public List<UserPrivilegeBean> getUserprivilegeList() {
+		return userprivilegeList;
 	}
 
-	public void setCompanyCombo(List<ComboBean> companyCombo) {
-		this.companyCombo = companyCombo;
+	public void setUserprivilegeList(List<UserPrivilegeBean> userprivilegeList) {
+		this.userprivilegeList = userprivilegeList;
+	}
+
+	public String getSendMailFlag() {
+		return sendMailFlag;
+	}
+
+	public void setSendMailFlag(String sendMailFlag) {
+		this.sendMailFlag = sendMailFlag;
 	}
 	
 }

@@ -27,9 +27,10 @@ public class PdfTest {
 	public static void main(String[] args) {
 		try {
 //			writePDF("ProductBarcodePdfForm", createJsonObjForProductBarcode(), "D:/motor/PDF/ProductBarcodePdfForm.pdf");
-			writePDF("FullSlipCashPdfForm", createJsonObjForFullSlip(), "D:/motor/PDF/FullSlipCashPdfFormA5.pdf");
+//			writePDF("FullSlipCashPdfForm", createJsonObjForFullSlip(), "D:/motor/PDF/FullSlipCashPdfFormA5.pdf");
 //			writePDF("FullSlipCashNoVatPdfForm", createJsonObjForFullSlip(), "D:/motor/PDF/FullSlipCashNoVatPdfFormA5.pdf");
 //			writePDF("HistoryPurchasedByDealerPdfForm", createJsonObjForHistoryPurchasedByDealer(), "D:/motor/PDF/HistoryPurchasedByDealerPdfForm.pdf");
+			writePDF("UserDetailPdfForm", createJsonObjForUserDetailPdfForm(), "D:/motor/PDF/UserDetailPdfForm.pdf");
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -49,8 +50,8 @@ public class PdfTest {
 			System.out.println("formName :: " + formName);
 			
 			formClass					= "th.go.stock.app.enjoy.pdf."+formName;
-//			document 					= new Document(PageSize.A4);
-			document 					= new Document(PageSize.A5);
+			document 					= new Document(PageSize.A4);
+//			document 					= new Document(PageSize.A5);
 			f 							= new File(pdfPath);
 			fos            				= new FileOutputStream(f.getAbsolutePath());			
 			writer 						= PdfWriter.getInstance( document,fos  );
@@ -140,11 +141,8 @@ public class PdfTest {
 	    JSONObject 					objDetail 				= null;
 	    CompanyDetailsBean 			companyDetailsBean		= new CompanyDetailsBean();
 	    CompanyDetailsBean 			companyDetailsDb		= null;
-	    CompanyDetailsDao			companyDetailsDao		= new CompanyDetailsDao();
 	    CustomerDetailsBean 		customerDetailsBean		= new CustomerDetailsBean();
 	    CustomerDetailsBean 		customerDetailsDb		= null;
-	    CustomerDetailsDao			customerDetailsDao		= new CustomerDetailsDao();
-	    InvoiceCashDao				invoiceCashDao			= new InvoiceCashDao();
 	    InvoiceCashMasterBean 		invoiceCashMasterBean 	= new InvoiceCashMasterBean();
 	    InvoiceCashMasterBean 		invoiceCashMasterDb 	= null;
 	    String						cusCode					= null;
@@ -152,6 +150,9 @@ public class PdfTest {
 	    String						invoiceCode				= null;
 	    InvoiceCashDetailBean 		invoiceCashDetailBean	= new InvoiceCashDetailBean();
 	    List<InvoiceCashDetailBean> invoiceCashDetailList 	= null;
+	    InvoiceCashDao				invoiceCashDao			= new InvoiceCashDao();
+	    CustomerDetailsDao			customerDetailsDao		= new CustomerDetailsDao();
+	    CompanyDetailsDao			companyDetailsDao		= new CompanyDetailsDao();
 	    
 		try{
 			invoiceCode = "INC59-00000001";
@@ -254,6 +255,10 @@ public class PdfTest {
 		    
 		}catch(Exception e){
 			e.printStackTrace();
+		}finally{
+			invoiceCashDao.destroySession();
+		    customerDetailsDao.destroySession();
+		    companyDetailsDao.destroySession();
 		}
 		return jsonObject;
 	}
@@ -262,7 +267,6 @@ public class PdfTest {
 		JSONObject 									jsonObject 						= new JSONObject();
 		JSONArray 									jSONArray 						= new JSONArray();
 	    JSONObject 									objDetail 						= null;
-	    HistoryPurchasedByDealerReportDao			dao								= new HistoryPurchasedByDealerReportDao();
 	    HistoryPurchasedByDealerReportBean 			bean							= new HistoryPurchasedByDealerReportBean();
 	    List<HistoryPurchasedByDealerReportBean> 	historyPurchasedByDealerList 	= null;
 	    String										tin								= "";
@@ -270,6 +274,7 @@ public class PdfTest {
 	    String										reciveDateTo					= "";
 	    CompanyDetailsBean 							companyDetailsBean				= new CompanyDetailsBean();
 	    CompanyDetailsBean 							companyDetailsDb				= null;
+	    HistoryPurchasedByDealerReportDao			dao								= new HistoryPurchasedByDealerReportDao();
 	    CompanyDetailsDao							companyDetailsDao				= new CompanyDetailsDao();
 	    
 		try{
@@ -323,6 +328,24 @@ public class PdfTest {
 			
 			jsonObject.put("historyPurchasedByDealerReportList"	,jSONArray);
 			/*End รายละเอียดรายงาน*/
+			
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally{
+			dao.destroySession();
+		    companyDetailsDao.destroySession();
+		}
+		return jsonObject;
+	}
+	
+	private static JSONObject createJsonObjForUserDetailPdfForm(){
+		JSONObject 									jsonObject 						= new JSONObject();
+	    
+		try{
+			
+			jsonObject.put("fullName"	,"พิชญาภา เปี่ยมขำดี");
+			jsonObject.put("userEmail"	,"pomkmutt@gmail.com");
+			jsonObject.put("pwd"		,"CDUqmiYK");
 			
 		}catch(Exception e){
 			e.printStackTrace();

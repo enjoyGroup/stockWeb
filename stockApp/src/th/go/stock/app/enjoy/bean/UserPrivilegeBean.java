@@ -4,14 +4,16 @@ import java.util.ArrayList;
 
 public class UserPrivilegeBean {
 		
-	private String 	  					privilegeCode	  = null;
-	private String 	  					privilegeName	  = null;
-	private ArrayList<PagesDetailBean> 	pagesList	 	  = null;
+	private String privilegeCode;
+	private String privilegeName;
+	private String pagesCode;
+	private ArrayList<PagesDetailBean> 	pagesList;
 	
 	public UserPrivilegeBean(){
-		this.privilegeCode			  = "";
-		this.privilegeName			  = "";
-		this.pagesList			  	  = new ArrayList<PagesDetailBean>();
+		this.privilegeCode			= "";
+		this.privilegeName			= "";
+		this.pagesList			  	= new ArrayList<PagesDetailBean>();
+		this.pagesCode				= "";
 	}
 
 	public String getPrivilegeCode() {
@@ -36,6 +38,14 @@ public class UserPrivilegeBean {
 
 	public void setPagesDetail(ArrayList<PagesDetailBean> pagesList) {
 		this.pagesList = pagesList;
+	}
+
+	public String getPagesCode() {
+		return pagesCode;
+	}
+
+	public void setPagesCode(String pagesCode) {
+		this.pagesCode = pagesCode;
 	}
 
 	

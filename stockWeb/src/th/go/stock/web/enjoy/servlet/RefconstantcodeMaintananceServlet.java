@@ -8,8 +8,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.json.simple.JSONObject;
 
 import th.go.stock.app.enjoy.bean.RefconstantcodeBean;
@@ -19,7 +17,6 @@ import th.go.stock.app.enjoy.exception.EnjoyException;
 import th.go.stock.app.enjoy.form.RefconstantcodeMaintananceForm;
 import th.go.stock.app.enjoy.main.Constants;
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
-import th.go.stock.app.enjoy.utils.HibernateUtil;
 import th.go.stock.web.enjoy.common.EnjoyStandardSvc;
 import th.go.stock.web.enjoy.utils.EnjoyUtil;
 
@@ -82,6 +79,7 @@ public class RefconstantcodeMaintananceServlet extends EnjoyStandardSvc {
  			e.printStackTrace();
  			logger.info(e.getMessage());
  		}finally{
+ 			destroySession();
  			logger.info("[execute][End]");
  		}
 	}
@@ -89,23 +87,21 @@ public class RefconstantcodeMaintananceServlet extends EnjoyStandardSvc {
 	private void getDetail() throws EnjoyException{
 		logger.info("[getDetail][Begin]");
 		
-		SessionFactory 					sessionFactory				= null;
-		Session 						session						= null;
-		RefconstantcodeBean 			refconstantcodeBean			= null;
 		List<RefconstantcodeBean> 		refconstantcodeList			= null;
+		RefconstantcodeBean				refconstantcodeBean			= new RefconstantcodeBean();
 		
 		try{
-			sessionFactory 				= HibernateUtil.getSessionFactory();
-			session 					= sessionFactory.openSession();
-			
 			this.form.setTitlePage("ตั้งค่ารหัสเอกสาร");
 			
-			session.beginTransaction();
+			refconstantcodeBean.setTin(this.userBean.getTin());
 			
-			refconstantcodeBean 	= new RefconstantcodeBean();
-			refconstantcodeList		= this.dao.searchByCriteria(session, refconstantcodeBean);
+			refconstantcodeBean.setTypeTB("1");
+			refconstantcodeList		= this.dao.searchByCriteria(refconstantcodeBean);
+			this.form.setSection1List(refconstantcodeList);
 			
-			this.form.setRefconstantcodeList(refconstantcodeList);
+			refconstantcodeBean.setTypeTB("2");
+			refconstantcodeList		= this.dao.searchByCriteria(refconstantcodeBean);
+			this.form.setSection2List(refconstantcodeList);
 			
 		}catch(EnjoyException e){
 			throw new EnjoyException(e.getMessage());
@@ -113,10 +109,6 @@ public class RefconstantcodeMaintananceServlet extends EnjoyStandardSvc {
 			logger.info(e.getMessage());
 			throw new EnjoyException("getDetail is error");
 		}finally{
-			session.close();
-			
-			sessionFactory	= null;
-			session			= null;
 			logger.info("[getDetail][End]");
 		}
 		
@@ -125,49 +117,44 @@ public class RefconstantcodeMaintananceServlet extends EnjoyStandardSvc {
 	private void onSave() throws EnjoyException{
 		logger.info("[onSave][Begin]");
 		
-		SessionFactory 				sessionFactory				= null;
-		Session 					session						= null;
-		JSONObject 					obj 						= null;
-		List<RefconstantcodeBean> 	refconstantcodeList			= null;
+		JSONObject 					obj 					= null;
+		List<RefconstantcodeBean> 	section1List			= null;
+		List<RefconstantcodeBean> 	section2List			= null;
+		String						sendMailFlg				= null;
 		
 		try{
-			sessionFactory 				= HibernateUtil.getSessionFactory();
-			session 					= sessionFactory.openSession();
-			obj 						= new JSONObject();
-			refconstantcodeList			= this.form.getRefconstantcodeList();
+			obj 					= new JSONObject();
+			section1List			= this.form.getSection1List();
+			section2List			= this.form.getSection2List();
+			sendMailFlg				= EnjoyUtil.chkBoxtoDb(request.getParameter("sendMailFlg"));
 			
-			session.beginTransaction();
-			
-			for(RefconstantcodeBean bean:refconstantcodeList){
+			for(RefconstantcodeBean bean:section1List){
 				if(bean.getRowStatus().equals(RefconstantcodeMaintananceForm.EDIT)){
-					this.dao.updateCodeDisplay(session, bean);
+					this.dao.updateCodeDisplay(bean);
 				}
 			}
 			
-			session.getTransaction().commit();
+			for(RefconstantcodeBean bean:section2List){
+				bean.setCodeDisplay(sendMailFlg);
+				this.dao.updateRefconstantcode(bean);
+			}
+			
+			commit();
 			
 			obj.put(STATUS, 			SUCCESS);
 			
 		}catch(EnjoyException e){
-			session.getTransaction().rollback();
+			rollback();
 			obj.put(STATUS, 		ERROR);
 			obj.put(ERR_MSG, 		e.getMessage());
 		}catch(Exception e){
-			session.getTransaction().rollback();
+			rollback();
 			logger.info(e.getMessage());
 			e.printStackTrace();
 			obj.put(STATUS, 		ERROR);
 			obj.put(ERR_MSG, 		"onSave is error");
 		}finally{
-			
-			session.flush();
-			session.clear();
-			session.close();
-			
 			this.enjoyUtil.writeMSG(obj.toString());
-			
-			sessionFactory	= null;
-			session			= null;
 			
 			logger.info("[onSave][End]");
 		}
@@ -192,7 +179,7 @@ public class RefconstantcodeMaintananceServlet extends EnjoyStandardSvc {
 			codeNameTH 				= EnjoyUtil.nullToStr(request.getParameter("codeNameTH"));
 			codeNameEN 				= EnjoyUtil.nullToStr(request.getParameter("codeNameEN"));
 			flagYear 				= EnjoyUtil.chkBoxtoDb(request.getParameter("flagYear"));
-			refconstantcodeList		= this.form.getRefconstantcodeList();
+			refconstantcodeList		= this.form.getSection1List();
 			
 			logger.info("[updateRecord] id 				:: " + id);
 			logger.info("[updateRecord] codeDisplay 	:: " + codeDisplay);
@@ -228,6 +215,21 @@ public class RefconstantcodeMaintananceServlet extends EnjoyStandardSvc {
 			this.enjoyUtil.writeMSG(obj.toString());
 			logger.info("[updateRecord][End]");
 		}
+	}
+
+	@Override
+	public void destroySession() {
+		this.dao.destroySession();
+	}
+
+	@Override
+	public void commit() {
+		this.dao.commit();
+	}
+
+	@Override
+	public void rollback() {
+		this.dao.rollback();
 	}
 	
 }

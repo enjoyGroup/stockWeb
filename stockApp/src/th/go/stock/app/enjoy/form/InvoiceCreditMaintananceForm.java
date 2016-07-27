@@ -25,7 +25,6 @@ public class InvoiceCreditMaintananceForm {
 	private List<InvoiceCreditDetailBean> 	invoiceCreditDetailList;
 	private String							seqTemp;
 	private List<ComboBean>					invoiceStatusCombo;
-	private List<ComboBean> 				companyCombo;
 	
 	public InvoiceCreditMaintananceForm(){
 		this.invoiceCreditMasterBean 	= new InvoiceCreditMasterBean();
@@ -36,7 +35,6 @@ public class InvoiceCreditMaintananceForm {
 		this.invoiceCreditDetailList	= new ArrayList<InvoiceCreditDetailBean>();
 		this.seqTemp					= "0";
 		this.invoiceStatusCombo			= new ArrayList<ComboBean>();
-		this.companyCombo				= new ArrayList<ComboBean>();
 	}
 
 	public InvoiceCreditMasterBean getInvoiceCreditMasterBean() {
@@ -101,13 +99,5 @@ public class InvoiceCreditMaintananceForm {
 
 	public void setInvoiceStatusCombo(List<ComboBean> invoiceStatusCombo) {
 		this.invoiceStatusCombo = invoiceStatusCombo;
-	}
-
-	public List<ComboBean> getCompanyCombo() {
-		return companyCombo;
-	}
-
-	public void setCompanyCombo(List<ComboBean> companyCombo) {
-		this.companyCombo = companyCombo;
 	}
 }

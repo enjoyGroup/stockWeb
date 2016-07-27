@@ -28,30 +28,9 @@
 	<script>
 		$(document).ready(function(){
 			
-			//var h = $(document).height();
-			
-			//$("#xx").corner("round 8px");
-			
 			$('#menu1').ptMenu();
 			$(window).scroll(function(){//alert($(window).scrollTop());
 				gp_controlMenu();
-				/*h = $(document).height();
-				//var options = {};
-		        if(document.documentElement.scrollTop || jQuery(this).scrollTop() > 10){//alert("s " + h); 
-		        	document.getElementById("m1").className 			= "fixs";
-		        	document.getElementById("headwrap").style.display 	= "none";
-		        	
-		        	//document.getElementById("m1").className 			= "fixs";
-		        	//$("#headwrap").removeAttr("style").hide();
-		        	
-		        }else{
-		        	document.getElementById("m1").className 			= "";
-		        	document.getElementById("headwrap").style.display 	= "block";
-		        	
-		        	//$("#headwrap").show("slide",{direction: 'up'}, 1000);
-		        	//document.getElementById("m1").className 			= "";
-		        }
-		        $('body').css('height', h);*/
 		    });
 			
 			$('#logOut').click(function(){ 
@@ -69,11 +48,27 @@
 <div class="headwrap" id="headwrap">
 	<div class="row" style="position: relative;">
     	<div class="brand span4" style="position: absolute;left:10px;" align="left">
-        	<img src="<%=Constants.SERV_URL%>/images/logo.png" />
+    		<a href="/stockWeb/pages/menu/welcome.jsp">
+     			<img src="<%=Constants.SERV_URL%>/images/logo.png" title="Home" alt="Home" />
+     		</a>
         </div>
         
         <div class="span8 user"  style="position: absolute;margin-right: 0px;width: 95%;">
-        	<div class="font14"><img src="<%=Constants.SERV_URL%>/images/icon-user.png" alt="">ชื่อผู้ใช้งาน <span class="text_white"><%=userDeatil.getUserName() %>&nbsp;&nbsp;<%=userDeatil.getUserSurname() %></span></div>
+        	<div class="font14" align="right">
+        		<table border="0" width="45%">
+        			<tr>
+        				<td rowspan="2" align="right" width="50%">
+        					<img src="<%=Constants.SERV_URL%>/images/icon-user.png" alt="<%=userDeatil.getCompanyName()%>" title="<%=userDeatil.getUserName() %>&nbsp;&nbsp;<%=userDeatil.getUserSurname()%>" />
+        				</td>
+        				<td align="right">ชื่อผู้ใช้งาน&nbsp;</td>
+        				<td align="left"> <span class="text_white"><%=userDeatil.getUserName() %>&nbsp;&nbsp;<%=userDeatil.getUserSurname()%></span></td>
+        			</tr>
+        			<tr>
+        				<td align="right">บริษัทที่สังกัด&nbsp;</td>
+        				<td align="left"><span class="text_white"><%=userDeatil.getCompanyName()%></span></td>
+        			</tr>
+        		</table>
+        	</div>
             <div style="height: 5px;"></div>
             <div style="width: 100%;" align="right">
 	            <div id="xx" align="center">
@@ -87,7 +82,7 @@
 <div id="m1">
   <ul id="menu1" <%if(userDeatil.getFlagChkCompany().equals("Y")){ %> style="visibility: hidden;"<%}%> >
   	<li><a href="javascript:void(0);" id="logOut" name="logOut" >ออกจากระบบ</a></li>
-	<%if(!userDeatil.getUserId().equals(Constants.ADMIN)){ %>
+	<%if(userDeatil.getUserUniqueId()!=Constants.ADMIN){ %>
 	<li><a href="<%=Constants.SERV_URL%>/EnjoyGenericSrv?service=servlet.ChangePasswordServlet&pageAction=new">เปลี่ยนรหัสผ่าน</a></li>
  	<%} %>
 	<%

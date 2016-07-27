@@ -9,7 +9,7 @@ public class ManageUnitTypeBean {
 	private String unitStatus;
 	private String rowStatus;
 	private String seq;
-	
+	private String tin;
 	
 	public ManageUnitTypeBean(){
 		this.unitCode 		= "";
@@ -17,6 +17,7 @@ public class ManageUnitTypeBean {
 		this.unitStatus 	= "";
 		this.rowStatus 		= "";
 		this.seq 			= "";
+		this.tin			= "";
 	}
 
 
@@ -67,5 +68,15 @@ public class ManageUnitTypeBean {
 
 	public void setSeq(String seq) {
 		this.seq = seq;
+	}
+
+
+	public String getTin() {
+		return tin;
+	}
+
+
+	public void setTin(String tin) {
+		this.tin = tin;
 	}
 }

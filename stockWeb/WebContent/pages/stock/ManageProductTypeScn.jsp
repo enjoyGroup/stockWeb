@@ -1,6 +1,6 @@
 <%@ include file="/pages/include/checkLogin.jsp"%>
 <%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
-<%@ page import="th.go.stock.app.enjoy.bean.ManageProductTypeBean"%>
+<%@ page import="th.go.stock.app.enjoy.bean.ManageProductTypeBean,th.go.stock.app.enjoy.bean.ComboBean"%>
 <%@ page import="java.util.*"%>
 <jsp:useBean id="manageProductTypeForm" class="th.go.stock.app.enjoy.form.ManageProductTypeForm" scope="session"/>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -16,17 +16,34 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 	<title><%=titlePage%></title>
 	<%@ include file="/pages/include/enjoyInclude.jsp"%>
+	<style type="text/css">
+		.scrollDetail {
+	        height: 500px;
+	        overflow-x: auto;
+	        overflow-y: auto;
+		}
+	</style>
 	<script>
 		var gv_service 				= null;
 		var gv_url 					= '<%=servURL%>/EnjoyGenericSrv';
-		var gv_checkFormatIdNumber 	= false;
 		
 		$(document).ready(function(){
-			//gp_progressBarOn();
-			
 			gv_service 		= "service=" + $('#service').val();
 			
-			//gp_progressBarOff();
+			$('#resultData').fixedHeaderTable();
+			
+			$('input[type="file"]').ajaxfileupload({
+				'action': gv_url + "?" + gv_service + "&pageAction=uploadFile",           
+			   	'onComplete': function(response) {
+			   			       lp_newRecordFromExcelFile(response);
+						     },
+			    'onStart': function() {
+					    	  gp_progressBarOn();
+					       },
+				'validate_extensions' : true,
+				'valid_extensions' : [ 'xls', 'xlsx' ],
+			    'submit_button' :  $('#btnUpload')
+			 });
 			
 		});
 		
@@ -45,8 +62,6 @@
 						alert("กรุณาระบุรหัสหมวดสินค้า", function() { 
 							la_productTypeCode[i].focus();
 		    		    });
-		            	//alert("กรุณาระบุรหัสหมวดสินค้า");
-		            	//la_productTypeCode[i].focus();
 		                return false;
 		            }
 				}
@@ -56,8 +71,6 @@
 						alert("กรุณาระบุชื่อหมวดสินค้า", function() { 
 							la_productTypeName[i].focus();
 		    		    });
-		            	//alert("กรุณาระบุชื่อหมวดสินค้า");
-		            	//la_productTypeName[i].focus();
 		                return false;
 		            }
 				}
@@ -100,21 +113,60 @@
 			return lv_return;
 		}
 		
-		function lp_newRecord(ao_obj){
-			var params							= "";
-		    var lo_table                        = document.getElementById("resultData");
-		    var lo_seqTemp            			= document.getElementById("seqTemp");
-		    var lv_maxSeq                       = parseInt(lo_seqTemp.value) + 1;
-		    var rowIndex                      	= gp_rowTableIndex(ao_obj);//lo_table.rows.length;
-		    var newNodeTr 	                	= null;
+		function lp_newRecordFromExcelFile(av_json){
+		    var lo_seqTemp  = document.getElementById("seqTemp");
+		    var lv_maxSeq   = parseInt(lo_seqTemp.value) + 1;
+		    var status		= av_json.status;
+		    
+			try{
+				if(status!="SUCCESS"){
+					alert(av_json.errMsg);
+					return;
+				}
+				
+				$.each(av_json.productTypeList, function(idx, obj) {
+					lv_maxSeq   = parseInt(lo_seqTemp.value) + 1;
+					
+					if(lp_addRowtable(obj.productTypeCode, obj.productTypeName, lv_maxSeq)){
+						lo_seqTemp.value  = lv_maxSeq;
+						lp_updateRecord(lv_maxSeq);
+					}
+    			});
+				
+				gp_progressBarOff();
+				$('#productTypeCode' + lv_maxSeq).focus();
+			}catch(e){
+				alert("lp_newRecordFromExcelFile :: " + e);
+			}
+		}
+		
+		function lp_newRecord(){
+		    var lo_seqTemp  = document.getElementById("seqTemp");
+		    var lv_maxSeq   = parseInt(lo_seqTemp.value) + 1;
+			
+			try{
+				
+				if(lp_addRowtable("", "", lv_maxSeq)){
+					lo_seqTemp.value  = lv_maxSeq;
+					$('#productTypeCode' + lv_maxSeq).focus();
+				}
+			}catch(e){
+				alert("lp_newRecord :: " + e);
+			}
+		}
+		
+		function lp_addRowtable(av_productTypeCode, av_productTypeName, av_seq){
+			var lo_table                        = document.getElementById("resultData");
+			var rowIndex                      	= lo_table.rows.length;//gp_rowTableIndex(ao_obj);
+			var newNodeTr 	                	= null;
 		    var newNodeTd1 						= null;
 		    var newNodeTd2 						= null;
 		    var newNodeTd3 						= null;
 		    var newNodeTd4 						= null;
-			
+		    var lv_ret							= false;
+		    
 			try{
-				
-				params 	= gv_service + "&pageAction=newRecord&newSeq=" + lv_maxSeq;
+				params 	= gv_service + "&pageAction=newRecord&newSeq=" + av_seq;
 				
 				$.ajax({
 					async:false,
@@ -143,21 +195,18 @@
 		                        newNodeTd1.innerHTML        = rowIndex;
 		                        
 		                      	//รหัสหมวดสินค้า
-		                       	newNodeTd2.innerHTML        = '<input type="text" maxlength="5" style="width: 100%;" onblur="lp_updateRecord('+lv_maxSeq+');" id="productTypeCode' + lv_maxSeq + '" name="productTypeCode" value="" />';
+		                       	newNodeTd2.innerHTML        = '<input type="text" maxlength="5" style="width: 100%;" onblur="lp_updateRecord('+av_seq+');" id="productTypeCode' + av_seq + '" name="productTypeCode" value="'+av_productTypeCode+'" />';
 		                       	
 		                      	//ชื่อหมวดสินค้า
-		                       	newNodeTd3.innerHTML        = '<input type="text" maxlength="200" style="width: 100%" onblur="lp_updateRecord('+lv_maxSeq+');" id="productTypeName' + lv_maxSeq + '" name="productTypeName" value="" />';
+		                       	newNodeTd3.innerHTML        = '<input type="text" maxlength="200" style="width: 100%" onblur="lp_updateRecord('+av_seq+');" id="productTypeName' + av_seq + '" name="productTypeName" value="'+av_productTypeName+'" />';
 		                       	
 		                      	//Action
 		                      	newNodeTd4.align 			= "center";
-		                       	newNodeTd4.innerHTML        = '<img alt="ลบ" title="ลบ" src="<%=imgURL%>/wrong.png" width="24" height="24" border="0" onclick="lp_deleteRecord(this, \'' + lv_maxSeq + '\');" />'
-															+ '<input type="hidden" id="seq'+lv_maxSeq+'" name="seq" value="'+lv_maxSeq+'" />';
-		                        
-								lo_seqTemp.value  = lv_maxSeq;
-								$('#productTypeCode' + lv_maxSeq).focus();
+		                       	newNodeTd4.innerHTML        = '<img alt="ลบ" title="ลบ" src="<%=imgURL%>/wrong.png" width="24" height="24" border="0" onclick="lp_deleteRecord(this, \'' + av_seq + '\');" />'
+															+ '<input type="hidden" id="seq'+av_seq+'" name="seq" value="'+av_seq+'" />';
+		                       	lv_ret = true;
 		            		}else{
 		            			alert(jsonObj.errMsg);
-		            			
 		            		}
 		            	}catch(e){
 		            		alert("in lp_newRecord :: " + e);
@@ -165,8 +214,10 @@
 		            }
 		        });
 				
+				return lv_ret;
 			}catch(e){
-				alert("lp_newRecord :: " + e);
+				alert("lp_addRowtable :: " + e);
+				return false;
 			}
 		}
 		
@@ -340,42 +391,55 @@
 										<h6 class="panel-title" style="font-size:1.0em"><%=titlePage%></h6>
 									</div>
 				         			<div class="panel-body">
-				         				<table class="table sim-panel-result-table" id="resultData">
-											<tr height="26px;">
-												<th  style="text-align: center;" width="5%" ><B>ลำดับ</B></th>
-												<th  style="text-align: center;" width="20%"><B>รหัสหมวดสินค้า</B></th>
-												<th  style="text-align: center;" width="60%"><B>ชื่อหมวดสินค้า</B></th>
-												<th style="text-align: center;" width="15%">Action</th>
-											</tr> 
-											<%
-   											int					  	seq		= 1;
-											for(ManageProductTypeBean bean:productTypeList){
-												if(!bean.getRowStatus().equals(manageProductTypeForm.DEL)){
-											%>
-													<tr>
-														<td style="text-align:center">
-															<%=seq%>
-														</td>
-														<td align="center">
-															<%=bean.getProductTypeCode()%>
-															<input type="hidden" id="productTypeCode<%=bean.getSeq()%>" name="productTypeCode" value="<%=bean.getProductTypeCode()%>" />
-														</td>
-														<td align="left">
-															<input type="text" style="width: 100%" maxlength="200" onblur="lp_updateRecord(<%=bean.getSeq()%>);" id="productTypeName<%=bean.getSeq()%>" name="productTypeName" value="<%=bean.getProductTypeName()%>" />
-														</td>
-														<td align="center">
-															<img alt="ลบ" title="ลบ" src="<%=imgURL%>/wrong.png" width="24" height="24" border="0" onclick="lp_deleteRecord(this, '<%=bean.getSeq()%>');" />
-															<input type="hidden" id="seq<%=bean.getSeq()%>" name="seq" value="<%=bean.getSeq()%>" />
-														</td>
-													</tr>
-											<% seq++;}}%>
-													<tr>
-														<td colspan="3">&nbsp;</td>
-														<td align="center">
-															<img alt="เพิ่ม" title="เพิ่ม" src="<%=imgURL%>/Add.png" width="24" height="24" border="0" onclick="lp_newRecord(this);" />
-														</td>
-													</tr>
+										<table width="100%" border="0">
+											<tr>
+												<td align="left" width="25%">
+													<input type="file" name="datafile" id="datafile" width="100%" />
+												</td>
+												<td align="left" width="75%">
+													<input type="button" name="btnUpload" class="btn btn-sm btn-warning" id="btnUpload" value="Upload" />
+													<a href="<%=servURL%>/upload/UploadproductType.xlsx">ตัวอย่างไฟล์อัพโหลด</a>
+												</td>
+											</tr>
 										</table>
+										<div class="scrollDetail">
+											<table class="table sim-panel-result-table" id="resultData">
+												<thead> 
+													<tr height="26px;">
+														<th  style="text-align: center;" width="5%" ><B>ลำดับ</B></th>
+														<th  style="text-align: center;" width="20%"><B>รหัสหมวดสินค้า</B></th>
+														<th  style="text-align: center;" width="60%"><B>ชื่อหมวดสินค้า</B></th>
+														<th style="text-align: center;" width="15%">
+															<img alt="เพิ่ม" title="เพิ่ม" src="<%=imgURL%>/Add.png" width="24" height="24" border="0" onclick="lp_newRecord();" />
+														</th>
+													</tr> 
+												</thead>
+												<tbody>
+													<%
+		   											int					  	seq		= 1;
+													for(ManageProductTypeBean bean:productTypeList){
+														if(!bean.getRowStatus().equals(manageProductTypeForm.DEL)){
+													%>
+															<tr>
+																<td style="text-align:center">
+																	<%=seq%>
+																</td>
+																<td align="center">
+																	<%=bean.getProductTypeCode()%>
+																	<input type="hidden" id="productTypeCode<%=bean.getSeq()%>" name="productTypeCode" value="<%=bean.getProductTypeCode()%>" />
+																</td>
+																<td align="left">
+																	<input type="text" style="width: 100%" maxlength="200" onblur="lp_updateRecord(<%=bean.getSeq()%>);" id="productTypeName<%=bean.getSeq()%>" name="productTypeName" value="<%=bean.getProductTypeName()%>" />
+																</td>
+																<td align="center">
+																	<img alt="ลบ" title="ลบ" src="<%=imgURL%>/wrong.png" width="24" height="24" border="0" onclick="lp_deleteRecord(this, '<%=bean.getSeq()%>');" />
+																	<input type="hidden" id="seq<%=bean.getSeq()%>" name="seq" value="<%=bean.getSeq()%>" />
+																</td>
+															</tr>
+													<% seq++;}}%>
+												</tbody>
+											</table>
+										</div>
 										<br/>
 										<table border="0" cellpadding="3" cellspacing="0" width="100%">
 											<tr>

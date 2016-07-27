@@ -2,65 +2,65 @@
 package th.go.stock.app.enjoy.dao;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.hibernate.Query;
-import org.hibernate.SQLQuery;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.type.IntegerType;
-import org.hibernate.type.StringType;
 
 import th.go.stock.app.enjoy.bean.ComboBean;
 import th.go.stock.app.enjoy.bean.ManageProductTypeBean;
 import th.go.stock.app.enjoy.exception.EnjoyException;
+import th.go.stock.app.enjoy.main.Constants;
+import th.go.stock.app.enjoy.main.DaoControl;
 import th.go.stock.app.enjoy.model.Productype;
+import th.go.stock.app.enjoy.model.ProductypePK;
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
 import th.go.stock.app.enjoy.utils.EnjoyUtils;
-import th.go.stock.app.enjoy.utils.HibernateUtil;
 
-public class ManageProductTypeDao {
+public class ManageProductTypeDao extends DaoControl{
 	
-	private static final EnjoyLogger logger = EnjoyLogger.getLogger(ManageProductTypeDao.class);
+	public ManageProductTypeDao(){
+		setLogger(EnjoyLogger.getLogger(ManageProductTypeDao.class));
+		super.init();
+	}
 	
-	public List<ManageProductTypeBean> getProductTypeList(	Session 					session) throws EnjoyException{
-		logger.info("[getProductTypeList][Begin]");
+	public List<ManageProductTypeBean> getProductTypeList(String tin) throws EnjoyException{
+		getLogger().info("[getProductTypeList][Begin]");
 		
-		String						hql							= null;
-		SQLQuery 					query 						= null;
-		List<Object[]>				list						= null;
-		ManageProductTypeBean		bean						= null;
-		List<ManageProductTypeBean> manageProductTypeBeanList 	= new ArrayList<ManageProductTypeBean>();
-		int							seq							= 0;
+		String							hql							= null;
+		ManageProductTypeBean			bean						= null;
+		List<ManageProductTypeBean> 	manageProductTypeBeanList 	= new ArrayList<ManageProductTypeBean>();
+		int								seq							= 0;
+		HashMap<String, Object>			param						= new HashMap<String, Object>();
+		List<String>					columnList					= new ArrayList<String>();
+		List<HashMap<String, Object>>	resultList					= null;
 		
 		try{	
 			hql					= "select * "
 								+ "	from productype"
-								+ "	where productTypeStatus = 'A' order by productTypeCode asc";
+								+ "	where productTypeStatus = 'A'"
+								+ "		and tin				= :tin"
+								+ "	order by productTypeCode asc";
 			
-			logger.info("[getProductTypeList] hql :: " + hql);
+			//Criteria
+			param.put("tin"	, tin);
 
-			query			= session.createSQLQuery(hql);			
-			query.addScalar("productTypeCode"		, new StringType());
-			query.addScalar("productTypeName"		, new StringType());
-			query.addScalar("productTypeStatus"		, new StringType());
+			//Column select
+			columnList.add("productTypeCode");
+			columnList.add("tin");
+			columnList.add("productTypeName");
+			columnList.add("productTypeStatus");
 			
-			list		 	= query.list();
+			resultList = getResult(hql, param, columnList);
 			
-			logger.info("[getProductTypeList] list.size() :: " + list.size());
-			
-			for(Object[] row:list){
+			for(HashMap<String, Object> row:resultList){
 				bean 	= new ManageProductTypeBean();
 				
-				logger.info("productTypeCode 		:: " + row[0]);
-				logger.info("productTypeName 		:: " + row[1]);
-				logger.info("productTypeStatus 		:: " + row[2]);
-				logger.info("seq 					:: " + seq);
-				
-				bean.setProductTypeCode				(EnjoyUtils.nullToStr(row[0]));
-				bean.setProductTypeName				(EnjoyUtils.nullToStr(row[1]));
-				bean.setProductTypeStatus			(EnjoyUtils.nullToStr(row[2]));
-				bean.setSeq							(EnjoyUtils.nullToStr(seq));
+				bean.setProductTypeCode		(EnjoyUtils.nullToStr(row.get("productTypeCode")));
+				bean.setTin					(EnjoyUtils.nullToStr(row.get("tin")));
+				bean.setProductTypeName		(EnjoyUtils.nullToStr(row.get("productTypeName")));
+				bean.setProductTypeStatus	(EnjoyUtils.nullToStr(row.get("productTypeStatus")));
+				bean.setSeq					(EnjoyUtils.nullToStr(seq));
 				
 				manageProductTypeBeanList.add(bean);
 				seq++;
@@ -68,46 +68,48 @@ public class ManageProductTypeDao {
 			}	
 			
 		}catch(Exception e){
-			logger.info("[getProductTypeList] " + e.getMessage());
+			getLogger().error(e);
 			e.printStackTrace();
 			throw new EnjoyException("error getProductTypeList");
 		}finally{
 			hql						= null;
-			logger.info("[getProductTypeList][End]");
+			getLogger().info("[getProductTypeList][End]");
 		}
 		
 		return manageProductTypeBeanList;
 		
 	}
 	
-	public void insertProductype(Session session, ManageProductTypeBean manageProductTypeBean) throws EnjoyException{
-		logger.info("[insertProductype][Begin]");
+	public void insertProductype(ManageProductTypeBean manageProductTypeBean) throws EnjoyException{
+		getLogger().info("[insertProductype][Begin]");
 		
-		Productype	productype						= null;
+		Productype		productype		= new Productype();
+		ProductypePK 	id				= new ProductypePK();
 		
 		try{
 			
-			productype = new Productype();
+			id.setProductTypeCode			(manageProductTypeBean.getProductTypeCode());
+			id.setTin						(manageProductTypeBean.getTin());
 			
-			productype.setProductTypeCode			(manageProductTypeBean.getProductTypeCode());
-			productype.setProductTypeName			(manageProductTypeBean.getProductTypeName());
-			productype.setProductTypeStatus			(manageProductTypeBean.getProductTypeStatus());
+			productype.setId				(id);
+			productype.setProductTypeName	(manageProductTypeBean.getProductTypeName());
+			productype.setProductTypeStatus	(manageProductTypeBean.getProductTypeStatus());
 			
-			session.saveOrUpdate(productype);
+			insertData(productype);
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			logger.info(e.getMessage());
+			getLogger().error(e);
 			throw new EnjoyException("Error insertProductype");
 		}finally{
 			
 			productype = null;
-			logger.info("[insertProductype][End]");
+			getLogger().info("[insertProductype][End]");
 		}
 	}
 	
-	public void updateProductype(Session session, ManageProductTypeBean manageProductTypeBean) throws EnjoyException{
-		logger.info("[updateProductype][Begin]");
+	public void updateProductype(ManageProductTypeBean manageProductTypeBean) throws EnjoyException{
+		getLogger().info("[updateProductype][Begin]");
 		
 		String							hql									= null;
 		Query 							query 								= null;
@@ -115,194 +117,190 @@ public class ManageProductTypeDao {
 		try{
 			hql				= "update Productype set productTypeName 		= :productTypeName"
 											+ "	,productTypeStatus 			= :productTypeStatus"
-										+ " where productTypeCode = :productTypeCode";
+										+ " where productTypeCode 	= :productTypeCode"
+										+ "		and	tin 			= :tin";
 			
-			query = session.createQuery(hql);
-			query.setParameter("productTypeName"			, manageProductTypeBean.getProductTypeName());
-			query.setParameter("productTypeStatus"			, manageProductTypeBean.getProductTypeStatus());
-			query.setParameter("productTypeCode"			, manageProductTypeBean.getProductTypeCode());
+			query = createQuery(hql);
+			query.setParameter("productTypeName"	, manageProductTypeBean.getProductTypeName());
+			query.setParameter("productTypeStatus"	, manageProductTypeBean.getProductTypeStatus());
+			query.setParameter("productTypeCode"	, manageProductTypeBean.getProductTypeCode());
+			query.setParameter("tin"				, manageProductTypeBean.getTin());
 			
 			query.executeUpdate();
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			logger.info(e.getMessage());
+			getLogger().error(e);
 			throw new EnjoyException("Error updateProductype");
 		}finally{
 			
 			hql									= null;
 			query 								= null;
-			logger.info("[updateProductype][End]");
+			getLogger().info("[updateProductype][End]");
 		}
 	}
 	
-	public int checkDupProductTypeCode(Session session, String productTypeCode) throws EnjoyException{
-		logger.info("[checkDupProductTypeCode][Begin]");
+	public int checkDupProductTypeCode(String productTypeCode, String tin) throws EnjoyException{
+		getLogger().info("[checkDupProductTypeCode][Begin]");
 		
-		String							hql									= null;
-		List<Integer>			 		list								= null;
-		SQLQuery 						query 								= null;
-		int 							result								= 0;
-		
+		String							hql						= null;
+		int 							result					= 0;
+		HashMap<String, Object>			param					= new HashMap<String, Object>();
+		List<Object>					resultList				= null;
 		
 		try{
-			hql				= "Select count(*) cou from productype where productTypeCode = '" + productTypeCode + "' and productTypeStatus = 'A'";
+			hql		= "select count(*) cou "
+					+ "	from productype "
+					+ "	where productTypeCode 		= :productTypeCode"
+					+ "		and tin					= :tin"
+					+ "		and productTypeStatus 	= 'A'";
 			
-			query			= session.createSQLQuery(hql);
+			//Criteria
+			param.put("productTypeCode"	, productTypeCode);
+			param.put("tin"				, tin);
+
+			resultList = getResult(hql, param, "cou", Constants.INT_TYPE);
 			
-			query.addScalar("cou"			, new IntegerType());
-			
-			list		 	= query.list();
-			
-			if(list!=null && list.size() > 0){
-				result = list.get(0);
+			if(resultList!=null && resultList.size() > 0){
+				result = EnjoyUtils.parseInt(resultList.get(0));
 			}
 			
-			logger.info("[checkDupProductTypeCode] result 			:: " + result);
+			getLogger().info("[checkDupProductTypeCode] result 			:: " + result);
 			
 			
 			
 		}catch(Exception e){
-			logger.info(e.getMessage());
+			getLogger().info(e.getMessage());
 			throw new EnjoyException(e.getMessage());
 		}finally{
-			
 			hql									= null;
-			list								= null;
-			query 								= null;
-			logger.info("[checkDupProductTypeCode][End]");
+			getLogger().info("[checkDupProductTypeCode][End]");
 		}
 		
 		return result;
 	}
 	
-	public int checkDupProductTypeName(Session session, String productTypeName) throws EnjoyException{
-		logger.info("[checkDupProductTypeCode][Begin]");
+	public int checkDupProductTypeName(String productTypeName, String tin) throws EnjoyException{
+		getLogger().info("[checkDupProductTypeCode][Begin]");
 		
-		String							hql									= null;
-		List<Integer>			 		list								= null;
-		SQLQuery 						query 								= null;
-		int 							result								= 0;
-		
+		String							hql						= null;
+		int 							result					= 0;
+		HashMap<String, Object>			param					= new HashMap<String, Object>();
+		List<Object>					resultList				= null;
 		
 		try{
-			hql				= "Select count(*) cou from productype where productTypeName = '" + productTypeName + "' and productTypeStatus = 'A'";
+			hql		= "select count(*) cou "
+					+ "	from productype "
+					+ "	where productTypeName 		= :productTypeName"
+					+ "		and tin					= :tin"
+					+ "		and productTypeStatus 	= 'A'";
 			
-			query			= session.createSQLQuery(hql);
+			//Criteria
+			param.put("productTypeName"	, productTypeName);
+			param.put("tin"				, tin);
+
+			resultList = getResult(hql, param, "cou", Constants.INT_TYPE);
 			
-			query.addScalar("cou"			, new IntegerType());
-			
-			list		 	= query.list();
-			
-			if(list!=null && list.size() > 0){
-				result = list.get(0);
+			if(resultList!=null && resultList.size() > 0){
+				result = EnjoyUtils.parseInt(resultList.get(0));
 			}
 			
-			logger.info("[checkDupProductTypeCode] result 			:: " + result);
-			
-			
+			getLogger().info("[checkDupProductTypeCode] result 			:: " + result);
 			
 		}catch(Exception e){
-			logger.info(e.getMessage());
+			getLogger().error(e);
 			throw new EnjoyException(e.getMessage());
 		}finally{
-			
 			hql									= null;
-			list								= null;
-			query 								= null;
-			logger.info("[checkDupProductTypeCode][End]");
+			getLogger().info("[checkDupProductTypeCode][End]");
 		}
 		
 		return result;
 	}
 	
-	public List<ComboBean> productTypeNameList(String productTypeName){
-		logger.info("[productTypeNameList][Begin]");
+	public List<ComboBean> productTypeNameList(String productTypeName, String tin){
+		getLogger().info("[productTypeNameList][Begin]");
 		
-		String 						hql			 		= null;
-        SessionFactory 				sessionFactory		= null;
-		Session 					session				= null;
-		SQLQuery 					query 				= null;
-		List<Object[]>				list				= null;
-		List<ComboBean>				comboList 			= null;
-		ComboBean					comboBean			= null;
+		String 							hql			 		= null;
+		List<ComboBean>					comboList 			= null;
+		ComboBean						comboBean			= null;
+		HashMap<String, Object>			param				= new HashMap<String, Object>();
+		List<String>					columnList			= new ArrayList<String>();
+		List<HashMap<String, Object>>	resultList			= null;
 		
 		try{
-			sessionFactory 		= HibernateUtil.getSessionFactory();
-			session 			= sessionFactory.openSession();
-			comboList			=  new ArrayList<ComboBean>();
-			hql 				= " select productTypeCode, productTypeName from productype where productTypeName like ('"+productTypeName+"%') and productTypeStatus = 'A' order by productTypeName asc limit 10 ";
+			comboList	=  new ArrayList<ComboBean>();
+			hql 		= "select productTypeCode, productTypeName "
+						+ "	from productype "
+						+ "	where productTypeName LIKE CONCAT(:productTypeName, '%')"
+						+ "		and	tin					= :tin"
+						+ "		and productTypeStatus 	= 'A' "
+						+ "	order by productTypeName asc limit 10 ";
 			
-			logger.info("[productTypeNameList] hql :: " + hql);
+			//Criteria
+			param.put("productTypeName"	, productTypeName);
+			param.put("tin"				, tin);
+
+			//Column select
+			columnList.add("productTypeCode");
+			columnList.add("productTypeName");
 			
-			query			= session.createSQLQuery(hql);
-			query.addScalar("productTypeCode"			, new StringType());
-			query.addScalar("productTypeName"			, new StringType());
+			resultList = getResult(hql, param, columnList);
 			
-			list		 	= query.list();
-			
-			logger.info("[getProductTypeList] list.size() :: " + list.size());
-			
-			for(Object[] row:list){
+			for(HashMap<String, Object> row:resultList){
 				comboBean 	= new ComboBean();
 				
-				logger.info("productTypeCode 		:: " + row[0]);
-				logger.info("productTypeName 		:: " + row[1]);
-				
-				comboBean.setCode				(EnjoyUtils.nullToStr(row[0]));
-				comboBean.setDesc				(EnjoyUtils.nullToStr(row[1]));
+				comboBean.setCode				(EnjoyUtils.nullToStr(row.get("productTypeCode")));
+				comboBean.setDesc				(EnjoyUtils.nullToStr(row.get("productTypeName")));
 				
 				comboList.add(comboBean);
 			}	
 			
 		}catch(Exception e){
 			e.printStackTrace();
+			getLogger().error(e);
 		}finally{
-			session.close();
-			sessionFactory	= null;
-			session			= null;
-			logger.info("[productTypeNameList][End]");
+			getLogger().info("[productTypeNameList][End]");
 		}
 		
 		return comboList;
 	}
 	
-	public String getProductTypeCode(String productTypeName){
-		logger.info("[getProductTypeCode][Begin]");
+	public String getProductTypeCode(String productTypeName, String tin){
+		getLogger().info("[getProductTypeCode][Begin]");
 		
-		String 						hql			 		= null;
-        SessionFactory 				sessionFactory		= null;
-		Session 					session				= null;
-		SQLQuery 					query 				= null;
-		List<String>			 	list				= null;
-        String						productTypeCode		= null;
+		String 							hql			 		= null;
+        String							productTypeCode		= null;
+        HashMap<String, Object>			param				= new HashMap<String, Object>();
+		List<Object>					resultList			= null;
 		
 		try{
-			sessionFactory 		= HibernateUtil.getSessionFactory();
-			session 			= sessionFactory.openSession();
-			hql 		= " select productTypeCode from productype where productTypeStatus = 'A' and productTypeName = '" + productTypeName + "'";
+			hql 	= "select productTypeCode "
+					+ "	from productype "
+					+ "	where productTypeStatus = 'A' "
+					+ "		and productTypeName = :productTypeName"
+					+ "		and tin				= :tin";
 			
-			logger.info("[getProductTypeCode] hql :: " + hql);
+			//Criteria
+			param.put("productTypeName"	, productTypeName);
+			param.put("tin"				, tin);
+
+			resultList = getResult(hql, param, "productTypeCode", Constants.STRING_TYPE);
 			
-			query			= session.createSQLQuery(hql);
-			query.addScalar("productTypeCode"			, new StringType());
-			
-			list		 	= query.list();
-			
-			if(list!=null && list.size() > 0){
-				productTypeCode = list.get(0);
+			if(resultList!=null && resultList.size() > 0){
+				productTypeCode = EnjoyUtils.nullToStr(resultList.get(0));
 			}
 			
 		}catch(Exception e){
 			e.printStackTrace();
+			getLogger().error(e);
 		}finally{
-			session.close();
-			sessionFactory	= null;
-			session			= null;
-			logger.info("[getProductTypeCode][End]");
+			getLogger().info("[getProductTypeCode][End]");
 		}
 		
 		return productTypeCode;
 	}
 	
 }
+
+

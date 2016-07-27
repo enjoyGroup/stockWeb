@@ -10,9 +10,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-
 import th.go.stock.app.enjoy.bean.ComboBean;
 import th.go.stock.app.enjoy.bean.CustomerDetailsBean;
 import th.go.stock.app.enjoy.bean.UserDetailsBean;
@@ -22,7 +19,6 @@ import th.go.stock.app.enjoy.form.CustomerDetailsLookUpForm;
 import th.go.stock.app.enjoy.main.Constants;
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
 import th.go.stock.app.enjoy.utils.EnjoyUtils;
-import th.go.stock.app.enjoy.utils.HibernateUtil;
 import th.go.stock.web.enjoy.common.EnjoyStandardSvc;
 import th.go.stock.web.enjoy.utils.EnjoyUtil;
 
@@ -83,6 +79,7 @@ public class CustomerDetailsLookUpServlet extends EnjoyStandardSvc {
  			e.printStackTrace();
  			logger.info(e.getMessage());
  		}finally{
+ 			destroySession();
  			logger.info("[execute][End]");
  		}
 	}
@@ -197,8 +194,6 @@ public class CustomerDetailsLookUpServlet extends EnjoyStandardSvc {
 	private void onSearch() throws EnjoyException{
 		logger.info("[onSearch][Begin]");
 		
-		SessionFactory 				sessionFactory		= null;
-		Session 					session				= null;
 		int							cou					= 0;
 		int							pageNum				= 1;
         int							totalPage			= 0;
@@ -212,22 +207,22 @@ public class CustomerDetailsLookUpServlet extends EnjoyStandardSvc {
     	String						sortBy				= null;
     	String						likeFlag			= null;
     	List<CustomerDetailsBean> 	dataList			= null;
+    	String						tin 				= null;
 
 		try{
-			find						= EnjoyUtils.nullToStr(this.request.getParameter("find"));
-			column						= EnjoyUtils.nullToStr(this.request.getParameter("column"));
-			orderBy						= EnjoyUtils.nullToStr(this.request.getParameter("orderBy"));
-			sortBy						= EnjoyUtils.nullToStr(this.request.getParameter("sortBy"));
-			likeFlag					= EnjoyUtils.chkBoxtoDb(this.request.getParameter("likeFlag"));
-			sessionFactory 				= HibernateUtil.getSessionFactory();
-			session 					= sessionFactory.openSession();			
-			session.beginTransaction();
+			find			= EnjoyUtils.nullToStr(this.request.getParameter("find"));
+			column			= EnjoyUtils.nullToStr(this.request.getParameter("column"));
+			orderBy			= EnjoyUtils.nullToStr(this.request.getParameter("orderBy"));
+			sortBy			= EnjoyUtils.nullToStr(this.request.getParameter("sortBy"));
+			likeFlag		= EnjoyUtils.chkBoxtoDb(this.request.getParameter("likeFlag"));
+			tin				= this.userBean.getTin();
 			
 			logger.info("[onSearch] find 	 	:: " + find);
 			logger.info("[onSearch] column 	 	:: " + column);
 			logger.info("[onSearch] orderBy 	:: " + orderBy);
 			logger.info("[onSearch] sortBy 	 	:: " + sortBy);
 			logger.info("[onSearch] likeFlag 	:: " + likeFlag);
+			logger.info("[onSearch] tin 		:: " + tin);
 			
 			this.form.setFind(find);
 			this.form.setColumn(column);
@@ -235,7 +230,7 @@ public class CustomerDetailsLookUpServlet extends EnjoyStandardSvc {
 			this.form.setSortBy(sortBy);
 			this.form.setLikeFlag(likeFlag);
 			
-			dataList = this.dao.getCustomerDetailsLookUpList(session, this.form);
+			dataList = this.dao.getCustomerDetailsLookUpList(this.form, tin);
 			
 			if(dataList.size() > 0){				
 				
@@ -285,10 +280,6 @@ public class CustomerDetailsLookUpServlet extends EnjoyStandardSvc {
 			logger.info(e.getMessage());
 			throw new EnjoyException("onSearch is error");
 		}finally{
-			session.close();
-			sessionFactory	= null;
-			session			= null;
-			
 			this.initialCombo();
 			logger.info("[onSearch][End]");
 		}
@@ -317,6 +308,21 @@ public class CustomerDetailsLookUpServlet extends EnjoyStandardSvc {
 		   }
 		   
 	   }
+
+	@Override
+	public void destroySession() {
+		this.dao.destroySession();
+	}
+
+	@Override
+	public void commit() {
+		this.dao.commit();
+	}
+
+	@Override
+	public void rollback() {
+		this.dao.rollback();
+	}
 	
 	
 	

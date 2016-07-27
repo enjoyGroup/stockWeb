@@ -12,6 +12,7 @@ public class ComparePriceBean {
 	private String quantity;
 	private String price;
 	private String rowStatus;
+	private String tin;
 	
 	public ComparePriceBean(){
 		this.productCode 		= "";
@@ -24,6 +25,7 @@ public class ComparePriceBean {
 		this.quantity 			= "0.00";
 		this.price 				= "0.00";
 		this.rowStatus			= "";
+		this.tin				= "";
 	}
 
 	public String getProductCode() {
@@ -104,5 +106,13 @@ public class ComparePriceBean {
 
 	public void setBranchName(String branchName) {
 		this.branchName = branchName;
+	}
+
+	public String getTin() {
+		return tin;
+	}
+
+	public void setTin(String tin) {
+		this.tin = tin;
 	}
 }

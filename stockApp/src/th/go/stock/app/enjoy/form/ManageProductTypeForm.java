@@ -12,9 +12,9 @@ public class ManageProductTypeForm {
 	public static final String DEL 	= "DEL";
 	
 	
-	private List<ManageProductTypeBean> 		productTypeList;
-	private String								errMsg;
-	private String								seqTemp;
+	private List<ManageProductTypeBean> 	productTypeList;
+	private String							errMsg;
+	private String							seqTemp;
 	
 	public ManageProductTypeForm(){
 		this.productTypeList		= new ArrayList<ManageProductTypeBean>();

@@ -77,6 +77,7 @@ public class CompanyVendorDisplayServlet extends EnjoyStandardSvc {
  			e.printStackTrace();
  			logger.info(e.getMessage());
  		}finally{
+ 			destroySession();
  			logger.info("[execute][End]");
  		}
 	}
@@ -84,26 +85,24 @@ public class CompanyVendorDisplayServlet extends EnjoyStandardSvc {
 	private void getDetail() throws EnjoyException{
 		logger.info("[getDetail][Begin]");
 		
-		SessionFactory 					sessionFactory				= null;
-		Session 						session						= null;
-		CompanyVendorBean 				companyVendorBean			= null;
-		CompanyVendorBean 				companyVendorBeanDb			= null;
-		String							vendorCode					= null;
+		CompanyVendorBean 	companyVendorBean			= null;
+		CompanyVendorBean 	companyVendorBeanDb			= null;
+		String				vendorCode					= null;
+		String				tinCompany 					= null;
 		
 		try{
-			sessionFactory 				= HibernateUtil.getSessionFactory();
-			session 					= sessionFactory.openSession();
-			vendorCode					= EnjoyUtil.nullToStr(request.getParameter("vendorCode"));
-			
-			session.beginTransaction();
+			vendorCode	= EnjoyUtil.nullToStr(request.getParameter("vendorCode"));
+			tinCompany	= this.userBean.getTin();;
 			
 			logger.info("[getDetail] vendorCode :: " + vendorCode);
+			logger.info("[getDetail] tinCompany :: " + tinCompany);
 			
 			this.form.setTitlePage("รายละเอียดผู้จำหน่าย");
 			
 			companyVendorBean = new CompanyVendorBean();
 			companyVendorBean.setVendorCode(vendorCode);
-			companyVendorBeanDb					= this.dao.getCompanyVendor(session, companyVendorBean);
+			companyVendorBean.setTinCompany(tinCompany);
+			companyVendorBeanDb					= this.dao.getCompanyVendor(companyVendorBean);
 			
 			this.form.setCompanyVendorBean		(companyVendorBeanDb);
 			
@@ -113,13 +112,24 @@ public class CompanyVendorDisplayServlet extends EnjoyStandardSvc {
 			logger.info(e.getMessage());
 			throw new EnjoyException("getDetail is error");
 		}finally{
-			session.close();
-			
-			sessionFactory	= null;
-			session			= null;
 			logger.info("[getDetail][End]");
 		}
 		
+	}
+
+	@Override
+	public void destroySession() {
+		this.dao.destroySession();
+	}
+
+	@Override
+	public void commit() {
+		this.dao.commit();
+	}
+
+	@Override
+	public void rollback() {
+		this.dao.commit();
 	}
 	   	
 }

@@ -22,6 +22,7 @@ public class CompanyVendorBean {
 	private String fax;
 	private String email;
 	private String remark;
+	private String tinCompany;
 	
 	public CompanyVendorBean(){
 		this.vendorCode 				= "";
@@ -44,6 +45,7 @@ public class CompanyVendorBean {
 		this.fax 						= "";
 		this.email 						= "";
 		this.remark 					= "";
+		this.tinCompany					= "";
 	}
 
 	public String getVendorCode() {
@@ -261,5 +263,13 @@ public class CompanyVendorBean {
 		}
 		
 		return address;
+	}
+
+	public String getTinCompany() {
+		return tinCompany;
+	}
+
+	public void setTinCompany(String tinCompany) {
+		this.tinCompany = tinCompany;
 	}
 }

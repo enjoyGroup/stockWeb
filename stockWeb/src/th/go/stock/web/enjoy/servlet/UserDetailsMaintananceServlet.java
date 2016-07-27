@@ -1,5 +1,8 @@
 package th.go.stock.web.enjoy.servlet;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutput;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,20 +12,22 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.json.simple.JSONObject;
 
 import th.go.stock.app.enjoy.bean.ComboBean;
+import th.go.stock.app.enjoy.bean.RefconstantcodeBean;
+import th.go.stock.app.enjoy.bean.RelationUserAndCompanyBean;
 import th.go.stock.app.enjoy.bean.UserDetailsBean;
 import th.go.stock.app.enjoy.dao.CompanyDetailsDao;
+import th.go.stock.app.enjoy.dao.RefconstantcodeDao;
+import th.go.stock.app.enjoy.dao.RelationUserAndCompanyDao;
 import th.go.stock.app.enjoy.dao.UserDetailsDao;
 import th.go.stock.app.enjoy.exception.EnjoyException;
 import th.go.stock.app.enjoy.form.UserDetailsMaintananceForm;
 import th.go.stock.app.enjoy.main.Constants;
+import th.go.stock.app.enjoy.pdf.ViewPdfMainForm;
 import th.go.stock.app.enjoy.utils.EnjoyEncryptDecrypt;
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
-import th.go.stock.app.enjoy.utils.HibernateUtil;
 import th.go.stock.app.enjoy.utils.SendMail;
 import th.go.stock.web.enjoy.common.EnjoyStandardSvc;
 import th.go.stock.web.enjoy.utils.EnjoyUtil;
@@ -41,6 +46,8 @@ public class UserDetailsMaintananceServlet extends EnjoyStandardSvc {
     private UserDetailsBean             userBean                    = null;
     private UserDetailsDao				dao							= null;
     private CompanyDetailsDao			companyDetailsDao			= null;
+    private RelationUserAndCompanyDao	relationUserAndCompanyDao	= null;
+    private RefconstantcodeDao			refconstantcodeDao			= null;
     private UserDetailsMaintananceForm	form						= null;
     
 	@Override
@@ -56,15 +63,17 @@ public class UserDetailsMaintananceServlet extends EnjoyStandardSvc {
          String pageAction = null; 
  		
  		try{
- 			 pageAction 				= EnjoyUtil.nullToStr(request.getParameter("pageAction"));
- 			 this.enjoyUtil 			= new EnjoyUtil(request, response);
- 			 this.request            	= request;
-             this.response           	= response;
-             this.session            	= request.getSession(false);
-             this.userBean           	= (UserDetailsBean)session.getAttribute("userBean");
-             this.form               	= (UserDetailsMaintananceForm)session.getAttribute(FORM_NAME);
-             this.dao					= new UserDetailsDao();
-             this.companyDetailsDao		= new CompanyDetailsDao();
+ 			 pageAction 					= EnjoyUtil.nullToStr(request.getParameter("pageAction"));
+ 			 this.enjoyUtil 				= new EnjoyUtil(request, response);
+ 			 this.request            		= request;
+             this.response           		= response;
+             this.session            		= request.getSession(false);
+             this.userBean           		= (UserDetailsBean)session.getAttribute("userBean");
+             this.form               		= (UserDetailsMaintananceForm)session.getAttribute(FORM_NAME);
+             this.dao						= new UserDetailsDao();
+             this.companyDetailsDao			= new CompanyDetailsDao();
+             this.relationUserAndCompanyDao = new RelationUserAndCompanyDao();
+             this.refconstantcodeDao		= new RefconstantcodeDao();
  			
              logger.info("[execute] pageAction : " + pageAction );
              
@@ -76,12 +85,14 @@ public class UserDetailsMaintananceServlet extends EnjoyStandardSvc {
  			}else if(pageAction.equals("getUserDetail")){
  				this.onGetUserDetail(0);
  				request.setAttribute("target", Constants.PAGE_URL +"/UserDetailsMaintananceScn.jsp");
- 			}else if(pageAction.equals("checkDupUserId")){
- 				this.checkDupUserId();
+ 			}else if(pageAction.equals("checkDupUserEmail")){
+ 				this.checkDupUserEmail();
  			}else if(pageAction.equals("save")){
  				this.onSave();
  			}else if(pageAction.equals("resetPass")){
  				this.resetPass();
+ 			}else if(pageAction.equals("genPdf")){
+ 				this.genPdf();
  			}
  			
  			session.setAttribute(FORM_NAME, this.form);
@@ -92,6 +103,7 @@ public class UserDetailsMaintananceServlet extends EnjoyStandardSvc {
  			e.printStackTrace();
  			logger.info(e.getMessage());
  		}finally{
+ 			destroySession();
  			logger.info("[execute][End]");
  		}
 	}
@@ -99,8 +111,12 @@ public class UserDetailsMaintananceServlet extends EnjoyStandardSvc {
 	private void onLoad() throws EnjoyException{
 		logger.info("[onLoad][Begin]");
 		
+		RefconstantcodeBean refconstantcodeBean = null;
+		
 		try{
+			refconstantcodeBean = refconstantcodeDao.getDetail(Constants.SEND_MAIL_ID, this.userBean.getTin());
 			
+			this.form.setSendMailFlag(refconstantcodeBean.getCodeDisplay());
 			this.form.getUserDetailsBean().setUserStatus("A");
 			this.setRefference();
 			
@@ -125,7 +141,6 @@ public class UserDetailsMaintananceServlet extends EnjoyStandardSvc {
 		try{
 			this.setStatusCombo();
 			this.form.setUserprivilegeList(this.dao.getUserprivilege());
-			this.setCompanyCombo();
 			
 		}catch(EnjoyException e){
 			throw new EnjoyException(e.getMessage());
@@ -157,47 +172,23 @@ public class UserDetailsMaintananceServlet extends EnjoyStandardSvc {
 		}
 	}
 	
-	private void setCompanyCombo() throws EnjoyException{
-		
-		List<ComboBean> 	comboList		= new ArrayList<ComboBean>();
-		List<ComboBean> 	comboListDb		= null;
-		
-		try{
-			comboListDb = this.companyDetailsDao.getCompanyCombo();
-			
-//			comboList.add(new ComboBean("", "กรุณาระบุ"));
-			for(ComboBean bean:comboListDb){
-				comboList.add(new ComboBean(bean.getCode(), bean.getDesc()));
-			}
-			
-			this.form.setCompanyCombo(comboList);
-			
-		}catch(Exception e){
-			logger.error(e);
-			throw new EnjoyException("setCompanyCombo is error");
-		}
-	}
-	
 	private void onGetUserDetail(int userUniqueId) throws EnjoyException{
 		logger.info("[onGetUserDetail][Begin]");
 		
-		UserDetailsBean 	userdetailDb	= null;
-		SessionFactory 		sessionFactory	= null;
-		Session 			session			= null;
+		UserDetailsBean 	userdetailDb		= null;
+		RefconstantcodeBean refconstantcodeBean = null;
 		
 		try{
-			sessionFactory 				= HibernateUtil.getSessionFactory();
-			session 					= sessionFactory.openSession();
-			
-			session.beginTransaction();
-			
 			if(userUniqueId==0){
 				userUniqueId 				= EnjoyUtil.nullToStr(request.getParameter("userUniqueId")).equals("")?0:Integer.parseInt(request.getParameter("userUniqueId"));
 			}
 			
 			logger.info("[onGetUserDetail] userUniqueId :: " + userUniqueId);
 			
-			userdetailDb				= this.dao.getUserdetail(session, userUniqueId);
+			userdetailDb		= this.dao.getUserdetail(userUniqueId);
+			refconstantcodeBean = refconstantcodeDao.getDetail(Constants.SEND_MAIL_ID, this.userBean.getTin());
+			
+			this.form.setSendMailFlag(refconstantcodeBean.getCodeDisplay());
 			
 			this.form.setTitlePage("แก้ไขผู้ใช้งานระบบ");
 			this.form.setPageMode(UserDetailsMaintananceForm.EDIT);
@@ -213,44 +204,36 @@ public class UserDetailsMaintananceServlet extends EnjoyStandardSvc {
 		}catch(EnjoyException e){
 			throw new EnjoyException(e.getMessage());
 		}catch(Exception e){
-			logger.info(e.getMessage());
+			e.printStackTrace();
+			logger.error(e);
 			throw new EnjoyException("onGetUserDetail is error");
 		}finally{
-			session.close();
-			
 			this.setRefference();
-			
-			sessionFactory	= null;
-			session			= null;
 			logger.info("[onGetUserDetail][End]");
 		}
 		
 	}
 	
-	private void checkDupUserId() throws EnjoyException{
-		logger.info("[checkDupUserId][Begin]");
+	private void checkDupUserEmail() throws EnjoyException{
+		logger.info("[checkDupUserEmail][Begin]");
 		
-		String 				userId 			= null;
+		String 				userEmail 		= null;
 		int 				cou				= 0;
-		SessionFactory 		sessionFactory	= null;
-		Session 			session			= null;
 		JSONObject 			obj 			= null;
 		String				pageMode		= null;
 		int					userUniqueId	= 0;
 		
 		try{
-			sessionFactory 				= HibernateUtil.getSessionFactory();
-			session 					= sessionFactory.openSession();
-			userId 						= EnjoyUtil.nullToStr(request.getParameter("userId"));
-			pageMode 					= EnjoyUtil.nullToStr(request.getParameter("pageMode"));
-			userUniqueId 				= EnjoyUtil.parseInt(request.getParameter("userUniqueId"));
+			userEmail 			= EnjoyUtil.nullToStr(request.getParameter("userEmail"));
+			pageMode 			= EnjoyUtil.nullToStr(request.getParameter("pageMode"));
+			userUniqueId 		= EnjoyUtil.parseInt(request.getParameter("userUniqueId"));
 			
-			logger.info("[checkDupUserId] userId 		:: " + userId);
-			logger.info("[checkDupUserId] pageMode 		:: " + pageMode);
-			logger.info("[checkDupUserId] userUniqueId 	:: " + userUniqueId);
+			logger.info("[checkDupUserEmail] userEmail 	:: " + userEmail);
+			logger.info("[checkDupUserEmail] pageMode 		:: " + pageMode);
+			logger.info("[checkDupUserEmail] userUniqueId 	:: " + userUniqueId);
 			
 			
-			cou							= this.dao.checkDupUserId(session, userId, pageMode, userUniqueId);
+			cou							= this.dao.checkDupUserEmail(userEmail, pageMode, userUniqueId);
 			obj 						= new JSONObject();
 			
 			obj.put(STATUS, 		SUCCESS);
@@ -264,15 +247,11 @@ public class UserDetailsMaintananceServlet extends EnjoyStandardSvc {
 			logger.info(e.getMessage());
 			
 			obj.put(STATUS, 		ERROR);
-			obj.put(ERR_MSG, 		"checkDupUserId is error");
+			obj.put(ERR_MSG, 		"checkDupUserEmail is error");
 		}finally{
-			session.close();
-			sessionFactory	= null;
-			session			= null;
-			
 			this.enjoyUtil.writeMSG(obj.toString());
 			
-			logger.info("[checkDupUserId][End]");
+			logger.info("[checkDupUserEmail][End]");
 		}
 		
 	}
@@ -281,34 +260,32 @@ public class UserDetailsMaintananceServlet extends EnjoyStandardSvc {
 	private void onSave() throws EnjoyException{
 		logger.info("[onSave][Begin]");
 		
-		String				pageMode			= null;
-		int					userUniqueId		= 0;
-		String				userName			= null;
-		String				userSurname			= null;
-		String 				userId 				= null;
-		String				userEmail			= null;
-		String				userStatus			= null;
-		String				flagChangePassword 	= null;
-		String				flagAlertStock 		= null;
-		String				flagSalesman 		= null;
-		String				commission 			= null;
-		String				remark 				= null;
-		String				userPrivilege		= null;
-		String				pwd					= null;
-		String				pwdEncypt			= null;
-		String				userLevel			= null;
-		SessionFactory 		sessionFactory		= null;
-		Session 			session				= null;
-		JSONObject 			obj 				= null;
-		UserDetailsBean 	userDetailsBean		= null;
-		SendMail			sendMail			= null;
-		String				fullName			= null;
+		String						pageMode					= null;
+		int							userUniqueId				= 0;
+		String						userName					= null;
+		String						userSurname					= null;
+		String						userEmail					= null;
+		String						userStatus					= null;
+		String						flagChangePassword 			= null;
+		String						flagAlertStock 				= null;
+		String						flagSalesman 				= null;
+		String						commission 					= null;
+		String						remark 						= null;
+		String						userPrivilege				= null;
+		String						pwd							= null;
+		String						pwdEncypt					= null;
+		String						userLevel					= null;
+		JSONObject 					obj 						= null;
+		UserDetailsBean 			userDetailsBean				= null;
+		SendMail					sendMail					= null;
+		String						fullName					= null;
+		RelationUserAndCompanyBean 	relationUserAndCompanyBean 	= null;
+		String						sendMailFlag				= null;
 		
 		try{
 			pageMode 					= EnjoyUtil.nullToStr(request.getParameter("pageMode"));
 			userName 					= EnjoyUtil.nullToStr(request.getParameter("userName"));
 			userSurname 				= EnjoyUtil.nullToStr(request.getParameter("userSurname"));
-			userId 						= EnjoyUtil.nullToStr(request.getParameter("userId"));
 			userEmail 					= EnjoyUtil.nullToStr(request.getParameter("userEmail"));
 			userStatus 					= EnjoyUtil.nullToStr(request.getParameter("userStatus"));
 			flagChangePassword 			= EnjoyUtil.chkBoxtoDb(request.getParameter("flagChangePassword"));
@@ -318,17 +295,14 @@ public class UserDetailsMaintananceServlet extends EnjoyStandardSvc {
 			remark 						= EnjoyUtil.nullToStr(request.getParameter("remark"));
 			userPrivilege 				= EnjoyUtil.nullToStr(request.getParameter("hidUserPrivilege"));
 			userUniqueId 				= EnjoyUtil.parseInt(request.getParameter("userUniqueId"));
+			sendMailFlag 				= EnjoyUtil.nullToStr(request.getParameter("sendMailFlag"));
 			userLevel					= userPrivilege.indexOf("R01") > -1?"9":"1";
-			sessionFactory 				= HibernateUtil.getSessionFactory();
-			session 					= sessionFactory.openSession();
 			obj 						= new JSONObject();
 			userDetailsBean				= new UserDetailsBean();
-			sendMail					= new SendMail();
 			
 			logger.info("[onSave] pageMode 				:: " + pageMode);
 			logger.info("[onSave] userName 				:: " + userName);
 			logger.info("[onSave] userSurname 			:: " + userSurname);
-			logger.info("[onSave] userId 				:: " + userId);
 			logger.info("[onSave] userEmail 			:: " + userEmail);
 			logger.info("[onSave] userStatus 			:: " + userStatus);
 			logger.info("[onSave] flagChangePassword 	:: " + flagChangePassword);
@@ -341,10 +315,10 @@ public class UserDetailsMaintananceServlet extends EnjoyStandardSvc {
 			logger.info("[onSave] pwd 					:: " + pwd);
 			logger.info("[onSave] pwdEncypt 			:: " + pwdEncypt);
 			logger.info("[onSave] userLevel 			:: " + userLevel);
+			logger.info("[onSave] sendMailFlag 			:: " + sendMailFlag);
 			
 			userDetailsBean.setUserName(userName);
 			userDetailsBean.setUserSurname(userSurname);
-			userDetailsBean.setUserId(userId);
 			userDetailsBean.setUserEmail(userEmail);
 			userDetailsBean.setUserStatus(userStatus);
 			userDetailsBean.setFlagChangePassword(flagChangePassword);
@@ -356,63 +330,62 @@ public class UserDetailsMaintananceServlet extends EnjoyStandardSvc {
 			userDetailsBean.setUserUniqueId(userUniqueId);
 			userDetailsBean.setUserLevel(userLevel);
 			
-			session.beginTransaction();
-			
 			if(pageMode.equals(UserDetailsMaintananceForm.NEW)){
 				
 				//Random new password (8 chars)
 				pwd							= EnjoyUtil.genPassword(8);
 				
-				//Encypt password
-				pwdEncypt					= EnjoyEncryptDecrypt.enCryption(userId, pwd);
+				//Encrypt password
+				pwdEncypt					= EnjoyEncryptDecrypt.enCryption(userEmail, pwd);
 				userDetailsBean.setPwd(pwdEncypt);
 				
-				this.dao.insertNewUser(session, userDetailsBean);
+				this.dao.insertNewUser(userDetailsBean);
+				
+				userUniqueId = this.dao.lastId();
+				
+				//ไม่ใช่ user admin enjoy ให้ insert ลง table relationuserncompany ด้วย
+				if(this.userBean.getUserUniqueId()!=1){
+					relationUserAndCompanyBean = new RelationUserAndCompanyBean();
+					relationUserAndCompanyBean.setUserUniqueId(String.valueOf(userUniqueId));
+					relationUserAndCompanyBean.setTin(this.userBean.getTin());
+					
+					relationUserAndCompanyDao.insertRelationUserAndCompany(relationUserAndCompanyBean);
+				}
 				
 				/*Begin send new password to email*/
 				fullName = userName + " " + userSurname;
-				sendMail.sendMail(fullName, userId, pwd, userEmail);
+				if("Y".equals(sendMailFlag)){
+					sendMail = new SendMail();
+					sendMail.sendMail(fullName, userEmail, pwd, userEmail);
+				}
 				/*End send new password to email*/
 				
 			}else{
-				this.dao.updateUserDetail(session, userDetailsBean);
+				this.dao.updateUserDetail(userDetailsBean);
 			}
 			
-			
-			
-			session.getTransaction().commit();
-			
-			if(pageMode.equals(UserDetailsMaintananceForm.NEW)){
-				session = sessionFactory.openSession();
-				userUniqueId = this.dao.lastId(session);
-			}
+			commit();
 			
 			logger.info("[onSave] After Save userUniqueId 			:: " + userUniqueId);
 			
-			obj.put(STATUS, 			SUCCESS);
-			obj.put("userUniqueId", 	userUniqueId);
+			obj.put(STATUS			,SUCCESS);
+			obj.put("userUniqueId"	,userUniqueId);
+			obj.put("fullName"		,fullName);
+			obj.put("userEmail"		,userEmail);
+			obj.put("pwd"			,pwd);
 			
 		}catch(EnjoyException e){
-			session.getTransaction().rollback();
+			rollback();
 			obj.put(STATUS, 		ERROR);
 			obj.put(ERR_MSG, 		e.getMessage());
 		}catch(Exception e){
-			session.getTransaction().rollback();
+			rollback();
 			logger.info(e.getMessage());
 			e.printStackTrace();
 			obj.put(STATUS, 		ERROR);
 			obj.put(ERR_MSG, 		"onSave is error");
 		}finally{
-			
-			session.flush();
-			session.clear();
-			session.close();
-			
-//			this.onGetUserDetail(userUniqueId);
 			this.enjoyUtil.writeMSG(obj.toString());
-			
-			sessionFactory	= null;
-			session			= null;
 			
 			logger.info("[onSave][End]");
 		}
@@ -424,79 +397,134 @@ public class UserDetailsMaintananceServlet extends EnjoyStandardSvc {
 		int					userUniqueId		= 0;
 		String				userName			= null;
 		String				userSurname			= null;
-		String 				userId 				= null;
 		String				userEmail			= null;
 		String				pwd					= null;
 		String				pwdEncypt			= null;
-		SessionFactory 		sessionFactory		= null;
-		Session 			session				= null;
 		JSONObject 			obj 				= null;
 		UserDetailsBean 	userDetailsBean		= null;
 		SendMail			sendMail			= null;
 		String				fullName			= null;
+		String				sendMailFlag		= null;
 		
 		try{
 			userName 					= EnjoyUtil.nullToStr(request.getParameter("userName"));
 			userSurname 				= EnjoyUtil.nullToStr(request.getParameter("userSurname"));
-			userId 						= EnjoyUtil.nullToStr(request.getParameter("userId"));
 			userEmail 					= EnjoyUtil.nullToStr(request.getParameter("userEmail"));
 			userUniqueId 				= EnjoyUtil.parseInt(request.getParameter("userUniqueId"));
-			sessionFactory 				= HibernateUtil.getSessionFactory();
-			session 					= sessionFactory.openSession();
+			sendMailFlag 				= EnjoyUtil.nullToStr(request.getParameter("sendMailFlag"));
 			obj 						= new JSONObject();
 			userDetailsBean				= new UserDetailsBean();
-			sendMail					= new SendMail();
 			
-			logger.info("[onSave] userId 				:: " + userId);
 			logger.info("[onSave] userEmail 			:: " + userEmail);
 			logger.info("[onSave] userUniqueId 			:: " + userUniqueId);
+			logger.info("[onSave] sendMailFlag 			:: " + sendMailFlag);
 			
 			//Random new password (8 chars)
 			pwd							= EnjoyUtil.genPassword(8);
 			
 			//Encypt password
-			pwdEncypt					= EnjoyEncryptDecrypt.enCryption(userId, pwd);
+			pwdEncypt					= EnjoyEncryptDecrypt.enCryption(userEmail, pwd);
 			userDetailsBean.setUserUniqueId(userUniqueId);
 			userDetailsBean.setPwd(pwdEncypt);
 			
-			session.beginTransaction();
-			
-			this.dao.changePassword(session, userDetailsBean);
+			this.dao.changePassword(userDetailsBean);
 			
 			/*Begin send new password to email*/
 			fullName = userName + " " + userSurname;
-			sendMail.sendMail(fullName, userId, pwd, userEmail);
+			
+			if("Y".equals(sendMailFlag)){
+				sendMail = new SendMail();
+				sendMail.sendMail(fullName, userEmail, pwd, userEmail);
+			}
 			/*End send new password to email*/
 			
+			commit();
 			
-			
-			session.getTransaction().commit();
-			
-			obj.put(STATUS, 			SUCCESS);
+			obj.put(STATUS			,SUCCESS);
+			obj.put("userUniqueId"	,userUniqueId);
+			obj.put("fullName"		,fullName);
+			obj.put("userEmail"		,userEmail);
+			obj.put("pwd"			,pwd);
 			
 		}catch(EnjoyException e){
-			session.getTransaction().rollback();
+			rollback();
 			obj.put(STATUS, 		ERROR);
 			obj.put(ERR_MSG, 		e.getMessage());
 		}catch(Exception e){
-			session.getTransaction().rollback();
+			rollback();
 			logger.info(e.getMessage());
 			e.printStackTrace();
 			obj.put(STATUS, 		ERROR);
 			obj.put(ERR_MSG, 		"resetPass is error");
 		}finally{
-			
-			session.flush();
-			session.clear();
-			session.close();
-			
 			this.enjoyUtil.writeMSG(obj.toString());
-			
-			sessionFactory	= null;
-			session			= null;
-			
 			logger.info("[resetPass][End]");
 		}
+	}
+	
+	private void genPdf(){
+		logger.info("[genPdf][Begin]");
+		
+		JSONObject 				obj 						= new JSONObject();
+		ViewPdfMainForm			viewPdfMainForm				= new ViewPdfMainForm();
+		DataOutput 				output 						= null;
+		ByteArrayOutputStream	buffer						= null;
+		byte[] 					bytes						= null;
+		String 					fullName 					= null;
+		String 					userEmail 					= null;
+		String 					pwd 						= null;
+		
+		try{
+			fullName 		= EnjoyUtil.nullToStr(request.getParameter("fullName"));
+			userEmail 			= EnjoyUtil.nullToStr(request.getParameter("userEmail"));
+			pwd 			= EnjoyUtil.nullToStr(request.getParameter("pwd"));
+			
+			obj.put("fullName"	,fullName);
+			obj.put("userEmail"	,userEmail);
+			obj.put("pwd"		,pwd);
+			
+			String pdfName = "UserDetailPdfForm";
+			buffer = viewPdfMainForm.writeTicketPDF(pdfName, obj, this.form.getTitlePage());
+			
+			response.setContentType( "application/pdf" );
+			response.setHeader("Content-Disposition", "filename=".concat(String.valueOf(pdfName+".pdf")));
+			output 	= new DataOutputStream( this.response.getOutputStream() );
+			bytes 	= buffer.toByteArray();
+	
+			this.response.setContentLength(bytes.length);
+			for( int i = 0; i < bytes.length; i++ ) { 
+				output.writeByte( bytes[i] ); 
+			}
+			
+		}catch(Exception e){
+			
+		}finally{
+			logger.info("[genPdf][End]");
+		}
+	}
+
+	@Override
+	public void destroySession() {
+		this.dao.destroySession();
+        this.companyDetailsDao.destroySession();
+        this.relationUserAndCompanyDao.destroySession();
+        this.refconstantcodeDao.destroySession();
+	}
+
+	@Override
+	public void commit() {
+		this.dao.commit();
+        this.companyDetailsDao.commit();
+        this.relationUserAndCompanyDao.commit();
+        this.refconstantcodeDao.commit();
+	}
+
+	@Override
+	public void rollback() {
+		this.dao.rollback();
+        this.companyDetailsDao.rollback();
+        this.relationUserAndCompanyDao.rollback();
+        this.refconstantcodeDao.rollback();
 	}
 	
 	

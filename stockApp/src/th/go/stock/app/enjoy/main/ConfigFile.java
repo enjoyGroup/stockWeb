@@ -12,8 +12,9 @@ public class ConfigFile {
 	private static final String PADING_RECIVE_NO   	= "pading.reciveNo";
 	private static final String PADING_INVOICE_CODE = "pading.invoiceCode";
 	private static final String PATH_LOG   			= "path.log";
-	private static final String OPEN_LOG   			= "open.log";
+	private static final String OPEN_LOG   			= "open.log";//company
 	private static final String VAT   				= "system.vat";
+	private static final String ENJOY_NAME   		= "enjoyname";
 	private static ConfigFile configFile;
 	private static Properties properties ;
 	
@@ -67,5 +68,8 @@ public class ConfigFile {
 	}
 	public static String getVat() {
 		return getText(VAT);
+	}
+	public static String getEnjoyName() {
+		return getText(ENJOY_NAME);
 	}
 }

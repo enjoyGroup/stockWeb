@@ -1,7 +1,6 @@
 package th.go.stock.app.enjoy.model;
 
 import java.io.Serializable;
-
 import javax.persistence.*;
 
 
@@ -14,8 +13,8 @@ import javax.persistence.*;
 public class Customer implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	@Id
-	private String cusCode;
+	@EmbeddedId
+	private CustomerPK id;
 
 	private String birthDate;
 
@@ -74,12 +73,12 @@ public class Customer implements Serializable {
 	public Customer() {
 	}
 
-	public String getCusCode() {
-		return cusCode;
+	public CustomerPK getId() {
+		return this.id;
 	}
 
-	public void setCusCode(String cusCode) {
-		this.cusCode = cusCode;
+	public void setId(CustomerPK id) {
+		this.id = id;
 	}
 
 	public String getBirthDate() {

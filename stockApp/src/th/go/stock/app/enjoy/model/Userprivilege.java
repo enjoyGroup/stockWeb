@@ -15,6 +15,9 @@ public class Userprivilege implements Serializable {
 
 	@Id
 	private String privilegeCode;
+	
+	@Column(name="flagDispaly",columnDefinition="char(1)")
+	private String flagDispaly;
 
 	private String pagesCode;
 
@@ -29,6 +32,14 @@ public class Userprivilege implements Serializable {
 
 	public void setPrivilegeCode(String privilegeCode) {
 		this.privilegeCode = privilegeCode;
+	}
+
+	public String getFlagDispaly() {
+		return this.flagDispaly;
+	}
+
+	public void setFlagDispaly(String flagDispaly) {
+		this.flagDispaly = flagDispaly;
 	}
 
 	public String getPagesCode() {
