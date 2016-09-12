@@ -56,8 +56,10 @@ public class UserDetailPdfForm extends EnjoyItext implements PdfFormService {
 		JSONObject 	jsonObjectMain  = this.formDataObj;
 		
 		table.addCell(setCellWB("เรียนคุณ " + getText(jsonObjectMain, "fullName"), getFont8(), 1, Element.ALIGN_LEFT, 0));
-		table.addCell(setCellWB("E-mail : " + getText(jsonObjectMain, "userEmail"), getFont8(), 1, Element.ALIGN_LEFT, 0));
+		table.addCell(setCellWB("User : " + getText(jsonObjectMain, "userEmail"), getFont8(), 1, Element.ALIGN_LEFT, 0));
 		table.addCell(setCellWB("Password : " + getText(jsonObjectMain, "pwd"), getFont8(), 1, Element.ALIGN_LEFT, 0));
+		table.addCell(setCellWB("", getFont8(), 1, Element.ALIGN_LEFT, 0));
+		table.addCell(setCellWB("***กรุณาเก็บ user และ password เอาไว้สำหรับใช้ในการเข้าระบบในครั้งต่อไป", getFont8(), 1, Element.ALIGN_LEFT, 0));
 		
 		table.setWidthPercentage(100);
 	

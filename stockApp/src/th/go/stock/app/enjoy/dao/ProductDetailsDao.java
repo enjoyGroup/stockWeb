@@ -429,6 +429,9 @@ public class ProductDetailsDao extends DaoControl{
 		    
 		    hql 		= "";
 		    param		= new HashMap<String, Object>();
+		    
+		    getLogger().info("[productNameList] productTypeCode  :: " + productTypeCode);
+		    getLogger().info("[productNameList] productGroupCode :: " + productGroupCode);
 			
 		    if(productTypeCode!=null && productGroupCode!=null){
 		    	hql = " select productCode, productName"
@@ -469,8 +472,6 @@ public class ProductDetailsDao extends DaoControl{
 		    	}
 		    }
 		    
-		    getLogger().info("[productGroupNameList] hql :: " + hql);
-		    
 	    	if(!hql.equals("")){
 	    		//Column select
 				columnList.add("productCode");
@@ -491,9 +492,9 @@ public class ProductDetailsDao extends DaoControl{
 		}catch(Exception e){
 			e.printStackTrace();
 			getLogger().error(e);
-			throw new EnjoyException("productGroupNameList error");
+			throw new EnjoyException("productNameList error");
 		}finally{
-			getLogger().info("[productGroupNameList][End]");
+			getLogger().info("[productNameList][End]");
 		}
 		
 		return comboList;

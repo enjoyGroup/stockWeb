@@ -137,6 +137,7 @@
 		function lp_validate(){
 			var la_validate             = new Array("vendorName:บริษัท"	
 													, "branchName:สาขา"
+													, "tin:เลขประจำตัวผู้เสียภาษี"
 													, "provinceName:จังหวัด"
 													, "districtName:อำเภอ/เขต"
 													, "subdistrictName:ตำบล/แขวง"
@@ -384,7 +385,7 @@
 						<section class="vbox">
 							<section class="scrollable padder">
 							<div class="alert alert-block alert-error fade in container">
-								<h4 class="alert-heading">เพิ่มลูกค้า/พนักงานขาย</h4>
+								<h4 class="alert-heading">เพิ่มลูกค้า/บริษัทสั่งซื้อ</h4>
 							</div>					          	
 							<div class="container main-container round-sm padding-xl-h">
 								<div class="col-sm-12 toppad" >
@@ -421,7 +422,7 @@
 								        	</tr>
 								        	<tr>
 							        			<td align="right">
-													เลขประจำตัวผู้เสียภาษี :
+													เลขประจำตัวผู้เสียภาษี<span style="color: red;"><b>*</b></span> :
 												</td>
 							        			<td align="left" colspan="5">
 							        				<input  type="text" 

@@ -51,40 +51,24 @@ public class CompanyVendorDao extends DaoControl {
 			//Criteria
 			param.put("tinCompany"	, companyVendorBean.getTinCompany());
 			
-			if(!companyVendorBean.getVendorName().equals("***")){
-				if(companyVendorBean.getVendorName().equals("")){
-					hql += " and (a.vendorName is null or a.vendorName = '')";
-				}else{
-					hql += " and a.vendorName LIKE CONCAT(:vendorName, '%')";
-					param.put("vendorName"	, companyVendorBean.getVendorName());
-				}
+			if(!companyVendorBean.getVendorName().equals("")){
+				hql += " and a.vendorName LIKE CONCAT(:vendorName, '%')";
+				param.put("vendorName"	, companyVendorBean.getVendorName());
 			}
 			
-			if(!companyVendorBean.getBranchName().equals("***")){
-				if(companyVendorBean.getBranchName().equals("")){
-					hql += " and (a.branchName is null or a.branchName = '')";
-				}else{
-					hql += " and a.branchName LIKE CONCAT(:branchName, '%')";
-					param.put("branchName"	, companyVendorBean.getBranchName());
-				}
+			if(!companyVendorBean.getBranchName().equals("")){
+				hql += " and a.branchName LIKE CONCAT(:branchName, '%')";
+				param.put("branchName"	, companyVendorBean.getBranchName());
 			}
 			
-			if(!companyVendorBean.getTin().equals("***")){
-				if(companyVendorBean.getTin().equals("")){
-					hql += " and (a.tin is null or a.tin = '')";
-				}else{
-					hql += " and a.tin LIKE CONCAT(:tin, '%')";
-					param.put("tin"	, companyVendorBean.getTin());
-				}
+			if(!companyVendorBean.getTin().equals("")){
+				hql += " and a.tin LIKE CONCAT(:tin, '%')";
+				param.put("tin"	, companyVendorBean.getTin());
 			}
 			
-			if(!companyVendorBean.getTel().equals("***")){
-				if(companyVendorBean.getTel().equals("")){
-					hql += " and (a.tel is null or a.tel = '')";
-				}else{
-					hql += " and a.tel LIKE CONCAT(:tel, '%')";
-					param.put("tel"	, companyVendorBean.getTel());
-				}
+			if(!companyVendorBean.getTel().equals("")){
+				hql += " and a.tel LIKE CONCAT(:tel, '%')";
+				param.put("tel"	, companyVendorBean.getTel());
 			}
 			
 			//Column select

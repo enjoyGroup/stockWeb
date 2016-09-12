@@ -476,6 +476,8 @@ public class EnjoyUtils {
         try {
         	lv_val = ao_obj==null?"":ao_obj.toString().trim();
         	
+        	System.out.println("lv_val :: " + lv_val);
+        	
         	if (lv_val!=null&&!lv_val.equals("")){	
         		lv_ret = new BigDecimal(lv_val.replaceAll(",", ""));
 			} 

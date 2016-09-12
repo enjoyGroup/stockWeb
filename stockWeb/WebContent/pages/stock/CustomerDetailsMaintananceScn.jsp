@@ -455,7 +455,7 @@
 						<section class="vbox">
 							<section class="scrollable padder">
 							<div class="alert alert-block alert-error fade in container">
-								<h4 class="alert-heading">เพิ่มลูกค้า/พนักงานขาย</h4>
+								<h4 class="alert-heading">เพิ่มลูกค้า/บริษัทสั่งซื้อ</h4>
 							</div>					          	
 							<div class="container main-container round-sm padding-xl-h">
 								<div class="col-sm-12 toppad" >
@@ -530,7 +530,7 @@
 								        				</select>
 								        			</td>
 								        			<td align="right">
-														เลขที่บัตร :
+														เลขที่บัตร <span style="color: red;"><b>*</b></span> :
 													</td>
 								        			<td align="left" colspan="4">
 								        				<input  type="text" 

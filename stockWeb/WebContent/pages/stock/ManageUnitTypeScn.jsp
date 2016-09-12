@@ -69,7 +69,7 @@
 		    var lo_table                        = document.getElementById("resultData");
 		    var lo_seqTemp            			= document.getElementById("seqTemp");
 		    var lv_maxSeq                       = parseInt(lo_seqTemp.value) + 1;
-		    var rowIndex                      	= gp_rowTableIndex(ao_obj);//lo_table.rows.length;
+		    var rowIndex                      	= lo_table.rows.length;//gp_rowTableIndex(ao_obj);
 		    var newNodeTr 	                	= null;
 		    var newNodeTd1 						= null;
 		    var newNodeTd2 						= null;
@@ -159,7 +159,7 @@
 		            		if(status=="SUCCESS"){
 		            			lo_table.deleteRow(gp_rowTableIndex(ao_obj)); 
 		            			
-		            			for(var i=1;i<(lo_table.rows.length - 1);i++){
+		            			for(var i=1;i<lo_table.rows.length;i++){
 		                            lo_table.rows[i].cells[0].innerHTML = (i);
 		                        }
 		            		}else{
@@ -304,7 +304,9 @@
 											<tr height="26px;">
 												<th  style="text-align: center;" width="5%" ><B>ลำดับ</B></th>
 												<th  style="text-align: center;" width="80%"><B>ชื่อหน่วยสินค้า</B></th>
-												<th style="text-align: center;" width="15%">Action</th>
+												<th style="text-align: center;" width="15%">
+													<img alt="เพิ่ม" title="เพิ่ม" src="<%=imgURL%>/Add.png" width="24" height="24" border="0" onclick="lp_newRecord();" />
+												</th>
 											</tr> 
 											<%
    											int					  	seq		= 1;
@@ -325,12 +327,6 @@
 														</td>
 													</tr>
 											<% seq++;}}%>
-													<tr>
-														<td colspan="2">&nbsp;</td>
-														<td align="center">
-															<img alt="เพิ่ม" title="เพิ่ม" src="<%=imgURL%>/Add.png" width="24" height="24" border="0" onclick="lp_newRecord(this);" />
-														</td>
-													</tr>
 										</table>
 										<br/>
 										<table border="0" cellpadding="3" cellspacing="0" width="100%">

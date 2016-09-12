@@ -582,6 +582,8 @@ public class UserDetailsDao extends DaoControl{
 		HashMap<String, Object>			param				= new HashMap<String, Object>();
 		List<String>					columnList			= new ArrayList<String>();
 		List<HashMap<String, Object>>	resultList			= null;
+		String							criteria			= "";
+		String							orderBy				= "";
 		
 		try{
 			comboList			=  new ArrayList<ComboBean>();
@@ -589,23 +591,36 @@ public class UserDetailsDao extends DaoControl{
 			if(userUniqueId==1){
 				hql 	= "select t.userUniqueId, CONCAT(t.userName, ' ', t.userSurname) userFullName"
 						+ " from userdetails t"
-						+ " where CONCAT(t.userName, ' ', t.userSurname) :userFullName"
-						+ " 	and t.userStatus 	= 'A'"
-						+ " 	and t.userUniqueId 	<> 1"
-						+ " order by CONCAT(t.userName, ' ', t.userSurname) asc limit 10 ";
+						+ " where t.userStatus 	= 'A'"
+						+ " 	and t.userUniqueId 	<> 1";
+				
+				if(userFullName!=null && !"".equals(userFullName)){
+					criteria = " and CONCAT(t.userName, ' ', t.userSurname) LIKE CONCAT(:userFullName, '%')";
+					param.put("userFullName"	, userFullName);
+				}
+				
+				orderBy = " order by CONCAT(t.userName, ' ', t.userSurname) asc limit 10";
+				
+				hql = hql + criteria + orderBy;
+				
 			}else{
 				hql 	= "select t.userUniqueId, CONCAT(t.userName, ' ', t.userSurname) userFullName"
 						+ " from userdetails t"
 						+ "		inner join relationuserncompany a on a.userUniqueId = t.userUniqueId and a.tin = :tin"
-						+ " where CONCAT(t.userName, ' ', t.userSurname) LIKE CONCAT(:userFullName, '%')"
-						+ " 	and t.userStatus 	= 'A'"
-						+ " 	and t.userUniqueId 	<> 1"
-						+ " order by CONCAT(t.userName, ' ', t.userSurname) asc limit 10 ";
+						+ " where t.userStatus 	= 'A'"
+						+ " 	and t.userUniqueId 	<> 1";
 				
 				param.put("tin"				, tin);
+				
+				if(userFullName!=null && !"".equals(userFullName)){
+					criteria = " and CONCAT(t.userName, ' ', t.userSurname) LIKE CONCAT(:userFullName, '%')";
+					param.put("userFullName"	, userFullName);
+				}
+				
+				orderBy = " order by CONCAT(t.userName, ' ', t.userSurname) asc limit 10";
+				
+				hql = hql + criteria + orderBy;
 			}
-			
-			param.put("userFullName"	, userFullName);
 			
 			//Column select
 			columnList.add("userUniqueId");

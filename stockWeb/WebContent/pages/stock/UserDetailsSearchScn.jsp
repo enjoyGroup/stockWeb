@@ -28,12 +28,12 @@
 	<script>
 		var gv_service 			= null;
 		var gv_url 				= '<%=servURL%>/EnjoyGenericSrv';
-		//var gv_checkDupUserId 	= false;
 		
 		$(document).ready(function(){
-			//gp_progressBarOn();
 			
 			gv_service 		= "service=" + $('#service').val();
+			
+			$("#userName").focus();
 			
 			$( "#userName" ).autocomplete({ 
 				 source: function(request, response) {
@@ -52,7 +52,7 @@
 		                }
 		            });
 		          },
-			      minLength: 3,//กี่ตัวอักษรถึงทำงาน
+			      minLength: 0,//กี่ตัวอักษรถึงทำงาน
 			      open: function() {
 						//Data return กลับมาแล้วทำไรต่อ
 			      },
@@ -111,6 +111,13 @@
 				alert("lp_sendEditPage :: " + e);
 			}
 		}
+		
+		function lp_enterToSearch(e){
+			var keycode =(window.event) ? event.keyCode : e.keyCode;
+			if(keycode == 13) {
+				$('#btnSearch').click();
+			}
+		} 
 		
 		//*********************************************************************************//
 		//    รายละเอียดเกี่ยวกับการกดปุ่ม First/Previous/Next/Last บนหน้าจอ				       //												
@@ -205,13 +212,13 @@
 								        				ชื่อ-นามสกุล  : &nbsp;
 								        			</td>
 								        			<td align="left" width="350px;">
-								        				<input type='text' id="userName" name='userName' maxlength="50" value="<%=userDetailsBean.getUserName() %>" />
+								        				<input type='text' id="userName" name='userName' maxlength="50" value="<%=userDetailsBean.getUserName() %>" onkeypress="return lp_enterToSearch(event);" />
 								        			</td>
 								        			<td align="right">
 								        				E-mail : &nbsp;
 								        			</td>
 								        			<td align="left">
-								        				<input type='text' id="userEmail" name='userEmail' maxlength="20" value="<%=userDetailsBean.getUserEmail() %>" />
+								        				<input type='text' id="userEmail" name='userEmail' maxlength="20" value="<%=userDetailsBean.getUserEmail() %>" onkeypress="return lp_enterToSearch(event);" />
 								        				&nbsp;
 								        				<span id="inValidSpan"></span>
 								        			</td>

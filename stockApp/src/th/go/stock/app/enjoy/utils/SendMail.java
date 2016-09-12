@@ -37,13 +37,13 @@ public class SendMail {
 		try {
  
 			Message message = new MimeMessage(session);
-//			message.setFrom(new InternetAddress(username));
-			message.setFrom(new InternetAddress("Enjoy System"));
+			message.setFrom(new InternetAddress(username, "Enjoy System"));
 			message.setRecipients(Message.RecipientType.TO,InternetAddress.parse(email));
 			message.setSubject("แจ้ง password ของคุณ " + fullName);
 			message.setText("เรียนคุณ " + fullName
-				+ "\n\n E-mail : " + userEmail
-				+ "\n\n Password : " + userPwd);
+				+ "\n\n User : " + userEmail
+				+ "\n\n Password : " + userPwd
+				+ "\n\n ***กรุณาเก็บ user และ password เอาไว้สำหรับใช้ในการเข้าระบบในครั้งต่อไป ");
  
 			Transport.send(message);
  

@@ -35,7 +35,7 @@
 			
 			gv_service 		= "service=" + $('#service').val();
 			
-			//gp_progressBarOff();
+			$("#companyName").focus();
 			
 			$( "#companyName" ).autocomplete({ 
 				 source: function(request, response) {
@@ -54,7 +54,7 @@
 		                }
 		            });
 		          },
-			      minLength: 3,//กี่ตัวอักษรถึงทำงาน
+			      minLength: 0,//กี่ตัวอักษรถึงทำงาน
 			      open: function() {
 						//Data return กลับมาแล้วทำไรต่อ
 			      },
@@ -87,7 +87,7 @@
 		                }
 		            });
 		          },
-			      minLength: 3,//กี่ตัวอักษรถึงทำงาน
+			      minLength: 0,//กี่ตัวอักษรถึงทำงาน
 			      open: function() {
 						//Data return กลับมาแล้วทำไรต่อ
 			      },
@@ -142,6 +142,13 @@
 				alert("lp_sendEditPage :: " + e);
 			}
 		}
+		
+		function lp_enterToSearch(e){
+			var keycode =(window.event) ? event.keyCode : e.keyCode;
+			if(keycode == 13) {
+				$('#btnSearch').click();
+			}
+		} 
 		
 		//*********************************************************************************//
 		//    รายละเอียดเกี่ยวกับการกดปุ่ม First/Previous/Next/Last บนหน้าจอ				       //												
@@ -236,13 +243,13 @@
 										        				ชื่อบริษัท  : &nbsp;
 										        			</td>
 										        			<td align="left" width="350px;">
-										        				<input type='text' id="companyName" name='companyName' maxlength="100" value="<%=companyDetailsBean.getCompanyName() %>" />
+										        				<input type='text' id="companyName" name='companyName' maxlength="100" value="<%=companyDetailsBean.getCompanyName() %>" onkeypress="return lp_enterToSearch(event);" />
 										        			</td>
 										        			<td align="right">
 										        				เลขประจำตัวผู้เสียภาษี : &nbsp;
 										        			</td>
 										        			<td align="left">
-										        				<input type='text' id="tin" name='tin' maxlength="13" value="<%=companyDetailsBean.getTin() %>" />
+										        				<input type='text' id="tin" name='tin' maxlength="13" value="<%=companyDetailsBean.getTin() %>" onkeypress="return lp_enterToSearch(event);" />
 										        			</td>
 										        		</tr>
 										        		<tr>

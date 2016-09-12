@@ -388,8 +388,8 @@
 		            				if (jsonObj.flagChkCompany == "Y" && jsonObj.FlagChange == "Y"){
 			            				window.location.replace('<%=pagesURL%>/ChangePassScn.jsp');
 			            			} else {
-			            				window.location = gv_url + "?service=" + $("#service").val() + "&pageAction=getDetail&tin=" + jsonObj.tin;
-			            				//lp_reset();
+			            				//window.location = gv_url + "?service=" + $("#service").val() + "&pageAction=getDetail&tin=" + jsonObj.tin;
+			            				lp_reset();
 			            			}
 		    	    		    });
 		            			
@@ -411,10 +411,12 @@
 		
 		function lp_reset(){
 			try{
+				//console.log($('#tin').val().replace("-", ""));
+				
 				if($("#pageMode").val()=="NEW"){
 					window.location = gv_url + "?service=" + $("#service").val() + "&pageAction=new";
 				}else{
-					window.location = gv_url + "?service=" + $("#service").val() + "&pageAction=getDetail&tin=" + $('#tin').val();
+					window.location = gv_url + "?service=" + $("#service").val() + "&pageAction=getDetail&tin=" + $('#tin').val().replace(/-/gi, "");
 				}
 			}catch(e){
 				alert("lp_reset :: " + e);

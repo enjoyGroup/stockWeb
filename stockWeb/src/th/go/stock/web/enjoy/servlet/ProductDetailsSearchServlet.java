@@ -326,7 +326,6 @@ public class ProductDetailsSearchServlet extends EnjoyStandardSvc {
 		   logger.info("[getProductNameList] productName 		:: " + productName);
 		   logger.info("[getProductNameList] productTypeName 	:: " + productTypeName);
 		   logger.info("[getProductNameList] productGroupName 	:: " + productGroupName);
-		   logger.info("[getProductNameList] tin 				:: " + productGroupName);
 		   
 		   list 		= this.dao.productNameList(productName, productTypeName, productGroupName, tin, true);
 		   

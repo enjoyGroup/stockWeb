@@ -572,13 +572,22 @@ public class CompanyDetailsDao extends DaoControl {
 		ComboBean						comboBean			= null;
 		HashMap<String, Object>			param				= new HashMap<String, Object>();
 		List<Object>					resultList			= null;
+		String							criteria			= "";
+		String							orderBy				= "";
 		
 		try{
 			comboList			=  new ArrayList<ComboBean>();
-			hql 				= " select distinct tin from company where tin LIKE CONCAT(:tin, '%') and tin <> '9999999999999' order by tin asc limit 10 ";
+			hql 				= " select distinct tin from company where tin <> '9999999999999'";
+			
 			
 			//Criteria
-			param.put("tin"	, tin);
+			if(tin!=null && !"".equals(tin)){
+				criteria = " and tin LIKE CONCAT(:tin, '%')";
+				param.put("tin"	, tin);
+			}
+			
+			orderBy = "	order by tin asc limit 10";
+			hql		= hql + criteria + orderBy;
 			
 			resultList = getResult(hql, param, "tin", Constants.STRING_TYPE);
 			
@@ -608,17 +617,23 @@ public class CompanyDetailsDao extends DaoControl {
 		ComboBean						comboBean			= null;
 		HashMap<String, Object>			param				= new HashMap<String, Object>();
 		List<Object>					resultList			= null;
+		String							criteria			= "";
+		String							orderBy				= "";
 		
 		try{
 			comboList	=  new ArrayList<ComboBean>();
 			hql 		= "select distinct companyName "
 						+ "	from company "
-						+ "	where companyName LIKE CONCAT(:companyName, '%')"
-						+ "		and tin <> '9999999999999'"
-						+ "	order by companyName asc limit 10 ";
+						+ "	where tin <> '9999999999999'";
 			
 			//Criteria
-			param.put("companyName"	, companyName);
+			if(companyName!=null && !"".equals(companyName)){
+				criteria = " and companyName LIKE CONCAT(:companyName, '%')";
+				param.put("companyName"	, companyName);
+			}
+			
+			orderBy = "	order by companyName asc limit 10";
+			hql		= hql + criteria + orderBy;
 			
 			resultList = getResult(hql, param, "companyName", Constants.STRING_TYPE);
 			
