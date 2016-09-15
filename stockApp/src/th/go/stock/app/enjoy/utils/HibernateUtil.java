@@ -10,9 +10,16 @@ public class HibernateUtil {
 	
 	private static SessionFactory buildSessionFactory() {
         try {
-        	// Create the SessionFactory from hibernate.cfg.xml
+        	// Create the SessionFactory from hibernate.cfg.xml 
             Configuration configuration = new Configuration();
+            
             configuration.configure("hibernate.cfg.xml");
+            
+            configuration.setProperty("hibernate.connection.driver_class"	, System.getProperty("ENJOY_DRIVER"));
+            configuration.setProperty("hibernate.connection.url"			, System.getProperty("ENJOY_URL"));
+            configuration.setProperty("hibernate.connection.username"		, System.getProperty("ENJOY_USER"));
+            configuration.setProperty("hibernate.connection.password"		, EnjoyUtils.nullToStr(System.getProperty("ENJOY_PASS")));
+            
             System.out.println("Hibernate Configuration loaded");
         	
           //apply configuration property settings to StandardServiceRegistryBuilder
