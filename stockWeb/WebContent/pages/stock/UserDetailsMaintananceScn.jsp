@@ -302,57 +302,66 @@
 		
 		function lp_resetPass(){
 			
-			var params				= "";
-			
 			try{
 				if($("#sendMailFlag").val()=="Y"){
-					if(!confirm("Password จะถูกส่งไปที่ E-mail ที่คุณกรอก คุณกรอก E-mail ถูกต้องแล้วใช่หรือไม่ ?")){
+					confirm("Password จะถูกส่งไปที่ E-mail ที่คุณกรอก คุณกรอก E-mail ถูกต้องแล้วใช่หรือไม่ ?", function(){
+						lp_ajaxResetPass();
+					}, function(){
 						$('#userEmail').focus();
 						return;
-					}
+					});
+					
+					/*if(!confirm("Password จะถูกส่งไปที่ E-mail ที่คุณกรอก คุณกรอก E-mail ถูกต้องแล้วใช่หรือไม่ ?")){
+						$('#userEmail').focus();
+						return;
+					}*/
+				}else{
+					lp_ajaxResetPass();
 				}
-				
-				params 	= "pageAction=resetPass&" + $('#frm').serialize();
-				
-				$.ajax({
-					async:false,
-		            type: "POST",
-		            url: gv_url,
-		            data: params,
-		            beforeSend: gp_progressBarOn(),
-		            success: function(data){
-		            	var jsonObj 			= null;
-		            	var status				= null;
-		            	
-		            	try{
-		            		gp_progressBarOff();
-		            		
-		            		jsonObj = JSON.parse(data);
-		            		status	= jsonObj.status;
-		            		
-		            		if(status=="SUCCESS"){
-		            			if($("#sendMailFlag").val()=="Y"){
-		            				alert("Password ถูกส่งไปที่ E-mail แล้ว");
-		            			}else{
-		            				params 	= "userUniqueId=" 	+ jsonObj.userUniqueId
-				            				+ "&fullName=" 		+ jsonObj.fullName
-				            				+ "&userEmail=" 	+ jsonObj.userEmail
-				            				+ "&pwd=" 			+ jsonObj.pwd;
-		            				gp_dialogPopUp(gv_url + "?" + gv_service + "&pageAction=genPdf&" + params, "แจ้งรหัสผู้ใช้งานและรหัสผ่าน");
-		            			}
-		            		}else{
-		            			alert(jsonObj.errMsg);
-		            			
-		            		}
-		            	}catch(e){
-		            		alert("in lp_resetPass :: " + e);
-		            	}
-		            }
-		        });
 				
 			}catch(e){
 				alert("lp_resetPass :: " + e);
 			}
+		}
+		
+		function lp_ajaxResetPass(){
+			var params 	= "pageAction=resetPass&" + $('#frm').serialize();
+			
+			$.ajax({
+				async:true,
+	            type: "POST",
+	            url: gv_url,
+	            data: params,
+	            beforeSend: gp_progressBarOn(),
+	            success: function(data){
+	            	var jsonObj 			= null;
+	            	var status				= null;
+	            	
+	            	try{
+	            		//gp_progressBarOff();
+	            		
+	            		jsonObj = JSON.parse(data);
+	            		status	= jsonObj.status;
+	            		
+	            		if(status=="SUCCESS"){
+	            			if($("#sendMailFlag").val()=="Y"){
+	            				alert("Password ถูกส่งไปที่ E-mail แล้ว");
+	            			}else{
+	            				params 	= "userUniqueId=" 	+ jsonObj.userUniqueId
+			            				+ "&fullName=" 		+ jsonObj.fullName
+			            				+ "&userEmail=" 	+ jsonObj.userEmail
+			            				+ "&pwd=" 			+ jsonObj.pwd;
+	            				gp_dialogPopUp(gv_url + "?" + gv_service + "&pageAction=genPdf&" + params, "แจ้งรหัสผู้ใช้งานและรหัสผ่าน");
+	            			}
+	            		}else{
+	            			alert(jsonObj.errMsg);
+	            			
+	            		}
+	            	}catch(e){
+	            		alert("in lp_resetPass :: " + e);
+	            	}
+	            }
+	        });
 		}
 		
 		function lp_ctrlCommission(){

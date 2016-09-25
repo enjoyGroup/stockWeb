@@ -631,16 +631,12 @@ public class ProductDetailsDao extends DaoControl{
 		
 		try{		
 			hql		= "select a.*, b.productTypeName, c.productGroupName, d.unitName"
-					+ "	from productmaster a, productype b, productgroup c, unittype d"
-					+ "	where b.productTypeCode 	= a.productType"
-					+ "		and b.tin				= a.tin"
-					+ " and c.productTypeCode 	= a.productType"
-					+ " and c.productGroupCode 	= a.productGroup"
-					+ "	and c.tin				= a.tin"
-					+ " and d.unitCode 			= a.unitCode"
-					+ "	and d.tin				= d.tin"
-					+ " and a.productName		= :productName"
-					+ "	and a.tin				= :tin";
+					+ "	from productmaster a"
+					+ "		inner join productype b ON b.productTypeCode = a.productType and b.tin	= a.tin"
+					+ "		inner join productgroup c on c.productTypeCode = a.productType and c.productGroupCode = a.productGroup and c.tin	= a.tin"
+					+ " 	inner JOIN unittype d on d.unitCode = a.unitCode and d.tin= a.tin "
+					+ " where a.productName		= :productName"
+					+ "		and a.tin			= :tin";
 			
 			//Criteria
 			param.put("productName"	, productName);
