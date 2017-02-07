@@ -245,21 +245,21 @@
 											<tbody>
 												<%
 													CompanyVendorBean 	  bean 		= null;
-	    											int					  seq		= 1;
+	    											//int					  seq		= 1;
 													
 													if(dataList.size()>0){
 														for(int i=0;i<dataList.size();i++){
 															bean = dataList.get(i);															
 												%>
 															<tr class="rowSelect" onclick="lp_sendEditPage('<%=bean.getVendorCode()%>')" >
-																<td style="text-align:center"><%=seq%></td>
+																<td style="text-align:center"><%=bean.getSeqDis()%></td>
 																<td><%=bean.getTin()%></td>
 																<td><%=bean.getVendorName()%></td>
 																<td><%=bean.getBranchName()%></td>
 																<td><%=bean.getAddress()%></td>
 																<td><%=bean.getTel()%></td>
 															</tr>
-												<% 			seq++;
+												<% 			//seq++;
 														} 
 													} else{  %>
 														<tr height="26px;"><td colspan="6" align="center"><b>ไม่พบข้อมูลที่ระบุ</b></td></tr>

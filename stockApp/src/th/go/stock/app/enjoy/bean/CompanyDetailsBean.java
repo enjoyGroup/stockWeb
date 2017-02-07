@@ -25,6 +25,7 @@ public class CompanyDetailsBean {
 	private String remark;
 	private String companyStatus;
 	private String companyStatusName;
+	private String seqDis;
 	
 	public CompanyDetailsBean(){
 		this.tin 				= "";
@@ -48,6 +49,7 @@ public class CompanyDetailsBean {
 		this.remark 			= "";
 		this.companyStatus 		= "";
 		this.companyStatusName 	= "";
+		this.seqDis				= "1";
 	}
 
 	public String getTin() {
@@ -273,6 +275,14 @@ public class CompanyDetailsBean {
 		}
 		
 		return address;
+	}
+
+	public String getSeqDis() {
+		return seqDis;
+	}
+
+	public void setSeqDis(String seqDis) {
+		this.seqDis = seqDis;
 	}
 
 	

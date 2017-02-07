@@ -525,14 +525,17 @@
 		                        
 								lo_seqTemp.value  = lv_maxSeq;
 								
+								$('#productName' + lv_maxSeq).focus();//เพิ่มมาหลังเทส
+								
 								if(ao_jsonObj!=null){
 									lp_calAmount(lv_maxSeq);
 									$("#productCodeDis").val('');
 									$("#productCodeDis").focus();
 									//lp_updateRecord(lv_maxSeq);
-								}else{
-									$('#productName' + lv_maxSeq).focus();
 								}
+								/*else{
+									$('#productName' + lv_maxSeq).focus();
+								}*/
 								
 		            		}else{
 		            			alert(jsonObj.errMsg);
@@ -1121,7 +1124,6 @@
 		
 		function lp_searchProductByProductCode(){
 			var params 				= "";
-			var letters 			= /^[\u0E01-\u0E5B]+$/;
 			var lv_productCodeDis 	= "";
 			
 			try{
@@ -1132,14 +1134,11 @@
 					return;
 				}
 				
-				if(letters.test(lv_productCodeDis)){
-					alert("รหัสสินค้าห้ามเป็นภาษาไทย", function() { 
+				if(!(gp_checkThaiLetter(lv_productCodeDis))){
+					alert("รหัสสินค้าต้องเปนภาษาอังกฤษหรือตัวเลขเท่านั้น !!", function() { 
 						$("#productCodeDis").val('');
 	        			$("#productCodeDis").focus();
 	    		    });
-					//alert("รหัสสินค้าห้ามเป็นภาษาไทย");
-					//$("#productCodeDis").val('');
-        			//$("#productCodeDis").focus();
 					return;
 				}
 				
@@ -1339,7 +1338,7 @@
 								        			<td align="right">
 														วันที่ขาย<span style="color: red;"><b>*</b></span>:
 													</td>
-								        			<td align="left" colspan="3">
+								        			<td align="left">
 								        				<%if(invoiceCashMaintananceForm.getPageMode().equals(invoiceCashMaintananceForm.NEW)){%>
 								        				<input type='text' 
 								        					   id="invoiceDate" 
@@ -1359,6 +1358,22 @@
 				   										<%}%>
 								        			</td>
 									        	</tr>
+									        	<%if(!"".equals(invoiceCashMasterBean.getInvoiceCredit())){ %>
+									        	<tr>
+									        		<td align="right">
+														เลขที่ใบวางบิล &nbsp;:&nbsp;
+													</td>
+								        			<td align="left" colspan="3">
+								        				<input type='text' 
+								        					   id="invoiceCreditDis" 
+								        					   name='invoiceCreditDis' 
+								        					   value="<%=invoiceCashMasterBean.getInvoiceCredit()%>"
+								        					   class="input-disabled"
+							        					   	   readonly="readonly"
+								        					   style="width: 220px;" />
+								        			</td>
+									        	</tr>
+									        	<%}%>
 										    </table>
 									        <div id="seasonTitle" class="padding-sm round-sm season-title-head2">
 												<h6 class="panel-title" style="font-size:1.0em">รายละเอียดใบขาย</h6>

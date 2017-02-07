@@ -549,7 +549,7 @@ public class CustomerDetailsMaintananceServlet extends EnjoyStandardSvc {
 			obj.put(ERR_MSG, 		e.getMessage());
 		}catch(Exception e){
 			rollback();
-			logger.info(e.getMessage());
+			logger.error(e);
 			e.printStackTrace();
 			obj.put(STATUS, 		ERROR);
 			obj.put(ERR_MSG, 		"onSave is error");

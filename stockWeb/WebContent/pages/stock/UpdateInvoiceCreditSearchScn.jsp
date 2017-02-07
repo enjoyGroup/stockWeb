@@ -288,13 +288,13 @@
 											</tfoot>
 											<tbody>
 												<%
-	    											int					  	seq		= 1;
+	    											//int					  	seq		= 1;
 													
 													if(dataList.size()>0){
 														for(InvoiceCreditMasterBean bean:dataList){
 												%>
 															<tr class="rowSelect" onclick="lp_sendEditPage('<%=bean.getInvoiceCash()%>')" >
-																<td style="text-align:center"><%=seq%></td>
+																<td style="text-align:center"><%=bean.getSeqDis()%></td>
 																<td align="center"><%=bean.getInvoiceCode()%></td>
 																<td align="center"><%=bean.getInvoiceTypeDesc()%></td>
 																<td align="left"><%=bean.getCusFullName()%></td>
@@ -302,7 +302,7 @@
 																<td align="right"><%=bean.getInvoiceTotal()%></td>
 																<td align="left"><%=bean.getRemark()%></td>
 															</tr>
-												<% 			seq++;
+												<% 			//seq++;
 														} 
 													} else{  %>
 														<tr height="26px;"><td colspan="7" align="center"><b>ไม่พบข้อมูลที่ระบุ</b></td></tr>

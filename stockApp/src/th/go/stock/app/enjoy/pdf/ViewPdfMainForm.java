@@ -91,4 +91,44 @@ public class ViewPdfMainForm {
 		return buffer;
 	}
 	
+	public ByteArrayOutputStream writeTicketPDFForBarCode(String formName, JSONObject jsonObject, String title) throws Exception{
+	    String 					formClass					= null;
+		Document 				document					= null;
+		PdfWriter 				writer 						= null;
+		PdfFormService 			pdfForm 					= null;
+		ByteArrayOutputStream 	buffer 						= null;
+		
+		try{
+			System.out.println("formName 	:: " + formName);
+			System.out.println("title 		:: " + title);
+			
+			formClass					= "th.go.stock.app.enjoy.pdf."+formName;
+			document 					= new Document(PageSize.A4, 5f, 5f, 5f, 5f);
+
+			buffer 						=	new ByteArrayOutputStream();
+			writer 						=	PdfWriter.getInstance( document, buffer );
+	
+			document.addTitle(title);
+			Class c 					= 	Class.forName(formClass);
+			pdfForm 	        		= 	(PdfFormService) c.newInstance();
+			document.open();
+					
+			pdfForm.setJSONObject(writer, jsonObject);
+			pdfForm.createForm(document);
+	
+			document.close();
+			writer.close();
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally{
+		    formClass					= null;
+			document					= null;
+			writer 						= null;
+			pdfForm 					= null;
+			jsonObject 					= null;
+		}
+		return buffer;
+	}
+	
+	
 }

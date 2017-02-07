@@ -219,6 +219,15 @@
 		    		    });
 		                return false;
 		            }
+					
+					if(!(gp_checkThaiLetter(gp_trim(la_productCode[i].value)))){
+						alert("รหัสสินค้าต้องเปนภาษาอังกฤษหรือตัวเลขเท่านั้น !!", function() { 
+							//la_productCode[i].value = "";
+							la_productCode[i].focus();
+		    		    });
+						return false;
+					}
+					
 				}
 				
 				for(var i=0;i<la_productCode.length;i++){
@@ -227,10 +236,12 @@
 							alert("รหัสสินค้า " + la_productCode[j].value + "มีอยู่ในระบบแล้วกรุณาระบุใหม่", function() { 
 								la_productCode[j].focus();
 			    		    });
+							return false;
 						}else if(gp_trim(la_productName[i].value)==gp_trim(la_productName[j].value)){
 							alert("ชื่อสินค้า " + la_productName[j].value + "มีอยู่ในระบบแล้วกรุณาระบุใหม่", function() { 
 								la_productName[j].focus();
 			    		    });
+							return false;
 						}
 					}
 				}

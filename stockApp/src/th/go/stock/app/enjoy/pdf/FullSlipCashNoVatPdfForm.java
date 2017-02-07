@@ -49,22 +49,13 @@ public class FullSlipCashNoVatPdfForm extends EnjoyItext implements PdfFormServi
 			document.add(this.genDetail());
 			document.add(this.brLine());
 			document.add(this.brLine());
+			document.add(this.brLine());
+			document.add(this.brLine());
+			document.add(this.brLine());
+			document.add(this.brLine());
+			document.add(this.brLine());
+			document.add(this.brLine());
 			document.add(this.genTotalCost());
-//			document.add(this.brLine());
-//			document.add(this.brLine());
-//			document.add(this.brLine());
-//			document.add(this.brLine());
-//			document.add(this.brLine());
-//			document.add(this.brLine());
-//			document.add(this.brLine());
-//			document.add(this.brLine());
-//			document.add(this.brLine());
-//			document.add(this.brLine());
-//			document.add(this.brLine());
-//			document.add(this.brLine());
-//			document.add(this.brLine());
-//			document.add(this.brLine());
-//			document.add(this.genFooter());
 			
 		}
 		catch(DocumentException de){
@@ -88,13 +79,13 @@ public class FullSlipCashNoVatPdfForm extends EnjoyItext implements PdfFormServi
 		JSONObject 	jsonObjectMain  	= this.formDataObj;
 		JSONObject  invoiceCashMaster	= (JSONObject) jsonObjectMain.get("invoiceCashMaster");
 		
-		table.addCell(setCellWB("ใบกำกับภาษี/ใบเสร็จรับเงิน", getFont10Bold(), 4, Element.ALIGN_CENTER, 0));
+		table.addCell(setCellWB("เงินสด", getFont12Bold(), 4, Element.ALIGN_CENTER, 0));
 		
-		table.addCell(setCellWB("เลขที่ใบเสร็จ", getFont8Bold(), 3, Element.ALIGN_RIGHT, 0));
-		table.addCell(setCellWB(getText(invoiceCashMaster, "invoiceCode"), getFont8(), 1, Element.ALIGN_LEFT, 0));
+		table.addCell(setCellWB("เลขที่ใบเสร็จ", getFont9Bold(), 3, Element.ALIGN_RIGHT, 0));
+		table.addCell(setCellWB(getText(invoiceCashMaster, "invoiceCode"), getFont9(), 1, Element.ALIGN_LEFT, 0));
 		
-		table.addCell(setCellWB("วันที่ใบเสร็จ", getFont8Bold(), 3, Element.ALIGN_RIGHT, 0));
-		table.addCell(setCellWB(getText(invoiceCashMaster, "invoiceDate"), getFont8(), 1, Element.ALIGN_LEFT, 0));
+		table.addCell(setCellWB("วันที่ใบเสร็จ", getFont9Bold(), 3, Element.ALIGN_RIGHT, 0));
+		table.addCell(setCellWB(getText(invoiceCashMaster, "invoiceDate"), getFont9(), 1, Element.ALIGN_LEFT, 0));
 		
 		table.setWidthPercentage(100);
 	
@@ -103,13 +94,11 @@ public class FullSlipCashNoVatPdfForm extends EnjoyItext implements PdfFormServi
 	
 	private PdfPTable genCustomerDetail(JSONObject customerDetails) throws DocumentException, MalformedURLException, IOException {
 		
-		float[] 	widths	 			= {12f,88f};
-		PdfPTable 	table 				= new PdfPTable(widths);
+		PdfPTable 	table 				= new PdfPTable(1);
 		
-		table.addCell(setCellWB("ชื่อลูกค้า    : ", getFont8Bold(), 1, Element.ALIGN_LEFT, 0));
-		table.addCell(setCellWB(getText(customerDetails, "cusName") + " " + getText(customerDetails, "cusSurname"), getFont8(), 1, Element.ALIGN_LEFT, 0));
-		table.addCell(setCellWB("ที่อยู่ลูกค้า  : ", getFont8Bold(), 1, Element.ALIGN_LEFT, 0));
-		table.addCell(setCellWB(getText(customerDetails, "address"), getFont8(), 1, Element.ALIGN_LEFT, 0));
+		table.addCell(setCellWB("ลูกค้า : " + getText(customerDetails, "cusName") + " " + getText(customerDetails, "cusSurname"), getFont9(), 1, Element.ALIGN_LEFT, 0));
+		table.addCell(setCellWB("ที่อยู่  : " + getText(customerDetails, "address"), getFont9(), 1, Element.ALIGN_LEFT, 0));
+		table.addCell(setCellWB("เลขประจำตัวผู้เสียภาษี : " + getText(customerDetails, "idNumber"), getFont9(), 1, Element.ALIGN_LEFT, 0));
 		
 		table.setWidthPercentage(100);
 	
@@ -122,7 +111,6 @@ public class FullSlipCashNoVatPdfForm extends EnjoyItext implements PdfFormServi
 		PdfPTable 	table 					= new PdfPTable(widths);
 		JSONObject 	jsonObjectMain  		= this.formDataObj;
 		JSONArray 	invoiceCashDetailList 	= (JSONArray) jsonObjectMain.get("invoiceCashDetailList");
-//		JSONObject  invoiceCashMaster		= (JSONObject) jsonObjectMain.get("invoiceCashMaster");
 		JSONObject 	invoiceCashDetail  		= null;
 		
 		table.addCell(setCell("ลำดับ", getFont8Bold(), 1, 1, Element.ALIGN_CENTER));
@@ -142,9 +130,6 @@ public class FullSlipCashNoVatPdfForm extends EnjoyItext implements PdfFormServi
 			table.addCell(setCell(getText(invoiceCashDetail, "price"),   getFont8(), 1, 1, Element.ALIGN_RIGHT));
 		}
 		
-//		table.addCell(setCell("จำนวนเงินรวมทั้งสิ้น",   getFont8Bold(), 5, 1, Element.ALIGN_RIGHT));
-//		table.addCell(setCell(getText(invoiceCashMaster, "invoiceTotal"),   getFont8(), 1, 1, Element.ALIGN_RIGHT));
-		
 		table.setHeaderRows(1);
 		table.setWidthPercentage(100);
 	
@@ -157,31 +142,35 @@ public class FullSlipCashNoVatPdfForm extends EnjoyItext implements PdfFormServi
 		PdfPTable 	table 				= new PdfPTable(widths);
 		float[] 	sub_w	 			= {1};
 		PdfPTable 	tableSub 			= new PdfPTable(sub_w);
+		float[] 	subWRemark	 		= {12f, 88f};
+		PdfPTable 	tableSubWRemark 	= new PdfPTable(subWRemark);
 		JSONObject 	jsonObjectMain  	= this.formDataObj;
 		JSONObject  invoiceCashMaster	= (JSONObject) jsonObjectMain.get("invoiceCashMaster");
-//		String		vat					= ConfigFile.getVat() + "%";
 		
-		table.addCell(setCellWB("รวมจำรวนเงิน ", getFont8Bold(), 3, Element.ALIGN_RIGHT, 0));
-		table.addCell(setCellWB(getText(invoiceCashMaster, "invoicePrice"), getFont8(), 1, Element.ALIGN_RIGHT, 0));
+		table.addCell(setCellWB("รวมจำรวนเงิน ", getFont9Bold(), 3, Element.ALIGN_RIGHT, 0));
+		table.addCell(setCellWB(getText(invoiceCashMaster, "invoicePrice"), getFont9(), 1, Element.ALIGN_RIGHT, 0));
 		
-		table.addCell(setCellWB("หักส่วนลด ", getFont8Bold(), 3, Element.ALIGN_RIGHT, 0));
-		table.addCell(setCellWB(getText(invoiceCashMaster, "invoicediscount"), getFont8(), 1, Element.ALIGN_RIGHT, 0));
+		table.addCell(setCellWB("หักส่วนลด ", getFont9Bold(), 3, Element.ALIGN_RIGHT, 0));
+		table.addCell(setCellWB(getText(invoiceCashMaster, "invoicediscount"), getFont9(), 1, Element.ALIGN_RIGHT, 0));
 		
-//		table.addCell(setCellWB("ภาษีมูลค่าเพิ่ม " + vat + " ", getFont8Bold(), 3, Element.ALIGN_RIGHT, 0));
-//		table.addCell(setCellWB(getText(invoiceCashMaster, "invoiceVat"), getFont8(), 1, Element.ALIGN_RIGHT, 0));
-		
-		table.addCell(setCellWB("หักมัดจำ ", getFont8Bold(), 3, Element.ALIGN_RIGHT, 0));
-		table.addCell(setCellWB(getText(invoiceCashMaster, "invoiceDeposit"), getFont8(), 1, Element.ALIGN_RIGHT, 0));
+		table.addCell(setCellWB("หักมัดจำ ", getFont9Bold(), 3, Element.ALIGN_RIGHT, 0));
+		table.addCell(setCellWB(getText(invoiceCashMaster, "invoiceDeposit"), getFont9(), 1, Element.ALIGN_RIGHT, 0));
 		
 		tableSub.addCell(setCell(EnjoyUtils.displayAmountThai(getText(invoiceCashMaster, "invoiceTotal")), getFont8(), 1, 1, Element.ALIGN_CENTER));
 		table.addCell(setCellWB(tableSub, 2, Element.ALIGN_LEFT, 0, false, false));
-		table.addCell(setCellWB("จำนวนเงินรวมทั้งสิ้น ", getFont8Bold(), 1, Element.ALIGN_RIGHT, 0));
-		table.addCell(setCellWB(getText(invoiceCashMaster, "invoiceTotal"), getFont8(), 1, Element.ALIGN_RIGHT, 0));
+		table.addCell(setCellWB("จำนวนเงินรวมทั้งสิ้น ", getFont9Bold(), 1, Element.ALIGN_RIGHT, 0));
+		table.addCell(setCellWB(getText(invoiceCashMaster, "invoiceTotal"), getFont9UnderLine(), 1, Element.ALIGN_RIGHT, 0));
 		
-		table.addCell(setCellWB("", getFont8Bold(), 4, Element.ALIGN_LEFT, 0));
+		table.addCell(setCellWB("", getFont9Bold(), 4, Element.ALIGN_LEFT, 0));
 		
-		table.addCell(setCellWB("หมายเหต ", getFont8Bold(), 1, Element.ALIGN_LEFT, 0));
-		table.addCell(setCellWB(getText(invoiceCashMaster, "remark"), getFont8(), 3, Element.ALIGN_LEFT, 0));
+		if(!"-".equals(getText(invoiceCashMaster, "remark"))){
+			tableSubWRemark.addCell(setCellWB("หมายเหต", getFont8Bold(), 1, Element.ALIGN_LEFT, 0));
+			tableSubWRemark.addCell(setCellWB(getText(invoiceCashMaster, "remark"), getFont8(), 3, Element.ALIGN_LEFT, 0));
+			table.addCell(setCellWB(tableSubWRemark, 4, Element.ALIGN_LEFT, 0, false, false));
+		}
+		
+//		table.addCell(setCellWB("หมายเหต ", getFont8Bold(), 1, Element.ALIGN_LEFT, 0));
+//		table.addCell(setCellWB(getText(invoiceCashMaster, "remark"), getFont8(), 3, Element.ALIGN_LEFT, 0));
 		
 		table.setWidthPercentage(100);
 	

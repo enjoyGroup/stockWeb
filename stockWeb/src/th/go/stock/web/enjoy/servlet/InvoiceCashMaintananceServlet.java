@@ -37,6 +37,7 @@ import th.go.stock.app.enjoy.dao.ProductquantityDao;
 import th.go.stock.app.enjoy.dao.UserDetailsDao;
 import th.go.stock.app.enjoy.exception.EnjoyException;
 import th.go.stock.app.enjoy.form.InvoiceCashMaintananceForm;
+import th.go.stock.app.enjoy.main.ConfigFile;
 import th.go.stock.app.enjoy.main.Constants;
 import th.go.stock.app.enjoy.pdf.ViewPdfMainForm;
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
@@ -1137,11 +1138,13 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 		ByteArrayOutputStream		buffer					= null;
 		byte[] 						bytes					= null;
 		String						invoiceType				= null;
+		String						vatDis					= null;
 	 
 		try{
 			invoiceCode 		= EnjoyUtils.nullToStr(this.request.getParameter("invoiceCode"));
 			tin 				= this.userBean.getTin();
 			viewPdfMainForm		= new ViewPdfMainForm();
+			vatDis	 			= ConfigFile.getVat() + "%";
 			
 			logger.info("[print] invoiceCode 	:: " + invoiceCode);
 			logger.info("[print] tin 			:: " + tin);
@@ -1174,6 +1177,7 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 			objDetail.put("invoiceTypeDesc"	, invoiceCashMasterDb.getInvoiceTypeDesc());
 			objDetail.put("remark"			, invoiceCashMasterDb.getRemark());
 			objDetail.put("tin"				, tin);
+			objDetail.put("vatDis"			,vatDis);
 			
 			jsonObject.put("invoiceCashMaster"	,objDetail);
 			/*End รายละเอียดใบกำกับภาษี*/

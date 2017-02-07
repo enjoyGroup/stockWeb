@@ -4,26 +4,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 import th.go.stock.app.enjoy.bean.AdjustStockBean;
+import th.go.stock.app.enjoy.bean.ComboBean;
 
-public class AdjustStockForm {
+public class AdjustStockHistoryForm {
 	
-	public static final String NEW 	= "NEW";
-	public static final String EDIT = "EDIT";
-	public static final String DEL 	= "DEL";
+	public static final String 	NEW 			= "NEW";
+	public static final String 	UPD 			= "UPD";
+	public static final String 	DEL 			= "DEL";
 	public static final int 	ORDER_LIMIT 	= 5;
 	
 	private AdjustStockBean 			adjustStockBean;
-	private List<AdjustStockBean> 		adjustStockList;
+	private List<AdjustStockBean> 		adjustHistoryListList;
 	private boolean						chk;
 	private boolean						limitAdjustHistoryFlag;
-	private String						seqTemp;
 	
-	public AdjustStockForm(){
-		this.adjustStockBean			= new AdjustStockBean();
-		this.adjustStockList			= new ArrayList<AdjustStockBean>();
-		this.chk						= false;
-		this.limitAdjustHistoryFlag		= false;
-		this.seqTemp					= "0";
+	public AdjustStockHistoryForm(){
+		this.adjustStockBean				= new AdjustStockBean();
+		this.adjustHistoryListList			= new ArrayList<AdjustStockBean>();
+		this.chk							= false;
+		this.limitAdjustHistoryFlag			= false;
 	}
 
 	public AdjustStockBean getAdjustStockBean() {
@@ -34,12 +33,12 @@ public class AdjustStockForm {
 		this.adjustStockBean = adjustStockBean;
 	}
 
-	public List<AdjustStockBean> getAdjustStockList() {
-		return adjustStockList;
+	public List<AdjustStockBean> getAdjustHistoryListList() {
+		return adjustHistoryListList;
 	}
 
-	public void setAdjustStockList(List<AdjustStockBean> adjustStockList) {
-		this.adjustStockList = adjustStockList;
+	public void setAdjustHistoryListList(List<AdjustStockBean> adjustHistoryListList) {
+		this.adjustHistoryListList = adjustHistoryListList;
 	}
 
 	public boolean isChk() {
@@ -56,13 +55,5 @@ public class AdjustStockForm {
 
 	public void setLimitAdjustHistoryFlag(boolean limitAdjustHistoryFlag) {
 		this.limitAdjustHistoryFlag = limitAdjustHistoryFlag;
-	}
-
-	public String getSeqTemp() {
-		return seqTemp;
-	}
-
-	public void setSeqTemp(String seqTemp) {
-		this.seqTemp = seqTemp;
 	}
 }

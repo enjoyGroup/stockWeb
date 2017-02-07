@@ -122,7 +122,7 @@ public class InvoiceCreditSearchServlet extends EnjoyStandardSvc {
 			combo.add(new ComboBean(""	, "ทุกสถานะ"));
 			combo.add(new ComboBean("A"	, "ใช้งานอยู่"));
 			combo.add(new ComboBean("C"	, "ยกเลิกการใช้งาน"));
-			//combo.add(new ComboBean("W"	, "รอสร้างใบ Invoice"));
+			combo.add(new ComboBean("S"	, "รับเงินเรียบร้อยแล้ว"));
 			
 			
 			this.form.setInvoiceStatusCombo(combo);

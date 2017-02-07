@@ -25,7 +25,7 @@ public class InvoiceCreditMasterBean {
 	private String invoiceTypeDesc;
 	private String tin;
 	private String remark;
-
+	private String seqDis;
 	
 	public InvoiceCreditMasterBean(){
 		this.invoiceCode 		= "";
@@ -51,6 +51,7 @@ public class InvoiceCreditMasterBean {
 		this.invoiceTypeDesc	= "";
 		this.tin				= "";
 		this.remark				= "";
+		this.seqDis				= "1";
 	}
 
 	public String getInvoiceCode() {
@@ -235,5 +236,13 @@ public class InvoiceCreditMasterBean {
 
 	public void setRemark(String remark) {
 		this.remark = remark;
+	}
+
+	public String getSeqDis() {
+		return seqDis;
+	}
+
+	public void setSeqDis(String seqDis) {
+		this.seqDis = seqDis;
 	}
 }

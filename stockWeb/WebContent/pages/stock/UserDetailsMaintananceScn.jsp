@@ -404,6 +404,7 @@
 		<input type="hidden" id="pageMode" 	name="pageMode" value="<%=pageMode%>" />
 		<input type="hidden" id="userUniqueId" 	name="userUniqueId" value="<%=userDetailsBean.getUserUniqueId()%>" />
 		<input type="hidden" id="sendMailFlag" 	name="sendMailFlag" value="<%=userDetailsMaintananceForm.getSendMailFlag()%>" />
+		<input type="hidden" id="flagAlertStock" name="flagAlertStock" value="<%=userDetailsBean.getFlagAlertStock()%>" />
 		<div id="menu" style="width: 100%;background: black;">
 			<%@ include file="/pages/menu/menu.jsp"%>
 		</div>
@@ -511,6 +512,7 @@
 								        				ต้องการเปลี่ยนรหัสผ่านเมื่อ Login ครั้งแรก
 								        			</td>
 									        	</tr>
+									        	<%-- 
 									        	<tr>
 								        			<td align="right">
 								        				<input type="checkbox" id="flagAlertStock" name="flagAlertStock" value="Y" <%if(userDetailsBean.getFlagAlertStock().equals("Y")){ %> checked="checked" <%} %> /> :&nbsp;
@@ -519,6 +521,7 @@
 								        				ต้องการรับ E-mail แจ้งเตือนเมื่อสินค้าลดเหลือถึงกำหนด
 								        			</td>
 									        	</tr>
+									        	--%>
 									        </table>
 									        <table class="user-register-table" style="margin-left:40px" width="80%" border="0" cellpadding="5" cellspacing="5">
 								        		<tr>

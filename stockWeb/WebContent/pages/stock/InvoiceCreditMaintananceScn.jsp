@@ -527,14 +527,17 @@
 		                        
 								lo_seqTemp.value  = lv_maxSeq;
 								
+								$('#productName' + lv_maxSeq).focus();//เพิ่มมาหลังเทส
+								
 								if(ao_jsonObj!=null){
 									lp_calAmount(lv_maxSeq);
 									$("#productCodeDis").val('');
 									$("#productCodeDis").focus();
 									//lp_updateRecord(lv_maxSeq);
-								}else{
-									$('#productName' + lv_maxSeq).focus();
 								}
+								/*else{
+									$('#productName' + lv_maxSeq).focus();
+								}*/
 								
 		            		}else{
 		            			alert(jsonObj.errMsg);
@@ -1137,14 +1140,11 @@
 					return;
 				}
 				
-				if(letters.test(lv_productCodeDis)){
-					alert("รหัสสินค้าห้ามเป็นภาษาไทย", function() { 
+				if(!(gp_checkThaiLetter(lv_productCodeDis))){
+					alert("รหัสสินค้าต้องเปนภาษาอังกฤษหรือตัวเลขเท่านั้น !!", function() { 
 						$("#productCodeDis").val('');
 	        			$("#productCodeDis").focus();
 	    		    });
-					//alert("รหัสสินค้าห้ามเป็นภาษาไทย");
-					//$("#productCodeDis").val('');
-        			//$("#productCodeDis").focus();
 					return;
 				}
 				
@@ -1676,7 +1676,7 @@
 								        				<input type="button" id="btnSave" class="btn btn-sm btn-warning" value='บันทึก' onclick="lp_save();" />&nbsp;&nbsp;&nbsp;
 				   										<input type="button" id="btnReset" onclick="lp_reset();" class="btn btn-sm btn-danger" value='เริ่มใหม่' />
 				   										<%}else{%>
-					   										<%if(!invoiceCreditMasterBean.getInvoiceStatus().equals("C")){ %>
+					   										<%if(!invoiceCreditMasterBean.getInvoiceStatus().equals("C") && !invoiceCreditMasterBean.getInvoiceStatus().equals("S")){ %>
 						   										<input type="button" id="btnPrint" name="btnPrint" class="btn btn-sm btn-warning" value='พิมพ์' onclick="lp_print();" />&nbsp;&nbsp;&nbsp;
 						   										<input type="button" id="btnCancel" name="btnCancel" onclick="lp_cancel();" class="btn btn-sm btn-danger" value='ยกเลิก' />
 					   										<%}%>

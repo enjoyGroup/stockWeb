@@ -23,6 +23,7 @@ public class CompanyVendorBean {
 	private String email;
 	private String remark;
 	private String tinCompany;
+	private String seqDis;
 	
 	public CompanyVendorBean(){
 		this.vendorCode 				= "";
@@ -46,6 +47,7 @@ public class CompanyVendorBean {
 		this.email 						= "";
 		this.remark 					= "";
 		this.tinCompany					= "";
+		this.seqDis						= "1";
 	}
 
 	public String getVendorCode() {
@@ -271,5 +273,13 @@ public class CompanyVendorBean {
 
 	public void setTinCompany(String tinCompany) {
 		this.tinCompany = tinCompany;
+	}
+
+	public String getSeqDis() {
+		return seqDis;
+	}
+
+	public void setSeqDis(String seqDis) {
+		this.seqDis = seqDis;
 	}
 }

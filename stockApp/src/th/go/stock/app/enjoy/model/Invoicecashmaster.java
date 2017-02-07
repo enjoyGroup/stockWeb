@@ -1,8 +1,15 @@
 package th.go.stock.app.enjoy.model;
 
 import java.io.Serializable;
-import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
+import javax.persistence.Entity;
+import javax.persistence.NamedQuery;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 
 /**
@@ -46,6 +53,10 @@ public class Invoicecashmaster implements Serializable {
 	private int saleUniqueId;
 
 	private int userUniqueId;
+	
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name="created_dt")
+	private Date createdDt;
 
 	public Invoicecashmaster() {
 	}
@@ -176,6 +187,14 @@ public class Invoicecashmaster implements Serializable {
 
 	public void setUserUniqueId(int userUniqueId) {
 		this.userUniqueId = userUniqueId;
+	}
+
+	public Date getCreatedDt() {
+		return createdDt;
+	}
+
+	public void setCreatedDt(Date createdDt) {
+		this.createdDt = createdDt;
 	}
 
 }

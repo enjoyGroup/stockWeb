@@ -468,7 +468,7 @@ public class ProductDetailsSearchServlet extends EnjoyStandardSvc {
 			   
 			   logger.info("[print] obj.toString() :: " + obj.toString());
 			   String pdfName = "ProductBarcodePdfForm";
-			   buffer = viewPdfMainForm.writeTicketPDF(pdfName, obj, "รหัสสินค้า");
+			   buffer = viewPdfMainForm.writeTicketPDFForBarCode(pdfName, obj, "รหัสสินค้า");
 				
 			   response.setContentType( "application/pdf" );
 			   response.setHeader("Content-Disposition", "filename=".concat(String.valueOf(pdfName+".pdf")));

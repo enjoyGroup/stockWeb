@@ -252,21 +252,21 @@
 											<tbody>
 												<%
 													CustomerDetailsBean 	bean 		= null;
-	    											int					  	seq		= 1;
+	    											//int					  	seq		= 1;
 													
 													if(dataList.size()>0){
 														for(int i=0;i<dataList.size();i++){
 															bean = dataList.get(i);															
 												%>
 															<tr class="rowSelect" onclick="lp_sendEditPage('<%=bean.getCusCode()%>', '<%=bean.getFullName()%>')" >
-																<td style="text-align:center"><%=seq%></td>
+																<td style="text-align:center"><%=bean.getSeqDis()%></td>
 																<td><%=bean.getFullName()%></td>
 																<td><%=bean.getAddress()%></td>
 																<td><%=bean.getTel()%></td>
 																<td><%=bean.getCustomerStatusName()%></td>
 																<td><%=bean.getRemark()%></td>
 															</tr>
-												<% 			seq++;
+												<% 			//seq++;
 														} 
 													} else{  %>
 														<tr height="26px;"><td colspan="6" align="center"><b>ไม่พบข้อมูลที่ระบุ</b></td></tr>

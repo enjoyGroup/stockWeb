@@ -43,6 +43,7 @@ public class CustomerDetailsDao extends DaoControl{
 		HashMap<String, Object>			param					= new HashMap<String, Object>();
 		List<String>					columnList				= new ArrayList<String>();
 		List<HashMap<String, Object>>	resultList				= null;
+		int								seqDis					= 1;
 		
 		try{	
 			addressDao 			= new AddressDao();
@@ -171,6 +172,7 @@ public class CustomerDetailsDao extends DaoControl{
 				bean.setFullName			(fullName);
 				bean.setBranchName			(EnjoyUtils.nullToStr(row.get("branchName")));
 				bean.setCusGroupCode		(EnjoyUtils.nullToStr(row.get("cusGroupCode")));
+				bean.setSeqDis				(String.valueOf(seqDis++));
 				
 				customerDetailsBeanList.add(bean);
 			}	

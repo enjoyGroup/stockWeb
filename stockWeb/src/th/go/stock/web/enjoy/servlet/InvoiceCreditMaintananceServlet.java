@@ -38,6 +38,7 @@ import th.go.stock.app.enjoy.dao.ProductquantityDao;
 import th.go.stock.app.enjoy.dao.UserDetailsDao;
 import th.go.stock.app.enjoy.exception.EnjoyException;
 import th.go.stock.app.enjoy.form.InvoiceCreditMaintananceForm;
+import th.go.stock.app.enjoy.main.ConfigFile;
 import th.go.stock.app.enjoy.main.Constants;
 import th.go.stock.app.enjoy.pdf.ViewPdfMainForm;
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
@@ -211,7 +212,7 @@ public class InvoiceCreditMaintananceServlet extends EnjoyStandardSvc {
 			combo.add(new ComboBean("A"	, "ใช้งานอยู่"));
 			combo.add(new ComboBean("C"	, "ยกเลิกการใช้งาน"));
 			combo.add(new ComboBean("W"	, "รอสร้างใบ Invoice"));
-			
+			combo.add(new ComboBean("S"	, "รับเงินเรียบร้อยแล้ว"));
 			
 			this.form.setInvoiceStatusCombo(combo);
 		}
@@ -1161,11 +1162,13 @@ public class InvoiceCreditMaintananceServlet extends EnjoyStandardSvc {
 		ByteArrayOutputStream			buffer					= null;
 		byte[] 							bytes					= null;
 		String							invoiceType				= null;
+		String							vatDis					= null;
 	 
 		try{
 			invoiceCode 		= EnjoyUtils.nullToStr(this.request.getParameter("invoiceCode"));
 			tin					= this.userBean.getTin();
 			viewPdfMainForm		= new ViewPdfMainForm();
+			vatDis	 			= ConfigFile.getVat() + "%";
    
 		    /*Begin รายละเอียดใบกำกับภาษี*/
 			invoiceCreditMasterBean.setInvoiceCode	(invoiceCode);
@@ -1195,6 +1198,7 @@ public class InvoiceCreditMaintananceServlet extends EnjoyStandardSvc {
 			objDetail.put("invoiceTypeDesc"	, invoiceCreditMasterDb.getInvoiceTypeDesc());
 			objDetail.put("remark"			, invoiceCreditMasterDb.getRemark());
 			objDetail.put("tin"				, tin);
+			objDetail.put("vatDis"			,vatDis);
 			
 			jsonObject.put("invoiceCreditMaster"	,objDetail);
 			/*End รายละเอียดใบกำกับภาษี*/
@@ -1268,13 +1272,14 @@ public class InvoiceCreditMaintananceServlet extends EnjoyStandardSvc {
 			jsonObject.put(STATUS, 			SUCCESS);
    
 			logger.info("[print] obj.toString() :: " + jsonObject.toString());
-			String pdfName = "";
-			if("V".equals(invoiceType)){
-				pdfName = "FullSlipCreditPdfForm";
-			}else{
-				pdfName = "FullSlipCreditNoVatPdfForm";
-			}
-	
+//			String pdfName = "";
+//			if("V".equals(invoiceType)){
+//				pdfName = "FullSlipCreditPdfForm";
+//			}else{
+//				pdfName = "FullSlipCreditNoVatPdfForm";
+//			}
+			String pdfName = "FullSlipCreditPdfForm";//หน้าตาบิลเครดิตแบบมี vat และไม่มี vat หน้าตาเหมือนกัน
+			
 			buffer = viewPdfMainForm.writeTicketPDFA5(pdfName, jsonObject, "ใบเสร็จรับเงิน");
 			
 			response.setContentType( "application/pdf" );

@@ -201,6 +201,7 @@ public class UserDetailsDao extends DaoControl{
 		HashMap<String, Object>			param					= new HashMap<String, Object>();
 		List<String>					columnList				= new ArrayList<String>();
 		List<HashMap<String, Object>>	resultList				= null;
+		int								seqDis					= 1;
 		
 		try{	
 			
@@ -274,6 +275,7 @@ public class UserDetailsDao extends DaoControl{
 				userDetailsBean.setCommission			(EnjoyUtils.convertFloatToDisplay(row.get("commission"), 2));
 				userDetailsBean.setRemark			    (EnjoyUtils.nullToStr(row.get("remark")));
 				userDetailsBean.setUserStatusName		(EnjoyUtils.nullToStr(row.get("userStatusName")));
+				userDetailsBean.setSeqDis				(String.valueOf(seqDis++));
 				
 				listUserDetailsBean.add(userDetailsBean);
 			}	
@@ -656,6 +658,7 @@ public class UserDetailsDao extends DaoControl{
 		HashMap<String, Object>			param				= new HashMap<String, Object>();
 		List<String>					columnList			= new ArrayList<String>();
 		List<HashMap<String, Object>>	resultList			= null;
+		int								seqDis				= 1;
 		
 		try{
 			find				= form.getFind();
@@ -709,6 +712,7 @@ public class UserDetailsDao extends DaoControl{
 					userDetailsBean.setUserFullName			(EnjoyUtils.nullToStr(row.get("userFullName")));
 					userDetailsBean.setUserStatus			(EnjoyUtils.nullToStr(row.get("userStatus")));
 					userDetailsBean.setUserStatusName		(EnjoyUtils.nullToStr(row.get("userStatusName")));
+					userDetailsBean.setSeqDis				(String.valueOf(seqDis++));
 					
 					listData.add(userDetailsBean);
 				}	

@@ -405,6 +405,7 @@
 															+ '<input type="hidden" id="seq'+lv_maxSeq+'" name="seq" value="'+lv_maxSeq+'" />';
 		                        
 								lo_seqTemp.value  = lv_maxSeq;
+								$("#vendorName"+lv_maxSeq).focus();
 		            		}else{
 		            			alert(jsonObj.errMsg);
 		            			

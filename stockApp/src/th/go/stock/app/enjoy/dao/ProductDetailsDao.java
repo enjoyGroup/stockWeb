@@ -38,6 +38,7 @@ public class ProductDetailsDao extends DaoControl{
 		HashMap<String, Object>			param					= new HashMap<String, Object>();
 		List<String>					columnList				= new ArrayList<String>();
 		List<HashMap<String, Object>>	resultList				= null;
+		int								seqDis					= 1;
 		
 		try{	
 			hql					= "select a.*, b.productTypeName, c.productGroupName "
@@ -100,6 +101,7 @@ public class ProductDetailsDao extends DaoControl{
 				bean.setProductTypeName			(EnjoyUtils.nullToStr(row.get("productTypeName")));
 				bean.setProductGroupName		(EnjoyUtils.nullToStr(row.get("productGroupName")));
 				bean.setChkBoxSeq				(String.valueOf(chkBoxSeq));
+				bean.setSeqDis					(String.valueOf(seqDis++));
 				
 				productDetailsList.add(bean);
 				chkBoxSeq++;
@@ -128,17 +130,14 @@ public class ProductDetailsDao extends DaoControl{
 		List<HashMap<String, Object>>	resultList				= null;
 		
 		try{		
-			hql		= "select a.*, b.productTypeName, c.productGroupName, d.unitName"
-					+ "	from productmaster a, productype b, productgroup c, unittype d"
-					+ "	where b.productTypeCode 	= a.productType"
-					+ "		and b.tin				= a.tin"
-					+ " 	and c.productTypeCode 	= a.productType"
-					+ " 	and c.productGroupCode 	= a.productGroup"
-					+ "		and c.tin				= a.tin"
-					+ " 	and d.unitCode 			= a.unitCode"
-					+ "		and d.tin				= a.tin"
-					+ " 	and a.productCode		= :productCode"
-					+ "		and a.tin				= :tin";
+			hql		= "select a.*, b.productTypeName, c.productGroupName, d.unitName, e.quantity"
+					+ "	from productmaster a"
+					+ "		inner join productype b on b.productTypeCode = a.productType and b.tin = a.tin"
+					+ "		inner join productgroup c on c.productTypeCode 	= a.productType and c.productGroupCode = a.productGroup and c.tin = a.tin"
+					+ " 	inner join unittype d on d.unitCode = a.unitCode and d.tin = a.tin"
+					+ " 	left join productquantity e on e.productCode = a.productCode and e.tin = a.tin"
+					+ "	where a.productCode		= :productCode"
+					+ " 	and a.tin			= :tin";
 			
 			//Criteria
 			param.put("productCode"	, productDetailsBean.getProductCode());
@@ -161,6 +160,7 @@ public class ProductDetailsDao extends DaoControl{
 			columnList.add("productTypeName");
 			columnList.add("productGroupName");
 			columnList.add("unitName");
+			columnList.add("quantity");
 			
 			resultList = getResult(hql, param, columnList);
 			
@@ -184,6 +184,7 @@ public class ProductDetailsDao extends DaoControl{
 					bean.setProductTypeName			(EnjoyUtils.nullToStr(row.get("productTypeName")));
 					bean.setProductGroupName		(EnjoyUtils.nullToStr(row.get("productGroupName")));
 					bean.setUnitName				(EnjoyUtils.nullToStr(row.get("unitName")));
+					bean.setQuantity				(EnjoyUtils.convertFloatToDisplay(row.get("quantity"), 2));
 					
 				}	
 			}
@@ -757,11 +758,12 @@ public class ProductDetailsDao extends DaoControl{
 		List<HashMap<String, Object>>	resultList				= null;
 		
 		try{	
-			hql					= "select a.*, b.productTypeName, c.productGroupName, d.unitName"
+			hql					= "select a.*, b.productTypeName, c.productGroupName, d.unitName, e.quantity"
 								+ "	from productmaster a"
 								+ "		inner join productype b on b.productTypeCode = a.productType and b.tin = a.tin"
 								+ "		inner join productgroup c on c.productTypeCode 	= a.productType and c.productGroupCode = a.productGroup and c.tin = a.tin"
 								+ "		inner join unittype d on d.unitCode = a.unitCode and d.tin = a.tin"
+								+ "		left join productquantity e on e.productCode = a.productCode and e.tin = a.tin"
 								+ "	where a.tin					= :tin"
 								+ "		and b.productTypeName 	= :productTypeName"
 								+ "		and c.productGroupName 	= :productGroupName"
@@ -789,6 +791,7 @@ public class ProductDetailsDao extends DaoControl{
 			columnList.add("salePrice5");
 			columnList.add("productTypeName");
 			columnList.add("productGroupName");
+			columnList.add("quantity");
 			
 			resultList = getResult(hql, param, columnList);
 			
@@ -810,6 +813,7 @@ public class ProductDetailsDao extends DaoControl{
 				bean.setSalePrice5				(EnjoyUtils.convertFloatToDisplay(row.get("salePrice5"), 2));
 				bean.setProductTypeName			(EnjoyUtils.nullToStr(row.get("productTypeName")));
 				bean.setProductGroupName		(EnjoyUtils.nullToStr(row.get("productGroupName")));
+				bean.setQuantity				(EnjoyUtils.convertFloatToDisplay(row.get("quantity"), 2));
 				
 				productDetailsList.add(bean);
 			}	

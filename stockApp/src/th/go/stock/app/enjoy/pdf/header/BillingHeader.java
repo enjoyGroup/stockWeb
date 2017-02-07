@@ -15,12 +15,12 @@ import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfPageEventHelper;
 import com.lowagie.text.pdf.PdfWriter;
 
-public class FullSlipCashHeader extends PdfPageEventHelper {
+public class BillingHeader extends PdfPageEventHelper {
 	
 	private JSONObject 	formDataObj;
 	private EnjoyItext	enjoyItext;
 	
-	public FullSlipCashHeader(JSONObject formDataObj) {
+	public BillingHeader(JSONObject formDataObj) {
 		enjoyItext 	= new EnjoyItext();
 		setFormDataObj(formDataObj);
 	}
@@ -53,10 +53,11 @@ public class FullSlipCashHeader extends PdfPageEventHelper {
 				+ " Fax." + enjoyItext.getText(companyDetails, "fax") 
 				+ " Email." + enjoyItext.getText(companyDetails, "email");
 		
-		table.addCell(enjoyItext.setCellWB(enjoyItext.getText(companyDetails, "companyName"), enjoyItext.getFont12Bold(), 1, Element.ALIGN_CENTER, 0));
-		table.addCell(enjoyItext.setCellWB(enjoyItext.getText(companyDetails, "address"), enjoyItext.getFont9(), 1, Element.ALIGN_CENTER, 0));
-		table.addCell(enjoyItext.setCellWB(address, enjoyItext.getFont9(), 1, Element.ALIGN_CENTER, 0));
-		table.addCell(enjoyItext.setCellWB("เลขประจำตัวผู้เสียภาษี:" + enjoyItext.getText(companyDetails, "tin"), enjoyItext.getFont9(), 1, Element.ALIGN_CENTER, 0));
+		table.addCell(enjoyItext.setCellWB("ใบวางบิล", enjoyItext.getFont18Bold(), 1, Element.ALIGN_CENTER, 0));
+		table.addCell(enjoyItext.setCellWB(enjoyItext.getText(companyDetails, "companyName"), enjoyItext.getFont14Bold(), 1, Element.ALIGN_CENTER, 0));
+		table.addCell(enjoyItext.setCellWB(enjoyItext.getText(companyDetails, "address"), enjoyItext.getFont10(), 1, Element.ALIGN_CENTER, 0));
+		table.addCell(enjoyItext.setCellWB(address, enjoyItext.getFont10(), 1, Element.ALIGN_CENTER, 0));
+		table.addCell(enjoyItext.setCellWB("เลขประจำตัวผู้เสียภาษี:" + enjoyItext.getText(companyDetails, "tin"), enjoyItext.getFont10(), 1, Element.ALIGN_CENTER, 0));
 		
 		table.setWidthPercentage(100);
 	
@@ -65,16 +66,17 @@ public class FullSlipCashHeader extends PdfPageEventHelper {
 	
 	private PdfPTable genHeader1() throws DocumentException, MalformedURLException, IOException {
 		
-		float[] 	widths	 			= {75f ,25f};
+		float[] 	widths	 			= {89f ,11f};
 		PdfPTable 	table 				= new PdfPTable(widths);
 		JSONObject 	jsonObjectMain  	= this.formDataObj;
-		JSONObject  invoiceCashMaster	= (JSONObject) jsonObjectMain.get("invoiceCashMaster");
+		JSONObject  billingDetail		= (JSONObject) jsonObjectMain.get("billingDetail");
 		
-		table.addCell(enjoyItext.setCellWB("เลขที่ใบเสร็จ", enjoyItext.getFont9Bold(), 1, Element.ALIGN_RIGHT, 0));
-		table.addCell(enjoyItext.setCellWB(enjoyItext.getText(invoiceCashMaster, "invoiceCode"), enjoyItext.getFont9(), 1, Element.ALIGN_LEFT, 0));
+//		table.addCell(enjoyItext.setCellWB("ใบวางบิล", enjoyItext.getFont12Bold(), 2, Element.ALIGN_CENTER, 0));
 		
-		table.addCell(enjoyItext.setCellWB("วันที่ใบเสร็จ", enjoyItext.getFont9Bold(), 1, Element.ALIGN_RIGHT, 0));
-		table.addCell(enjoyItext.setCellWB(enjoyItext.getText(invoiceCashMaster, "invoiceDate"), enjoyItext.getFont9(), 1, Element.ALIGN_LEFT, 0));
+//		table.addCell(setCellWB("เลขประจำตัวผู้เสียภาษี", getFont8Bold(), 1, Element.ALIGN_RIGHT, 0));
+//		table.addCell(setCellWB(getText(billingDetail, "tin"), getFont8(), 1, Element.ALIGN_LEFT, 0));
+		table.addCell(enjoyItext.setCellWB("วันที่", enjoyItext.getFont10Bold(), 1, Element.ALIGN_RIGHT, 0));
+		table.addCell(enjoyItext.setCellWB(enjoyItext.getText(billingDetail, "bullingDate"), enjoyItext.getFont10(), 1, Element.ALIGN_RIGHT, 0));
 		
 		table.setWidthPercentage(100);
 	
@@ -85,15 +87,15 @@ public class FullSlipCashHeader extends PdfPageEventHelper {
 		
 		PdfPTable 	table 				= new PdfPTable(1);
 		
-		table.addCell(enjoyItext.setCellWB("ลูกค้า : " + enjoyItext.getText(customerDetails, "cusName") + " " + enjoyItext.getText(customerDetails, "cusSurname"), enjoyItext.getFont9(), 1, Element.ALIGN_LEFT, 0));
-		table.addCell(enjoyItext.setCellWB("ที่อยู่  : " + enjoyItext.getText(customerDetails, "address"), enjoyItext.getFont9(), 1, Element.ALIGN_LEFT, 0));
-		table.addCell(enjoyItext.setCellWB("เลขประจำตัวผู้เสียภาษี : " + enjoyItext.getText(customerDetails, "idNumber"), enjoyItext.getFont9(), 1, Element.ALIGN_LEFT, 0));
+		table.addCell(enjoyItext.setCellWB("ลูกค้า : " + enjoyItext.getText(customerDetails, "cusName") + " " + enjoyItext.getText(customerDetails, "cusSurname"), enjoyItext.getFont10(), 1, Element.ALIGN_LEFT, 0));
+		table.addCell(enjoyItext.setCellWB("ที่อยู่  : " + enjoyItext.getText(customerDetails, "address"), enjoyItext.getFont10(), 1, Element.ALIGN_LEFT, 0));
+		table.addCell(enjoyItext.setCellWB("เลขประจำตัวผู้เสียภาษี : " + enjoyItext.getText(customerDetails, "idNumber"), enjoyItext.getFont10(), 1, Element.ALIGN_LEFT, 0));
 		
 		table.setWidthPercentage(100);
 	
 		return table;
 	}
-	
+		
 	public PdfPTable brLine() throws DocumentException, MalformedURLException, IOException {
 		
 		PdfPTable 	table 			= new PdfPTable(1);

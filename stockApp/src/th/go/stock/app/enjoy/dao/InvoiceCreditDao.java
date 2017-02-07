@@ -2,6 +2,7 @@
 package th.go.stock.app.enjoy.dao;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -26,8 +27,7 @@ public class InvoiceCreditDao extends DaoControl{
 		setLogger(EnjoyLogger.getLogger(InvoiceCreditDao.class));
 		super.init();
 	}
-	
-	
+		
 	public List<InvoiceCreditMasterBean> searchByCriteria(InvoiceCreditMasterBean invoiceCreditMasterBean) throws EnjoyException{
 		getLogger().info("[searchByCriteria][Begin]");
 		
@@ -42,6 +42,7 @@ public class InvoiceCreditDao extends DaoControl{
 		HashMap<String, Object>			param					= new HashMap<String, Object>();
 		List<String>					columnList				= new ArrayList<String>();
 		List<HashMap<String, Object>>	resultList				= null;
+		int								seqDis					= 1;
 		
 		try{	
 			
@@ -79,9 +80,10 @@ public class InvoiceCreditDao extends DaoControl{
 			if(!invoiceCreditMasterBean.getInvoiceStatus().equals("")){
 				hql += " and a.invoiceStatus = :invoiceStatus";
 				param.put("invoiceStatus"	, invoiceCreditMasterBean.getInvoiceStatus());
-			}else{
-				hql += " and a.invoiceStatus not in ('S')";
 			}
+			//else{
+			//	hql += " and a.invoiceStatus not in ('S')";
+			//}
 			
 			//Column select
 			columnList.add("invoiceCode");
@@ -106,6 +108,8 @@ public class InvoiceCreditDao extends DaoControl{
 					invoiceStatusDesc = "ยกเลิกการใช้งาน";
 				}else if(invoiceStatus.equals("W")){
 					invoiceStatusDesc = "รอสร้างใบ Invoice";
+				}else if(invoiceStatus.equals("S")){
+					invoiceStatusDesc = "รับเงินเรียบร้อยแล้ว";
 				}
 				
 				
@@ -118,6 +122,7 @@ public class InvoiceCreditDao extends DaoControl{
 				bean.setInvoiceStatus		(invoiceStatus);
 				bean.setInvoiceStatusDesc	(invoiceStatusDesc);
 				bean.setTin					(EnjoyUtils.nullToStr(row.get("tin")));
+				bean.setSeqDis				(String.valueOf(seqDis++));
 				
 				invoicecreditmasterList.add(bean);
 			}	
@@ -246,6 +251,7 @@ public class InvoiceCreditDao extends DaoControl{
 			invoicecreditmaster.setInvoiceCash			(invoiceCreditMasterBean.getInvoiceCash());
 			invoicecreditmaster.setInvoiceStatus		(invoiceCreditMasterBean.getInvoiceStatus());
 			invoicecreditmaster.setRemark				(invoiceCreditMasterBean.getRemark());
+			invoicecreditmaster.setCreatedDt			(new Date());
 			
 			insertData(invoicecreditmaster);
 			
@@ -554,6 +560,7 @@ public class InvoiceCreditDao extends DaoControl{
 		HashMap<String, Object>			param					= new HashMap<String, Object>();
 		List<String>					columnList				= new ArrayList<String>();
 		List<HashMap<String, Object>>	resultList				= null;
+		int								seqDis					= 1;
 		
 		try{	
 			
@@ -621,6 +628,7 @@ public class InvoiceCreditDao extends DaoControl{
 				bean.setRemark				(EnjoyUtils.nullToStr(row.get("remark")));
 				bean.setInvoiceCash			(EnjoyUtils.nullToStr(row.get("invoiceCash")));
 				bean.setTin					(EnjoyUtils.nullToStr(row.get("tin")));
+				bean.setSeqDis				(String.valueOf(seqDis++));
 				
 				invoiceCreditMasterList.add(bean);
 			}	
@@ -637,5 +645,181 @@ public class InvoiceCreditDao extends DaoControl{
 		return invoiceCreditMasterList;
 		
 	}
+	
+	public List<InvoiceCreditMasterBean> searchForBillingReport(InvoiceCreditMasterBean invoiceCreditMasterBean) throws EnjoyException{
+		getLogger().info("[searchForBillingReport][Begin]");
+		
+		String							hql						= null;
+		InvoiceCreditMasterBean			bean					= null;
+		List<InvoiceCreditMasterBean> 	invoicecreditmasterList = new ArrayList<InvoiceCreditMasterBean>();
+		String 							invoiceDateForm			= null;
+		String 							invoiceDateTo			= null;
+		HashMap<String, Object>			param					= new HashMap<String, Object>();
+		List<String>					columnList				= new ArrayList<String>();
+		List<HashMap<String, Object>>	resultList				= null;
+		
+		try{	
+			
+			invoiceDateForm 	= EnjoyUtils.dateThaiToDb(invoiceCreditMasterBean.getInvoiceDateForm());
+			invoiceDateTo		= EnjoyUtils.dateThaiToDb(invoiceCreditMasterBean.getInvoiceDateTo());
+			
+			hql					= "select * from invoicecreditmaster "
+								+ "	where tin 				= :tin "
+								+ "		and invoiceStatus 	= 'A'"
+								+ "		and cusCode 		= :cusCode"
+								+ "		and invoiceDate >= STR_TO_DATE(:invoiceDateForm, '%Y%m%d')"
+								+ "		and invoiceDate <= STR_TO_DATE(:invoiceDateTo, '%Y%m%d')";
+			
+			//Criteria
+			param.put("tin"				, invoiceCreditMasterBean.getTin());
+			param.put("cusCode"			, invoiceCreditMasterBean.getCusCode());
+			param.put("invoiceDateForm"	, invoiceDateForm);
+			param.put("invoiceDateTo"	, invoiceDateTo);
+			
+			if(!invoiceCreditMasterBean.getInvoiceCode().equals("")){
+				hql += " and invoiceCode LIKE CONCAT(:invoiceCode, '%')";
+				param.put("invoiceCode"	, invoiceCreditMasterBean.getInvoiceCode());
+			}
+			
+			if(!invoiceCreditMasterBean.getInvoiceType().equals("")){
+				hql += " and invoiceType = :invoiceType";
+				param.put("invoiceType"	, invoiceCreditMasterBean.getInvoiceType());
+			}
+			
+			hql += "	order by invoiceDate asc";
+			
+			//Column select
+			columnList.add("invoiceCode");
+			columnList.add("invoiceDate");
+			columnList.add("invoiceType");
+			columnList.add("cusCode");
+			columnList.add("branchName");
+			columnList.add("saleUniqueId");
+			columnList.add("saleCommission");
+			columnList.add("invoicePrice");
+			columnList.add("invoicediscount");
+			columnList.add("invoiceDeposit");
+			columnList.add("invoiceVat");
+			columnList.add("invoiceTotal");
+			columnList.add("userUniqueId");
+			columnList.add("invoiceCash");
+			columnList.add("invoiceStatus");
+			columnList.add("tin");
+			columnList.add("remark");
+			
+			resultList = getResult(hql, param, columnList);
+			
+			for(HashMap<String, Object> row:resultList){
+				bean 	= new InvoiceCreditMasterBean();
+				
+				bean.setInvoiceCode				(EnjoyUtils.nullToStr(row.get("invoiceCode")));
+				bean.setInvoiceDate				(EnjoyUtils.dateToThaiDisplay(row.get("invoiceDate")));
+				bean.setInvoiceType				(EnjoyUtils.nullToStr(row.get("invoiceType")));
+				bean.setCusCode					(EnjoyUtils.nullToStr(row.get("cusCode")));
+				bean.setBranchName				(EnjoyUtils.nullToStr(row.get("branchName")));
+				bean.setSaleUniqueId			(EnjoyUtils.nullToStr(row.get("saleUniqueId")));
+				bean.setSaleCommission			(EnjoyUtils.convertFloatToDisplay(row.get("saleCommission"), 2));
+				bean.setInvoicePrice			(EnjoyUtils.convertFloatToDisplay(row.get("invoicePrice"), 2));
+				bean.setInvoicediscount			(EnjoyUtils.convertFloatToDisplay(row.get("invoicediscount"), 2));
+				bean.setInvoiceDeposit			(EnjoyUtils.convertFloatToDisplay(row.get("invoiceDeposit"), 2));
+				bean.setInvoiceVat				(EnjoyUtils.convertFloatToDisplay(row.get("invoiceVat"), 2));
+				bean.setInvoiceTotal			(EnjoyUtils.convertFloatToDisplay(row.get("invoiceTotal"), 2));
+				bean.setUserUniqueId			(EnjoyUtils.nullToStr(row.get("userUniqueId")));
+				bean.setInvoiceCash				(EnjoyUtils.nullToStr(row.get("invoiceCash")));
+				bean.setInvoiceStatus			(EnjoyUtils.nullToStr(row.get("invoiceStatus")));
+				bean.setTin						(EnjoyUtils.nullToStr(row.get("tin")));
+				bean.setRemark					(EnjoyUtils.nullToStr(row.get("remark")));
+				
+				invoicecreditmasterList.add(bean);
+			}	
+			
+		}catch(Exception e){
+			getLogger().error(e);
+			e.printStackTrace();
+			throw new EnjoyException("error searchForBillingReport");
+		}finally{
+			hql						= null;
+			getLogger().info("[searchForBillingReport][End]");
+		}
+		
+		return invoicecreditmasterList;
+		
+	}	
+	
+	public InvoiceCreditMasterBean sumTotalForBillingReport(InvoiceCreditMasterBean invoiceCreditMasterBean) throws EnjoyException{
+		getLogger().info("[sumTotalForBillingReport][Begin]");
+		
+		String							hql						= null;
+		InvoiceCreditMasterBean			bean					= new InvoiceCreditMasterBean();
+		String 							invoiceDateForm			= null;
+		String 							invoiceDateTo			= null;
+		HashMap<String, Object>			param					= new HashMap<String, Object>();
+		List<String>					columnList				= new ArrayList<String>();
+		List<HashMap<String, Object>>	resultList				= null;
+		
+		try{	
+			
+			invoiceDateForm 	= EnjoyUtils.dateThaiToDb(invoiceCreditMasterBean.getInvoiceDateForm());
+			invoiceDateTo		= EnjoyUtils.dateThaiToDb(invoiceCreditMasterBean.getInvoiceDateTo());
+			
+			hql		= "select SUM(invoicePrice) as invoicePrice"
+					+ "		, SUM(invoicediscount) as invoicediscount "
+					+ "		, SUM(invoiceDeposit) as invoiceDeposit "
+					+ "		, SUM(invoiceVat) as invoiceVat "
+					+ "		, SUM(invoiceTotal) as invoiceTotal "
+					+ "	from invoicecreditmaster"
+					+ "	where tin 				= :tin "
+					+ "		and invoiceStatus 	= 'A'"
+					+ "		and cusCode 		= :cusCode"
+					+ "		and invoiceDate >= STR_TO_DATE(:invoiceDateForm, '%Y%m%d')"
+					+ "		and invoiceDate <= STR_TO_DATE(:invoiceDateTo, '%Y%m%d')";
+			
+			//Criteria
+			param.put("tin"				, invoiceCreditMasterBean.getTin());
+			param.put("cusCode"			, invoiceCreditMasterBean.getCusCode());
+			param.put("invoiceDateForm"	, invoiceDateForm);
+			param.put("invoiceDateTo"	, invoiceDateTo);
+			
+			if(!invoiceCreditMasterBean.getInvoiceCode().equals("")){
+				hql += " and invoiceCode LIKE CONCAT(:invoiceCode, '%')";
+				param.put("invoiceCode"	, invoiceCreditMasterBean.getInvoiceCode());
+			}
+			
+			if(!invoiceCreditMasterBean.getInvoiceType().equals("")){
+				hql += " and invoiceType = :invoiceType";
+				param.put("invoiceType"	, invoiceCreditMasterBean.getInvoiceType());
+			}
+			
+			//Column select
+			columnList.add("invoicePrice");
+			columnList.add("invoicediscount");
+			columnList.add("invoiceDeposit");
+			columnList.add("invoiceVat");
+			columnList.add("invoiceTotal");
+			
+			resultList = getResult(hql, param, columnList);
+			
+			if(resultList!=null && !resultList.isEmpty()){
+				HashMap<String, Object> row = resultList.get(0);
+				
+				bean.setInvoicePrice	(EnjoyUtils.convertFloatToDisplay(row.get("invoicePrice"), 2));
+				bean.setInvoicediscount	(EnjoyUtils.convertFloatToDisplay(row.get("invoicediscount"), 2));
+				bean.setInvoiceDeposit	(EnjoyUtils.convertFloatToDisplay(row.get("invoiceDeposit"), 2));
+				bean.setInvoiceVat		(EnjoyUtils.convertFloatToDisplay(row.get("invoiceVat"), 2));
+				bean.setInvoiceTotal	(EnjoyUtils.convertFloatToDisplay(row.get("invoiceTotal"), 2));
+			}	
+			
+		}catch(Exception e){
+			getLogger().error(e);
+			e.printStackTrace();
+			throw new EnjoyException("error searchForBillingReport");
+		}finally{
+			hql						= null;
+			getLogger().info("[searchForBillingReport][End]");
+		}
+		
+		return bean;
+		
+	}	
 
 }

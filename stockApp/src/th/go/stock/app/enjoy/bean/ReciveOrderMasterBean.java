@@ -22,6 +22,7 @@ public class ReciveOrderMasterBean {
 	private String reciveDateTo;
 	private String usrName;
 	private String tin;
+	private String seqDis;
 	
 	public ReciveOrderMasterBean(){
 		this.reciveNo 			= "";
@@ -44,6 +45,7 @@ public class ReciveOrderMasterBean {
 		this.reciveDateTo		= "";
 		this.usrName			= "";
 		this.tin				= "";
+		this.seqDis				= "";
 	}
 
 	public String getReciveNo() {
@@ -204,5 +206,13 @@ public class ReciveOrderMasterBean {
 
 	public void setTin(String tin) {
 		this.tin = tin;
+	}
+
+	public String getSeqDis() {
+		return seqDis;
+	}
+
+	public void setSeqDis(String seqDis) {
+		this.seqDis = seqDis;
 	}
 }

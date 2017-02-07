@@ -30,7 +30,11 @@
 			
 			if($("#pageMode").val()=="EDIT"){
 				lp_setModeEdit();
+				$("#productName").focus();
+			}else{
+				$("#productCode").focus();
 			}
+			$('html, body').animate({scrollTop: '0px'}, 300);
 			
 			$( "#productTypeName" ).autocomplete({ 
 				 source: function(request, response) {
@@ -171,6 +175,14 @@
 		                return false;
 	                }
 				}*/
+				
+				if(!(gp_checkThaiLetter($("#productCode").val()))){
+					alert("รหัสสินค้าต้องเปนภาษาอังกฤษหรือตัวเลขเท่านั้น !!", function() { 
+						$("#productCode").val('');
+	        			$("#productCode").focus();
+	    		    });
+					return;
+				}
 				
 				for(var i=0;i<la_quanDiscount.length;i++){
 					if(gp_trim(la_quanDiscount[i].value)=="" || gp_trim(la_quanDiscount[i].value)=="0.00"){

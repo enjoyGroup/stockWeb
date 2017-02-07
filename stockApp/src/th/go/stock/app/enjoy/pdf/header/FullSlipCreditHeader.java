@@ -53,9 +53,11 @@ public class FullSlipCreditHeader extends PdfPageEventHelper {
 				+ " Fax." + enjoyItext.getText(companyDetails, "fax") 
 				+ " Email." + enjoyItext.getText(companyDetails, "email");
 		
-		table.addCell(enjoyItext.setCellWB(enjoyItext.getText(companyDetails, "companyName"), enjoyItext.getFont11Bold(), 1, Element.ALIGN_CENTER, 0));
-		table.addCell(enjoyItext.setCellWB(enjoyItext.getText(companyDetails, "address"), enjoyItext.getFont8(), 1, Element.ALIGN_CENTER, 0));
-		table.addCell(enjoyItext.setCellWB(address, enjoyItext.getFont8(), 1, Element.ALIGN_CENTER, 0));
+		table.addCell(enjoyItext.setCellWB("ใบส่งของชั่วคราว", enjoyItext.getFont14Bold(), 1, Element.ALIGN_CENTER, 0));
+		table.addCell(enjoyItext.setCellWB(enjoyItext.getText(companyDetails, "companyName"), enjoyItext.getFont12Bold(), 1, Element.ALIGN_CENTER, 0));
+		table.addCell(enjoyItext.setCellWB(enjoyItext.getText(companyDetails, "address"), enjoyItext.getFont9(), 1, Element.ALIGN_CENTER, 0));
+		table.addCell(enjoyItext.setCellWB(address, enjoyItext.getFont9(), 1, Element.ALIGN_CENTER, 0));
+		table.addCell(enjoyItext.setCellWB("เลขประจำตัวผู้เสียภาษี:" + enjoyItext.getText(companyDetails, "tin"), enjoyItext.getFont9(), 1, Element.ALIGN_CENTER, 0));
 		
 		table.setWidthPercentage(100);
 	
@@ -64,20 +66,16 @@ public class FullSlipCreditHeader extends PdfPageEventHelper {
 	
 	private PdfPTable genHeader1() throws DocumentException, MalformedURLException, IOException {
 		
-		float[] 	widths	 			= {22f,28f ,25f,25f};
+		float[] 	widths	 			= {75f ,25f};
 		PdfPTable 	table 				= new PdfPTable(widths);
 		JSONObject 	jsonObjectMain  	= this.formDataObj;
 		JSONObject  invoiceCreditMaster	= (JSONObject) jsonObjectMain.get("invoiceCreditMaster");
 		
-		table.addCell(enjoyItext.setCellWB("ใบกำกับภาษี/ใบเสร็จรับเงิน", enjoyItext.getFont10Bold(), 4, Element.ALIGN_CENTER, 0));
+		table.addCell(enjoyItext.setCellWB("เลขที่ใบเสร็จ", enjoyItext.getFont9Bold(), 1, Element.ALIGN_RIGHT, 0));
+		table.addCell(enjoyItext.setCellWB(enjoyItext.getText(invoiceCreditMaster, "invoiceCode"), enjoyItext.getFont9(), 1, Element.ALIGN_LEFT, 0));
 		
-		table.addCell(enjoyItext.setCellWB("เลขประจำตัวผู้เสียภาษี", enjoyItext.getFont8Bold(), 1, Element.ALIGN_RIGHT, 0));
-		table.addCell(enjoyItext.setCellWB(enjoyItext.getText(invoiceCreditMaster, "tin"), enjoyItext.getFont8(), 1, Element.ALIGN_LEFT, 0));
-		table.addCell(enjoyItext.setCellWB("เลขที่ใบเสร็จ", enjoyItext.getFont8Bold(), 1, Element.ALIGN_RIGHT, 0));
-		table.addCell(enjoyItext.setCellWB(enjoyItext.getText(invoiceCreditMaster, "invoiceCode"), enjoyItext.getFont8(), 1, Element.ALIGN_LEFT, 0));
-		
-		table.addCell(enjoyItext.setCellWB("วันที่ใบเสร็จ", enjoyItext.getFont8Bold(), 3, Element.ALIGN_RIGHT, 0));
-		table.addCell(enjoyItext.setCellWB(enjoyItext.getText(invoiceCreditMaster, "invoiceDate"), enjoyItext.getFont8(), 1, Element.ALIGN_LEFT, 0));
+		table.addCell(enjoyItext.setCellWB("วันที่ใบเสร็จ", enjoyItext.getFont9Bold(), 1, Element.ALIGN_RIGHT, 0));
+		table.addCell(enjoyItext.setCellWB(enjoyItext.getText(invoiceCreditMaster, "invoiceDate"), enjoyItext.getFont9(), 1, Element.ALIGN_LEFT, 0));
 		
 		table.setWidthPercentage(100);
 	
@@ -86,13 +84,12 @@ public class FullSlipCreditHeader extends PdfPageEventHelper {
 	
 	private PdfPTable genCustomerDetail(JSONObject customerDetails) throws DocumentException, MalformedURLException, IOException {
 		
-		float[] 	widths	 			= {12f,88f};
-		PdfPTable 	table 				= new PdfPTable(widths);
+//		float[] 	widths	 			= {12f,88f};
+		PdfPTable 	table 				= new PdfPTable(1);
 		
-		table.addCell(enjoyItext.setCellWB("ชื่อลูกค้า    : ", enjoyItext.getFont8Bold(), 1, Element.ALIGN_LEFT, 0));
-		table.addCell(enjoyItext.setCellWB(enjoyItext.getText(customerDetails, "cusName") + " " + enjoyItext.getText(customerDetails, "cusSurname"), enjoyItext.getFont8(), 1, Element.ALIGN_LEFT, 0));
-		table.addCell(enjoyItext.setCellWB("ที่อยู่ลูกค้า  : ", enjoyItext.getFont8Bold(), 1, Element.ALIGN_LEFT, 0));
-		table.addCell(enjoyItext.setCellWB(enjoyItext.getText(customerDetails, "address"), enjoyItext.getFont8(), 1, Element.ALIGN_LEFT, 0));
+		table.addCell(enjoyItext.setCellWB("ลูกค้า : " + enjoyItext.getText(customerDetails, "cusName") + " " + enjoyItext.getText(customerDetails, "cusSurname"), enjoyItext.getFont9(), 1, Element.ALIGN_LEFT, 0));
+		table.addCell(enjoyItext.setCellWB("ที่อยู่  : " + enjoyItext.getText(customerDetails, "address"), enjoyItext.getFont9(), 1, Element.ALIGN_LEFT, 0));
+		table.addCell(enjoyItext.setCellWB("เลขประจำตัวผู้เสียภาษี : " + enjoyItext.getText(customerDetails, "idNumber"), enjoyItext.getFont9(), 1, Element.ALIGN_LEFT, 0));
 		
 		table.setWidthPercentage(100);
 	

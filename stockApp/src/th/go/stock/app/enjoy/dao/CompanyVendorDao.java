@@ -41,6 +41,7 @@ public class CompanyVendorDao extends DaoControl {
 		HashMap<String, Object>			param					= new HashMap<String, Object>();
 		List<String>					columnList				= new ArrayList<String>();
 		List<HashMap<String, Object>>	resultList				= null;
+		int								seqDis					= 1;
 		
 		try{	
 			addressDao 			= new AddressDao();
@@ -131,6 +132,7 @@ public class CompanyVendorDao extends DaoControl {
 				bean.setFax					(EnjoyUtils.nullToStr(row.get("fax")));
 				bean.setEmail				(EnjoyUtils.nullToStr(row.get("email")));
 				bean.setRemark				(EnjoyUtils.nullToStr(row.get("remark")));
+				bean.setSeqDis				(String.valueOf(seqDis++));
 				
 				companyVendorBeanList.add(bean);
 			}	

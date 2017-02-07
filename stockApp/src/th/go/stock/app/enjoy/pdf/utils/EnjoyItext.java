@@ -16,18 +16,18 @@ public class EnjoyItext {
 	private BaseFont bfComic;
 	
 	private Font font3;
-	private Font font4;
-	private Font font5;
 	private Font font6;
 	private Font font7;
 	private Font font8;
 	private Font font9;
 	private Font font10;
-	private Font fontL;
+	private Font font11;
+	private Font font12;
+	private Font font14;
+	private Font font16;
+	private Font font18;
 	
 	private Font font3Bold;
-	private Font font4Bold;
-	private Font font5Bold;
 	private Font font6Bold;
 	private Font font7Bold;
 	private Font font8Bold;
@@ -35,50 +35,64 @@ public class EnjoyItext {
 	private Font font10Bold;
 	private Font font11Bold;
 	private Font font12Bold;
-	private Font fontLBold;
-	private Font fontXLBold;
+	private Font font14Bold;
+	private Font font16Bold;
+	private Font font18Bold;
     
-	private Font font10UnderLine;
+	private Font font3UnderLine;
+	private Font font6UnderLine;
+	private Font font7UnderLine;
 	private Font font8UnderLine;
-	private Font fontSymbol12;
-	private Font fontSymbol16;
-	private Font fontSymbolL;
+	private Font font9UnderLine;
+	private Font font10UnderLine;
+	private Font font11UnderLine;
+	private Font font12UnderLine;
+	private Font font14UnderLine;
+	private Font font16UnderLine;
+	private Font font18UnderLine;
 	
 	public EnjoyItext( ) {
 		String fontName 	= 	PdfConfig.FONTNAME;
-		String fontSymbol 	= 	PdfConfig.FONTSYMBOL;
+//		String fontSymbol 	= 	PdfConfig.FONTSYMBOL;
 		
 		try{
 			bfComic 		= 	BaseFont.createFont(fontName, BaseFont.IDENTITY_H,BaseFont.EMBEDDED);
 			font3 			= 	new Font(bfComic, 3);
-			font3Bold 		= 	new Font(bfComic, 3, Font.BOLD);
-			font4 			= 	new Font(bfComic, 4);
-			font4Bold 		= 	new Font(bfComic, 4, Font.BOLD);
-			font5 			= 	new Font(bfComic, 5);
-			font5Bold 		= 	new Font(bfComic, 6, Font.BOLD);
 			font6 			= 	new Font(bfComic, 6);
-			font6Bold 		= 	new Font(bfComic, 6, Font.BOLD);
 			font7 			= 	new Font(bfComic, 7);
-			font7Bold 		= 	new Font(bfComic, 7, Font.BOLD);
 			font8 			= 	new Font(bfComic, 8);
-			font8Bold 		= 	new Font(bfComic, 8, Font.BOLD);
 			font9 			= 	new Font(bfComic, 9);
-			font9Bold 		= 	new Font(bfComic, 9, Font.BOLD);
 			font10 			= 	new Font(bfComic, 10);
+			font11 			= 	new Font(bfComic, 11);
+			font12 			= 	new Font(bfComic, 12);
+			font14 			= 	new Font(bfComic, 14);
+			font16 			= 	new Font(bfComic, 16);
+			font18 			= 	new Font(bfComic, 18);
+			
+			font3Bold 		= 	new Font(bfComic, 3, Font.BOLD);
+			font6Bold 		= 	new Font(bfComic, 6, Font.BOLD);
+			font7Bold 		= 	new Font(bfComic, 7, Font.BOLD);
+			font8Bold 		= 	new Font(bfComic, 8, Font.BOLD);
+			font9Bold 		= 	new Font(bfComic, 9, Font.BOLD);
 			font10Bold 		= 	new Font(bfComic, 10, Font.BOLD);
 			font11Bold 		= 	new Font(bfComic, 11, Font.BOLD);
-			font10UnderLine = 	FontFactory.getFont(fontName, 10,Font.UNDERLINE);
-			font8UnderLine = 	FontFactory.getFont(fontName, 8,Font.UNDERLINE);
 			font12Bold 		= 	new Font(bfComic, 12, Font.BOLD);
-			font12Bold 		= 	new Font(bfComic, 16, Font.BOLD);
-			fontL 			= 	new Font(bfComic, 18);
-			fontLBold 		= 	new Font(bfComic, 18, Font.BOLD);
-			fontXLBold 		= 	new Font(bfComic, 24, Font.BOLD);
+			font14Bold 		= 	new Font(bfComic, 14, Font.BOLD);
+			font16Bold 		= 	new Font(bfComic, 16, Font.BOLD);
+			font18Bold 		= 	new Font(bfComic, 18, Font.BOLD);
+			
+			font3UnderLine = 	FontFactory.getFont(fontName, 3,Font.UNDERLINE);
+			font6UnderLine = 	FontFactory.getFont(fontName, 6,Font.UNDERLINE);
+			font7UnderLine = 	FontFactory.getFont(fontName, 7,Font.UNDERLINE);
+			font8UnderLine = 	FontFactory.getFont(fontName, 8,Font.UNDERLINE);
+			font9UnderLine = 	FontFactory.getFont(fontName, 9,Font.UNDERLINE);
+			font10UnderLine = 	FontFactory.getFont(fontName, 10,Font.UNDERLINE);
+			font11UnderLine = 	FontFactory.getFont(fontName, 11,Font.UNDERLINE);
+			font12UnderLine = 	FontFactory.getFont(fontName, 12,Font.UNDERLINE);
+			font14UnderLine = 	FontFactory.getFont(fontName, 14,Font.UNDERLINE);
+			font16UnderLine = 	FontFactory.getFont(fontName, 16,Font.UNDERLINE);
+			font18UnderLine = 	FontFactory.getFont(fontName, 18,Font.UNDERLINE);
 	
-			BaseFont bfSym 	= 	BaseFont.createFont(fontSymbol,BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
-			fontSymbol12 	= 	new Font(bfSym, 12);
-			fontSymbol16 	= 	new Font(bfSym, 16, Font.BOLD);
-			fontSymbolL 	= 	new Font(bfSym, 18);
 		}catch(Exception e){
 			e.printStackTrace();
 		}
@@ -233,7 +247,7 @@ public class EnjoyItext {
 		cell.setUseBorderPadding(true);
 		cell.setNoWrap(noWrap);
 		if (space) {
-			cell.setPaddingBottom(5); // ��ͧ��ҧ��ҹ...
+			cell.setPaddingBottom(5);
 		}
 		if (border == 0) {
 			cell.setBorder(border);
@@ -274,7 +288,6 @@ public class EnjoyItext {
 		
 	}
 	
-	
 	public static EnjoyItext getInstance() {
 		return instance;
 	}
@@ -292,7 +305,7 @@ public class EnjoyItext {
 	}
 	public void setFont6(Font font6) {
 		this.font6 = font6;
-	}	
+	}
 	public Font getFont7() {
 		return font7;
 	}
@@ -317,11 +330,47 @@ public class EnjoyItext {
 	public void setFont10(Font font10) {
 		this.font10 = font10;
 	}
-	public Font getFontL() {
-		return fontL;
+	public Font getFont11() {
+		return font11;
 	}
-	public void setFontL(Font fontL) {
-		this.fontL = fontL;
+	public void setFont11(Font font11) {
+		this.font11 = font11;
+	}
+	public Font getFont12() {
+		return font12;
+	}
+	public void setFont12(Font font12) {
+		this.font12 = font12;
+	}
+	public Font getFont14() {
+		return font14;
+	}
+	public void setFont14(Font font14) {
+		this.font14 = font14;
+	}
+	public Font getFont16() {
+		return font16;
+	}
+	public void setFont16(Font font16) {
+		this.font16 = font16;
+	}
+	public Font getFont18() {
+		return font18;
+	}
+	public void setFont18(Font font18) {
+		this.font18 = font18;
+	}
+	public Font getFont6Bold() {
+		return font6Bold;
+	}
+	public void setFont6Bold(Font font6Bold) {
+		this.font6Bold = font6Bold;
+	}
+	public Font getFont7Bold() {
+		return font7Bold;
+	}
+	public void setFont7Bold(Font font7Bold) {
+		this.font7Bold = font7Bold;
 	}
 	public Font getFont8Bold() {
 		return font8Bold;
@@ -353,23 +402,35 @@ public class EnjoyItext {
 	public void setFont12Bold(Font font12Bold) {
 		this.font12Bold = font12Bold;
 	}
-	public Font getFontLBold() {
-		return fontLBold;
+	public Font getFont14Bold() {
+		return font14Bold;
 	}
-	public void setFontLBold(Font fontLBold) {
-		this.fontLBold = fontLBold;
+	public void setFont14Bold(Font font14Bold) {
+		this.font14Bold = font14Bold;
 	}
-	public Font getFontXLBold() {
-		return fontXLBold;
+	public Font getFont16Bold() {
+		return font16Bold;
 	}
-	public void setFontXLBold(Font fontXLBold) {
-		this.fontXLBold = fontXLBold;
+	public void setFont16Bold(Font font16Bold) {
+		this.font16Bold = font16Bold;
 	}
-	public Font getFont10UnderLine() {
-		return font10UnderLine;
+	public Font getFont18Bold() {
+		return font18Bold;
 	}
-	public void setFont10UnderLine(Font font10UnderLine) {
-		this.font10UnderLine = font10UnderLine;
+	public void setFont18Bold(Font font18Bold) {
+		this.font18Bold = font18Bold;
+	}
+	public Font getFont6UnderLine() {
+		return font6UnderLine;
+	}
+	public void setFont6UnderLine(Font font6UnderLine) {
+		this.font6UnderLine = font6UnderLine;
+	}
+	public Font getFont7UnderLine() {
+		return font7UnderLine;
+	}
+	public void setFont7UnderLine(Font font7UnderLine) {
+		this.font7UnderLine = font7UnderLine;
 	}
 	public Font getFont8UnderLine() {
 		return font8UnderLine;
@@ -377,23 +438,47 @@ public class EnjoyItext {
 	public void setFont8UnderLine(Font font8UnderLine) {
 		this.font8UnderLine = font8UnderLine;
 	}
-	public Font getFontSymbol12() {
-		return fontSymbol12;
+	public Font getFont9UnderLine() {
+		return font9UnderLine;
 	}
-	public void setFontSymbol12(Font fontSymbol12) {
-		this.fontSymbol12 = fontSymbol12;
+	public void setFont9UnderLine(Font font9UnderLine) {
+		this.font9UnderLine = font9UnderLine;
 	}
-	public Font getFontSymbol16() {
-		return fontSymbol16;
+	public Font getFont10UnderLine() {
+		return font10UnderLine;
 	}
-	public void setFontSymbol16(Font fontSymbol16) {
-		this.fontSymbol16 = fontSymbol16;
+	public void setFont10UnderLine(Font font10UnderLine) {
+		this.font10UnderLine = font10UnderLine;
 	}
-	public Font getFontSymbolL() {
-		return fontSymbolL;
+	public Font getFont11UnderLine() {
+		return font11UnderLine;
 	}
-	public void setFontSymbolL(Font fontSymbolL) {
-		this.fontSymbolL = fontSymbolL;
+	public void setFont11UnderLine(Font font11UnderLine) {
+		this.font11UnderLine = font11UnderLine;
+	}
+	public Font getFont12UnderLine() {
+		return font12UnderLine;
+	}
+	public void setFont12UnderLine(Font font12UnderLine) {
+		this.font12UnderLine = font12UnderLine;
+	}
+	public Font getFont14UnderLine() {
+		return font14UnderLine;
+	}
+	public void setFont14UnderLine(Font font14UnderLine) {
+		this.font14UnderLine = font14UnderLine;
+	}
+	public Font getFont16UnderLine() {
+		return font16UnderLine;
+	}
+	public void setFont16UnderLine(Font font16UnderLine) {
+		this.font16UnderLine = font16UnderLine;
+	}
+	public Font getFont18UnderLine() {
+		return font18UnderLine;
+	}
+	public void setFont18UnderLine(Font font18UnderLine) {
+		this.font18UnderLine = font18UnderLine;
 	}
 	public Font getFont3() {
 		return font3;
@@ -401,49 +486,17 @@ public class EnjoyItext {
 	public void setFont3(Font font3) {
 		this.font3 = font3;
 	}
-	public Font getFont4() {
-		return font4;
-	}
-	public void setFont4(Font font4) {
-		this.font4 = font4;
-	}
-	public Font getFont5() {
-		return font5;
-	}
-	public void setFont5(Font font5) {
-		this.font5 = font5;
-	}
 	public Font getFont3Bold() {
 		return font3Bold;
 	}
 	public void setFont3Bold(Font font3Bold) {
 		this.font3Bold = font3Bold;
 	}
-	public Font getFont4Bold() {
-		return font4Bold;
+	public Font getFont3UnderLine() {
+		return font3UnderLine;
 	}
-	public void setFont4Bold(Font font4Bold) {
-		this.font4Bold = font4Bold;
+	public void setFont3UnderLine(Font font3UnderLine) {
+		this.font3UnderLine = font3UnderLine;
 	}
-	public Font getFont5Bold() {
-		return font5Bold;
-	}
-	public void setFont5Bold(Font font5Bold) {
-		this.font5Bold = font5Bold;
-	}
-	public Font getFont6Bold() {
-		return font6Bold;
-	}
-	public void setFont6Bold(Font font6Bold) {
-		this.font6Bold = font6Bold;
-	}
-	public Font getFont7Bold() {
-		return font7Bold;
-	}
-	public void setFont7Bold(Font font7Bold) {
-		this.font7Bold = font7Bold;
-	}
-	
-	
 	
 }

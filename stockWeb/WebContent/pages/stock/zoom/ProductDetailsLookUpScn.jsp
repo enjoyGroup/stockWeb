@@ -264,6 +264,18 @@
 			}
 		}
 		
+		function lp_clickSearch(event) {
+		    var x 		= event.which || event.keyCode;
+
+			try{
+				if(x==13){
+					$('#btnSearch').click();
+				}
+			}catch(e){
+				alert("lp_clickSearch :: " + e);
+			}
+		}
+		
 		/*function lp_setData(av_productCode, av_productName){
 			try{
 				parent.lp_returnData(av_productCode, av_productName);
@@ -354,6 +366,7 @@
         					   name='productTypeName' 
         					   value="<%=productmasterBean.getProductTypeName()%>" 
         					   maxlength="200" 
+        					   onkeydown="lp_clickSearch(event);"
         					   style="width: 220px;" />
         			</td>
         			<td align="right">
@@ -365,6 +378,7 @@
         					   name='productGroupName' 
         					   value="<%=productmasterBean.getProductGroupName()%>" 
         					   maxlength="200" 
+        					   onkeydown="lp_clickSearch(event);"
         					   style="width: 220px;" />
         			</td>
         		</tr>
@@ -378,6 +392,7 @@
         					   name='productName' 
         					   value="<%=productmasterBean.getProductName()%>" 
         					   maxlength="255" 
+        					   onkeydown="lp_clickSearch(event);"
         					   style="width: 220px;" />
         			</td>
         		</tr>
@@ -424,7 +439,7 @@
 				<tbody>
 					<%
 						ProductmasterBean 	bean 		= null;
-									int					seq			= 1;
+						//int					seq			= 1;
 				
 						if(dataList.size()>0){
 							for(int i=0;i<dataList.size();i++){
@@ -439,14 +454,14 @@
 											   onclick="lp_setForChooseProduct(this, <%=bean.getChkBoxSeq()%>);"
 											   <%if(bean.getChkBox().equals("Y")){%>checked="checked"<%}%> />
 									</td>
-									<td style="text-align:center;"><%=seq%></td>
+									<td style="text-align:center;"><%=bean.getSeqDis()%></td>
 									<td style="text-align:left;"><%=bean.getProductTypeName()%></td>
 									<td style="text-align:left;"><%=bean.getProductGroupName()%></td>
 									<td style="text-align:left;"><%=bean.getProductCode()%></td>
 									<td style="text-align:left;"><%=bean.getProductName()%></td>
 									<td style="text-align:left;"><%=bean.getSalePrice1()%></td>
 								</tr>
-					<% 			seq++;
+					<% 			//seq++;
 							} 
 						} else{  %>
 							<tr height="26px;"><td colspan="7" align="center"><b>ไม่พบข้อมูลที่ระบุ</b></td></tr>

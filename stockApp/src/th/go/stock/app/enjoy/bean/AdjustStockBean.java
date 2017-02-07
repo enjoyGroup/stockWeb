@@ -14,6 +14,8 @@ public class AdjustStockBean {
 	private String unitName;
 	private int lastOrder;
 	private String tin;
+	private String seq;
+	private String rowStatus;
 	
 	public AdjustStockBean(){
 		this.adjustNo 			= "";
@@ -28,6 +30,8 @@ public class AdjustStockBean {
 		this.unitName			= "";
 		this.lastOrder			= 0;
 		this.tin				= "";
+		this.seq 				= "";
+		this.rowStatus			= "";
 	}
 
 	public String getAdjustNo() {
@@ -124,6 +128,22 @@ public class AdjustStockBean {
 
 	public void setTin(String tin) {
 		this.tin = tin;
+	}
+
+	public String getSeq() {
+		return seq;
+	}
+
+	public void setSeq(String seq) {
+		this.seq = seq;
+	}
+
+	public String getRowStatus() {
+		return rowStatus;
+	}
+
+	public void setRowStatus(String rowStatus) {
+		this.rowStatus = rowStatus;
 	}
 
 }

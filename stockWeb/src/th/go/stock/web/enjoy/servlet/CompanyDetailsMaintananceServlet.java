@@ -436,18 +436,19 @@ public class CompanyDetailsMaintananceServlet extends EnjoyStandardSvc {
 			
 			commit();
 			
+			this.getDetail(tin);
+			
 		}catch(EnjoyException e){
 			rollback();
 			obj.put(STATUS, 		ERROR);
 			obj.put(ERR_MSG, 		e.getMessage());
 		}catch(Exception e){
 			rollback();
-			logger.info(e.getMessage());
+			logger.error(e);
 			e.printStackTrace();
 			obj.put(STATUS, 		ERROR);
 			obj.put(ERR_MSG, 		"onSave is error");
 		}finally{
-			this.getDetail(tin);
 			this.enjoyUtil.writeMSG(obj.toString());
 			
 			logger.info("[onSave][End]");

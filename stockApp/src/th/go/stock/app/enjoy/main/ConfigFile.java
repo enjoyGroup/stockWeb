@@ -15,6 +15,12 @@ public class ConfigFile {
 	private static final String OPEN_LOG   			= "open.log";//company
 	private static final String VAT   				= "system.vat";
 	private static final String ENJOY_NAME   		= "enjoyname";
+	private static final String DB_DRIVER   		= "db.driver";
+	private static final String DB_URL   			= "db.url";
+	private static final String DB_USER   			= "db.user";
+	private static final String DB_PASS   			= "db.pass";
+	private static final String DB_NAME   			= "db.name";
+	
 	private static ConfigFile configFile;
 	private static Properties properties ;
 	
@@ -43,7 +49,7 @@ public class ConfigFile {
 	public static String getText( String arg ){
 		String result = ConfigFile.getProperties().getProperty( arg );		
 	    result = EnjoyUtils.convertDataThai(result);
-//System.out.println("result  :: " + result);	
+System.out.println("result  :: " + result);	
 		return result;
 	}
 	
@@ -71,5 +77,20 @@ public class ConfigFile {
 	}
 	public static String getEnjoyName() {
 		return getText(ENJOY_NAME);
+	}
+	public static String getDbDriver() {
+		return getText(DB_DRIVER);
+	}
+	public static String getDbUrl() {
+		return getText(DB_URL);
+	}
+	public static String getDbUser() {
+		return getText(DB_USER);
+	}
+	public static String getDbPass() {
+		return getText(DB_PASS);
+	}
+	public static String getDbName() {
+		return getText(DB_NAME);
 	}
 }

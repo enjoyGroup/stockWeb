@@ -271,16 +271,17 @@
 								               <tr height="26px;">
 													<th  style="text-align: center;" width="5%" ><B>ลำดับ</B></th>
 													<th  style="text-align: center;" width="15%"><B>เลขที่ใบเสร็จ</B></th>
-													<th  style="text-align: center;" width="15%"><B>ประเภทการขาย</B></th>
-													<th  style="text-align: center;" width="20%"><B>ลูกค้า</B></th>
-													<th  style="text-align: center;" width="15%"><B>วันที่ขาย</B></th>
+													<th  style="text-align: center;" width="15%"><B>เลขที่ใบวางบิล</B></th>
+													<th  style="text-align: center;" width="12%"><B>ประเภทการขาย</B></th>
+													<th  style="text-align: center;" width="18%"><B>ลูกค้า</B></th>
+													<th  style="text-align: center;" width="10%"><B>วันที่ขาย</B></th>
 													<th  style="text-align: center;" width="15%"><B>จำนวนเงิน</B></th>
-													<th  style="text-align: center;" width="15%"><B>สถานะ</B></th>
+													<th  style="text-align: center;" width="10%"><B>สถานะ</B></th>
 												</tr> 
 											</thead>
 											<tfoot>
 												<tr height="26px;">
-													<td colspan="7" align="right">
+													<td colspan="8" align="right">
 														<span style="top: -3px;">จำนวน&nbsp;</span>
 														<input type="text" id="i_txt_nvt_totalresult" name="i_txt_nvt_totalresult" style="top:0px;left:0px;width: 50px;"  readonly="readonly" value="<%=invoiceCashSearchForm.getTotalRecord()%>" >
 														<span style="top: -3px;">&nbsp;รายการ&nbsp;&nbsp;</span>
@@ -298,24 +299,25 @@
 											</tfoot>
 											<tbody>
 												<%
-	    											int					  	seq		= 1;
+	    											//int					  	seq		= 1;
 													
 													if(dataList.size()>0){
 														for(InvoiceCashMasterBean bean:dataList){
 												%>
 															<tr class="rowSelect" onclick="lp_sendEditPage('<%=bean.getInvoiceCode()%>')" >
-																<td style="text-align:center"><%=seq%></td>
+																<td style="text-align:center"><%=bean.getSeqDis()%></td>
 																<td align="left"><%=bean.getInvoiceCode()%></td>
+																<td align="left"><%=bean.getInvoiceCredit()%></td>
 																<td align="left"><%=bean.getInvoiceTypeDesc()%></td>
 																<td align="left"><%=bean.getCusFullName()%></td>
 																<td align="center"><%=bean.getInvoiceDate()%></td>
 																<td align="right"><%=bean.getInvoiceTotal()%></td>
 																<td align="left"><%=bean.getInvoiceStatusDesc()%></td>
 															</tr>
-												<% 			seq++;
+												<% 			//seq++;
 														} 
 													} else{  %>
-														<tr height="26px;"><td colspan="7" align="center"><b>ไม่พบข้อมูลที่ระบุ</b></td></tr>
+														<tr height="26px;"><td colspan="8" align="center"><b>ไม่พบข้อมูลที่ระบุ</b></td></tr>
 												<%  } %>  
 											</tbody>
 										</table>

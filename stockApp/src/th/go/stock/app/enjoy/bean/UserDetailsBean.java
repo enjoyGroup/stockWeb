@@ -25,6 +25,7 @@ public class UserDetailsBean {
 	private String							remark;
 	private String							tin;
 	private String							companyName;
+	private String 							seqDis;
 	
 	public UserDetailsBean(){
 		this.userUniqueId		= 0;
@@ -48,6 +49,7 @@ public class UserDetailsBean {
 		this.remark				= "";
 		this.tin				= "";
 		this.companyName		= "";
+		this.seqDis				= "1";
 	}
 
 	public int getUserUniqueId() {
@@ -216,5 +218,13 @@ public class UserDetailsBean {
 
 	public void setCompanyName(String companyName) {
 		this.companyName = companyName;
+	}
+
+	public String getSeqDis() {
+		return seqDis;
+	}
+
+	public void setSeqDis(String seqDis) {
+		this.seqDis = seqDis;
 	}
 }

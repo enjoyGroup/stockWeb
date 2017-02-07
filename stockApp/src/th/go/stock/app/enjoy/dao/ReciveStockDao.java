@@ -39,6 +39,7 @@ public class ReciveStockDao extends DaoControl{
 		HashMap<String, Object>			param					= new HashMap<String, Object>();
 		List<String>					columnList				= new ArrayList<String>();
 		List<HashMap<String, Object>>	resultList				= null;
+		int								seqDis					= 1;
 		
 		try{	
 			
@@ -93,6 +94,7 @@ public class ReciveStockDao extends DaoControl{
 				bean.setReciveStatus		(EnjoyUtils.nullToStr(row.get("reciveStatus")));
 				bean.setReciveStatusDesc	(EnjoyUtils.nullToStr(row.get("reciveStatusName")));
 				bean.setTin					(EnjoyUtils.nullToStr(row.get("tin")));
+				bean.setSeqDis				(String.valueOf(seqDis++));
 				
 				reciveOrderMasterList.add(bean);
 			}	

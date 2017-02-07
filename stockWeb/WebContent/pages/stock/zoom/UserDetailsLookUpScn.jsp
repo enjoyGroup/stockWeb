@@ -247,19 +247,19 @@
 				</tfoot>
 				<tbody>
 					<%
-						int				 		seq			= 1;
+						//int				 		seq			= 1;
 						List<UserDetailsBean> 	dataList 	= userDetailsLookUpForm.getDataList();
 										
 						if(dataList.size()>0){
 							for(UserDetailsBean bean:dataList){
 					%>
 								<tr class="rowSelect" onclick="lp_setData('<%=bean.getUserUniqueId()%>', '<%=bean.getUserFullName()%>', '<%=bean.getUserEmail()%>', '<%=bean.getUserStatus()%>', '<%=bean.getUserStatusName()%>');" >
-									<td align="center"><%=seq%></td>
+									<td align="center"><%=bean.getSeqDis()%></td>
 									<td><%=bean.getUserEmail()%></td>
 									<td><%=bean.getUserFullName()%></td>
 									<td><%=bean.getUserStatusName()%></td>
 								</tr>
-					<% 			seq++;
+					<% 			//seq++;
 							} 
 						} else{  %>
 							<tr height="26px;"><td colspan="4" align="center"><b>ไม่พบข้อมูลที่ระบุ</b></td></tr>

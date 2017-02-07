@@ -1165,6 +1165,39 @@ function gp_checkMonth(ao_obj){
     }
 
     return true;
-  }
+}
+
+	function gp_checkThaiLetter(av_txtChk){
+		var letters = /^[u0E01-u0E5B]+$/;
+		
+		try{
+			if(!(letters.test(av_txtChk))) return false;
+			
+			return true;
+		}catch(e){
+			alert("gp_checkThaiLetter :: " + e);
+	    	return false;
+		}
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

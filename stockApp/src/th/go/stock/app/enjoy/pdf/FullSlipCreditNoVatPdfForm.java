@@ -53,21 +53,21 @@ public class FullSlipCreditNoVatPdfForm extends EnjoyItext implements PdfFormSer
 			document.add(this.brLine());
 			document.add(this.brLine());
 			document.add(this.genTotalCost());
-//			document.add(this.brLine());
-//			document.add(this.brLine());
-//			document.add(this.brLine());
-//			document.add(this.brLine());
-//			document.add(this.brLine());
-//			document.add(this.brLine());
-//			document.add(this.brLine());
-//			document.add(this.brLine());
-//			document.add(this.brLine());
-//			document.add(this.brLine());
-//			document.add(this.brLine());
-//			document.add(this.brLine());
-//			document.add(this.brLine());
-//			document.add(this.brLine());
-//			document.add(this.genFooter());
+			document.add(this.brLine());
+			document.add(this.brLine());
+			document.add(this.brLine());
+			document.add(this.brLine());
+			document.add(this.brLine());
+			document.add(this.brLine());
+			document.add(this.brLine());
+			document.add(this.brLine());
+			document.add(this.brLine());
+			document.add(this.brLine());
+			document.add(this.brLine());
+			document.add(this.brLine());
+			document.add(this.brLine());
+			document.add(this.brLine());
+			document.add(this.genFooter());
 			
 		}
 		catch(DocumentException de){
@@ -214,17 +214,17 @@ public class FullSlipCreditNoVatPdfForm extends EnjoyItext implements PdfFormSer
 		return table;
 	}
 	
-//	private PdfPTable genFooter() throws DocumentException, MalformedURLException, IOException {
-//		float[] 	widths	 	= {75f, 25f};
-//		PdfPTable 	table 		= new PdfPTable(widths);
-//		
-//		table.addCell(setCellWB("ผู้รับเงิน (ลายเซ็นต์)", getFont8(), 1, Element.ALIGN_RIGHT, 0));
-//		table.addCell(setCellWB("ผู้รับสินค้า (ลายเซ็นต์)", getFont8(), 1, Element.ALIGN_RIGHT, 0));
-//		
-//		table.setWidthPercentage(100);
-//	
-//		return table;
-//	}
+	private PdfPTable genFooter() throws DocumentException, MalformedURLException, IOException {
+		float[] 	widths	 	= {75f, 25f};
+		PdfPTable 	table 		= new PdfPTable(widths);
+		
+		table.addCell(setCellWB("ผู้รับเงิน (ลายเซ็นต์)", getFont8(), 1, Element.ALIGN_RIGHT, 0));
+		table.addCell(setCellWB("ผู้รับสินค้า (ลายเซ็นต์)", getFont8(), 1, Element.ALIGN_RIGHT, 0));
+		
+		table.setWidthPercentage(100);
+	
+		return table;
+	}
 
 	public PdfPTable brLine() throws DocumentException, MalformedURLException, IOException {
 		

@@ -2,6 +2,7 @@
 package th.go.stock.app.enjoy.dao;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -41,6 +42,7 @@ public class InvoiceCashDao extends DaoControl{
 		HashMap<String, Object>			param					= new HashMap<String, Object>();
 		List<String>					columnList				= new ArrayList<String>();
 		List<HashMap<String, Object>>	resultList				= null;
+		int								seqDis					= 1;
 		
 		try{	
 			
@@ -90,6 +92,7 @@ public class InvoiceCashDao extends DaoControl{
 			columnList.add("invoiceTotal");
 			columnList.add("invoiceStatus");
 			columnList.add("tin");
+			columnList.add("invoiceCredit");
 			
 			resultList = getResult(hql, param, columnList);
 			
@@ -117,6 +120,8 @@ public class InvoiceCashDao extends DaoControl{
 				bean.setInvoiceStatus		(invoiceStatus);
 				bean.setInvoiceStatusDesc	(invoiceStatusDesc);
 				bean.setTin					(EnjoyUtils.nullToStr(row.get("tin")));
+				bean.setInvoiceCredit		(EnjoyUtils.nullToStr(row.get("invoiceCredit")));
+				bean.setSeqDis				(String.valueOf(seqDis++));
 				
 				invoiceCashMasterList.add(bean);
 			}	
@@ -245,6 +250,7 @@ public class InvoiceCashDao extends DaoControl{
 			invoiceCashMaster.setInvoiceCredit			(invoiceCashMasterBean.getInvoiceCredit());
 			invoiceCashMaster.setInvoiceStatus			(invoiceCashMasterBean.getInvoiceStatus());
 			invoiceCashMaster.setRemark					(invoiceCashMasterBean.getRemark());
+			invoiceCashMaster.setCreatedDt				(new Date());
 			
 			insertData(invoiceCashMaster);
 			

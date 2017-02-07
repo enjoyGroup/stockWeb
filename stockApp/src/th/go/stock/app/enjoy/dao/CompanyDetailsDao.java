@@ -39,6 +39,7 @@ public class CompanyDetailsDao extends DaoControl {
 		HashMap<String, Object>			param					= new HashMap<String, Object>();
 		List<String>					columnList				= new ArrayList<String>();
 		List<HashMap<String, Object>>	resultList				= null;
+		int								seqDis					= 1;
 		
 		try{	
 			addressDao 			= new AddressDao();
@@ -123,6 +124,7 @@ public class CompanyDetailsDao extends DaoControl {
 				bean.setRemark				(EnjoyUtils.nullToStr(row.get("remark")));
 				bean.setCompanyStatus		(EnjoyUtils.nullToStr(row.get("companyStatus")));
 				bean.setCompanyStatusName	(EnjoyUtils.nullToStr(row.get("companyStatusName")));
+				bean.setSeqDis				(String.valueOf(seqDis++));
 				
 				companyDetailsBeanList.add(bean);
 			}	

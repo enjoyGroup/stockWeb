@@ -41,6 +41,7 @@ public class ProductmasterBean {
 	private ExcelField colH;
 	private ExcelField colI;
 	private ExcelField colJ;
+	private String seqDis;
 	
 	public ProductmasterBean(){
 		this.productCode 		= "";
@@ -64,6 +65,7 @@ public class ProductmasterBean {
 		this.rowStatus			= "";
 		this.seq				= "0";
 		this.quantity			= "0.00";
+		this.seqDis				= "1";
 	}
 	
 	public ProductmasterBean(Row row){
@@ -325,5 +327,13 @@ public class ProductmasterBean {
 
 	public void setColJ(ExcelField colJ) {
 		this.colJ = colJ;
+	}
+
+	public String getSeqDis() {
+		return seqDis;
+	}
+
+	public void setSeqDis(String seqDis) {
+		this.seqDis = seqDis;
 	}
 }

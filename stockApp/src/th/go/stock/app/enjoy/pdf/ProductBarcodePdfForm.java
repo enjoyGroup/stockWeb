@@ -1,5 +1,6 @@
 package th.go.stock.app.enjoy.pdf;
 
+import java.awt.Color;
 import java.io.IOException;
 import java.net.MalformedURLException;
 
@@ -14,10 +15,12 @@ import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.Element;
 import com.lowagie.text.Image;
+import com.lowagie.text.Rectangle;
 import com.lowagie.text.pdf.Barcode128;
 import com.lowagie.text.pdf.BaseFont;
 import com.lowagie.text.pdf.PdfContentByte;
 import com.lowagie.text.pdf.PdfPTable;
+import com.lowagie.text.pdf.PdfTemplate;
 import com.lowagie.text.pdf.PdfWriter;
 
 public class ProductBarcodePdfForm extends EnjoyItext implements PdfFormService {
@@ -63,7 +66,7 @@ public class ProductBarcodePdfForm extends EnjoyItext implements PdfFormService 
 	
 	private PdfPTable genDetail(JSONArray detailList) throws DocumentException, MalformedURLException, IOException {
 		
-		float[] 		widths	 		= {25f ,25f ,25f, 25f};
+		float[] 		widths	 		= {25f ,25f ,25f ,25f};
 		PdfPTable 		table 			= new PdfPTable(widths);
 		float[] 		subW1	 		= {1};
 		PdfPTable 		subTab1 		= null;
@@ -75,11 +78,16 @@ public class ProductBarcodePdfForm extends EnjoyItext implements PdfFormService 
 		Image			barCode			= null;
 		BaseFont 		bfComic 		= BaseFont.createFont(PdfConfig.FONTNAME, BaseFont.IDENTITY_H,BaseFont.EMBEDDED);
 		String			printType		= (String) this.formDataObj.get("printType");
-		int				maxRow			= 18;
+		int				maxRow			= 14;
+		int				maxCol			= 4;
 		int				row				= 1;
 		int				col				= 4;
 		int				mod				= 0;
 		int				couColumn		= 1;
+		float			barcodeW		= 0.6f;
+		float			barcodeH		= 40f;
+		
+		System.out.println("[genDetail] printType :: " + printType);
 		
 		/*พิมพ์ซ้ำรายการเดิม*/
 		if("A".equals(printType)){
@@ -105,13 +113,15 @@ public class ProductBarcodePdfForm extends EnjoyItext implements PdfFormService 
 						code128.setTextAlignment(Element.ALIGN_CENTER);
 						code128.setFont(bfComic);
 						code128.setSize(6);
+						code128.setBarHeight(barcodeH);
+				        code128.setX(barcodeW);
 						barCode = code128.createImageWithBarcode(cb, null, null);
 						barCode.setBorder(0);
 						subTab1.addCell(setCellWB(barCode, 1, Element.ALIGN_CENTER, 0, false, false));
 						
 						table.addCell(setCell(subTab1, 1));
 						
-						if(couColumn==4){
+						if(couColumn==maxCol){
 							couColumn = 1;
 							row++;
 						}else{
@@ -150,13 +160,16 @@ public class ProductBarcodePdfForm extends EnjoyItext implements PdfFormService 
 					code128.setTextAlignment(Element.ALIGN_CENTER);
 					code128.setFont(bfComic);
 					code128.setSize(6);
+					code128.setBarHeight(barcodeH);
+			        code128.setX(barcodeW);
+			        
 					barCode = code128.createImageWithBarcode(cb, null, null);
 					barCode.setBorder(0);
 					subTab1.addCell(setCellWB(barCode, 1, Element.ALIGN_CENTER, 0, false, false));
 					
 					table.addCell(setCell(subTab1, 1));
 					
-					if(couColumn==4){
+					if(couColumn==maxCol){
 						couColumn = 1;
 					}else{
 						couColumn++;
