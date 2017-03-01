@@ -448,7 +448,7 @@ public class InvoiceCashDao extends DaoControl{
 			id.setSeq			(EnjoyUtils.parseInt(invoiceCashDetailBean.getSeqDb()));
 			
 			invoicecashdetail.setId					(id);
-			invoicecashdetail.setProductCode		(invoiceCashDetailBean.getProductCode());
+			invoicecashdetail.setProductCode		(EnjoyUtils.parseInt(invoiceCashDetailBean.getProductCode()));
 			invoicecashdetail.setQuantity			(EnjoyUtils.parseBigDecimal(invoiceCashDetailBean.getQuantity()));
 			invoicecashdetail.setPricePerUnit		(EnjoyUtils.parseBigDecimal(invoiceCashDetailBean.getPricePerUnit()));
 			invoicecashdetail.setDiscount			(EnjoyUtils.parseBigDecimal(invoiceCashDetailBean.getDiscount()));

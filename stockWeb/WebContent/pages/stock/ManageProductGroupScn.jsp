@@ -1,7 +1,7 @@
 <%@ include file="/pages/include/checkLogin.jsp"%>
 <%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
 <%@ page import="th.go.stock.app.enjoy.bean.ManageProductGroupBean,th.go.stock.app.enjoy.bean.ComboBean"%>
-<%@ page import="java.util.*"%>
+<%@ page import="java.util.*,org.apache.commons.lang3.StringEscapeUtils"%>
 <jsp:useBean id="manageProductGroupForm" class="th.go.stock.app.enjoy.form.ManageProductGroupForm" scope="session"/>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
@@ -124,22 +124,22 @@
 		});
 			
 		function lp_validate(){
-		    var la_productGroupCode		= null;
+		    var la_productGroupCodeDis	= null;
 		    var la_productGroupName		= null;
 		    var lv_return				= true;
 		    
 			try{
 				
-				la_productGroupCode = document.getElementsByName("productGroupCode");
+				la_productGroupCodeDis = document.getElementsByName("productGroupCodeDis");
 				la_productGroupName = document.getElementsByName("productGroupName");
 				
-				for(var i=0;i<la_productGroupCode.length;i++){
-					if(gp_trim(la_productGroupCode[i].value)==""){
+				for(var i=0;i<la_productGroupCodeDis.length;i++){
+					if(gp_trim(la_productGroupCodeDis[i].value)==""){
 						alert("กรุณาระบุรหัสหมู่สินค้า", function() { 
-							la_productGroupCode[i].focus();
+							la_productGroupCodeDis[i].focus();
 		    		    });
 		            	//alert("กรุณาระบุรหัสหมู่สินค้า");
-		            	//la_productGroupCode[i].focus();
+		            	//la_productGroupCodeDis[i].focus();
 		                return false;
 		            }
 				}
@@ -201,7 +201,7 @@
 				
 				if(lp_addRowtable("", "", lv_maxSeq)){
 					lo_seqTemp.value  = lv_maxSeq;
-					$('#productGroupCode' + lv_maxSeq).focus();
+					$('#productGroupCodeDis' + lv_maxSeq).focus();
 				}
 			}catch(e){
 				alert("lp_newRecord :: " + e);
@@ -222,20 +222,20 @@
 				$.each(av_json.productGroupList, function(idx, obj) {
 					lv_maxSeq   = parseInt(lo_seqTemp.value) + 1;
 					
-					if(lp_addRowtable(obj.productGroupCode, obj.productGroupName, lv_maxSeq)){
+					if(lp_addRowtable(obj.productGroupCodeDis, obj.productGroupName, lv_maxSeq)){
 						lo_seqTemp.value  = lv_maxSeq;
 						lp_updateRecord(lv_maxSeq);
 					}
     			});
 				
 				gp_progressBarOff();
-				$('#productGroupCode' + lv_maxSeq).focus();
+				$('#productGroupCodeDis' + lv_maxSeq).focus();
 			}catch(e){
 				alert("lp_newRecordFromExcelFile :: " + e);
 			}
 		}
 		
-		function lp_addRowtable(av_productGroupCode, av_productGroupName, av_seq){
+		function lp_addRowtable(av_productGroupCodeDis, av_productGroupName, av_seq){
 			var lo_table                        = document.getElementById("resultData");
 			var rowIndex                      	= lo_table.rows.length;//gp_rowTableIndex(ao_obj);
 			var newNodeTr 	                	= null;
@@ -276,10 +276,13 @@
 		                        newNodeTd1.innerHTML        = rowIndex;
 		                        
 		                      	//รหัสหมู่สินค้า
-		                       	newNodeTd2.innerHTML        = '<input type="text" maxlength="5" style="width: 100%;" onblur="lp_updateRecord('+av_seq+');" id="productGroupCode' + av_seq + '" name="productGroupCode" value="'+av_productGroupCode+'" />';
+		                       	newNodeTd2.innerHTML        = '<input type="text" maxlength="5" style="width: 100%;" onblur="lp_updateRecord('+av_seq+');" id="productGroupCodeDis' + av_seq + '" name="productGroupCodeDis" value="" />'
+		                       								+ '<input type="hidden" id="productGroupCode' + av_seq + '" name="productGroupCode" value="" />';
+		                       	$("#productGroupCodeDis" + av_seq).val(av_productGroupCodeDis);
 		                       	
 		                      	//ชื่อหมู่สินค้า
-		                       	newNodeTd3.innerHTML        = '<input type="text" maxlength="200" style="width: 100%" onblur="lp_updateRecord('+av_seq+');" id="productGroupName' + av_seq + '" name="productGroupName" value="'+av_productGroupName+'" />';
+		                       	newNodeTd3.innerHTML        = '<input type="text" maxlength="200" style="width: 100%" onblur="lp_updateRecord('+av_seq+');" id="productGroupName' + av_seq + '" name="productGroupName" value="" />';
+		                       	$("#productGroupName" + av_seq).val(av_productGroupName);
 		                       	
 		                      	//Action
 		                      	newNodeTd4.align 			= "center";
@@ -306,8 +309,8 @@
 		}
 		
 		function lp_deleteRecord(ao_obj, av_val){
-			var params							= "";
-		    var lo_table                        = document.getElementById("resultData");
+			var params		= "";
+		    var lo_table    = document.getElementById("resultData");
 			
 			try{
 				
@@ -353,14 +356,19 @@
 		function lp_updateRecord(av_val){
 			var params					= "";
 			var productGroupCode		= null;
+			var productGroupCodeDis		= null;
 			var productGroupName		= null;
 			
 			try{
 				
-				productGroupCode = document.getElementById("productGroupCode" + av_val).value;
-				productGroupName = document.getElementById("productGroupName" + av_val).value;
+				productGroupCode 	= document.getElementById("productGroupCode" + av_val).value;
+				productGroupCodeDis = document.getElementById("productGroupCodeDis" + av_val).value;
+				productGroupName 	= document.getElementById("productGroupName" + av_val).value;
 				
-				params 	= gv_service + "&pageAction=updateRecord&seq=" + av_val + "&productGroupCode=" + productGroupCode + "&productGroupName=" + productGroupName;
+				params 	= gv_service + "&pageAction=updateRecord&seq=" + av_val 
+						+ "&productGroupCode=" + productGroupCode 
+						+ "&productGroupCodeDis=" + productGroupCodeDis 
+						+ "&productGroupName=" + productGroupName;
 				
 				$.ajax({
 					async:false,
@@ -494,7 +502,7 @@
 						        					   maxlength="200" 
 						        					   placeholder="หมวดสินค้า"  
 						        					   onkeydown="lp_enterToSearch();"
-						        					   value="<%=manageProductGroupForm.getProductTypeName()%>" 
+						        					   value="<%=StringEscapeUtils.escapeHtml4(manageProductGroupForm.getProductTypeName())%>" 
 						        					   <%if(chk==true){%> class="input-disabled" readonly<%}%> />
 						        				<input type="button" id="btnSearch" class='btn btn-primary padding-sm' style="margin-right:12px; padding-right:24px; padding-left:24px;" value='ค้นหา' <%if(chk==true){%>disabled<%}%> />
 						        			</td>
@@ -539,11 +547,12 @@
 																	<%=seq%>
 																</td>
 																<td align="center">
-																	<%=bean.getProductGroupCode()%>
+																	<%=StringEscapeUtils.escapeHtml4(bean.getProductGroupCodeDis())%>
 																	<input type="hidden" id="productGroupCode<%=bean.getSeq()%>" name="productGroupCode" value="<%=bean.getProductGroupCode()%>" />
+																	<input type="hidden" id="productGroupCodeDis<%=bean.getSeq()%>" name="productGroupCodeDis" value="<%=StringEscapeUtils.escapeHtml4(bean.getProductGroupCodeDis())%>" />
 																</td>
 																<td align="left">
-																	<input type="text" style="width: 100%" maxlength="200" onblur="lp_updateRecord(<%=bean.getSeq()%>);" id="productGroupName<%=bean.getSeq()%>" name="productGroupName" value="<%=bean.getProductGroupName()%>" />
+																	<input type="text" style="width: 100%" maxlength="200" onblur="lp_updateRecord(<%=bean.getSeq()%>);" id="productGroupName<%=bean.getSeq()%>" name="productGroupName" value="<%=StringEscapeUtils.escapeHtml4(bean.getProductGroupName())%>" />
 																</td>
 																<td align="center">
 																	<img alt="ลบ" title="ลบ" src="<%=imgURL%>/wrong.png" width="24" height="24" border="0" onclick="lp_deleteRecord(this, '<%=bean.getSeq()%>');" />

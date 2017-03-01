@@ -33,7 +33,7 @@ public class ProductquantityDao extends DaoControl{
 			productquantity = new Productquantity();
 			id				= new ProductquantityPK();
 			
-			id.setProductCode(productquantityBean.getProductCode());
+			id.setProductCode(EnjoyUtils.parseInt(productquantityBean.getProductCode()));
 			id.setTin(productquantityBean.getTin());
 			
 			productquantity.setId(id);
@@ -65,7 +65,7 @@ public class ProductquantityDao extends DaoControl{
 			
 			query = createQuery(hql);
 			query.setParameter("quantity"			, EnjoyUtils.parseBigDecimal(productquantityBean.getQuantity()));
-			query.setParameter("productCode"		, productquantityBean.getProductCode());
+			query.setParameter("productCode"		, EnjoyUtils.parseInt(productquantityBean.getProductCode()));
 			query.setParameter("tin"				, productquantityBean.getTin());
 			
 			query.executeUpdate();
@@ -97,7 +97,7 @@ public class ProductquantityDao extends DaoControl{
 								+ " 	and tin 		= :tin";
 			
 			//Criteria
-			param.put("productCode"	, productquantityBean.getProductCode());
+			param.put("productCode"	, EnjoyUtils.parseInt(productquantityBean.getProductCode()));
 			param.put("tin"			, productquantityBean.getTin());
 
 			resultList = getResult(hql, param, "quantity", Constants.STRING_TYPE);

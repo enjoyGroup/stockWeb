@@ -42,6 +42,8 @@ public class ProductmasterBean {
 	private ExcelField colI;
 	private ExcelField colJ;
 	private String seqDis;
+	private String productCodeDis;
+	private String productStatus;
 	
 	public ProductmasterBean(){
 		this.productCode 		= "";
@@ -66,6 +68,8 @@ public class ProductmasterBean {
 		this.seq				= "0";
 		this.quantity			= "0.00";
 		this.seqDis				= "1";
+		this.productCodeDis		= "";
+		this.productStatus		= "";
 	}
 	
 	public ProductmasterBean(Row row){
@@ -262,6 +266,7 @@ public class ProductmasterBean {
 	}
 
 	public void setColB(ExcelField colB) {
+		colB.setValue(colB.getValue());
 		this.colB = colB;
 	}
 
@@ -335,5 +340,21 @@ public class ProductmasterBean {
 
 	public void setSeqDis(String seqDis) {
 		this.seqDis = seqDis;
+	}
+
+	public String getProductCodeDis() {
+		return productCodeDis;
+	}
+
+	public void setProductCodeDis(String productCodeDis) {
+		this.productCodeDis = productCodeDis;
+	}
+
+	public String getProductStatus() {
+		return productStatus;
+	}
+
+	public void setProductStatus(String productStatus) {
+		this.productStatus = productStatus;
 	}
 }

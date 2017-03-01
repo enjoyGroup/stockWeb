@@ -16,6 +16,8 @@ public class Productgroup implements Serializable {
 	@EmbeddedId
 	private ProductgroupPK id;
 
+	private String productGroupCodeDis;
+
 	private String productGroupName;
 
 	private String productGroupStatus;
@@ -29,6 +31,14 @@ public class Productgroup implements Serializable {
 
 	public void setId(ProductgroupPK id) {
 		this.id = id;
+	}
+
+	public String getProductGroupCodeDis() {
+		return this.productGroupCodeDis;
+	}
+
+	public void setProductGroupCodeDis(String productGroupCodeDis) {
+		this.productGroupCodeDis = productGroupCodeDis;
 	}
 
 	public String getProductGroupName() {

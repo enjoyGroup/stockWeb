@@ -1,7 +1,7 @@
 <%@ include file="/pages/include/checkLogin.jsp"%>
 <%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
 <%@ page import="th.go.stock.app.enjoy.bean.AdjustStockBean, th.go.stock.app.enjoy.bean.ComboBean"%>
-<%@ page import="java.util.*"%>
+<%@ page import="java.util.*,org.apache.commons.lang3.StringEscapeUtils"%>
 <jsp:useBean id="adjustStockForm" class="th.go.stock.app.enjoy.form.AdjustStockForm" scope="session"/>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
@@ -361,23 +361,29 @@
 		                        
 		                      	//สินค้า
 		                      	newNodeTd2.align 			= "left";
-		                       	newNodeTd2.innerHTML        = '<input type="text" style="width: 100%" onblur="lp_getProductDetailByName(' + lv_maxSeq + ', this.value);" id="productName' + lv_maxSeq + '" name="productName" value="'+lv_productName+'" />'
+		                       	newNodeTd2.innerHTML        = '<input type="text" style="width: 100%" onblur="lp_getProductDetailByName(' + lv_maxSeq + ', this.value);" id="productName' + lv_maxSeq + '" name="productName" value="" />'
 		                       								+ '<input type="hidden" id="productCode'+lv_maxSeq+'" name="productCode" value="'+lv_productCode+'" />';
+		                       	$("#productName" + lv_maxSeq).val(lv_productName);
 		                       	
 		                       	//หน่วย
-		                       	newNodeTd3.innerHTML        = '<input type="text" style="width: 100%" id="unitName'+lv_maxSeq+'" name="unitName" class="input-disabled" readonly="readonly" value="'+lv_unitName+'" />';
+		                       	newNodeTd3.innerHTML        = '<input type="text" style="width: 100%" id="unitName'+lv_maxSeq+'" name="unitName" class="input-disabled" readonly="readonly" value="" />';
+		                       	$("#unitName" + lv_maxSeq).val(lv_unitName);
 		                       	
 		                      	//เหลือในคลัง(เดิม)
-		                       	newNodeTd4.innerHTML        = '<input type="text" id="quanOld'+lv_maxSeq+'" name="quanOld" class="moneyOnly-disabled" readonly="readonly" value="'+lv_quanOld+'" style="width: 100%" />';
+		                       	newNodeTd4.innerHTML        = '<input type="text" id="quanOld'+lv_maxSeq+'" name="quanOld" class="moneyOnly-disabled" readonly="readonly" value="" style="width: 100%" />';
+		                       	$("#quanOld" + lv_maxSeq).val(lv_quanOld);
 		                       	
 		                      	//เพิ่ม/ลด สินค้า
-		                       	newNodeTd5.innerHTML        = '<input type="text" style="width: 100%" id="quanNew'+lv_maxSeq+'" name="quanNew" class="moneyOnly" onblur="gp_checkAmtOnly(this, 12);lp_calQuantity(' + lv_maxSeq + ');" value="'+lv_quanNew+'" />';
+		                       	newNodeTd5.innerHTML        = '<input type="text" style="width: 100%" id="quanNew'+lv_maxSeq+'" name="quanNew" class="moneyOnly" onblur="gp_checkAmtOnly(this, 12);lp_calQuantity(' + lv_maxSeq + ');" value="" />';
+		                       	$("#quanNew" + lv_maxSeq).val(lv_quanNew);
    								
 								//เหลือในคลัง(ใหม่)
-		                       	newNodeTd6.innerHTML        = '<input type="text" style="width: 100%" id="quantity'+lv_maxSeq+'" name="quantity" class="moneyOnly-disabled" readonly="readonly" value="'+lv_quantity+'" />';
+		                       	newNodeTd6.innerHTML        = '<input type="text" style="width: 100%" id="quantity'+lv_maxSeq+'" name="quantity" class="moneyOnly-disabled" readonly="readonly" value="" />';
+		                       	$("#quantity" + lv_maxSeq).val(lv_quantity);
 		                       	
 		                      	//หมายเหตุ
-		                       	newNodeTd7.innerHTML        = '<input type="text" style="width: 100%" id="remark'+lv_maxSeq+'" onblur="lp_updateRecord('+lv_maxSeq+');" name="remark" maxlength="500" value="'+lv_remark+'" />';
+		                       	newNodeTd7.innerHTML        = '<input type="text" style="width: 100%" id="remark'+lv_maxSeq+'" onblur="lp_updateRecord('+lv_maxSeq+');" name="remark" maxlength="500" value="" />';
+		                       	$("#remark" + lv_maxSeq).val(lv_remark);
 		                       	
 		                      	//Action
 		                      	newNodeTd8.align 			= "center";
@@ -538,7 +544,7 @@
 														   id="productName<%=bean.getSeq()%>" 
 														   name="productName"
 														   onblur="lp_getProductDetailByName('<%=bean.getSeq()%>', this.value);"
-														   value="<%=bean.getProductName()%>" />
+														   value="<%=StringEscapeUtils.escapeHtml4(bean.getProductName())%>" />
 													<input type="hidden" id="productCode<%=bean.getSeq()%>" name="productCode" value="<%=bean.getProductCode()%>" />
 												</td>
 												<td align="left">
@@ -548,7 +554,7 @@
 														   name="unitName" 
 														   class="input-disabled"
 														   readonly="readonly"
-														   value="<%=bean.getUnitName()%>" />
+														   value="<%=StringEscapeUtils.escapeHtml4(bean.getUnitName())%>" />
 												</td>
 												<td align="left">
 													<input type='text' 
@@ -584,7 +590,7 @@
 														   name="remark"
 														   onblur="lp_updateRecord(<%=bean.getSeq()%>);"
 														   maxlength="500"
-														   value="<%=bean.getRemark()%>" />
+														   value="<%=StringEscapeUtils.escapeHtml4(bean.getRemark())%>" />
 												</td>
 												<td align="center">
 													<img alt="ลบ" title="ลบ" src="<%=imgURL%>/wrong.png" width="24" height="24" border="0" onclick="lp_deleteRecord(this, '<%=bean.getSeq()%>');" />

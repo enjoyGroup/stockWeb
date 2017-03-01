@@ -1,7 +1,7 @@
 <%@ include file="/pages/include/checkLogin.jsp"%>
 <%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
 <%@ page import="th.go.stock.app.enjoy.bean.ProductmasterBean"%>
-<%@ page import="java.util.*"%>
+<%@ page import="java.util.*,org.apache.commons.lang3.StringEscapeUtils"%>
 <jsp:useBean id="multiManageProductForm" class="th.go.stock.app.enjoy.form.MultiManageProductForm" scope="session"/>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
@@ -193,24 +193,24 @@
 		});
 			
 		function lp_validate(){
-		    var la_productCode		= null;
+		    var la_productCodeDis	= null;
 		    var la_productName		= null;
 		    var lv_return			= true;
 		    
 			try{
 				
-				la_productCode = document.getElementsByName("productCode");
-				la_productName = document.getElementsByName("productName");
+				la_productCodeDis 	= document.getElementsByName("productCodeDis");
+				la_productName 		= document.getElementsByName("productName");
 				
-				if(la_productCode.length<=0){
+				if(la_productCodeDis.length<=0){
 					alert("กรุณาระบุรายการสินค้า");
 	                return false;
 				}
 				
-				for(var i=0;i<la_productCode.length;i++){
-					if(gp_trim(la_productCode[i].value)==""){
+				for(var i=0;i<la_productCodeDis.length;i++){
+					if(gp_trim(la_productCodeDis[i].value)==""){
 						alert("กรุณาระบุรหัสสินค้า", function() { 
-							la_productCode[i].focus();
+							la_productCodeDis[i].focus();
 		    		    });
 		                return false;
 		            }else if(gp_trim(la_productName[i].value)==""){
@@ -220,21 +220,21 @@
 		                return false;
 		            }
 					
-					if(!(gp_checkThaiLetter(gp_trim(la_productCode[i].value)))){
+					if(!(gp_checkThaiLetter(gp_trim(la_productCodeDis[i].value)))){
 						alert("รหัสสินค้าต้องเปนภาษาอังกฤษหรือตัวเลขเท่านั้น !!", function() { 
-							//la_productCode[i].value = "";
-							la_productCode[i].focus();
+							//la_productCodeDis[i].value = "";
+							la_productCodeDis[i].focus();
 		    		    });
 						return false;
 					}
 					
 				}
 				
-				for(var i=0;i<la_productCode.length;i++){
-					for(var j=(i+1);j<la_productCode.length;j++){
-						if(gp_trim(la_productCode[i].value)==gp_trim(la_productCode[j].value)){
-							alert("รหัสสินค้า " + la_productCode[j].value + "มีอยู่ในระบบแล้วกรุณาระบุใหม่", function() { 
-								la_productCode[j].focus();
+				for(var i=0;i<la_productCodeDis.length;i++){
+					for(var j=(i+1);j<la_productCodeDis.length;j++){
+						if(gp_trim(la_productCodeDis[i].value)==gp_trim(la_productCodeDis[j].value)){
+							alert("รหัสสินค้า " + la_productCodeDis[j].value + "มีอยู่ในระบบแล้วกรุณาระบุใหม่", function() { 
+								la_productCodeDis[j].focus();
 			    		    });
 							return false;
 						}else if(gp_trim(la_productName[i].value)==gp_trim(la_productName[j].value)){
@@ -337,7 +337,8 @@
 				}
 				
 				$.each(av_json.productList, function(idx, obj) {
-					lp_addRowtable(obj.productCode
+					//alert(obj.productName);
+					lp_addRowtable(obj.productCodeDis
 								 , obj.productName
 								 , obj.minQuan
 								 , obj.costPrice
@@ -359,7 +360,7 @@
 			}
 		}
 		
-		function lp_addRowtable(av_productCode
+		function lp_addRowtable(av_productCodeDis
 								, av_productName
 								, av_minQuan
 								, av_costPrice
@@ -407,34 +408,44 @@
                 newNodeTd1.innerHTML        = rowIndex;
                 
               	//รหัสสินค้า
-               	newNodeTd2.innerHTML        = '<input type="text" maxlength="17" style="width: 100%;" onblur="lp_updateRecord('+av_seq+');" id="productCode' + av_seq + '" name="productCode" value="'+av_productCode+'" />';
+               	newNodeTd2.innerHTML        = '<input type="text" maxlength="17" style="width: 100%;" onblur="lp_updateRecord('+av_seq+');" id="productCodeDis' + av_seq + '" name="productCodeDis" value="" />';
+               	$("#productCodeDis"+av_seq).val(av_productCodeDis);
                	
               	//ชื่อสินค้า
-               	newNodeTd3.innerHTML        = '<input type="text" maxlength="255" style="width: 100%" onblur="lp_updateRecord('+av_seq+');" id="productName' + av_seq + '" name="productName" value="'+av_productName+'" />';
+               	newNodeTd3.innerHTML        = '<input type="text" maxlength="255" style="width: 100%" onblur="lp_updateRecord('+av_seq+');" id="productName' + av_seq + '" name="productName" value="" />';
+               	$("#productName"+av_seq).val(av_productName);
                	
               	//ยอดต่ำสุดที่ต้องแจ้งเตือน
-               	newNodeTd4.innerHTML        = '<input type="text" class="moneyOnly" style="width: 100%" onblur="gp_checkAmtOnly(this, 9);lp_updateRecord('+av_seq+');" id="minQuan' + av_seq + '" name="minQuan" value="'+av_minQuan+'" />';
+               	newNodeTd4.innerHTML        = '<input type="text" class="moneyOnly" style="width: 100%" onblur="gp_checkAmtOnly(this, 9);lp_updateRecord('+av_seq+');" id="minQuan' + av_seq + '" name="minQuan" value="" />';
+               	$("#minQuan"+av_seq).val(av_minQuan);
                	
               	//ราคาทุน
-               	newNodeTd5.innerHTML        = '<input type="text" class="moneyOnly" style="width: 100%" onblur="gp_checkAmtOnly(this, 11);lp_updateRecord('+av_seq+');" id="costPrice' + av_seq + '" name="costPrice" value="'+av_costPrice+'" />';
+               	newNodeTd5.innerHTML        = '<input type="text" class="moneyOnly" style="width: 100%" onblur="gp_checkAmtOnly(this, 11);lp_updateRecord('+av_seq+');" id="costPrice' + av_seq + '" name="costPrice" value="" />';
+               	$("#costPrice"+av_seq).val(av_costPrice);
                	
               	//ราคาขาย 1
-               	newNodeTd6.innerHTML        = '<input type="text" class="moneyOnly" style="width: 100%" onblur="gp_checkAmtOnly(this, 11);lp_updateRecord('+av_seq+');" id="salePrice1' + av_seq + '" name="salePrice1" value="'+av_salePrice1+'" />';
+               	newNodeTd6.innerHTML        = '<input type="text" class="moneyOnly" style="width: 100%" onblur="gp_checkAmtOnly(this, 11);lp_updateRecord('+av_seq+');" id="salePrice1' + av_seq + '" name="salePrice1" value="" />';
+               	$("#salePrice1"+av_seq).val(av_salePrice1);
                	
               	//ราคาขาย 2
-               	newNodeTd7.innerHTML        = '<input type="text" class="moneyOnly" style="width: 100%" onblur="gp_checkAmtOnly(this, 11);lp_updateRecord('+av_seq+');" id="salePrice2' + av_seq + '" name="salePrice2" value="'+av_salePrice2+'" />';
+               	newNodeTd7.innerHTML        = '<input type="text" class="moneyOnly" style="width: 100%" onblur="gp_checkAmtOnly(this, 11);lp_updateRecord('+av_seq+');" id="salePrice2' + av_seq + '" name="salePrice2" value="" />';
+               	$("#salePrice2"+av_seq).val(av_salePrice2);
                	
               	//ราคาขาย 3
-               	newNodeTd8.innerHTML        = '<input type="text" class="moneyOnly" style="width: 100%" onblur="gp_checkAmtOnly(this, 11);lp_updateRecord('+av_seq+');" id="salePrice3' + av_seq + '" name="salePrice3" value="'+av_salePrice3+'" />';
+               	newNodeTd8.innerHTML        = '<input type="text" class="moneyOnly" style="width: 100%" onblur="gp_checkAmtOnly(this, 11);lp_updateRecord('+av_seq+');" id="salePrice3' + av_seq + '" name="salePrice3" value="" />';
+               	$("#salePrice3"+av_seq).val(av_salePrice3);
                	
               	//ราคาขาย 4
-               	newNodeTd9.innerHTML        = '<input type="text" class="moneyOnly" style="width: 100%" onblur="gp_checkAmtOnly(this, 11);lp_updateRecord('+av_seq+');" id="salePrice4' + av_seq + '" name="salePrice4" value="'+av_salePrice4+'" />';
+               	newNodeTd9.innerHTML        = '<input type="text" class="moneyOnly" style="width: 100%" onblur="gp_checkAmtOnly(this, 11);lp_updateRecord('+av_seq+');" id="salePrice4' + av_seq + '" name="salePrice4" value="" />';
+               	$("#salePrice4"+av_seq).val(av_salePrice4);
                	
               	//ราคาขาย 5
-               	newNodeTd10.innerHTML        = '<input type="text" class="moneyOnly" style="width: 100%" onblur="gp_checkAmtOnly(this, 11);lp_updateRecord('+av_seq+');" id="salePrice5' + av_seq + '" name="salePrice5" value="'+av_salePrice5+'" />';
+               	newNodeTd10.innerHTML        = '<input type="text" class="moneyOnly" style="width: 100%" onblur="gp_checkAmtOnly(this, 11);lp_updateRecord('+av_seq+');" id="salePrice5' + av_seq + '" name="salePrice5" value="" />';
+               	$("#salePrice5"+av_seq).val(av_salePrice5);
                	
               	//จำนวน
-               	newNodeTd11.innerHTML        = '<input type="text" class="moneyOnly" style="width: 100%" onblur="gp_checkAmtOnly(this, 12);lp_updateRecord('+av_seq+');" id="quantity' + av_seq + '" name="quantity" value="'+av_quantity+'" />';
+               	newNodeTd11.innerHTML        = '<input type="text" class="moneyOnly" style="width: 100%" onblur="gp_checkAmtOnly(this, 12);lp_updateRecord('+av_seq+');" id="quantity' + av_seq + '" name="quantity" value="" />';
+               	$("#quantity"+av_seq).val(av_quantity);
                	
               	//Action
               	newNodeTd12.align 			= "center";
@@ -501,7 +512,7 @@
 				
 				params 	= gv_service 
 						+ "&pageAction=updateRecord&seq=" + av_val 
-						+ "&productCode=" 	+ $("#productCode" + av_val).val() 
+						+ "&productCodeDis=" 	+ $("#productCodeDis" + av_val).val() 
 						+ "&productName=" 	+ $("#productName" + av_val).val()
 						+ "&minQuan=" 		+ $("#minQuan" + av_val).val()
 						+ "&costPrice=" 	+ $("#costPrice" + av_val).val()
@@ -643,7 +654,7 @@
 						        					   maxlength="200" 
 						        					   placeholder="หมวดสินค้า"  
 						        					   onkeydown="lp_enterToSearch();"
-						        					   value="<%=multiManageProductForm.getProductTypeName()%>" 
+						        					   value="<%=StringEscapeUtils.escapeHtml4(multiManageProductForm.getProductTypeName())%>" 
 						        					   <%if(chk==true){%> class="input-disabled" readonly<%}%> />
 						        			</td>
 						        			<td align="right">
@@ -656,7 +667,7 @@
 						        					   maxlength="200" 
 						        					   placeholder="หมู่สินค้า"  
 						        					   onkeydown="lp_enterToSearch();"
-						        					   value="<%=multiManageProductForm.getProductGroupName()%>" 
+						        					   value="<%=StringEscapeUtils.escapeHtml4(multiManageProductForm.getProductGroupName())%>" 
 						        					   <%if(chk==true){%> class="input-disabled" readonly<%}%> />
 						        			</td>
 						        		</tr>
@@ -671,7 +682,7 @@
 						        					   maxlength="200" 
 						        					   placeholder="หน่วยสินค้า "  
 						        					   onkeydown="lp_enterToSearch();"
-						        					   value="<%=multiManageProductForm.getUnitName()%>" 
+						        					   value="<%=StringEscapeUtils.escapeHtml4(multiManageProductForm.getUnitName())%>" 
 						        					   <%if(chk==true){%> class="input-disabled" readonly<%}%> />
 						        			</td>
 						        		</tr>
@@ -727,12 +738,12 @@
 																	<%=seq%>
 																</td>
 																<td align="center">
-																	<%=bean.getProductCode()%>
-																	<input type="hidden" id="productCode<%=bean.getSeq()%>" name="productCode" value="<%=bean.getProductCode()%>" />
+																	<%=StringEscapeUtils.escapeHtml4(bean.getProductCodeDis())%>
+																	<input type="hidden" id="productCodeDis<%=bean.getSeq()%>" name="productCodeDis" value="<%=StringEscapeUtils.escapeHtml4(bean.getProductCodeDis())%>" />
 																</td>
 																<td align="left">
-																	<%=bean.getProductName()%>
-																	<input type="hidden" id="productName<%=bean.getSeq()%>" name="productName" value="<%=bean.getProductName()%>" />
+																	<%=StringEscapeUtils.escapeHtml4(bean.getProductName())%>
+																	<input type="hidden" id="productName<%=bean.getSeq()%>" name="productName" value="<%=StringEscapeUtils.escapeHtml4(bean.getProductName())%>" />
 																</td>
 																<td align="right">
 																	<%=bean.getMinQuan()%>

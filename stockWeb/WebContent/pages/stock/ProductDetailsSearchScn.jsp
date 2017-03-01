@@ -1,7 +1,7 @@
 <%@ include file="/pages/include/checkLogin.jsp"%>
 <%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
 <%@ page import="th.go.stock.app.enjoy.bean.ProductmasterBean,th.go.stock.app.enjoy.bean.ComboBean"%>
-<%@ page import="java.util.*"%>
+<%@ page import="java.util.*,org.apache.commons.lang3.StringEscapeUtils"%>
 <jsp:useBean id="productDetailsSearchForm" class="th.go.stock.app.enjoy.form.ProductDetailsSearchForm" scope="session"/>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
@@ -419,7 +419,7 @@
 										        				<input type='text' 
 										        					   id="productTypeName" 
 										        					   name='productTypeName' 
-										        					   value="<%=productmasterBean.getProductTypeName()%>" 
+										        					   value="<%=StringEscapeUtils.escapeHtml4(productmasterBean.getProductTypeName())%>" 
 										        					   maxlength="200" 
 										        					   onkeydown="lp_clickSearch(event);"
 										        					   style="width: 220px;" />
@@ -431,7 +431,7 @@
 										        				<input type='text' 
 										        					   id="productGroupName" 
 										        					   name='productGroupName' 
-										        					   value="<%=productmasterBean.getProductGroupName()%>" 
+										        					   value="<%=StringEscapeUtils.escapeHtml4(productmasterBean.getProductGroupName())%>" 
 										        					   maxlength="200" 
 										        					   onkeydown="lp_clickSearch(event);"
 										        					   style="width: 220px;" />
@@ -445,7 +445,7 @@
 										        				<input type='text' 
 										        					   id="productName" 
 										        					   name='productName' 
-										        					   value="<%=productmasterBean.getProductName()%>" 
+										        					   value="<%=StringEscapeUtils.escapeHtml4(productmasterBean.getProductName())%>" 
 										        					   maxlength="255" 
 										        					   onkeydown="lp_clickSearch(event);"
 										        					   style="width: 220px;" />
@@ -519,10 +519,10 @@
 																		   <%if(bean.getChkBox().equals("Y")){%>checked="checked"<%}%> />
 																</td>
 																<td style="text-align:center;"><%=bean.getSeqDis()%></td>
-																<td style="text-align:left;"><%=bean.getProductTypeName()%></td>
-																<td style="text-align:left;"><%=bean.getProductGroupName()%></td>
-																<td style="text-align:left;"><%=bean.getProductCode()%></td>
-																<td style="text-align:left;"><%=bean.getProductName()%></td>
+																<td style="text-align:left;"><%=StringEscapeUtils.escapeHtml4(bean.getProductTypeName())%></td>
+																<td style="text-align:left;"><%=StringEscapeUtils.escapeHtml4(bean.getProductGroupName())%></td>
+																<td style="text-align:left;"><%=StringEscapeUtils.escapeHtml4(bean.getProductCodeDis())%></td>
+																<td style="text-align:left;"><%=StringEscapeUtils.escapeHtml4(bean.getProductName())%></td>
 																<td style="text-align:left;"><%=bean.getSalePrice1()%></td>
 															</tr>
 												<% 			//seq++;

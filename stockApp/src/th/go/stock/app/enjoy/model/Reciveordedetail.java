@@ -23,7 +23,7 @@ public class Reciveordedetail implements Serializable {
 
 	private BigDecimal price;
 
-	private String productCode;
+	private int productCode;
 
 	private BigDecimal quantity;
 
@@ -62,11 +62,11 @@ public class Reciveordedetail implements Serializable {
 		this.price = price;
 	}
 
-	public String getProductCode() {
+	public int getProductCode() {
 		return this.productCode;
 	}
 
-	public void setProductCode(String productCode) {
+	public void setProductCode(int productCode) {
 		this.productCode = productCode;
 	}
 

@@ -22,7 +22,7 @@ public class Adjusthistory implements Serializable {
 
 	private String adjustDate;
 
-	private String productCode;
+	private int productCode;
 
 	private BigDecimal quanNew;
 
@@ -51,11 +51,11 @@ public class Adjusthistory implements Serializable {
 		this.adjustDate = adjustDate;
 	}
 
-	public String getProductCode() {
+	public int getProductCode() {
 		return this.productCode;
 	}
 
-	public void setProductCode(String productCode) {
+	public void setProductCode(int productCode) {
 		this.productCode = productCode;
 	}
 

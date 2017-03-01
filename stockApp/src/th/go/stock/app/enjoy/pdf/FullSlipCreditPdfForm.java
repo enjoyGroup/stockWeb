@@ -107,7 +107,7 @@ public class FullSlipCreditPdfForm extends EnjoyItext implements PdfFormService 
 		table.addCell(setCellWB(getText(companyDetails, "companyName"), getFont12Bold(), 1, Element.ALIGN_CENTER, 0));
 		table.addCell(setCellWB(getText(companyDetails, "address"), getFont9(), 1, Element.ALIGN_CENTER, 0));
 		table.addCell(setCellWB(address, getFont9(), 1, Element.ALIGN_CENTER, 0));
-		table.addCell(setCellWB("เลขประจำตัวผู้เสียภาษี:" + getText(companyDetails, "tin"), getFont9(), 1, Element.ALIGN_CENTER, 0));
+//		table.addCell(setCellWB("เลขประจำตัวผู้เสียภาษี:" + getText(companyDetails, "tin"), getFont9(), 1, Element.ALIGN_CENTER, 0));
 		
 		table.setWidthPercentage(100);
 	
@@ -121,10 +121,10 @@ public class FullSlipCreditPdfForm extends EnjoyItext implements PdfFormService 
 		JSONObject 	jsonObjectMain  	= this.formDataObj;
 		JSONObject  invoiceCreditMaster	= (JSONObject) jsonObjectMain.get("invoiceCreditMaster");
 		
-		table.addCell(setCellWB("เลขที่ใบเสร็จ", getFont9Bold(), 1, Element.ALIGN_RIGHT, 0));
+		table.addCell(setCellWB("เลขที่", getFont9Bold(), 1, Element.ALIGN_RIGHT, 0));
 		table.addCell(setCellWB(getText(invoiceCreditMaster, "invoiceCode"), getFont9(), 1, Element.ALIGN_LEFT, 0));
 		
-		table.addCell(setCellWB("วันที่ใบเสร็จ", getFont9Bold(), 1, Element.ALIGN_RIGHT, 0));
+		table.addCell(setCellWB("วันที่", getFont9Bold(), 1, Element.ALIGN_RIGHT, 0));
 		table.addCell(setCellWB(getText(invoiceCreditMaster, "invoiceDate"), getFont9(), 1, Element.ALIGN_LEFT, 0));
 		
 		table.setWidthPercentage(100);
@@ -138,7 +138,7 @@ public class FullSlipCreditPdfForm extends EnjoyItext implements PdfFormService 
 		PdfPTable 	table 				= new PdfPTable(1);
 		
 		table.addCell(setCellWB("ลูกค้า : " + getText(customerDetails, "cusName") + " " + getText(customerDetails, "cusSurname"), getFont9(), 1, Element.ALIGN_LEFT, 0));
-		table.addCell(setCellWB("ที่อยู่  : " + getText(customerDetails, "address"), getFont9(), 1, Element.ALIGN_LEFT, 0));
+//		table.addCell(setCellWB("ที่อยู่  : " + getText(customerDetails, "address"), getFont9(), 1, Element.ALIGN_LEFT, 0));
 		table.addCell(setCellWB("เลขประจำตัวผู้เสียภาษี : " + getText(customerDetails, "idNumber"), getFont9(), 1, Element.ALIGN_LEFT, 0));
 		
 		table.setWidthPercentage(100);
@@ -163,12 +163,12 @@ public class FullSlipCreditPdfForm extends EnjoyItext implements PdfFormService 
 		
 		for(int i=0;i<invoiceCreditDetailList.size();i++){
 			invoiceCreditDetail = (JSONObject) invoiceCreditDetailList.get(i);
-			table.addCell(setCell(String.valueOf((i+1)),   getFont8(), 1, 1, Element.ALIGN_CENTER));
-			table.addCell(setCell(getText(invoiceCreditDetail, "productName"),   getFont8(), 1, 1, Element.ALIGN_LEFT));
-			table.addCell(setCell(getText(invoiceCreditDetail, "quantity") + " " + getText(invoiceCreditDetail, "unitName"),   getFont8(), 1, 1, Element.ALIGN_CENTER));
-			table.addCell(setCell(getText(invoiceCreditDetail, "pricePerUnit"),   getFont8(), 1, 1, Element.ALIGN_RIGHT));
-			table.addCell(setCell(getText(invoiceCreditDetail, "discount"),   getFont8(), 1, 1, Element.ALIGN_RIGHT));
-			table.addCell(setCell(getText(invoiceCreditDetail, "price"),   getFont8(), 1, 1, Element.ALIGN_RIGHT));
+			table.addCell(setCellWB(String.valueOf((i+1)),   getFont8(), 1, Element.ALIGN_CENTER, 0));
+			table.addCell(setCellWB(getText(invoiceCreditDetail, "productName"),   getFont8(), 1, Element.ALIGN_LEFT, 0));
+			table.addCell(setCellWB(getText(invoiceCreditDetail, "quantity") + " " + getText(invoiceCreditDetail, "unitName"),   getFont8(), 1, Element.ALIGN_CENTER, 0));
+			table.addCell(setCellWB(getText(invoiceCreditDetail, "pricePerUnit"),   getFont8(), 1, Element.ALIGN_RIGHT, 0));
+			table.addCell(setCellWB(getText(invoiceCreditDetail, "discount"),   getFont8(), 1, Element.ALIGN_RIGHT, 0));
+			table.addCell(setCellWB(getText(invoiceCreditDetail, "price"),   getFont8(), 1, Element.ALIGN_RIGHT, 0));
 		}
 		
 		table.setHeaderRows(1);
@@ -191,14 +191,15 @@ public class FullSlipCreditPdfForm extends EnjoyItext implements PdfFormService 
 		table.addCell(setCellWB("รวมจำรวนเงิน ", getFont9Bold(), 3, Element.ALIGN_RIGHT, 0));
 		table.addCell(setCellWB(getText(invoiceCreditMaster, "invoicePrice"), getFont9(), 1, Element.ALIGN_RIGHT, 0));
 		
-		table.addCell(setCellWB("หักส่วนลด ", getFont9Bold(), 3, Element.ALIGN_RIGHT, 0));
-		table.addCell(setCellWB(getText(invoiceCreditMaster, "invoicediscount"), getFont9(), 1, Element.ALIGN_RIGHT, 0));
+//		table.addCell(setCellWB("หักส่วนลด ", getFont9Bold(), 3, Element.ALIGN_RIGHT, 0));
+//		table.addCell(setCellWB(getText(invoiceCreditMaster, "invoicediscount"), getFont9(), 1, Element.ALIGN_RIGHT, 0));
 		
-		table.addCell(setCellWB("ภาษีมูลค่าเพิ่ม " + getText(invoiceCreditMaster, "vatDis"), getFont9Bold(), 3, Element.ALIGN_RIGHT, 0));
+//		table.addCell(setCellWB("ภาษีมูลค่าเพิ่ม " + getText(invoiceCreditMaster, "vatDis"), getFont9Bold(), 3, Element.ALIGN_RIGHT, 0));
+		table.addCell(setCellWB("VAT", getFont9Bold(), 3, Element.ALIGN_RIGHT, 0));
 		table.addCell(setCellWB(getText(invoiceCreditMaster, "invoiceVat"), getFont9(), 1, Element.ALIGN_RIGHT, 0));
 		
-		table.addCell(setCellWB("หักมัดจำ ", getFont9Bold(), 3, Element.ALIGN_RIGHT, 0));
-		table.addCell(setCellWB(getText(invoiceCreditMaster, "invoiceDeposit"), getFont9(), 1, Element.ALIGN_RIGHT, 0));
+//		table.addCell(setCellWB("หักมัดจำ ", getFont9Bold(), 3, Element.ALIGN_RIGHT, 0));
+//		table.addCell(setCellWB(getText(invoiceCreditMaster, "invoiceDeposit"), getFont9(), 1, Element.ALIGN_RIGHT, 0));
 		
 		tableSub.addCell(setCell(EnjoyUtils.displayAmountThai(getText(invoiceCreditMaster, "invoiceTotal")), getFont8(), 1, 1, Element.ALIGN_CENTER));
 		table.addCell(setCellWB(tableSub, 2, Element.ALIGN_LEFT, 0, false, false));

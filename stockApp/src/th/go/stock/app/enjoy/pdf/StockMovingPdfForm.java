@@ -6,8 +6,7 @@ import java.net.MalformedURLException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import th.go.stock.app.enjoy.pdf.header.HistoryPurchasedByProductHeader;
-import th.go.stock.app.enjoy.pdf.header.SummarySaleByProductHeader;
+import th.go.stock.app.enjoy.pdf.header.StockMovingHeader;
 import th.go.stock.app.enjoy.pdf.utils.EnjoyItext;
 import th.go.stock.app.enjoy.pdf.utils.PdfFormService;
 
@@ -19,9 +18,9 @@ import com.lowagie.text.pdf.PdfWriter;
 
 public class StockMovingPdfForm extends EnjoyItext implements PdfFormService {
 	
-	private PdfWriter 					writer;
-	private JSONObject 					formDataObj;
-	private SummarySaleByProductHeader 	header;
+	private PdfWriter 			writer;
+	private JSONObject 			formDataObj;
+	private StockMovingHeader 	header;
 	
 	private void setWriter(PdfWriter writer) {
 		this.writer = writer;
@@ -29,7 +28,7 @@ public class StockMovingPdfForm extends EnjoyItext implements PdfFormService {
 
 	public void setJSONObject(PdfWriter writer, JSONObject jsonObject) {
 		this.formDataObj  	= jsonObject;
-		this.header			= new SummarySaleByProductHeader(jsonObject);
+		this.header			= new StockMovingHeader(jsonObject);
 		setWriter(writer);
 		writer.setPageEvent(this.header);
 		
@@ -39,7 +38,7 @@ public class StockMovingPdfForm extends EnjoyItext implements PdfFormService {
 		System.out.println("[StockMovingPdfForm][createForm][Begin]");
 		
 		try{
-			document.add(this.genHeader());
+			document.add(genHeader(formDataObj, "รายงานเคลื่อนไหว Stock สินค้า"));
 			document.add(this.brLine());
 			document.add(this.genHeader1());
 			document.add(this.brLine());
@@ -62,27 +61,27 @@ public class StockMovingPdfForm extends EnjoyItext implements PdfFormService {
 		return document;
 	}
 	
-	private PdfPTable genHeader() throws DocumentException, MalformedURLException, IOException {
-		
-		PdfPTable 	table 			= new PdfPTable(1);
-		JSONObject 	jsonObjectMain  = this.formDataObj;
-		JSONObject  companyDetails	= (JSONObject) jsonObjectMain.get("companyDetails");
-		String		address			= "";
-		
-		address = " โทร." + getText(companyDetails, "tel") 
-				+ " Fax." + getText(companyDetails, "fax") 
-				+ " Email." + getText(companyDetails, "email");
-		
-		table.addCell(setCellWB(getText(companyDetails, "companyName"), getFont11Bold(), 1, Element.ALIGN_CENTER, 0));
-		table.addCell(setCellWB(getText(companyDetails, "address"), getFont8(), 1, Element.ALIGN_CENTER, 0));
-		table.addCell(setCellWB(address, getFont8(), 1, Element.ALIGN_CENTER, 0));
-		table.addCell(setCellWB("", getFont8(), 1, Element.ALIGN_CENTER, 0));
-		table.addCell(setCellWB("รายงานเคลื่อนไหว Stock สินค้า", getFont10Bold(), 1, Element.ALIGN_CENTER, 0));
-		
-		table.setWidthPercentage(100);
-	
-		return table;
-	}
+//	private PdfPTable genHeader() throws DocumentException, MalformedURLException, IOException {
+//		
+//		PdfPTable 	table 			= new PdfPTable(1);
+//		JSONObject 	jsonObjectMain  = this.formDataObj;
+//		JSONObject  companyDetails	= (JSONObject) jsonObjectMain.get("companyDetails");
+//		String		address			= "";
+//		
+//		address = " โทร." + getText(companyDetails, "tel") 
+//				+ " Fax." + getText(companyDetails, "fax") 
+//				+ " Email." + getText(companyDetails, "email");
+//		
+//		table.addCell(setCellWB(getText(companyDetails, "companyName"), getFont11Bold(), 1, Element.ALIGN_CENTER, 0));
+//		table.addCell(setCellWB(getText(companyDetails, "address"), getFont8(), 1, Element.ALIGN_CENTER, 0));
+//		table.addCell(setCellWB(address, getFont8(), 1, Element.ALIGN_CENTER, 0));
+//		table.addCell(setCellWB("", getFont8(), 1, Element.ALIGN_CENTER, 0));
+//		table.addCell(setCellWB("รายงานเคลื่อนไหว Stock สินค้า", getFont10Bold(), 1, Element.ALIGN_CENTER, 0));
+//		
+//		table.setWidthPercentage(100);
+//	
+//		return table;
+//	}
 	
 	private PdfPTable genHeader1() throws DocumentException, MalformedURLException, IOException {
 		

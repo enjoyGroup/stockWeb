@@ -21,11 +21,15 @@ public class Productmaster implements Serializable {
 
 	private BigDecimal minQuan;
 
-	private String productGroup;
+	private String productCodeDis;
+
+	private int productGroup;
 
 	private String productName;
 
-	private String productType;
+	private String productStatus;
+
+	private int productType;
 
 	private BigDecimal salePrice1;
 
@@ -66,11 +70,19 @@ public class Productmaster implements Serializable {
 		this.minQuan = minQuan;
 	}
 
-	public String getProductGroup() {
+	public String getProductCodeDis() {
+		return this.productCodeDis;
+	}
+
+	public void setProductCodeDis(String productCodeDis) {
+		this.productCodeDis = productCodeDis;
+	}
+
+	public int getProductGroup() {
 		return this.productGroup;
 	}
 
-	public void setProductGroup(String productGroup) {
+	public void setProductGroup(int productGroup) {
 		this.productGroup = productGroup;
 	}
 
@@ -82,11 +94,19 @@ public class Productmaster implements Serializable {
 		this.productName = productName;
 	}
 
-	public String getProductType() {
+	public String getProductStatus() {
+		return this.productStatus;
+	}
+
+	public void setProductStatus(String productStatus) {
+		this.productStatus = productStatus;
+	}
+
+	public int getProductType() {
 		return this.productType;
 	}
 
-	public void setProductType(String productType) {
+	public void setProductType(int productType) {
 		this.productType = productType;
 	}
 

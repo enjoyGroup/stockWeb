@@ -136,6 +136,8 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 				this.getInventoryForProduct();
 			}else if(pageAction.equals("updateCredit")){
 				this.updateCredit();
+			}else if(pageAction.equals("getProductDetailByCodeDis")){
+				this.getProductDetailByCodeDis();
 			}
  			
  			session.setAttribute(FORM_NAME, this.form);
@@ -339,6 +341,8 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 		ProductQuanHistoryBean		productQuanHistoryBean		= null;
 		ProductmasterBean 			productmasterBean			= null;
 		ProductmasterBean 			productmasterBeanDb			= null;
+		int							hisCode						= 1;
+		boolean						chkFlag						= true;
 		
 		try{
 			invoiceCode 				= EnjoyUtil.nullToStr(request.getParameter("invoiceCode"));
@@ -434,7 +438,15 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 					productQuanHistoryBean.setQuantityMinus(bean.getQuantity());
 					productQuanHistoryBean.setQuantityTotal(String.valueOf(quantity));
 					
-					productQuanHistoryDao.insert(productQuanHistoryBean);
+					/*Begin หา hisCode*/
+					if(chkFlag==true){
+						hisCode		= productQuanHistoryDao.genId(tin);
+						chkFlag  	= false;
+					}else{
+						hisCode++;
+					}
+					/*End หา hisCode*/
+					productQuanHistoryDao.insert(productQuanHistoryBean, hisCode);
 					/*End ส่วนประวัตเพิ่มลดสินค้า*/
 					
 				}
@@ -1011,6 +1023,8 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 		ProductQuanHistoryBean		productQuanHistoryBean		= null;
 		ProductmasterBean 			productmasterBean			= null;
 		ProductmasterBean 			productmasterBeanDb			= null;
+		int							hisCode						= 1;
+		boolean						chkFlag						= true;
 		
 		try{
 			obj 						= new JSONObject();
@@ -1077,7 +1091,15 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 						productQuanHistoryBean.setQuantityMinus("0.00");
 						productQuanHistoryBean.setQuantityTotal(String.valueOf(quantity));
 						
-						productQuanHistoryDao.insert(productQuanHistoryBean);
+						/*Begin หา hisCode*/
+						if(chkFlag==true){
+							hisCode		= productQuanHistoryDao.genId(tin);
+							chkFlag  	= false;
+						}else{
+							hisCode++;
+						}
+						/*End หา hisCode*/
+						productQuanHistoryDao.insert(productQuanHistoryBean, hisCode);
 						/*End ส่วนประวัตเพิ่มลดสินค้า*/
 					}
 				}
@@ -1383,7 +1405,91 @@ public class InvoiceCashMaintananceServlet extends EnjoyStandardSvc {
 			logger.info("[updateCredit][End]");
 		}
 	}
-
+	
+	private void getProductDetailByCodeDis(){
+	   logger.info("[getProductDetailByCodeDis][Begin]");
+	   
+	   String					productCodeDis			= null;
+	   String				 	groupSalePrice			= null;
+	   JSONObject 				obj		 				= null;
+	   ProductmasterBean		productmasterBeanDb		= null;
+	   String					pricePerUnit			= "";
+	   String					discount				= "";
+	   String					tin						= null;
+	   ProductquantityBean		productquantityBean		= null;
+	   String					inventory				= "0.00";
+	   String					invoiceDate				= null;
+	   String					quantity				= null;
+	
+	   try{
+		   obj 				= new JSONObject();
+		   productCodeDis	= EnjoyUtils.nullToStr(this.request.getParameter("productCodeDis"));
+		   groupSalePrice 	= EnjoyUtil.nullToStr(request.getParameter("groupSalePrice"));
+		   tin				= this.userBean.getTin();
+		   invoiceDate		= EnjoyUtils.nullToStr(this.request.getParameter("invoiceDate"));
+		   quantity 		= EnjoyUtil.replaceComma(request.getParameter("quantity"));
+		   
+		   logger.info("[getProductDetailByCodeDis] productCodeDis 	:: " + productCodeDis);
+		   logger.info("[getProductDetailByCodeDis] groupSalePrice 	:: " + groupSalePrice);
+		   logger.info("[getProductDetailByCodeDis] tin 				:: " + tin);
+		   logger.info("[getProductDetailByCodeDis] invoiceDate 		:: " + invoiceDate);
+		   logger.info("[getProductDetailByCodeDis] quantity 			:: " + quantity);
+		   
+		   productmasterBeanDb 		= this.productDetailsDao.getProductDetailByProductCodeDis(tin, productCodeDis);
+		   
+		   if(productmasterBeanDb!=null && !tin.equals("")){
+			   
+			   if(groupSalePrice.equals("2")){
+				   pricePerUnit = productmasterBeanDb.getSalePrice2();
+			   }else if(groupSalePrice.equals("3")){
+				   pricePerUnit = productmasterBeanDb.getSalePrice3();
+			   }else if(groupSalePrice.equals("4")){
+				   pricePerUnit = productmasterBeanDb.getSalePrice4();
+			   }else if(groupSalePrice.equals("5")){
+				   pricePerUnit = productmasterBeanDb.getSalePrice5();
+			   }else{
+				   pricePerUnit = productmasterBeanDb.getSalePrice1();
+			   }
+			   
+			   discount = this.productDetailsDao.getQuanDiscount(productmasterBeanDb.getProductCode(), quantity, invoiceDate, tin);
+			   
+			   obj.put("productCode"	,productmasterBeanDb.getProductCode());
+			   obj.put("productName"	,productmasterBeanDb.getProductName());
+			   obj.put("pricePerUnit"	,pricePerUnit);
+			   
+			   productquantityBean = new ProductquantityBean();
+			   productquantityBean.setTin(tin);
+			   productquantityBean.setProductCode(productmasterBeanDb.getProductCode());
+			   inventory = EnjoyUtils.convertFloatToDisplay(this.productquantityDao.getProductquantity(productquantityBean), 2);
+			   
+			   obj.put("inventory"		,inventory);
+			   obj.put("unitCode"		,productmasterBeanDb.getUnitCode());
+			   obj.put("unitName"		,productmasterBeanDb.getUnitName());
+			   obj.put("discount"		,discount);
+			   
+		   }else{
+			   obj.put("productCode"	,"");
+			   obj.put("productName"	,"");
+			   obj.put("pricePerUnit"	,"");
+			   obj.put("inventory"		,inventory);
+			   obj.put("unitCode"		,"");
+			   obj.put("unitName"		,"");
+			   obj.put("discount"		,"0.00");
+		   }
+		   
+		   obj.put(STATUS, 		SUCCESS);
+		   
+	   }catch(Exception e){
+		   obj.put(STATUS, 		ERROR);
+		   obj.put(ERR_MSG, 	"getProductDetailByCodeDis is error");
+		   e.printStackTrace();
+		   logger.info("[getProductDetailByCodeDis] " + e.getMessage());
+	   }finally{
+		   this.enjoyUtil.writeMSG(obj.toString());
+		   logger.info("[getProductDetailByCodeDis][End]");
+	   }
+	}
+	
 	@Override
 	public void destroySession() {
 		this.invoiceCashDao.destroySession();

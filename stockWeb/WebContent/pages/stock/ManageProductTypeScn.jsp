@@ -1,7 +1,7 @@
 <%@ include file="/pages/include/checkLogin.jsp"%>
 <%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
 <%@ page import="th.go.stock.app.enjoy.bean.ManageProductTypeBean,th.go.stock.app.enjoy.bean.ComboBean"%>
-<%@ page import="java.util.*"%>
+<%@ page import="java.util.*,org.apache.commons.lang3.StringEscapeUtils"%>
 <jsp:useBean id="manageProductTypeForm" class="th.go.stock.app.enjoy.form.ManageProductTypeForm" scope="session"/>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
@@ -48,19 +48,19 @@
 		});
 		
 		function lp_validate(){
-		    var la_productTypeCode		= null;
+		    var la_productTypeCodeDis	= null;
 		    var la_productTypeName		= null;
 		    var lv_return				= true;
 		    
 			try{
 				
-				la_productTypeCode = document.getElementsByName("productTypeCode");
-				la_productTypeName = document.getElementsByName("productTypeName");
+				la_productTypeCodeDis 	= document.getElementsByName("productTypeCodeDis");
+				la_productTypeName 		= document.getElementsByName("productTypeName");
 				
-				for(var i=0;i<la_productTypeCode.length;i++){
-					if(gp_trim(la_productTypeCode[i].value)==""){
+				for(var i=0;i<la_productTypeCodeDis.length;i++){
+					if(gp_trim(la_productTypeCodeDis[i].value)==""){
 						alert("กรุณาระบุรหัสหมวดสินค้า", function() { 
-							la_productTypeCode[i].focus();
+							la_productTypeCodeDis[i].focus();
 		    		    });
 		                return false;
 		            }
@@ -127,14 +127,14 @@
 				$.each(av_json.productTypeList, function(idx, obj) {
 					lv_maxSeq   = parseInt(lo_seqTemp.value) + 1;
 					
-					if(lp_addRowtable(obj.productTypeCode, obj.productTypeName, lv_maxSeq)){
+					if(lp_addRowtable(obj.productTypeCodeDis, obj.productTypeName, lv_maxSeq)){
 						lo_seqTemp.value  = lv_maxSeq;
 						lp_updateRecord(lv_maxSeq);
 					}
     			});
 				
 				gp_progressBarOff();
-				$('#productTypeCode' + lv_maxSeq).focus();
+				$('#productTypeCodeDis' + lv_maxSeq).focus();
 			}catch(e){
 				alert("lp_newRecordFromExcelFile :: " + e);
 			}
@@ -148,14 +148,14 @@
 				
 				if(lp_addRowtable("", "", lv_maxSeq)){
 					lo_seqTemp.value  = lv_maxSeq;
-					$('#productTypeCode' + lv_maxSeq).focus();
+					$('#productTypeCodeDis' + lv_maxSeq).focus();
 				}
 			}catch(e){
 				alert("lp_newRecord :: " + e);
 			}
 		}
 		
-		function lp_addRowtable(av_productTypeCode, av_productTypeName, av_seq){
+		function lp_addRowtable(av_productTypeCodeDis, av_productTypeName, av_seq){
 			var lo_table                        = document.getElementById("resultData");
 			var rowIndex                      	= lo_table.rows.length;//gp_rowTableIndex(ao_obj);
 			var newNodeTr 	                	= null;
@@ -195,10 +195,13 @@
 		                        newNodeTd1.innerHTML        = rowIndex;
 		                        
 		                      	//รหัสหมวดสินค้า
-		                       	newNodeTd2.innerHTML        = '<input type="text" maxlength="5" style="width: 100%;" onblur="lp_updateRecord('+av_seq+');" id="productTypeCode' + av_seq + '" name="productTypeCode" value="'+av_productTypeCode+'" />';
+		                       	newNodeTd2.innerHTML        = '<input type="text" maxlength="5" style="width: 100%;" onblur="lp_updateRecord('+av_seq+');" id="productTypeCodeDis' + av_seq + '" name="productTypeCodeDis" value="" />'
+		                       								+ '<input type="hidden" id="productTypeCode' + av_seq + '" name="productTypeCode" value="" />';
+		                       	$("#productTypeCodeDis" + av_seq).val(av_productTypeCodeDis);
 		                       	
 		                      	//ชื่อหมวดสินค้า
-		                       	newNodeTd3.innerHTML        = '<input type="text" maxlength="200" style="width: 100%" onblur="lp_updateRecord('+av_seq+');" id="productTypeName' + av_seq + '" name="productTypeName" value="'+av_productTypeName+'" />';
+		                       	newNodeTd3.innerHTML        = '<input type="text" maxlength="200" style="width: 100%" onblur="lp_updateRecord('+av_seq+');" id="productTypeName' + av_seq + '" name="productTypeName" value="" />';
+		                       	$("#productTypeName" + av_seq).val(av_productTypeName);
 		                       	
 		                      	//Action
 		                      	newNodeTd4.align 			= "center";
@@ -269,14 +272,18 @@
 		function lp_updateRecord(av_val){
 			var params					= "";
 			var productTypeCode			= null;
+			var productTypeCodeDis		= null;
 			var productTypeName			= null;
 			
 			try{
+				productTypeCode 	= document.getElementById("productTypeCode" + av_val).value;
+				productTypeCodeDis 	= document.getElementById("productTypeCodeDis" + av_val).value;
+				productTypeName 	= document.getElementById("productTypeName" + av_val).value;
 				
-				productTypeCode = document.getElementById("productTypeCode" + av_val).value;
-				productTypeName = document.getElementById("productTypeName" + av_val).value;
-				
-				params 	= gv_service + "&pageAction=updateRecord&seq=" + av_val + "&productTypeCode=" + productTypeCode + "&productTypeName=" + productTypeName;
+				params 	= gv_service + "&pageAction=updateRecord&seq=" + av_val 
+						+ "&productTypeCode=" + productTypeCode 
+						+ "&productTypeCodeDis=" + productTypeCodeDis 
+						+ "&productTypeName=" + productTypeName;
 				
 				$.ajax({
 					async:false,
@@ -425,11 +432,12 @@
 																	<%=seq%>
 																</td>
 																<td align="center">
-																	<%=bean.getProductTypeCode()%>
+																	<%=StringEscapeUtils.escapeHtml4(bean.getProductTypeCodeDis())%>
 																	<input type="hidden" id="productTypeCode<%=bean.getSeq()%>" name="productTypeCode" value="<%=bean.getProductTypeCode()%>" />
+																	<input type="hidden" id="productTypeCodeDis<%=bean.getSeq()%>" name="productTypeCodeDis" value="<%=StringEscapeUtils.escapeHtml4(bean.getProductTypeCodeDis())%>" />
 																</td>
 																<td align="left">
-																	<input type="text" style="width: 100%" maxlength="200" onblur="lp_updateRecord(<%=bean.getSeq()%>);" id="productTypeName<%=bean.getSeq()%>" name="productTypeName" value="<%=bean.getProductTypeName()%>" />
+																	<input type="text" style="width: 100%" maxlength="200" onblur="lp_updateRecord(<%=bean.getSeq()%>);" id="productTypeName<%=bean.getSeq()%>" name="productTypeName" value="<%=StringEscapeUtils.escapeHtml4(bean.getProductTypeName())%>" />
 																</td>
 																<td align="center">
 																	<img alt="ลบ" title="ลบ" src="<%=imgURL%>/wrong.png" width="24" height="24" border="0" onclick="lp_deleteRecord(this, '<%=bean.getSeq()%>');" />

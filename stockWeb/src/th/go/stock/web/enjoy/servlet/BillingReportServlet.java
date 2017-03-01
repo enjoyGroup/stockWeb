@@ -155,6 +155,7 @@ public class BillingReportServlet extends EnjoyStandardSvc {
 	    String							invoiceDateFrom			= null;
 	    String							invoiceDateTo			= null;
 	    String							invoiceType				= null;
+	    String							includeVat				= null;
 	    List<InvoiceCreditMasterBean> 	invoiceCreditMasterList = null;
 	    InvoiceCreditDao				invoiceCreditDao		= new InvoiceCreditDao();
 	    CustomerDetailsDao				customerDetailsDao		= new CustomerDetailsDao();
@@ -164,6 +165,8 @@ public class BillingReportServlet extends EnjoyStandardSvc {
 		DataOutput 						output 					= null;
 		ByteArrayOutputStream			buffer					= null;
 		byte[] 							bytes					= null;
+		double							sumvat					= 0;
+		String							sumvatStr				= "";
 
 		try{
 			cusCode 		= EnjoyUtils.nullToStr(this.request.getParameter("cusCode"));
@@ -171,6 +174,7 @@ public class BillingReportServlet extends EnjoyStandardSvc {
 			invoiceType 	= EnjoyUtils.nullToStr(this.request.getParameter("invoiceType"));
 			invoiceDateFrom = EnjoyUtils.nullToStr(this.request.getParameter("invoiceDateFrom"));
 			invoiceDateTo 	= EnjoyUtils.nullToStr(this.request.getParameter("invoiceDateTo"));
+			includeVat	 	= EnjoyUtils.nullToStr(this.request.getParameter("includeVat"));
 			tin	 			= this.userBean.getTin();
 			vatDis	 		= ConfigFile.getVat() + "%";
 			
@@ -206,7 +210,19 @@ public class BillingReportServlet extends EnjoyStandardSvc {
 			objDetail.put("sumInvoicePrice"		,invoiceCreditMasterSum.getInvoicePrice());
 			objDetail.put("sumInvoicediscount"	,invoiceCreditMasterSum.getInvoicediscount());
 			objDetail.put("sumInvoiceDeposit"	,invoiceCreditMasterSum.getInvoiceDeposit());
-			objDetail.put("sumInvoiceVat"		,invoiceCreditMasterSum.getInvoiceVat());
+			
+			logger.info("[showData] includeVat :: " + includeVat);
+			if("Y".equals(includeVat)){
+				sumvat = ((EnjoyUtils.parseDouble(ConfigFile.getVat()) + 100) * EnjoyUtils.parseDouble(invoiceCreditMasterSum.getInvoicePrice()))/100;
+				logger.info("[showData] sumvat :: " + sumvat);
+				sumvatStr = EnjoyUtils.convertFloatToDisplay(String.valueOf(sumvat), 2);
+			}else{
+				sumvatStr = invoiceCreditMasterSum.getInvoiceVat();
+			}
+			
+			logger.info("[showData] sumvatStr :: " + sumvatStr);
+			
+			objDetail.put("sumInvoiceVat"		,sumvatStr);
 			objDetail.put("sumInvoiceTotal"		,invoiceCreditMasterSum.getInvoiceTotal());
 			objDetail.put("totalRecord"			,String.valueOf(invoiceCreditMasterList.size()));
 			objDetail.put("bullingDate"			,EnjoyUtils.dateToThaiDisplay(EnjoyUtils.currDateThai()));

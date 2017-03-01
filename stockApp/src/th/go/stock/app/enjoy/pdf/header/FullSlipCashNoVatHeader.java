@@ -48,10 +48,10 @@ public class FullSlipCashNoVatHeader extends PdfPageEventHelper {
 		
 		table.addCell(enjoyItext.setCellWB("เงินสด", enjoyItext.getFont12Bold(), 4, Element.ALIGN_CENTER, 0));
 		
-		table.addCell(enjoyItext.setCellWB("เลขที่ใบเสร็จ", enjoyItext.getFont9Bold(), 3, Element.ALIGN_RIGHT, 0));
+		table.addCell(enjoyItext.setCellWB("เลขที่", enjoyItext.getFont9Bold(), 3, Element.ALIGN_RIGHT, 0));
 		table.addCell(enjoyItext.setCellWB(enjoyItext.getText(invoiceCashMaster, "invoiceCode"), enjoyItext.getFont9(), 1, Element.ALIGN_LEFT, 0));
 		
-		table.addCell(enjoyItext.setCellWB("วันที่ใบเสร็จ", enjoyItext.getFont9Bold(), 3, Element.ALIGN_RIGHT, 0));
+		table.addCell(enjoyItext.setCellWB("วันที่", enjoyItext.getFont9Bold(), 3, Element.ALIGN_RIGHT, 0));
 		table.addCell(enjoyItext.setCellWB(enjoyItext.getText(invoiceCashMaster, "invoiceDate"), enjoyItext.getFont9(), 1, Element.ALIGN_LEFT, 0));
 		
 		table.setWidthPercentage(100);
@@ -64,7 +64,7 @@ private PdfPTable genCustomerDetail(JSONObject customerDetails) throws DocumentE
 		PdfPTable 	table 				= new PdfPTable(1);
 		
 		table.addCell(enjoyItext.setCellWB("ลูกค้า : " + enjoyItext.getText(customerDetails, "cusName") + " " + enjoyItext.getText(customerDetails, "cusSurname"), enjoyItext.getFont9(), 1, Element.ALIGN_LEFT, 0));
-		table.addCell(enjoyItext.setCellWB("ที่อยู่  : " + enjoyItext.getText(customerDetails, "address"), enjoyItext.getFont9(), 1, Element.ALIGN_LEFT, 0));
+//		table.addCell(enjoyItext.setCellWB("ที่อยู่  : " + enjoyItext.getText(customerDetails, "address"), enjoyItext.getFont9(), 1, Element.ALIGN_LEFT, 0));
 		table.addCell(enjoyItext.setCellWB("เลขประจำตัวผู้เสียภาษี : " + enjoyItext.getText(customerDetails, "idNumber"), enjoyItext.getFont9(), 1, Element.ALIGN_LEFT, 0));
 		
 		table.setWidthPercentage(100);

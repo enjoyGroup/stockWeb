@@ -23,7 +23,7 @@ public class Invoicecashdetail implements Serializable {
 
 	private BigDecimal pricePerUnit;
 
-	private String productCode;
+	private int productCode;
 
 	private BigDecimal quantity;
 
@@ -62,11 +62,11 @@ public class Invoicecashdetail implements Serializable {
 		this.pricePerUnit = pricePerUnit;
 	}
 
-	public String getProductCode() {
+	public int getProductCode() {
 		return this.productCode;
 	}
 
-	public void setProductCode(String productCode) {
+	public void setProductCode(int productCode) {
 		this.productCode = productCode;
 	}
 

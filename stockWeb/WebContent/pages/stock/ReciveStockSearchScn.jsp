@@ -1,7 +1,7 @@
 <%@ include file="/pages/include/checkLogin.jsp"%>
 <%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
 <%@ page import="th.go.stock.app.enjoy.bean.ReciveOrderMasterBean,th.go.stock.app.enjoy.bean.ComboBean"%>
-<%@ page import="java.util.*"%>
+<%@ page import="java.util.*,org.apache.commons.lang3.StringEscapeUtils"%>
 <jsp:useBean id="reciveStockSearchForm" class="th.go.stock.app.enjoy.form.ReciveStockSearchForm" scope="session"/>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
@@ -265,7 +265,7 @@
 														<td style="text-align:center"><%=bean.getSeqDis()%></td>
 														<td align="center"><%=bean.getReciveNo()%></td>
 														<td align="center"><%=bean.getReciveDate()%></td>
-														<td align="left"><%=bean.getUsrName()%></td>
+														<td align="left"><%=StringEscapeUtils.escapeHtml4(bean.getUsrName())%></td>
 														<td align="left"><%=bean.getReciveStatusDesc()%></td>
 													</tr>
 										<% 			//seq++;

@@ -1,7 +1,6 @@
 package th.go.stock.web.enjoy.servlet;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -97,6 +96,8 @@ public class ProductDetailsMaintananceServlet extends EnjoyStandardSvc {
 				this.updateRecord();
 			}else if(pageAction.equals("deleteRecord")){
 				this.deleteRecord();
+			}else if(pageAction.equals("cancel")){
+				this.cancel();
 			}
  			
  			session.setAttribute(FORM_NAME, this.form);
@@ -118,12 +119,14 @@ public class ProductDetailsMaintananceServlet extends EnjoyStandardSvc {
 		
 		try{
 			
-			this.setRefference();
+//			this.setRefference();
 			this.form.setTitlePage("เพิ่มรายละเอียดสินค้า");
 			
-		}catch(EnjoyException e){
-			throw new EnjoyException(e.getMessage());
-		}catch(Exception e){
+		}
+//		catch(EnjoyException e){
+//			throw new EnjoyException(e.getMessage());
+//		}
+		catch(Exception e){
 			logger.info(e.getMessage());
 			throw new EnjoyException("onLoad is error");
 		}finally{
@@ -133,45 +136,45 @@ public class ProductDetailsMaintananceServlet extends EnjoyStandardSvc {
 		
 	}
 	
-	private void setRefference() throws EnjoyException{
-		
-		logger.info("[setRefference][Begin]");
-		
-		try{
-			this.setStatusCombo();
-		}catch(EnjoyException e){
-			throw new EnjoyException(e.getMessage());
-		}catch(Exception e){
-			e.printStackTrace();
-			logger.info(e.getMessage());
-		}finally{
-			logger.info("[setRefference][End]");
-		}
-	}
+//	private void setRefference() throws EnjoyException{
+//		
+//		logger.info("[setRefference][Begin]");
+//		
+//		try{
+//			this.setStatusCombo();
+//		}catch(EnjoyException e){
+//			throw new EnjoyException(e.getMessage());
+//		}catch(Exception e){
+//			e.printStackTrace();
+//			logger.info(e.getMessage());
+//		}finally{
+//			logger.info("[setRefference][End]");
+//		}
+//	}
 	
-	private void setStatusCombo() throws EnjoyException{
-		
-		logger.info("[setStatusCombo][Begin]");
-		
-		List<ComboBean>			statusCombo = null;
-		
-		try{
-			
-			statusCombo = new ArrayList<ComboBean>();
-			
-			statusCombo.add(new ComboBean(""	, "กรุณาระบุ"));
-			statusCombo.add(new ComboBean("A"	, "ใช้งานได้อยู่"));
-			statusCombo.add(new ComboBean("C"	, "ยกเลิกการใช้งาน"));
-			
-			this.form.setStatusCombo(statusCombo);
-		}
-		catch(Exception e){
-			logger.info(e.getMessage());
-			throw new EnjoyException("setStatusCombo is error");
-		}finally{
-			logger.info("[setStatusCombo][End]");
-		}
-	}
+//	private void setStatusCombo() throws EnjoyException{
+//		
+//		logger.info("[setStatusCombo][Begin]");
+//		
+//		List<ComboBean>			statusCombo = null;
+//		
+//		try{
+//			
+//			statusCombo = new ArrayList<ComboBean>();
+//			
+//			statusCombo.add(new ComboBean(""	, "กรุณาระบุ"));
+//			statusCombo.add(new ComboBean("A"	, "ใช้งานได้อยู่"));
+//			statusCombo.add(new ComboBean("C"	, "ยกเลิกการใช้งาน"));
+//			
+//			this.form.setStatusCombo(statusCombo);
+//		}
+//		catch(Exception e){
+//			logger.info(e.getMessage());
+//			throw new EnjoyException("setStatusCombo is error");
+//		}finally{
+//			logger.info("[setStatusCombo][End]");
+//		}
+//	}
 	
 	private void getDetail(String productCode) throws EnjoyException{
 		logger.info("[getDetail][Begin]");
@@ -230,7 +233,7 @@ public class ProductDetailsMaintananceServlet extends EnjoyStandardSvc {
 			logger.info(e.getMessage());
 			throw new EnjoyException("getDetail is error");
 		}finally{
-			this.setRefference();
+//			this.setRefference();
 			
 			logger.info("[getDetail][End]");
 		}
@@ -247,6 +250,7 @@ public class ProductDetailsMaintananceServlet extends EnjoyStandardSvc {
 	   String						productGroupName			= null;
 	   String						unitName					= null;
 	   String 						productCode					= null;
+	   String 						productCodeDis				= null;
 	   String 						productName					= null;
 	   String						tin							= null;
 	   JSONObject 					obj 						= new JSONObject();
@@ -260,6 +264,7 @@ public class ProductDetailsMaintananceServlet extends EnjoyStandardSvc {
 		   productGroupName		= EnjoyUtils.nullToStr(this.request.getParameter("productGroupName"));
 		   unitName				= EnjoyUtils.nullToStr(this.request.getParameter("unitName"));
 		   productCode			= EnjoyUtils.nullToStr(this.request.getParameter("productCode"));
+		   productCodeDis		= EnjoyUtils.nullToStr(this.request.getParameter("productCodeDis"));
 		   productName			= EnjoyUtils.nullToStr(this.request.getParameter("productName"));
 		   tin					= this.userBean.getTin();
 		   productdetailList	= this.form.getProductdetailList();
@@ -268,14 +273,13 @@ public class ProductDetailsMaintananceServlet extends EnjoyStandardSvc {
 		   logger.info("[lp_validate] productGroupName 	:: " + productGroupName);
 		   logger.info("[lp_validate] unitName 			:: " + unitName);
 		   logger.info("[lp_validate] productCode 		:: " + productCode);
+		   logger.info("[lp_validate] productCodeDis 	:: " + productCodeDis);
 		   logger.info("[lp_validate] productName 		:: " + productName);
 		   logger.info("[lp_validate] tin 				:: " + tin);
 		   
-		   if(this.form.getPageMode().equals(ProductDetailsMaintananceForm.NEW)){
-			   cou = this.dao.checkDupProductCode(productCode, tin);
-			   if(cou > 0){
-				   throw new EnjoyException("รหัสสินค้าซ้ำกันกรุณาระบุใหม่");
-			   }
+		   cou = this.dao.checkDupProductCode(productCodeDis, tin, productCode, this.form.getPageMode());
+		   if(cou > 0){
+			   throw new EnjoyException("รหัสสินค้าซ้ำกันกรุณาระบุใหม่");
 		   }
 		   
 		   cou = this.dao.checkDupProductName(productName, productCode, tin, this.form.getPageMode());
@@ -320,8 +324,8 @@ public class ProductDetailsMaintananceServlet extends EnjoyStandardSvc {
 	private void onSave() throws EnjoyException{
 		logger.info("[onSave][Begin]");
 		
-		String						pageMode				= null;
 		String						productCode				= null;
+		String						productCodeDis			= null;
 		String						productName				= null;
 		String						productTypeCode			= null;
 		String						productGroupCode		= null;
@@ -341,8 +345,8 @@ public class ProductDetailsMaintananceServlet extends EnjoyStandardSvc {
 		int							seqDb					= 1;
 		
 		try{
-			pageMode 					= EnjoyUtil.nullToStr(request.getParameter("pageMode"));
 			productCode 				= EnjoyUtil.nullToStr(request.getParameter("productCode"));
+			productCodeDis 				= EnjoyUtil.nullToStr(request.getParameter("productCodeDis"));
 			productName 				= EnjoyUtil.nullToStr(request.getParameter("productName"));
 			productTypeCode 			= EnjoyUtil.nullToStr(request.getParameter("productTypeCode"));
 			productGroupCode 			= EnjoyUtil.nullToStr(request.getParameter("productGroupCode"));
@@ -359,8 +363,8 @@ public class ProductDetailsMaintananceServlet extends EnjoyStandardSvc {
 			productmasterBean			= new ProductmasterBean();
 			productdetailList			= this.form.getProductdetailList();
 			
-			logger.info("[onSave] pageMode 				:: " + pageMode);
 			logger.info("[onSave] productCode 			:: " + productCode);
+			logger.info("[onSave] productCodeDis 		:: " + productCodeDis);
 			logger.info("[onSave] productName 			:: " + productName);
 			logger.info("[onSave] productTypeCode 		:: " + productTypeCode);
 			logger.info("[onSave] productGroupCode 		:: " + productGroupCode);
@@ -374,8 +378,9 @@ public class ProductDetailsMaintananceServlet extends EnjoyStandardSvc {
 			logger.info("[onSave] salePrice5 			:: " + salePrice5);
 			logger.info("[onSave] tin 					:: " + tin);
 			
-			productmasterBean.setProductCode(productCode);
+//			productmasterBean.setProductCode(productCode);
 			productmasterBean.setTin(tin);
+			productmasterBean.setProductCodeDis(productCodeDis);
 			productmasterBean.setProductName(productName);
 			productmasterBean.setProductTypeCode(productTypeCode);
 			productmasterBean.setProductGroupCode(productGroupCode);
@@ -387,10 +392,15 @@ public class ProductDetailsMaintananceServlet extends EnjoyStandardSvc {
 			productmasterBean.setSalePrice3(salePrice3);
 			productmasterBean.setSalePrice4(salePrice4);
 			productmasterBean.setSalePrice5(salePrice5);
+			productmasterBean.setProductStatus("A");
 			
-			if(pageMode.equals(ProductDetailsMaintananceForm.NEW)){
+			if("".equals(productCode)){
+				productCode = EnjoyUtil.nullToStr(this.dao.genId(tin));
+				productmasterBean.setProductCode(productCode);
+				
 				this.dao.insertProductmaster(productmasterBean);
 			}else{
+				productmasterBean.setProductCode(productCode);
 				this.dao.updateProductmaster(productmasterBean);
 			}
 			
@@ -674,6 +684,39 @@ public class ProductDetailsMaintananceServlet extends EnjoyStandardSvc {
 			
 			this.enjoyUtil.writeMSG(obj.toString());
 			logger.info("[deleteRecord][End]");
+		}
+	}
+	
+	private void cancel() throws EnjoyException{
+		logger.info("[cancel][Begin]");
+		
+		JSONObject 		obj 			= null;
+		String 			productCode		= null;
+		String			tin 			= null;
+		
+		try{
+			
+			obj 			= new JSONObject();
+			productCode 	= EnjoyUtil.nullToStr(request.getParameter("productCode"));
+			tin				= this.userBean.getTin();
+			
+			logger.info("[cancel] productCode :: " + productCode);
+			
+			dao.cancelProductmaster(tin, "", "", productCode);
+			
+			commit();
+			
+			obj.put(STATUS, 		SUCCESS);
+			
+		}catch(Exception e){
+			logger.info(e.getMessage());
+			
+			obj.put(STATUS, 		ERROR);
+			obj.put(ERR_MSG, 		"cancel is error");
+		}finally{
+			
+			this.enjoyUtil.writeMSG(obj.toString());
+			logger.info("[cancel][End]");
 		}
 	}
 

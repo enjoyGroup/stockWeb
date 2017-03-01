@@ -7,8 +7,10 @@ import java.util.List;
 
 import th.go.stock.app.enjoy.bean.ProductQuanHistoryBean;
 import th.go.stock.app.enjoy.exception.EnjoyException;
+import th.go.stock.app.enjoy.main.Constants;
 import th.go.stock.app.enjoy.main.DaoControl;
 import th.go.stock.app.enjoy.model.Productquanhistory;
+import th.go.stock.app.enjoy.model.ProductquanhistoryPK;
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
 import th.go.stock.app.enjoy.utils.EnjoyUtils;
 
@@ -19,21 +21,25 @@ public class ProductQuanHistoryDao extends DaoControl {
 		super.init();
 	}
 	
-	public void insert(ProductQuanHistoryBean bean) throws EnjoyException{
+	public void insert(ProductQuanHistoryBean bean, int hisCode) throws EnjoyException{
 		getLogger().info("[insert][Begin]");
 		
-		Productquanhistory 	productquanhistory 	= null;
+		Productquanhistory 		productquanhistory 	= null;
+		ProductquanhistoryPK 	id					= null;
 		
 		try{
+			id					= new ProductquanhistoryPK();
+			productquanhistory 	= new Productquanhistory();
 			
-			productquanhistory = new Productquanhistory();
+			id.setTin			(bean.getTin());
+			id.setHisCode		(hisCode);
 			
+			productquanhistory.setId			(id);
 			productquanhistory.setFormRef		(bean.getFormRef());
 			productquanhistory.setHisDate		(EnjoyUtils.currDateThai());
-			productquanhistory.setProductType	(bean.getProductType());
-			productquanhistory.setProductGroup	(bean.getProductGroup());
-			productquanhistory.setProductCode	(bean.getProductCode());
-			productquanhistory.setTin			(bean.getTin());
+			productquanhistory.setProductType	(EnjoyUtils.parseInt(bean.getProductType()));
+			productquanhistory.setProductGroup	(EnjoyUtils.parseInt(bean.getProductGroup()));
+			productquanhistory.setProductCode	(EnjoyUtils.parseInt(bean.getProductCode()));
 			productquanhistory.setQuantityPlus	(EnjoyUtils.parseBigDecimal(bean.getQuantityPlus()));
 			productquanhistory.setQuantityMinus	(EnjoyUtils.parseBigDecimal(bean.getQuantityMinus()));
 			productquanhistory.setQuantityTotal	(EnjoyUtils.parseBigDecimal(bean.getQuantityTotal()));
@@ -130,6 +136,40 @@ public class ProductQuanHistoryDao extends DaoControl {
 		return list;
 		
 	}
-	
+
+	public int genId(String tin) throws EnjoyException{
+		getLogger().info("[genId][Begin]");
+		
+		String							hql				= null;
+		int 							result			= 1;
+		HashMap<String, Object>			param			= new HashMap<String, Object>();
+		List<Object>					resultList		= null;
+		
+		try{
+			hql		= "select (max(hisCode) + 1) newId"
+					+ "	from productquanhistory "
+					+ "	where tin				= :tin";
+			
+			//Criteria
+			param.put("tin"				, tin);
+			
+			resultList = getResult(hql, param, "newId", Constants.INT_TYPE);
+			
+			if(resultList!=null && resultList.size() > 0){
+				result = EnjoyUtils.parseInt(resultList.get(0))==0?1:EnjoyUtils.parseInt(resultList.get(0));
+			}
+			
+			getLogger().info("[genId] newId 			:: " + result);
+			
+		}catch(Exception e){
+			getLogger().error(e);
+			throw new EnjoyException("genId error");
+		}finally{
+			hql									= null;
+			getLogger().info("[genId][End]");
+		}
+		
+		return result;
+	}	
 	
 }

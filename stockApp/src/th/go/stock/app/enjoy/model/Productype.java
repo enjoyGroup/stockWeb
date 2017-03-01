@@ -16,6 +16,8 @@ public class Productype implements Serializable {
 	@EmbeddedId
 	private ProductypePK id;
 
+	private String productTypeCodeDis;
+
 	private String productTypeName;
 
 	private String productTypeStatus;
@@ -29,6 +31,14 @@ public class Productype implements Serializable {
 
 	public void setId(ProductypePK id) {
 		this.id = id;
+	}
+
+	public String getProductTypeCodeDis() {
+		return this.productTypeCodeDis;
+	}
+
+	public void setProductTypeCodeDis(String productTypeCodeDis) {
+		this.productTypeCodeDis = productTypeCodeDis;
 	}
 
 	public String getProductTypeName() {

@@ -1,6 +1,7 @@
 package th.go.stock.app.enjoy.model;
 
 import java.io.Serializable;
+
 import javax.persistence.*;
 
 /**
@@ -11,17 +12,17 @@ import javax.persistence.*;
 public class ProductypePK implements Serializable {
 	//default serial version id, required for serializable classes.
 	private static final long serialVersionUID = 1L;
-
-	private String productTypeCode;
+	
+	private int productTypeCode;
 
 	private String tin;
 
 	public ProductypePK() {
 	}
-	public String getProductTypeCode() {
+	public int getProductTypeCode() {
 		return this.productTypeCode;
 	}
-	public void setProductTypeCode(String productTypeCode) {
+	public void setProductTypeCode(int productTypeCode) {
 		this.productTypeCode = productTypeCode;
 	}
 	public String getTin() {
@@ -40,14 +41,14 @@ public class ProductypePK implements Serializable {
 		}
 		ProductypePK castOther = (ProductypePK)other;
 		return 
-			this.productTypeCode.equals(castOther.productTypeCode)
+			(this.productTypeCode == castOther.productTypeCode)
 			&& this.tin.equals(castOther.tin);
 	}
 
 	public int hashCode() {
 		final int prime = 31;
 		int hash = 17;
-		hash = hash * prime + this.productTypeCode.hashCode();
+		hash = hash * prime + this.productTypeCode;
 		hash = hash * prime + this.tin.hashCode();
 		
 		return hash;

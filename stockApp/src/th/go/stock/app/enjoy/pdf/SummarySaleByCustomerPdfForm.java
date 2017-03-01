@@ -38,7 +38,7 @@ public class SummarySaleByCustomerPdfForm extends EnjoyItext implements PdfFormS
 		System.out.println("[SummarySaleByCustomerPdfForm][createForm][Begin]");
 		
 		try{
-			document.add(this.genHeader());
+			document.add(genHeader(formDataObj, "รายงานประวัติการซื้อของลูกค้า"));
 			document.add(this.brLine());
 			document.add(this.genHeader1());
 			document.add(this.brLine());
@@ -61,27 +61,27 @@ public class SummarySaleByCustomerPdfForm extends EnjoyItext implements PdfFormS
 		return document;
 	}
 	
-	private PdfPTable genHeader() throws DocumentException, MalformedURLException, IOException {
-		
-		PdfPTable 	table 			= new PdfPTable(1);
-		JSONObject 	jsonObjectMain  = this.formDataObj;
-		JSONObject  customerDetails	= (JSONObject) jsonObjectMain.get("customerDetails");
-		String		address			= "";
-		
-		address = " โทร." + getText(customerDetails, "tel") 
-				+ " Fax." + getText(customerDetails, "fax") 
-				+ " Email." + getText(customerDetails, "email");
-		
-		table.addCell(setCellWB(getText(customerDetails, "fullName"), getFont11Bold(), 1, Element.ALIGN_CENTER, 0));
-		table.addCell(setCellWB(getText(customerDetails, "address"), getFont8(), 1, Element.ALIGN_CENTER, 0));
-		table.addCell(setCellWB(address, getFont8(), 1, Element.ALIGN_CENTER, 0));
-		table.addCell(setCellWB("", getFont8(), 1, Element.ALIGN_CENTER, 0));
-		table.addCell(setCellWB("รายงานประวัติการซื้อของลูกค้า", getFont10Bold(), 1, Element.ALIGN_CENTER, 0));
-		
-		table.setWidthPercentage(100);
-	
-		return table;
-	}
+//	private PdfPTable genHeader() throws DocumentException, MalformedURLException, IOException {
+//		
+//		PdfPTable 	table 			= new PdfPTable(1);
+//		JSONObject 	jsonObjectMain  = this.formDataObj;
+//		JSONObject  customerDetails	= (JSONObject) jsonObjectMain.get("customerDetails");
+//		String		address			= "";
+//		
+//		address = " โทร." + getText(customerDetails, "tel") 
+//				+ " Fax." + getText(customerDetails, "fax") 
+//				+ " Email." + getText(customerDetails, "email");
+//		
+//		table.addCell(setCellWB(getText(customerDetails, "fullName"), getFont11Bold(), 1, Element.ALIGN_CENTER, 0));
+//		table.addCell(setCellWB(getText(customerDetails, "address"), getFont8(), 1, Element.ALIGN_CENTER, 0));
+//		table.addCell(setCellWB(address, getFont8(), 1, Element.ALIGN_CENTER, 0));
+//		table.addCell(setCellWB("", getFont8(), 1, Element.ALIGN_CENTER, 0));
+//		table.addCell(setCellWB("รายงานประวัติการซื้อของลูกค้า", getFont10Bold(), 1, Element.ALIGN_CENTER, 0));
+//		
+//		table.setWidthPercentage(100);
+//	
+//		return table;
+//	}
 	
 	private PdfPTable genHeader1() throws DocumentException, MalformedURLException, IOException {
 		

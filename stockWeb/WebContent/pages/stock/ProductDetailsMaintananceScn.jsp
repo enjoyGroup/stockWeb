@@ -1,14 +1,14 @@
 <%@ include file="/pages/include/checkLogin.jsp"%>
 <%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
 <%@ page import="th.go.stock.app.enjoy.bean.ProductmasterBean,th.go.stock.app.enjoy.bean.ProductdetailBean,th.go.stock.app.enjoy.bean.ComboBean"%>
-<%@ page import="java.util.*"%>
+<%@ page import="java.util.*,org.apache.commons.lang3.StringEscapeUtils"%>
 <jsp:useBean id="productDetailsMaintananceForm" class="th.go.stock.app.enjoy.form.ProductDetailsMaintananceForm" scope="session"/>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
 <%
 	String 						pageMode 			= productDetailsMaintananceForm.getPageMode();
 	ProductmasterBean 			productmasterBean 	= productDetailsMaintananceForm.getProductmasterBean();
-	List<ComboBean> 			statusCombo 		= productDetailsMaintananceForm.getStatusCombo();
+	//List<ComboBean> 			statusCombo 		= productDetailsMaintananceForm.getStatusCombo();
 	String						titlePage			= productDetailsMaintananceForm.getTitlePage();
 	List<ProductdetailBean> 	productdetailList	= productDetailsMaintananceForm.getProductdetailList();
 %>
@@ -28,12 +28,15 @@
 			
 			gv_service 		= "service=" + $('#service').val();
 			
-			if($("#pageMode").val()=="EDIT"){
-				lp_setModeEdit();
+			/*if($("#pageMode").val()=="EDIT"){
+				//lp_setModeEdit();
 				$("#productName").focus();
 			}else{
-				$("#productCode").focus();
-			}
+				$("#productCodeDis").focus();
+			}*/
+			
+			$("#productCodeDis").focus();
+			
 			$('html, body').animate({scrollTop: '0px'}, 300);
 			
 			$( "#productTypeName" ).autocomplete({ 
@@ -139,7 +142,7 @@
 		});
 		
 		function lp_validate(){
-			var la_validate               = new Array("productCode:รหัสสินค้า"	
+			var la_validate               = new Array("productCodeDis:รหัสสินค้า"	
 													,"productName:ชื่อสินค้า"
 													, "productTypeName:หมวดสินค้า"
 													, "productGroupName:หมู่สินค้า"
@@ -176,10 +179,10 @@
 	                }
 				}*/
 				
-				if(!(gp_checkThaiLetter($("#productCode").val()))){
+				if(!(gp_checkThaiLetter($("#productCodeDis").val()))){
 					alert("รหัสสินค้าต้องเปนภาษาอังกฤษหรือตัวเลขเท่านั้น !!", function() { 
-						$("#productCode").val('');
-	        			$("#productCode").focus();
+						$("#productCodeDis").val('');
+	        			$("#productCodeDis").focus();
 	    		    });
 					return;
 				}
@@ -272,8 +275,8 @@
 		function lp_setModeEdit(){
 			
 			try{
-				document.getElementById("productCode").readOnly 	= true;
-				document.getElementById("productCode").className 	= "input-disabled";
+				document.getElementById("productCodeDis").readOnly 	= true;
+				document.getElementById("productCodeDis").className 	= "input-disabled";
 			}catch(e){
 				alert("lp_setModeEdit :: " + e);
 			}
@@ -325,6 +328,50 @@
 				
 			}catch(e){
 				alert("lp_save :: " + e);
+				return;
+			}
+		}
+		
+		function lp_cancel(){
+			var params				= "";
+			
+			try{
+				gp_progressBarOn();
+				confirm("คุณแน่ใจว่าต้องการยกเลิกสินค้ารายการนี้", function(){
+					params 	= "&pageAction=cancel&" + $('#frm').serialize();
+					
+					$.ajax({
+						async:true,
+			            type: "POST",
+			            url: gv_url,
+			            data: gv_service + params,
+			            beforeSend: "",
+			            success: function(data){
+			            	var jsonObj 			= null;
+			            	var status				= null;
+			            	
+			            	try{
+			            		//gp_progressBarOff();
+			            		jsonObj = JSON.parse(data);
+			            		status	= jsonObj.status;
+			            		
+			            		if(status=="SUCCESS"){
+			            			alert("ยกเลิกเรียบร้อย", function() {
+			            				window.location = gv_url + "?service=servlet.ProductDetailsSearchServlet&pageAction=new";
+					    		    }, false);
+			            		}else{
+			            			alert(jsonObj.errMsg);
+			            			
+			            		}
+			            	}catch(e){
+			            		alert("in lp_cancel :: " + e);
+			            	}
+			            }
+			        });
+				}, function(){gp_progressBarOff();}, false);
+				
+			}catch(e){
+				alert("lp_cancel :: " + e);
 				return;
 			}
 		}
@@ -561,11 +608,12 @@
 												</td>
 							        			<td align="left">
 							        				<input type='text' 
-							        					   id="productCode" 
-							        					   name='productCode' 
-							        					   value="<%=productmasterBean.getProductCode()%>" 
+							        					   id="productCodeDis" 
+							        					   name='productCodeDis' 
+							        					   value="<%=StringEscapeUtils.escapeHtml4(productmasterBean.getProductCodeDis())%>" 
 							        					   maxlength="17" 
 							        					   style="width: 220px;" />
+							        				<input type='hidden' id="productCode" name='productCode' value="<%=productmasterBean.getProductCode()%>"  />
 							        			</td>
 								        	</tr>
 								        	<tr>
@@ -576,7 +624,7 @@
 							        				<input type='text' 
 							        					   id="productName" 
 							        					   name='productName' 
-							        					   value="<%=productmasterBean.getProductName()%>" 
+							        					   value="<%=StringEscapeUtils.escapeHtml4(productmasterBean.getProductName())%>" 
 							        					   maxlength="255" 
 							        					   style="width: 220px;" />
 							        			</td>
@@ -589,7 +637,7 @@
 							        				<input type='text' 
 							        					   id="productTypeName" 
 							        					   name='productTypeName' 
-							        					   value="<%=productmasterBean.getProductTypeName()%>" 
+							        					   value="<%=StringEscapeUtils.escapeHtml4(productmasterBean.getProductTypeName())%>" 
 							        					   maxlength="200" 
 							        					   style="width: 220px;" />
 							        				<input type="hidden" id="productTypeCode" name="productTypeCode" value="<%=productmasterBean.getProductTypeCode()%>" />
@@ -603,7 +651,7 @@
 							        				<input type='text' 
 							        					   id="productGroupName" 
 							        					   name='productGroupName' 
-							        					   value="<%=productmasterBean.getProductGroupName()%>" 
+							        					   value="<%=StringEscapeUtils.escapeHtml4(productmasterBean.getProductGroupName())%>" 
 							        					   maxlength="200" 
 							        					   style="width: 220px;" />
 							        				<input type="hidden" id="productGroupCode" name="productGroupCode" value="<%=productmasterBean.getProductGroupCode()%>" />
@@ -617,7 +665,7 @@
 							        				<input type='text' 
 							        					   id="unitName" 
 							        					   name='unitName' 
-							        					   value="<%=productmasterBean.getUnitName()%>" 
+							        					   value="<%=StringEscapeUtils.escapeHtml4(productmasterBean.getUnitName())%>" 
 							        					   maxlength="200" 
 							        					   style="width: 220px;" />
 							        				<input type="hidden" id="unitCode" name="unitCode" value="<%=productmasterBean.getUnitCode()%>" />
@@ -803,8 +851,11 @@
 											<tr>
 							        			<td align="center">
 							        				<br/>
-							        				<input type="button" id="btnSave" class="btn btn-sm btn-warning" value='บันทึก' onclick="lp_save();" />&nbsp;&nbsp;&nbsp;
-			   										<input type="button" id="btnReset" onclick="lp_reset();" class="btn btn-sm btn-danger" value='เริ่มใหม่' />
+							        				<input type="button" id="btnSave" class="btn btn-sm btn-primary" value='บันทึก' onclick="lp_save();" />&nbsp;&nbsp;&nbsp;
+							        				<%if(pageMode.equals(productDetailsMaintananceForm.EDIT)){ %>
+							        					<input type="button" id="btnCancel" class="btn btn-sm btn-danger" value='ยกเลิก' onclick="lp_cancel();" />&nbsp;&nbsp;&nbsp;
+							        				<%} %>
+			   										<input type="button" id="btnReset" onclick="lp_reset();" class="btn btn-sm btn-warning" value='เริ่มใหม่' />
 							        			</td>
 							        		</tr>
 										</table>

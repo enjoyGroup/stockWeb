@@ -918,10 +918,16 @@ function gp_validateEmptyObj(ga_array){
 	}
 }
 
-window.alert = function(message, successCallback){
+window.alert = function(message, successCallback, autoIndicator){
 	//var lo_dialog = null;
 	
-	gp_progressBarOn();
+	if(autoIndicator == undefined ){
+        autoIndicator = true;
+    }
+	
+    if(autoIndicator){
+    	gp_progressBarOn();
+    }
 	
 	//$( "#dialog" ).empty();
 	//$( "#dialog" ).dialog('destroy').remove();
@@ -943,7 +949,7 @@ window.alert = function(message, successCallback){
 	        duration: 200
 	      },
 	      close: function() {
-	    	  gp_progressBarOff();
+	    	  if(autoIndicator)gp_progressBarOff();
 	    	  //console.log("successCallback :: " + successCallback);
 	    	  if(successCallback!=null && successCallback != 'undefined'){
 	    		  successCallback();
@@ -972,9 +978,15 @@ window.alert = function(message, successCallback){
 		//event.preventDefault();
 };
 
-window.confirm = function(message, successCallback, nonSuccessCallback){
+window.confirm = function(message, successCallback, nonSuccessCallback, autoIndicator){
 	
-	gp_progressBarOn();
+	if(autoIndicator == undefined ){
+        autoIndicator = true;
+    }
+	
+    if(autoIndicator){
+    	gp_progressBarOn();
+    }
 	
 	$(document.createElement('div'))
 	    .html("<p>" + message + "</p>")
@@ -993,7 +1005,7 @@ window.confirm = function(message, successCallback, nonSuccessCallback){
 	        duration: 200
 	      },
 	      close: function() {
-	    	  gp_progressBarOff();
+	    	  if(autoIndicator)gp_progressBarOff();
 	    	  $( this ).removeClass( "zoom" );
 	        },
 	      title: "การแจ้งเตือน",

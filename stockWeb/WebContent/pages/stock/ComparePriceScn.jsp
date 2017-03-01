@@ -1,7 +1,7 @@
 <%@ include file="/pages/include/checkLogin.jsp"%>
 <%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
 <%@ page import="th.go.stock.app.enjoy.bean.ComparePriceBean,th.go.stock.app.enjoy.bean.ComboBean"%>
-<%@ page import="java.util.*"%>
+<%@ page import="java.util.*,org.apache.commons.lang3.StringEscapeUtils"%>
 <jsp:useBean id="comparePriceForm" class="th.go.stock.app.enjoy.form.ComparePriceForm" scope="session"/>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
@@ -622,7 +622,7 @@
 							        					   <%if(chk==false){%> onblur="lp_getProductDetailByName();"<%}%>
 							        					   <%if(chk==false){%> onkeypress="return lp_enterToSearch(event);"<%}%>
 							        					   placeholder="สินค้า"  
-							        					   value="<%=comparePriceForm.getProductName()%>" 
+							        					   value="<%=StringEscapeUtils.escapeHtml4(comparePriceForm.getProductName())%>" 
 							        					   <%if(chk==true){%> class="input-disabled" readonly<%}%> />
 							        				<input type="button" id="btnSearch" class='btn btn-primary padding-sm' style="margin-right:12px; padding-right:24px; padding-left:24px;" value='ค้นหา' <%if(chk==true){%>disabled<%}%> />
 							        			</td>

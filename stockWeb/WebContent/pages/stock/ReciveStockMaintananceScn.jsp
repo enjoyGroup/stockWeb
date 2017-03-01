@@ -4,7 +4,7 @@
 				th.go.stock.app.enjoy.bean.ReciveOrdeDetailBean,
 				th.go.stock.app.enjoy.bean.CompanyVendorBean,
 				th.go.stock.app.enjoy.bean.ComboBean"%>
-<%@ page import="java.util.*"%>
+<%@ page import="java.util.*,org.apache.commons.lang3.StringEscapeUtils"%>
 <jsp:useBean id="reciveStockMaintananceForm" class="th.go.stock.app.enjoy.form.ReciveStockMaintananceForm" scope="session"/>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
@@ -33,12 +33,6 @@
 		$(document).ready(function(){
 			//gp_progressBarOn();
 			gv_service 		= "service=" + $('#service').val();
-			
-			if($("#pageMode").val()=="EDIT"){
-				lp_setModeEdit();
-			}else{
-				lp_setModeNew();
-			}
 			
 			$("input[name=productName]").live("focus",function(){
 				$(this).autocomplete({
@@ -75,6 +69,19 @@
 				  });
 				
 			});
+			
+			if($("#pageMode").val()=="EDIT"){
+				lp_setModeEdit();
+				
+				$("input[name=productName]").each(function(){
+					//console.log("b ==> " + $(this).val());
+					$(this).focus();
+					//console.log("a ==> " + $(this).val());
+				});
+				
+			}else{
+				lp_setModeNew();
+			}
 			
 			$( "#vendorName" ).autocomplete({ 
 				 source: function(request, response) {
@@ -429,6 +436,7 @@
 					$("#reciveStatus option[value='3']").remove();
 				}
 				
+				lp_ctrllReciveType();
 				
 			}catch(e){
 				alert("lp_setModeEdit :: " + e);
@@ -626,28 +634,37 @@
 		                        
 		                      	//สินค้า
 		                      	newNodeTd2.align 			= "left";
-		                       	newNodeTd2.innerHTML        = '<input type="text" style="width: 77%" onblur="lp_getProductDetailByName(' + lv_maxSeq + ', this.value);lp_updateRecord('+lv_maxSeq+');" id="productName' + lv_maxSeq + '" name="productName" value="'+lv_productName+'" />'
+		                       	newNodeTd2.innerHTML        = '<input type="text" style="width: 77%" onblur="lp_getProductDetailByName(' + lv_maxSeq + ', this.value);lp_updateRecord('+lv_maxSeq+');" id="productName' + lv_maxSeq + '" name="productName" value="" />'
 		                       								+ '<img alt="lookUp" title="lookUp" src="<%=imgURL%>/lookup.png" width="20%" height="24" border="0" onclick="lp_comparePrice('+lv_maxSeq+');" />'
-		                       								+ '<input type="hidden" id="productCode'+lv_maxSeq+'" name="productCode" value="'+lv_productCode+'" />';
+		                       								+ '<input type="hidden" id="productCode'+lv_maxSeq+'" name="productCode" value="" />';
+		                       	$("#productName" + lv_maxSeq).val(lv_productName);
+		                       	$("#productCode" + lv_maxSeq).val(lv_productCode);
 		                       	
 		                      	//เหลือในคลัง
-		                       	newNodeTd3.innerHTML        = '<input type="text" style="width: 100%;" class="input-disabled" readonly="readonly" id="inventory' + lv_maxSeq + '" name="inventory" value="'+lv_inventory+'" />';
+		                       	newNodeTd3.innerHTML        = '<input type="text" style="width: 100%;" class="input-disabled" readonly="readonly" id="inventory' + lv_maxSeq + '" name="inventory" value="" />';
+		                       	$("#inventory" + lv_maxSeq).val(lv_inventory);
 		                       	
 		                      	//ปริมาณ
-		                       	newNodeTd4.innerHTML        = '<input type="text" style="width: 100%"  onblur="gp_checkAmtOnly(this, 12);lp_getPrice('+lv_maxSeq+');" class="moneyOnly" id="quantity' + lv_maxSeq + '" name="quantity" value="0.00" />';
+		                       	newNodeTd4.innerHTML        = '<input type="text" style="width: 100%"  onblur="gp_checkAmtOnly(this, 12);lp_getPrice('+lv_maxSeq+');" class="moneyOnly" id="quantity' + lv_maxSeq + '" name="quantity" value="" />';
+		                       	$("#quantity" + lv_maxSeq).val("0.00");
 		                       	
 		                      	//หน่วย
-		                       	newNodeTd5.innerHTML        = '<input type="text" style="width: 100%;" id="unitName' + lv_maxSeq + '" class="input-disabled" readonly="readonly" name="unitName" value="'+lv_unitName+'" />'
-   															+ '<input type="hidden" id="unitCode'+lv_maxSeq+'" name="unitCode" value="'+lv_unitCode+'" />';
+		                       	newNodeTd5.innerHTML        = '<input type="text" style="width: 100%;" id="unitName' + lv_maxSeq + '" class="input-disabled" readonly="readonly" name="unitName" value="" />'
+   															+ '<input type="hidden" id="unitCode'+lv_maxSeq+'" name="unitCode" value="" />';
+   								$("#unitName" + lv_maxSeq).val(lv_unitName);
+   								$("#unitCode" + lv_maxSeq).val(lv_unitCode);
    								
 								//ราคาที่ซื้อ
-		                       	newNodeTd6.innerHTML        = '<input type="text" style="width: 100%"  onblur="gp_checkAmtOnly(this, 12);lp_calAmount('+lv_maxSeq+');" class="moneyOnly" id="price' + lv_maxSeq + '" name="price" value="0.00" />';
+		                       	newNodeTd6.innerHTML        = '<input type="text" style="width: 100%"  onblur="gp_checkAmtOnly(this, 12);lp_calAmount('+lv_maxSeq+');" class="moneyOnly" id="price' + lv_maxSeq + '" name="price" value="" />';
+		                       	$("#price" + lv_maxSeq).val("0.00");
 		                       	
 		                      	//ส่วนลด
-		                       	newNodeTd7.innerHTML        = '<input type="text" style="width: 100%"  onblur="gp_checkAmtOnly(this, 12);lp_calAmount('+lv_maxSeq+');" class="moneyOnly" id="discountRate' + lv_maxSeq + '" name="discountRate" value="0.00" />';
+		                       	newNodeTd7.innerHTML        = '<input type="text" style="width: 100%"  onblur="gp_checkAmtOnly(this, 12);lp_calAmount('+lv_maxSeq+');" class="moneyOnly" id="discountRate' + lv_maxSeq + '" name="discountRate" value="" />';
+		                       	$("#discountRate" + lv_maxSeq).val("0.00");
 		                       	
 		                      	//จำนวนเงิน
-		                       	newNodeTd8.innerHTML        = '<input type="text" style="width: 100%"  onblur="gp_checkAmtOnly(this, 12);lp_calReciveAmount();lp_updateRecord('+lv_maxSeq+');" class="moneyOnly" id="costPrice' + lv_maxSeq + '" name="costPrice" value="0.00" />';
+		                       	newNodeTd8.innerHTML        = '<input type="text" style="width: 100%"  onblur="gp_checkAmtOnly(this, 12);lp_calReciveAmount();lp_updateRecord('+lv_maxSeq+');" class="moneyOnly" id="costPrice' + lv_maxSeq + '" name="costPrice" value="" />';
+		                       	$("#costPrice" + lv_maxSeq).val("0.00");
 		                       	
 		                      	//Action
 		                      	newNodeTd9.align 			= "center";
@@ -1243,7 +1260,7 @@
 								        				<input type='text' 
 								        					   id="vendorName" 
 								        					   name='vendorName' 
-								        					   value="<%=companyVendorBean.getVendorName() %>" 
+								        					   value="<%=StringEscapeUtils.escapeHtml4(companyVendorBean.getVendorName())%>" 
 								        					   maxlength="100" 
 								        					   onblur="lp_getCompanyVendorDetail();"
 								        					   style="width: 280px;" />
@@ -1256,7 +1273,7 @@
 								        				<input type='text' 
 								        					   id="branchName" 
 								        					   name='branchName' 
-								        					   value="<%=companyVendorBean.getBranchName() %>" 
+								        					   value="<%=StringEscapeUtils.escapeHtml4(companyVendorBean.getBranchName()) %>" 
 								        					   maxlength="30" 
 								        					   onblur="lp_getCompanyVendorDetail();"
 								        					   style="width: 220px;" />
@@ -1271,7 +1288,7 @@
 								        						id="billNo" 
 								        						name="billNo"
 								        						style="width: 220px;"
-								        						value="<%=reciveOrderMasterBean.getBillNo()%>" 
+								        						value="<%=StringEscapeUtils.escapeHtml4(reciveOrderMasterBean.getBillNo())%>" 
 								        						maxlength="50" />
 								        			</td>
 								        		</tr>
@@ -1434,7 +1451,7 @@
 															   id="productName<%=bean.getSeq()%>" 
 															   name="productName"
 															   onblur="lp_getProductDetailByName('<%=bean.getSeq()%>', this.value);lp_updateRecord('<%=bean.getSeq()%>');"
-															   value="<%=bean.getProductName()%>" />
+															   value="<%=StringEscapeUtils.escapeHtml4(bean.getProductName())%>" />
 														<img alt="lookUp" title="lookUp" src="<%=imgURL%>/lookup.png" width="20%" height="24" border="0" onclick="lp_comparePrice(<%=bean.getSeq()%>);" />
 														<input type="hidden" id="productCode<%=bean.getSeq()%>" name="productCode" value="<%=bean.getProductCode()%>" />
 													</td>
@@ -1463,7 +1480,7 @@
 															   name="unitName" 
 															   class="input-disabled"
 															   readonly="readonly"
-															   value="<%=bean.getUnitName()%>" />
+															   value="<%=StringEscapeUtils.escapeHtml4(bean.getUnitName())%>" />
 														<input type="hidden" id="unitCode<%=bean.getSeq()%>" name="unitCode" value="<%=bean.getUnitCode()%>" />
 													</td>
 													<td align="left">

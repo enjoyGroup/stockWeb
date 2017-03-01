@@ -10,6 +10,7 @@ public class ManageProductGroupBean {
 	
 	private String productTypeCode;
 	private String productGroupCode;
+	private String productGroupCodeDis;
 	private String productGroupName;
 	private String productGroupStatus;
 	private String rowStatus;
@@ -21,6 +22,7 @@ public class ManageProductGroupBean {
 	public ManageProductGroupBean(){
 		this.productTypeCode 		= "";
 		this.productGroupCode 		= "";
+		this.productGroupCodeDis	= "";
 		this.productGroupName 		= "";
 		this.productGroupStatus 	= "";
 		this.rowStatus 				= "";
@@ -103,5 +105,13 @@ public class ManageProductGroupBean {
 
 	public void setColB(ExcelField colB) {
 		this.colB = colB;
+	}
+
+	public String getProductGroupCodeDis() {
+		return productGroupCodeDis;
+	}
+
+	public void setProductGroupCodeDis(String productGroupCodeDis) {
+		this.productGroupCodeDis = productGroupCodeDis;
 	}
 }

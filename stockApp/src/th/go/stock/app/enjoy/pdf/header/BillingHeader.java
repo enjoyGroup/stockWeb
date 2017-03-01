@@ -27,7 +27,7 @@ public class BillingHeader extends PdfPageEventHelper {
 	
 	public void onStartPage(PdfWriter writer, Document document) {
 		try{
-			document.add(this.genHeader());
+			document.add(enjoyItext.genHeader(formDataObj, "ใบวางบิล"));
 			document.add(this.brLine());
 			document.add(this.genHeader1());
 			
@@ -41,28 +41,28 @@ public class BillingHeader extends PdfPageEventHelper {
 	    }
 	}
 	
-	private PdfPTable genHeader() throws DocumentException, MalformedURLException, IOException {
-		
-		float[] 	widths	 		= {1};
-		PdfPTable 	table 			= new PdfPTable(widths);
-		JSONObject 	jsonObjectMain  = this.formDataObj;
-		JSONObject  companyDetails	= (JSONObject) jsonObjectMain.get("companyDetails");
-		String		address			= "";
-		
-		address = " โทร." + enjoyItext.getText(companyDetails, "tel") 
-				+ " Fax." + enjoyItext.getText(companyDetails, "fax") 
-				+ " Email." + enjoyItext.getText(companyDetails, "email");
-		
-		table.addCell(enjoyItext.setCellWB("ใบวางบิล", enjoyItext.getFont18Bold(), 1, Element.ALIGN_CENTER, 0));
-		table.addCell(enjoyItext.setCellWB(enjoyItext.getText(companyDetails, "companyName"), enjoyItext.getFont14Bold(), 1, Element.ALIGN_CENTER, 0));
-		table.addCell(enjoyItext.setCellWB(enjoyItext.getText(companyDetails, "address"), enjoyItext.getFont10(), 1, Element.ALIGN_CENTER, 0));
-		table.addCell(enjoyItext.setCellWB(address, enjoyItext.getFont10(), 1, Element.ALIGN_CENTER, 0));
-		table.addCell(enjoyItext.setCellWB("เลขประจำตัวผู้เสียภาษี:" + enjoyItext.getText(companyDetails, "tin"), enjoyItext.getFont10(), 1, Element.ALIGN_CENTER, 0));
-		
-		table.setWidthPercentage(100);
-	
-		return table;
-	}
+//	private PdfPTable genHeader() throws DocumentException, MalformedURLException, IOException {
+//		
+//		float[] 	widths	 		= {1};
+//		PdfPTable 	table 			= new PdfPTable(widths);
+//		JSONObject 	jsonObjectMain  = this.formDataObj;
+//		JSONObject  companyDetails	= (JSONObject) jsonObjectMain.get("companyDetails");
+//		String		address			= "";
+//		
+//		address = " โทร." + enjoyItext.getText(companyDetails, "tel") 
+//				+ " Fax." + enjoyItext.getText(companyDetails, "fax") 
+//				+ " Email." + enjoyItext.getText(companyDetails, "email");
+//		
+//		table.addCell(enjoyItext.setCellWB("ใบวางบิล", enjoyItext.getFont18Bold(), 1, Element.ALIGN_CENTER, 0));
+//		table.addCell(enjoyItext.setCellWB(enjoyItext.getText(companyDetails, "companyName"), enjoyItext.getFont14Bold(), 1, Element.ALIGN_CENTER, 0));
+//		table.addCell(enjoyItext.setCellWB(enjoyItext.getText(companyDetails, "address"), enjoyItext.getFont10(), 1, Element.ALIGN_CENTER, 0));
+//		table.addCell(enjoyItext.setCellWB(address, enjoyItext.getFont10(), 1, Element.ALIGN_CENTER, 0));
+//		table.addCell(enjoyItext.setCellWB("เลขประจำตัวผู้เสียภาษี:" + enjoyItext.getText(companyDetails, "tin"), enjoyItext.getFont10(), 1, Element.ALIGN_CENTER, 0));
+//		
+//		table.setWidthPercentage(100);
+//	
+//		return table;
+//	}
 	
 	private PdfPTable genHeader1() throws DocumentException, MalformedURLException, IOException {
 		

@@ -42,7 +42,7 @@ public class AdjustStockDao extends DaoControl {
 								+ "		) a LIMIT :limit, " + AdjustStockForm.ORDER_LIMIT;
 			
 			
-			param.put("productCode"	, adjustStockBean.getProductCode());
+			param.put("productCode"	, EnjoyUtils.parseInt(adjustStockBean.getProductCode()));
 			param.put("tin"			, adjustStockBean.getTin());
 			param.put("limit"		, adjustStockBean.getLastOrder());
 			
@@ -100,7 +100,7 @@ public class AdjustStockDao extends DaoControl {
 							+ " ) a where a.rownum > :lastOrder";
 			
 			//Criteria
-			param.put("productCode"	, productCode);
+			param.put("productCode"	, EnjoyUtils.parseInt(productCode));
 			param.put("tin"			, tin);
 			param.put("lastOrder"	, lastOrder);
 			
@@ -135,7 +135,7 @@ public class AdjustStockDao extends DaoControl {
 			adjusthistory = new Adjusthistory();
 			
 			adjusthistory.setAdjustDate			(adjustStockBean.getAdjustDate());
-			adjusthistory.setProductCode		(adjustStockBean.getProductCode());
+			adjusthistory.setProductCode		(EnjoyUtils.parseInt(adjustStockBean.getProductCode()));
 			adjusthistory.setQuanOld			(EnjoyUtils.parseBigDecimal(adjustStockBean.getQuanOld()));
 			adjusthistory.setQuanNew			(EnjoyUtils.parseBigDecimal(adjustStockBean.getQuanNew()));
 			adjusthistory.setRemark				(adjustStockBean.getRemark());

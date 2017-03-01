@@ -80,6 +80,7 @@
 		<mapping class="th.go.stock.app.enjoy.model.Productquantity" />
 		<mapping class="th.go.stock.app.enjoy.model.ProductquantityPK" />
 		<mapping class="th.go.stock.app.enjoy.model.Productquanhistory" />
+		<mapping class="th.go.stock.app.enjoy.model.ProductquanhistoryPK" />
 		
 		<!-- End Entity zone -->
 	</session-factory>

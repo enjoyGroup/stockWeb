@@ -27,7 +27,7 @@ public class AlertLowProductHeader extends PdfPageEventHelper {
 	
 	public void onStartPage(PdfWriter writer, Document document) {
 		try{
-			document.add(genHeader());
+			document.add(enjoyItext.genHeader(formDataObj, "รายงานแจ้งเตือน Stock สินค้าใกล้หมด"));
 			document.add(brLine());
 			document.add(brLine());
 		} catch (Exception e) {
@@ -35,28 +35,28 @@ public class AlertLowProductHeader extends PdfPageEventHelper {
 	    }
 	}
 	
-	private PdfPTable genHeader() throws DocumentException, MalformedURLException, IOException {
-		
-		PdfPTable 	table 			= new PdfPTable(1);
-		JSONObject 	jsonObjectMain  = this.formDataObj;
-		JSONObject  companyDetails	= (JSONObject) jsonObjectMain.get("companyDetails");
-		String		address			= "";
-		
-		address = " โทร." + enjoyItext.getText(companyDetails, "tel") 
-				+ " Fax." + enjoyItext.getText(companyDetails, "fax") 
-				+ " Email." + enjoyItext.getText(companyDetails, "email");
-		
-		table.addCell(enjoyItext.setCellWB("รายงานแจ้งเตือน Stock สินค้าใกล้หมด", enjoyItext.getFont18Bold(), 1, Element.ALIGN_CENTER, 0));
-		table.addCell(enjoyItext.setCellWB(enjoyItext.getText(companyDetails, "companyName"), enjoyItext.getFont14Bold(), 1, Element.ALIGN_CENTER, 0));
-		table.addCell(enjoyItext.setCellWB(enjoyItext.getText(companyDetails, "address"), enjoyItext.getFont10(), 1, Element.ALIGN_CENTER, 0));
-		table.addCell(enjoyItext.setCellWB(address, enjoyItext.getFont10(), 1, Element.ALIGN_CENTER, 0));
-		table.addCell(enjoyItext.setCellWB("", enjoyItext.getFont10(), 1, Element.ALIGN_CENTER, 0));
-		table.addCell(enjoyItext.setCellWB("เลขประจำตัวผู้เสียภาษี:" + enjoyItext.getText(companyDetails, "tin"), enjoyItext.getFont10(), 1, Element.ALIGN_CENTER, 0));
-		
-		table.setWidthPercentage(100);
-	
-		return table;
-	}
+//	private PdfPTable genHeader() throws DocumentException, MalformedURLException, IOException {
+//		
+//		PdfPTable 	table 			= new PdfPTable(1);
+//		JSONObject 	jsonObjectMain  = this.formDataObj;
+//		JSONObject  companyDetails	= (JSONObject) jsonObjectMain.get("companyDetails");
+//		String		address			= "";
+//		
+//		address = " โทร." + enjoyItext.getText(companyDetails, "tel") 
+//				+ " Fax." + enjoyItext.getText(companyDetails, "fax") 
+//				+ " Email." + enjoyItext.getText(companyDetails, "email");
+//		
+//		table.addCell(enjoyItext.setCellWB("รายงานแจ้งเตือน Stock สินค้าใกล้หมด", enjoyItext.getFont18Bold(), 1, Element.ALIGN_CENTER, 0));
+//		table.addCell(enjoyItext.setCellWB(enjoyItext.getText(companyDetails, "companyName"), enjoyItext.getFont14Bold(), 1, Element.ALIGN_CENTER, 0));
+//		table.addCell(enjoyItext.setCellWB(enjoyItext.getText(companyDetails, "address"), enjoyItext.getFont10(), 1, Element.ALIGN_CENTER, 0));
+//		table.addCell(enjoyItext.setCellWB(address, enjoyItext.getFont10(), 1, Element.ALIGN_CENTER, 0));
+//		table.addCell(enjoyItext.setCellWB("", enjoyItext.getFont10(), 1, Element.ALIGN_CENTER, 0));
+//		table.addCell(enjoyItext.setCellWB("เลขประจำตัวผู้เสียภาษี:" + enjoyItext.getText(companyDetails, "tin"), enjoyItext.getFont10(), 1, Element.ALIGN_CENTER, 0));
+//		
+//		table.setWidthPercentage(100);
+//	
+//		return table;
+//	}
 	
 	public PdfPTable brLine() throws DocumentException, MalformedURLException, IOException {
 		

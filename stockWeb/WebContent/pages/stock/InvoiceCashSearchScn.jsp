@@ -1,7 +1,7 @@
 <%@ include file="/pages/include/checkLogin.jsp"%>
 <%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
 <%@ page import="th.go.stock.app.enjoy.bean.InvoiceCashMasterBean,th.go.stock.app.enjoy.bean.ComboBean"%>
-<%@ page import="java.util.*"%>
+<%@ page import="java.util.*,org.apache.commons.lang3.StringEscapeUtils"%>
 <jsp:useBean id="invoiceCashSearchForm" class="th.go.stock.app.enjoy.form.InvoiceCashSearchForm" scope="session"/>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
@@ -235,7 +235,7 @@
 										        				<input type='text' 
 										        					   id="cusFullName" 
 										        					   name='cusFullName' 
-										        					   value="<%=invoiceCashMasterBean.getCusFullName()%>" />
+										        					   value="<%=StringEscapeUtils.escapeHtml4(invoiceCashMasterBean.getCusFullName())%>" />
 										        			</td>
 										        			<td align="right">
 										        				สถานะ :&nbsp;
@@ -309,7 +309,7 @@
 																<td align="left"><%=bean.getInvoiceCode()%></td>
 																<td align="left"><%=bean.getInvoiceCredit()%></td>
 																<td align="left"><%=bean.getInvoiceTypeDesc()%></td>
-																<td align="left"><%=bean.getCusFullName()%></td>
+																<td align="left"><%=StringEscapeUtils.escapeHtml4(bean.getCusFullName())%></td>
 																<td align="center"><%=bean.getInvoiceDate()%></td>
 																<td align="right"><%=bean.getInvoiceTotal()%></td>
 																<td align="left"><%=bean.getInvoiceStatusDesc()%></td>

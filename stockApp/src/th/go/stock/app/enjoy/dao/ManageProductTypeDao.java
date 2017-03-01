@@ -40,7 +40,7 @@ public class ManageProductTypeDao extends DaoControl{
 								+ "	from productype"
 								+ "	where productTypeStatus = 'A'"
 								+ "		and tin				= :tin"
-								+ "	order by productTypeCode asc";
+								+ "	order by productTypeCodeDis asc";
 			
 			//Criteria
 			param.put("tin"	, tin);
@@ -48,6 +48,7 @@ public class ManageProductTypeDao extends DaoControl{
 			//Column select
 			columnList.add("productTypeCode");
 			columnList.add("tin");
+			columnList.add("productTypeCodeDis");
 			columnList.add("productTypeName");
 			columnList.add("productTypeStatus");
 			
@@ -58,6 +59,7 @@ public class ManageProductTypeDao extends DaoControl{
 				
 				bean.setProductTypeCode		(EnjoyUtils.nullToStr(row.get("productTypeCode")));
 				bean.setTin					(EnjoyUtils.nullToStr(row.get("tin")));
+				bean.setProductTypeCodeDis	(EnjoyUtils.nullToStr(row.get("productTypeCodeDis")));
 				bean.setProductTypeName		(EnjoyUtils.nullToStr(row.get("productTypeName")));
 				bean.setProductTypeStatus	(EnjoyUtils.nullToStr(row.get("productTypeStatus")));
 				bean.setSeq					(EnjoyUtils.nullToStr(seq));
@@ -88,10 +90,11 @@ public class ManageProductTypeDao extends DaoControl{
 		
 		try{
 			
-			id.setProductTypeCode			(manageProductTypeBean.getProductTypeCode());
+			id.setProductTypeCode			(EnjoyUtils.parseInt(manageProductTypeBean.getProductTypeCode()));
 			id.setTin						(manageProductTypeBean.getTin());
 			
 			productype.setId				(id);
+			productype.setProductTypeCodeDis(manageProductTypeBean.getProductTypeCodeDis());
 			productype.setProductTypeName	(manageProductTypeBean.getProductTypeName());
 			productype.setProductTypeStatus	(manageProductTypeBean.getProductTypeStatus());
 			
@@ -123,7 +126,7 @@ public class ManageProductTypeDao extends DaoControl{
 			query = createQuery(hql);
 			query.setParameter("productTypeName"	, manageProductTypeBean.getProductTypeName());
 			query.setParameter("productTypeStatus"	, manageProductTypeBean.getProductTypeStatus());
-			query.setParameter("productTypeCode"	, manageProductTypeBean.getProductTypeCode());
+			query.setParameter("productTypeCode"	, EnjoyUtils.parseInt(manageProductTypeBean.getProductTypeCode()));
 			query.setParameter("tin"				, manageProductTypeBean.getTin());
 			
 			query.executeUpdate();
@@ -140,45 +143,45 @@ public class ManageProductTypeDao extends DaoControl{
 		}
 	}
 	
-	public int checkDupProductTypeCode(String productTypeCode, String tin) throws EnjoyException{
-		getLogger().info("[checkDupProductTypeCode][Begin]");
-		
-		String							hql						= null;
-		int 							result					= 0;
-		HashMap<String, Object>			param					= new HashMap<String, Object>();
-		List<Object>					resultList				= null;
-		
-		try{
-			hql		= "select count(*) cou "
-					+ "	from productype "
-					+ "	where productTypeCode 		= :productTypeCode"
-					+ "		and tin					= :tin"
-					+ "		and productTypeStatus 	= 'A'";
-			
-			//Criteria
-			param.put("productTypeCode"	, productTypeCode);
-			param.put("tin"				, tin);
-
-			resultList = getResult(hql, param, "cou", Constants.INT_TYPE);
-			
-			if(resultList!=null && resultList.size() > 0){
-				result = EnjoyUtils.parseInt(resultList.get(0));
-			}
-			
-			getLogger().info("[checkDupProductTypeCode] result 			:: " + result);
-			
-			
-			
-		}catch(Exception e){
-			getLogger().info(e.getMessage());
-			throw new EnjoyException(e.getMessage());
-		}finally{
-			hql									= null;
-			getLogger().info("[checkDupProductTypeCode][End]");
-		}
-		
-		return result;
-	}
+//	public int checkDupProductTypeCode(String productTypeCodeDis, String tin) throws EnjoyException{
+//		getLogger().info("[checkDupProductTypeCode][Begin]");
+//		
+//		String							hql						= null;
+//		int 							result					= 0;
+//		HashMap<String, Object>			param					= new HashMap<String, Object>();
+//		List<Object>					resultList				= null;
+//		
+//		try{
+//			hql		= "select count(*) cou "
+//					+ "	from productype "
+//					+ "	where productTypeCodeDis 	= :productTypeCodeDis"
+//					+ "		and tin					= :tin"
+//					+ "		and productTypeStatus 	= 'A'";
+//			
+//			//Criteria
+//			param.put("productTypeCodeDis"	, productTypeCodeDis);
+//			param.put("tin"					, tin);
+//
+//			resultList = getResult(hql, param, "cou", Constants.INT_TYPE);
+//			
+//			if(resultList!=null && resultList.size() > 0){
+//				result = EnjoyUtils.parseInt(resultList.get(0));
+//			}
+//			
+//			getLogger().info("[checkDupProductTypeCode] result 			:: " + result);
+//			
+//			
+//			
+//		}catch(Exception e){
+//			getLogger().info(e.getMessage());
+//			throw new EnjoyException(e.getMessage());
+//		}finally{
+//			hql									= null;
+//			getLogger().info("[checkDupProductTypeCode][End]");
+//		}
+//		
+//		return result;
+//	}
 	
 	public int checkDupProductTypeName(String productTypeName, String tin) throws EnjoyException{
 		getLogger().info("[checkDupProductTypeCode][Begin]");
@@ -299,6 +302,41 @@ public class ManageProductTypeDao extends DaoControl{
 		}
 		
 		return productTypeCode;
+	}
+	
+	public int genId(String tin) throws EnjoyException{
+		getLogger().info("[genId][Begin]");
+		
+		String							hql				= null;
+		int 							result			= 1;
+		HashMap<String, Object>			param			= new HashMap<String, Object>();
+		List<Object>					resultList		= null;
+		
+		try{
+			hql		= "select (max(productTypeCode) + 1) newId"
+					+ "	from productype "
+					+ "	where tin		= :tin";
+			
+			//Criteria
+			param.put("tin"		, tin);
+			
+			resultList = getResult(hql, param, "newId", Constants.INT_TYPE);
+			
+			if(resultList!=null && resultList.size() > 0){
+				result = EnjoyUtils.parseInt(resultList.get(0))==0?1:EnjoyUtils.parseInt(resultList.get(0));
+			}
+			
+			getLogger().info("[genId] newId 			:: " + result);
+			
+		}catch(Exception e){
+			getLogger().error(e);
+			throw new EnjoyException("genId error");
+		}finally{
+			hql									= null;
+			getLogger().info("[genId][End]");
+		}
+		
+		return result;
 	}
 	
 }

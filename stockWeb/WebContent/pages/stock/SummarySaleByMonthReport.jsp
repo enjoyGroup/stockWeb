@@ -105,9 +105,9 @@
 								        				เดือน/ปี <span style="color: red;"><b>*</b></span> :&nbsp;
 								        			</td>
 								        			<td align="left" colspan="5">
-								        				<input type='text' 
+								        				<input type="text" 
 								        					   id="invoiceMonth" 
-								        					   name='invoiceMonth' 
+								        					   name="invoiceMonth" 
 								        					   placeholder="MM/YYYY"
 								        					   onchange="gp_checkMonth(this);"
 								        					   style="width: 100px;"

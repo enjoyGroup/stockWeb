@@ -33,20 +33,28 @@
 		$(document).ready(function(){
 			
 			gv_service 		= "service=" + $('#service').val();
+			
+			lp_onChangeInvoiceType();
 			 
 			$('#btnShowData').click(function(){ 
-				var params = "";
+				var params 			= "";
+				var lv_includeVat 	= "N";
 				
 				try{
 					if(!lp_validate()){
 						return;
 					}
 					
+					if($("#invoiceType").val()=="N" && $("#includeVat").is(':checked')){
+						lv_includeVat = $("#includeVat").val();
+					}
+					
 					params = "cusCode=" 			+ $("#cusCode").val()
 							+ "&invoiceCode=" 		+ $("#invoiceCode").val()
 							+ "&invoiceDateFrom=" 	+ $("#invoiceDateFrom").val()
 							+ "&invoiceDateTo=" 	+ $("#invoiceDateTo").val()
-							+ "&invoiceType=" 		+ $("#invoiceType").val();
+							+ "&invoiceType=" 		+ $("#invoiceType").val()
+							+ "&includeVat=" 		+ lv_includeVat;
 					
 					gp_dialogPopUp(gv_url + "?" + gv_service + "&pageAction=showData&" + params, "<%=titlePage%>");
 				}catch(err){
@@ -100,6 +108,19 @@
 				$( "#dialog" ).dialog( "close" );
 			}catch(e){
 				alert("lp_returnCustomerData :: " + e);
+			}
+		}
+		
+		function lp_onChangeInvoiceType(){
+			try{
+				if($("#invoiceType").val()=="N"){
+					$("#spanIncludeVat").show();
+				}else{
+					$( '#includeVat' ).prop('checked', false);
+					$("#spanIncludeVat").hide();
+				}
+			}catch(e){
+				alert("lp_onChangeInvoiceType :: " + e);
 			}
 		}
 		
@@ -177,11 +198,14 @@
 								        				ประเภทบิล  :&nbsp;
 								        			</td>
 								        			<td align="left">
-								        				<select id="invoiceType" name="invoiceType" style="width: 220px;" >
+								        				<select id="invoiceType" name="invoiceType" style="width: 220px;" onchange="lp_onChangeInvoiceType();" >
 								        					<% for(ComboBean comboBean:invoiceTypeCombo){ %>
 								        					<option value="<%=comboBean.getCode()%>" <%if(invoiceCreditMasterBean.getInvoiceType().equals(comboBean.getCode())){ %> selected <%} %> ><%=comboBean.getDesc()%></option>
 								        					<%} %>
 								        				</select>
+								        				<span id="spanIncludeVat">
+								        					<input type="checkbox" id="includeVat" name="includeVat" value="Y" />&nbsp;รวม Vat
+								        				</span>
 								        			</td>
 								        		</tr>
 								        		<tr>

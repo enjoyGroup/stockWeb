@@ -455,7 +455,7 @@ public class ProductDetailsSearchServlet extends EnjoyStandardSvc {
 				   for(ProductmasterBean bean:dataList){
 					   if(bean.getChkBox().equals("Y")){
 						   objDetail 		= new JSONObject();
-						   objDetail.put("productCode"			,bean.getProductCode());
+						   objDetail.put("productCodeDis"		,bean.getProductCodeDis());
 						   objDetail.put("productName"			,bean.getProductName());
 						   
 						   detailJSONArray.add(objDetail);

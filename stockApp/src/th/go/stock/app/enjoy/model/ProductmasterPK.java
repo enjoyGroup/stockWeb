@@ -12,16 +12,16 @@ public class ProductmasterPK implements Serializable {
 	//default serial version id, required for serializable classes.
 	private static final long serialVersionUID = 1L;
 
-	private String productCode;
+	private int productCode;
 
 	private String tin;
 
 	public ProductmasterPK() {
 	}
-	public String getProductCode() {
+	public int getProductCode() {
 		return this.productCode;
 	}
-	public void setProductCode(String productCode) {
+	public void setProductCode(int productCode) {
 		this.productCode = productCode;
 	}
 	public String getTin() {
@@ -40,14 +40,14 @@ public class ProductmasterPK implements Serializable {
 		}
 		ProductmasterPK castOther = (ProductmasterPK)other;
 		return 
-			this.productCode.equals(castOther.productCode)
+			(this.productCode == castOther.productCode)
 			&& this.tin.equals(castOther.tin);
 	}
 
 	public int hashCode() {
 		final int prime = 31;
 		int hash = 17;
-		hash = hash * prime + this.productCode.hashCode();
+		hash = hash * prime + this.productCode;
 		hash = hash * prime + this.tin.hashCode();
 		
 		return hash;

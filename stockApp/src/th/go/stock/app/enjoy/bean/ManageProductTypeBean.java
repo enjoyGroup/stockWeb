@@ -14,6 +14,7 @@ public class ManageProductTypeBean {
 	private String rowStatus;
 	private String seq;
 	private String tin;
+	private String productTypeCodeDis;
 	private ExcelField colA;
 	private ExcelField colB;
 	
@@ -25,6 +26,7 @@ public class ManageProductTypeBean {
 		this.rowStatus 				= "";
 		this.seq 					= "";
 		this.tin					= "";
+		this.productTypeCodeDis		= "";
 	}
 	
 	public ManageProductTypeBean(Row row){
@@ -105,5 +107,13 @@ public class ManageProductTypeBean {
 
 	public void setColB(ExcelField colB) {
 		this.colB = colB;
+	}
+
+	public String getProductTypeCodeDis() {
+		return productTypeCodeDis;
+	}
+
+	public void setProductTypeCodeDis(String productTypeCodeDis) {
+		this.productTypeCodeDis = productTypeCodeDis;
 	}
 }

@@ -38,7 +38,7 @@ public class HistoryPurchasedByProductPdfForm extends EnjoyItext implements PdfF
 		System.out.println("[HistoryPurchasedByProductPdfForm][createForm][Begin]");
 		
 		try{
-			document.add(this.genHeader());
+			document.add(genHeader(formDataObj, "รายงานประวัติการซื้อตามสินค้า"));
 			document.add(this.brLine());
 			document.add(this.genHeader1());
 			document.add(this.brLine());

@@ -1,9 +1,7 @@
 package th.go.stock.app.enjoy.model;
 
 import java.io.Serializable;
-
 import javax.persistence.*;
-
 import java.math.BigDecimal;
 
 
@@ -16,19 +14,18 @@ import java.math.BigDecimal;
 public class Productquanhistory implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
-	private int hisCode;
+	@EmbeddedId
+	private ProductquanhistoryPK id;
 
 	private String formRef;
 
 	private String hisDate;
 
-	private String productCode;
+	private int productCode;
 
-	private String productGroup;
+	private int productGroup;
 
-	private String productType;
+	private int productType;
 
 	private BigDecimal quantityMinus;
 
@@ -36,17 +33,15 @@ public class Productquanhistory implements Serializable {
 
 	private BigDecimal quantityTotal;
 
-	private String tin;
-
 	public Productquanhistory() {
 	}
 
-	public int getHisCode() {
-		return this.hisCode;
+	public ProductquanhistoryPK getId() {
+		return this.id;
 	}
 
-	public void setHisCode(int hisCode) {
-		this.hisCode = hisCode;
+	public void setId(ProductquanhistoryPK id) {
+		this.id = id;
 	}
 
 	public String getFormRef() {
@@ -65,27 +60,27 @@ public class Productquanhistory implements Serializable {
 		this.hisDate = hisDate;
 	}
 
-	public String getProductCode() {
+	public int getProductCode() {
 		return this.productCode;
 	}
 
-	public void setProductCode(String productCode) {
+	public void setProductCode(int productCode) {
 		this.productCode = productCode;
 	}
 
-	public String getProductGroup() {
+	public int getProductGroup() {
 		return this.productGroup;
 	}
 
-	public void setProductGroup(String productGroup) {
+	public void setProductGroup(int productGroup) {
 		this.productGroup = productGroup;
 	}
 
-	public String getProductType() {
+	public int getProductType() {
 		return this.productType;
 	}
 
-	public void setProductType(String productType) {
+	public void setProductType(int productType) {
 		this.productType = productType;
 	}
 
@@ -111,14 +106,6 @@ public class Productquanhistory implements Serializable {
 
 	public void setQuantityTotal(BigDecimal quantityTotal) {
 		this.quantityTotal = quantityTotal;
-	}
-
-	public String getTin() {
-		return this.tin;
-	}
-
-	public void setTin(String tin) {
-		this.tin = tin;
 	}
 
 }

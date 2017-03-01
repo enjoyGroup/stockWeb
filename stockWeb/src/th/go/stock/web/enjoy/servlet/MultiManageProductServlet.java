@@ -134,7 +134,7 @@ public class MultiManageProductServlet extends EnjoyStandardSvc {
 		JSONObject 			obj 					= null;
 		ProductmasterBean	productmasterBean		= new ProductmasterBean();
 		String				newSeq					= null;
-		String				productCode				= null;
+		String				productCodeDis			= null;
 		String				productName				= null;
 		String				minQuan					= null;
 		String				costPrice				= null;
@@ -149,7 +149,7 @@ public class MultiManageProductServlet extends EnjoyStandardSvc {
 			
 			obj 					= new JSONObject();
 			newSeq					= EnjoyUtil.nullToStr(this.request.getParameter("newSeq"));
-			productCode 			= EnjoyUtil.nullToStr(request.getParameter("productCode"));
+			productCodeDis 			= EnjoyUtil.nullToStr(request.getParameter("productCodeDis"));
 			productName 			= EnjoyUtil.nullToStr(request.getParameter("productName"));
 			minQuan 				= EnjoyUtil.nullToStr(request.getParameter("minQuan"));
 			costPrice 				= EnjoyUtil.nullToStr(request.getParameter("costPrice"));
@@ -164,7 +164,7 @@ public class MultiManageProductServlet extends EnjoyStandardSvc {
 			
 			productmasterBean.setRowStatus(MultiManageProductForm.NEW);
 			productmasterBean.setSeq(newSeq);
-			productmasterBean.setProductCode(productCode);
+			productmasterBean.setProductCodeDis(productCodeDis);
 			productmasterBean.setProductName(productName);
 			productmasterBean.setMinQuan(minQuan);
 			productmasterBean.setCostPrice(costPrice);
@@ -196,7 +196,7 @@ public class MultiManageProductServlet extends EnjoyStandardSvc {
 		logger.info("[updateRecord][Begin]");
 		
 		JSONObject 						obj 					= null;
-		String							productCode				= null;
+		String							productCodeDis			= null;
 		String							productName				= null;
 		String							minQuan					= null;
 		String							costPrice				= null;
@@ -213,7 +213,7 @@ public class MultiManageProductServlet extends EnjoyStandardSvc {
 			
 			obj 					= new JSONObject();
 			seq 					= EnjoyUtil.nullToStr(request.getParameter("seq"));
-			productCode 			= EnjoyUtil.nullToStr(request.getParameter("productCode"));
+			productCodeDis 			= EnjoyUtil.nullToStr(request.getParameter("productCodeDis"));
 			productName 			= EnjoyUtil.nullToStr(request.getParameter("productName"));
 			minQuan 				= EnjoyUtil.nullToStr(request.getParameter("minQuan"));
 			costPrice 				= EnjoyUtil.nullToStr(request.getParameter("costPrice"));
@@ -230,7 +230,7 @@ public class MultiManageProductServlet extends EnjoyStandardSvc {
 			for(ProductmasterBean bean:productList){
 				if(bean.getSeq().equals(seq)){
 					
-					bean.setProductCode(productCode);
+					bean.setProductCodeDis(productCodeDis);
 					bean.setProductName(productName);
 					bean.setMinQuan(minQuan);
 					bean.setCostPrice(costPrice);
@@ -318,12 +318,12 @@ public class MultiManageProductServlet extends EnjoyStandardSvc {
 		   
 		   for(ProductmasterBean bean:productList){
 			   if(bean.getRowStatus().equals(ManageProductGroupForm.NEW)){
-				   cou = this.productDetailsDao.checkDupProductCode(bean.getProductCode(), tin);
+				   cou = this.productDetailsDao.checkDupProductCode(bean.getProductCodeDis(), tin, bean.getProductCode(), bean.getRowStatus());
 				   if(cou > 0){
-					   throw new EnjoyException("รหัสสินค้า " + bean.getProductCode() + "มีอยู่ในระบบแล้วกรุณาระบุใหม่");
+					   throw new EnjoyException("รหัสสินค้า " + bean.getProductCodeDis() + "มีอยู่ในระบบแล้วกรุณาระบุใหม่");
 				   }
 				   
-				   cou = this.productDetailsDao.checkDupProductName(bean.getProductName(), bean.getProductCode(), tin, "NEW");
+				   cou = this.productDetailsDao.checkDupProductName(bean.getProductName(), bean.getProductCode(), tin, bean.getRowStatus());
 				   if(cou > 0){
 					   throw new EnjoyException("ชื่อสินค้า " + bean.getProductName() + "มีอยู่ในระบบแล้วกรุณาระบุใหม่");
 				   }
@@ -356,6 +356,9 @@ public class MultiManageProductServlet extends EnjoyStandardSvc {
 		String						quantityDb				= null;
 		ProductQuanHistoryBean		productQuanHistoryBean	= null;
 		ProductmasterBean			productmasterBean		= null;
+		int							productCode				= 1;
+		int							hisCode					= 1;
+		boolean						chkFlag					= true;
 		
 		try{
 			productList			= this.form.getProductList();
@@ -365,17 +368,30 @@ public class MultiManageProductServlet extends EnjoyStandardSvc {
 			
 			for(ProductmasterBean bean:productList){
 				if(bean.getRowStatus().equals(ManageProductGroupForm.NEW)){
+					/*Begin หา productCode*/
+					if(chkFlag==true){
+						productCode = this.productDetailsDao.genId(tin);
+						hisCode		= productQuanHistoryDao.genId(tin);
+						chkFlag  	= false;
+					}else{
+						productCode++;
+						hisCode++;
+					}
+					/*End หา productCode*/
+					
 					/*Begin รายการสินค้า*/
-					bean.setTin(tin);
-					bean.setProductTypeCode(this.form.getProductTypeCode());
+					bean.setTin				(tin);
+					bean.setProductCode		(EnjoyUtils.nullToStr(productCode));
+					bean.setProductTypeCode	(this.form.getProductTypeCode());
 					bean.setProductGroupCode(this.form.getProductGroupCode());
-					bean.setUnitCode(this.form.getUnitCode());
+					bean.setUnitCode		(this.form.getUnitCode());
+					bean.setProductStatus	("A");
 					this.productDetailsDao.insertProductmaster(bean);
 					/*End รายการสินค้า*/
 					
 					/*Begin จำนวนสินค้า*/
 					productquantityBean = new ProductquantityBean();
-					productquantityBean.setProductCode(bean.getProductCode());
+					productquantityBean.setProductCode(EnjoyUtils.nullToStr(productCode));
 					productquantityBean.setTin(tin);
 					productquantityBean.setQuantity(bean.getQuantity());
 					
@@ -394,7 +410,7 @@ public class MultiManageProductServlet extends EnjoyStandardSvc {
 					
 					productQuanHistoryBean.setProductType(bean.getProductTypeCode());
 					productQuanHistoryBean.setProductGroup(bean.getProductGroupCode());
-					productQuanHistoryBean.setProductCode(bean.getProductCode());
+					productQuanHistoryBean.setProductCode(EnjoyUtils.nullToStr(productCode));
 					
 					productQuanHistoryBean.setTin(tin);
 					
@@ -407,7 +423,7 @@ public class MultiManageProductServlet extends EnjoyStandardSvc {
 					}
 					productQuanHistoryBean.setQuantityTotal(bean.getQuantity());
 					
-					productQuanHistoryDao.insert(productQuanHistoryBean);
+					productQuanHistoryDao.insert(productQuanHistoryBean, hisCode);
 					/*End ส่วนประวัตเพิ่มลดสินค้า*/
 				}
 			}
@@ -651,7 +667,7 @@ public class MultiManageProductServlet extends EnjoyStandardSvc {
 		String 					sheetName 				= "";
 		Row[]   				rowArray  				= null;
 		ProductmasterBean		productmasterBean		= null;
-		String					productCode				= null;
+		String					productCodeDis			= null;
 		String					productName				= null;
 		String					minQuan					= null;
 		String					costPrice				= null;
@@ -708,7 +724,7 @@ public class MultiManageProductServlet extends EnjoyStandardSvc {
 							for(int j=1;j<rowArray.length;j++){
 								productmasterBean 	= new ProductmasterBean(rowArray[j]);
 								objDetail 			= new JSONObject();
-								productCode			= productmasterBean.getColA().getValue();
+								productCodeDis		= productmasterBean.getColA().getValue();
 								productName			= productmasterBean.getColB().getValue();
 								minQuan				= productmasterBean.getColC().getValue();
 								costPrice			= productmasterBean.getColD().getValue();
@@ -719,7 +735,7 @@ public class MultiManageProductServlet extends EnjoyStandardSvc {
 								salePrice5			= productmasterBean.getColI().getValue();
 								quantity			= productmasterBean.getColJ().getValue();
 								
-								productmasterBean.setProductCode(productCode);
+								productmasterBean.setProductCodeDis(productCodeDis);
 								productmasterBean.setProductName(productName);
 								productmasterBean.setMinQuan(minQuan);
 								productmasterBean.setCostPrice(costPrice);
@@ -734,17 +750,17 @@ public class MultiManageProductServlet extends EnjoyStandardSvc {
 								
 								productList.add(productmasterBean);
 								
-								objDetail.put("productCode"	, productCode);
-								objDetail.put("productName"	, productName);
-								objDetail.put("minQuan"		, EnjoyUtils.convertFloatToDisplay(minQuan, 2));
-								objDetail.put("costPrice"	, EnjoyUtils.convertFloatToDisplay(costPrice, 2));
-								objDetail.put("salePrice1"	, EnjoyUtils.convertFloatToDisplay(salePrice1, 2));
-								objDetail.put("salePrice2"	, EnjoyUtils.convertFloatToDisplay(salePrice2, 2));
-								objDetail.put("salePrice3"	, EnjoyUtils.convertFloatToDisplay(salePrice3, 2));
-								objDetail.put("salePrice4"	, EnjoyUtils.convertFloatToDisplay(salePrice4, 2));
-								objDetail.put("salePrice5"	, EnjoyUtils.convertFloatToDisplay(salePrice5, 2));
-								objDetail.put("quantity"	, EnjoyUtils.convertFloatToDisplay(quantity, 2));
-								objDetail.put("seq"			, seqTemp);
+								objDetail.put("productCodeDis"	, productCodeDis);
+								objDetail.put("productName"		, productName);
+								objDetail.put("minQuan"			, EnjoyUtils.convertFloatToDisplay(minQuan, 2));
+								objDetail.put("costPrice"		, EnjoyUtils.convertFloatToDisplay(costPrice, 2));
+								objDetail.put("salePrice1"		, EnjoyUtils.convertFloatToDisplay(salePrice1, 2));
+								objDetail.put("salePrice2"		, EnjoyUtils.convertFloatToDisplay(salePrice2, 2));
+								objDetail.put("salePrice3"		, EnjoyUtils.convertFloatToDisplay(salePrice3, 2));
+								objDetail.put("salePrice4"		, EnjoyUtils.convertFloatToDisplay(salePrice4, 2));
+								objDetail.put("salePrice5"		, EnjoyUtils.convertFloatToDisplay(salePrice5, 2));
+								objDetail.put("quantity"		, EnjoyUtils.convertFloatToDisplay(quantity, 2));
+								objDetail.put("seq"				, seqTemp);
 								
 								jSONArray.add(objDetail);
 							}

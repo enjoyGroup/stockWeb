@@ -71,7 +71,7 @@ public class ProductBarcodePdfForm extends EnjoyItext implements PdfFormService 
 		float[] 		subW1	 		= {1};
 		PdfPTable 		subTab1 		= null;
 		JSONObject		detail			= null;
-		String			productCode		= null;
+		String			productCodeDis	= null;
 		String			productName		= null;
 		PdfContentByte 	cb 				= writer.getDirectContent();
 		Barcode128 		code128 		= null;
@@ -98,17 +98,17 @@ public class ProductBarcodePdfForm extends EnjoyItext implements PdfFormService 
 				while(row < maxRow){
 					for(int i=0;i<detailList.size();i++){
 						detail = (JSONObject) detailList.get(i);
-						productCode		= (String) detail.get("productCode");
+						productCodeDis		= (String) detail.get("productCodeDis");
 						productName		= (String) detail.get("productName");
 						
-						System.out.println("[genDetail] productCode :: " + productCode);
-						System.out.println("[genDetail] productName :: " + productName);
+						System.out.println("[genDetail] productCodeDis 	:: " + productCodeDis);
+						System.out.println("[genDetail] productName 	:: " + productName);
 						
 						subTab1 		= new PdfPTable(subW1);
 						subTab1.addCell(setCellWB(productName, getFont6Bold(), 1, Element.ALIGN_CENTER, 0));
 						
 						code128 		= new Barcode128();
-						code128.setCode(productCode);
+						code128.setCode(productCodeDis);
 						
 						code128.setTextAlignment(Element.ALIGN_CENTER);
 						code128.setFont(bfComic);
@@ -145,17 +145,17 @@ public class ProductBarcodePdfForm extends EnjoyItext implements PdfFormService 
 				
 				for(int i=0;i<detailList.size();i++){
 					detail = (JSONObject) detailList.get(i);
-					productCode		= (String) detail.get("productCode");
+					productCodeDis	= (String) detail.get("productCodeDis");
 					productName		= (String) detail.get("productName");
 					
-					System.out.println("[genDetail] productCode :: " + productCode);
-					System.out.println("[genDetail] productName :: " + productName);
+					System.out.println("[genDetail] productCodeDis 	:: " + productCodeDis);
+					System.out.println("[genDetail] productName 	:: " + productName);
 					
 					subTab1 		= new PdfPTable(subW1);
 					subTab1.addCell(setCellWB(productName, getFont6Bold(), 1, Element.ALIGN_CENTER, 0));
 					
 					code128 		= new Barcode128();
-					code128.setCode(productCode);
+					code128.setCode(productCodeDis);
 					
 					code128.setTextAlignment(Element.ALIGN_CENTER);
 					code128.setFont(bfComic);

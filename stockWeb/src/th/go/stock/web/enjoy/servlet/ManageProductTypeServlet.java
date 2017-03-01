@@ -20,11 +20,14 @@ import org.json.simple.JSONObject;
 
 import th.go.stock.app.enjoy.bean.ManageProductTypeBean;
 import th.go.stock.app.enjoy.bean.UserDetailsBean;
+import th.go.stock.app.enjoy.dao.ManageProductGroupDao;
 import th.go.stock.app.enjoy.dao.ManageProductTypeDao;
+import th.go.stock.app.enjoy.dao.ProductDetailsDao;
 import th.go.stock.app.enjoy.exception.EnjoyException;
 import th.go.stock.app.enjoy.form.ManageProductTypeForm;
 import th.go.stock.app.enjoy.main.Constants;
 import th.go.stock.app.enjoy.utils.EnjoyLogger;
+import th.go.stock.app.enjoy.utils.EnjoyUtils;
 import th.go.stock.app.enjoy.utils.ExcelUtil;
 import th.go.stock.web.enjoy.common.EnjoyStandardSvc;
 import th.go.stock.web.enjoy.utils.EnjoyUtil;
@@ -42,6 +45,8 @@ public class ManageProductTypeServlet extends EnjoyStandardSvc {
     private HttpSession                 	session                     = null;
     private UserDetailsBean             	userBean                    = null;
     private ManageProductTypeDao			dao							= null;
+    private ManageProductGroupDao			productGroupDao				= null;
+    private ProductDetailsDao				productDetailsDao			= null;
     private ManageProductTypeForm			form						= null;
     
 	@Override
@@ -65,6 +70,8 @@ public class ManageProductTypeServlet extends EnjoyStandardSvc {
              this.userBean           		= (UserDetailsBean)session.getAttribute("userBean");
              this.form               		= (ManageProductTypeForm)session.getAttribute(FORM_NAME);
              this.dao						= new ManageProductTypeDao();
+             this.productDetailsDao			= new ProductDetailsDao();
+             this.productGroupDao			= new ManageProductGroupDao();
  			
              logger.info("[execute] pageAction : " + pageAction );
              
@@ -201,6 +208,7 @@ public class ManageProductTypeServlet extends EnjoyStandardSvc {
 		
 		JSONObject 						obj 					= null;
 		String 							productTypeCode			= null;
+		String							productTypeCodeDis		= null;
 		String 							productTypeName			= null;
 		String 							seq						= null;
 		List<ManageProductTypeBean> 	productTypeList			= null;
@@ -210,17 +218,20 @@ public class ManageProductTypeServlet extends EnjoyStandardSvc {
 			obj 					= new JSONObject();
 			seq 					= EnjoyUtil.nullToStr(request.getParameter("seq"));
 			productTypeCode 		= EnjoyUtil.nullToStr(request.getParameter("productTypeCode"));
+			productTypeCodeDis 		= EnjoyUtil.nullToStr(request.getParameter("productTypeCodeDis"));
 			productTypeName 		= EnjoyUtil.nullToStr(request.getParameter("productTypeName"));
 			productTypeList			= this.form.getProductTypeList();
 			
-			logger.info("[updateRecord] seq 			:: " + seq);
-			logger.info("[updateRecord] productTypeCode :: " + productTypeCode);
-			logger.info("[updateRecord] productTypeName :: " + productTypeName);
+			logger.info("[updateRecord] seq 				:: " + seq);
+			logger.info("[updateRecord] productTypeCode 	:: " + productTypeCode);
+			logger.info("[updateRecord] productTypeCodeDis 	:: " + productTypeCodeDis);
+			logger.info("[updateRecord] productTypeName 	:: " + productTypeName);
 			
 			for(ManageProductTypeBean bean:productTypeList){
 				if(bean.getSeq().equals(seq)){
 					
 					bean.setProductTypeCode(productTypeCode);
+					bean.setProductTypeCodeDis(productTypeCodeDis);
 					bean.setProductTypeName(productTypeName);
 					
 					if(!bean.getRowStatus().equals(ManageProductTypeForm.NEW)){
@@ -304,7 +315,7 @@ public class ManageProductTypeServlet extends EnjoyStandardSvc {
 					for(int j=(i+1);j<productTypeList.size();j++){
 						beanTemp = productTypeList.get(j);
 						
-						if(!beanTemp.getRowStatus().equals(ManageProductTypeForm.DEL) && bean.getProductTypeCode().equals(beanTemp.getProductTypeCode())){
+						if(!beanTemp.getRowStatus().equals(ManageProductTypeForm.DEL) && bean.getProductTypeCodeDis().equals(beanTemp.getProductTypeCodeDis())){
 							throw new EnjoyException("รหัสหมวดสินค้าห้ามซ้ำ");
 						}
 						
@@ -339,6 +350,8 @@ public class ManageProductTypeServlet extends EnjoyStandardSvc {
 		JSONObject 						obj 					= null;
 		List<ManageProductTypeBean> 	productTypeList			= null;
 		String							tin						= null;
+		boolean							chkFlag					= true;
+		int								productTypeCode			= 0;
 		
 		try{
 			obj 				= new JSONObject();
@@ -348,9 +361,25 @@ public class ManageProductTypeServlet extends EnjoyStandardSvc {
 			for(ManageProductTypeBean bean:productTypeList){
 				bean.setTin(tin);
 				if(bean.getRowStatus().equals(ManageProductTypeForm.NEW)){
+					if(chkFlag==true){
+						productTypeCode = this.dao.genId(tin);
+						chkFlag  = false;
+					}else{
+						productTypeCode++;
+					}
+					
+					logger.info("[onSave] productTypeCode :: " + productTypeCode);
+					
+					bean.setProductTypeCode(EnjoyUtils.nullToStr(productTypeCode));
 					this.dao.insertProductype(bean);
 				}else if(bean.getRowStatus().equals(ManageProductTypeForm.UPD) || bean.getRowStatus().equals(ManageProductTypeForm.DEL)){
 					this.dao.updateProductype(bean);
+					
+					if(bean.getRowStatus().equals(ManageProductTypeForm.DEL)){
+						productGroupDao.cancelProductgroupByProductTypeCode(bean.getProductTypeCode(), tin);
+						productDetailsDao.cancelProductmaster(tin, bean.getProductTypeCode(), "", "");
+					}
+					
 				}
 			}
 			
@@ -392,7 +421,7 @@ public class ManageProductTypeServlet extends EnjoyStandardSvc {
 		String 					sheetName 				= "";
 		Row[]   				rowArray  				= null;
 		ManageProductTypeBean	manageProductTypeBean	= null;
-		String					productTypeCode			= null;
+		String					productTypeCodeDis		= null;
 		String					productTypeName			= null;
 		boolean					del						= false;
 		JSONObject 				obj 					= new JSONObject();
@@ -438,14 +467,14 @@ public class ManageProductTypeServlet extends EnjoyStandardSvc {
 							for(int j=1;j<rowArray.length;j++){
 								manageProductTypeBean 	= new ManageProductTypeBean(rowArray[j]);
 								objDetail 				= new JSONObject();
-								productTypeCode			= manageProductTypeBean.getColA().getValue();
+								productTypeCodeDis		= manageProductTypeBean.getColA().getValue();
 								productTypeName			= manageProductTypeBean.getColB().getValue();
 								
-								logger.info("[lp_uploadFile] productTypeCode :: " + productTypeCode);
-								logger.info("[lp_uploadFile] productTypeName :: " + productTypeName);
+								logger.info("[lp_uploadFile] productTypeCodeDis :: " + productTypeCodeDis);
+								logger.info("[lp_uploadFile] productTypeName 	:: " + productTypeName);
 								
-								objDetail.put("productTypeCode", productTypeCode);
-								objDetail.put("productTypeName", productTypeName);
+								objDetail.put("productTypeCodeDis"	, productTypeCodeDis);
+								objDetail.put("productTypeName"		, productTypeName);
 								
 								jSONArray.add(objDetail);
 							}
@@ -476,15 +505,21 @@ public class ManageProductTypeServlet extends EnjoyStandardSvc {
 	@Override
 	public void destroySession() {
 		this.dao.destroySession();
+		this.productGroupDao.destroySession();
+		this.productDetailsDao.destroySession();
 	}
 
 	@Override
 	public void commit() {
 		this.dao.commit();
+		this.productGroupDao.commit();
+		this.productDetailsDao.commit();
 	}
 
 	@Override
 	public void rollback() {
 		this.dao.rollback();
+		this.productGroupDao.rollback();
+		this.productDetailsDao.rollback();
 	}	
 }

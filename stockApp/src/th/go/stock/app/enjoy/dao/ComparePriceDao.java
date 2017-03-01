@@ -46,7 +46,7 @@ public class ComparePriceDao extends DaoControl{
 									+ " order by a.seq asc";
 			
 			//Criteria
-			param.put("productCode"	, comparePriceBean.getProductCode());
+			param.put("productCode"	, EnjoyUtils.parseInt(comparePriceBean.getProductCode()));
 			param.put("tin"			, comparePriceBean.getTin());
 			
 			//Column select
@@ -102,7 +102,7 @@ public class ComparePriceDao extends DaoControl{
 			compareprice 	= new Compareprice();
 			pk				= new ComparepricePK();
 			
-			pk.setProductCode(comparePriceBean.getProductCode());
+			pk.setProductCode(EnjoyUtils.parseInt(comparePriceBean.getProductCode()));
 			pk.setTin(comparePriceBean.getTin());
 			pk.setSeq(EnjoyUtils.parseInt(comparePriceBean.getSeq()));
 			
@@ -139,7 +139,7 @@ public class ComparePriceDao extends DaoControl{
 						+ "		and vendorCode	= :vendorCode";
 			
 			//Criteria
-			param.put("productCode"	, productCode);
+			param.put("productCode"	, EnjoyUtils.parseInt(productCode));
 			param.put("tin"			, tin);
 			param.put("vendorCode"	, vendorCode);
 			
@@ -178,7 +178,7 @@ public class ComparePriceDao extends DaoControl{
 					+ "		and tin			= :tin";
 			
 			//Criteria
-			param.put("productCode"	, productCode);
+			param.put("productCode"	, EnjoyUtils.parseInt(productCode));
 			param.put("tin"			, tin);
 			
 			resultList = getResult(hql, param, "newSeq", Constants.INT_TYPE);
@@ -212,7 +212,7 @@ public class ComparePriceDao extends DaoControl{
 			
 			query = createQuery(hql);
 			
-			query.setParameter("productCode", productCode);
+			query.setParameter("productCode", EnjoyUtils.parseInt(productCode));
 			query.setParameter("tin"		, tin);
 			
 			query.executeUpdate();			
@@ -253,7 +253,7 @@ public class ComparePriceDao extends DaoControl{
 					+ "		LIMIT 1";
 			
 			//Criteria
-			param.put("productCode"	, productCode);
+			param.put("productCode"	, EnjoyUtils.parseInt(productCode));
 			param.put("tin"			, comparePriceBean.getTin());
 			param.put("vendorCode"	, vendorCode);
 			param.put("quantity"	, quantity);

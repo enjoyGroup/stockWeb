@@ -1,7 +1,12 @@
 package th.go.stock.app.enjoy.pdf.utils;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+
 import org.json.simple.JSONObject;
 
+import com.lowagie.text.DocumentException;
+import com.lowagie.text.Element;
 import com.lowagie.text.Font;
 import com.lowagie.text.FontFactory;
 import com.lowagie.text.Image;
@@ -497,6 +502,28 @@ public class EnjoyItext {
 	}
 	public void setFont3UnderLine(Font font3UnderLine) {
 		this.font3UnderLine = font3UnderLine;
+	}
+	
+	public PdfPTable genHeader(JSONObject jsonObjectMain, String reportName) throws DocumentException, MalformedURLException, IOException {
+		
+		PdfPTable 	table 			= new PdfPTable(1);
+		JSONObject  companyDetails	= (JSONObject) jsonObjectMain.get("companyDetails");
+		String		address			= "";
+		
+		address = " โทร." + getText(companyDetails, "tel") 
+				+ " Fax." + getText(companyDetails, "fax") 
+				+ " Email." + getText(companyDetails, "email");
+		
+		table.addCell(setCellWB(reportName, getFont18Bold(), 1, Element.ALIGN_CENTER, 0));
+		table.addCell(setCellWB(getText(companyDetails, "companyName"), getFont14Bold(), 1, Element.ALIGN_CENTER, 0));
+		table.addCell(setCellWB(getText(companyDetails, "address"), getFont10(), 1, Element.ALIGN_CENTER, 0));
+		table.addCell(setCellWB(address, getFont10(), 1, Element.ALIGN_CENTER, 0));
+		table.addCell(setCellWB("", getFont10(), 1, Element.ALIGN_CENTER, 0));
+		table.addCell(setCellWB("เลขประจำตัวผู้เสียภาษี:" + getText(companyDetails, "tin"), getFont10(), 1, Element.ALIGN_CENTER, 0));
+		
+		table.setWidthPercentage(100);
+	
+		return table;
 	}
 	
 }

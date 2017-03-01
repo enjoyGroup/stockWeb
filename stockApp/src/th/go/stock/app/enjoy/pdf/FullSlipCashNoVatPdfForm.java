@@ -81,10 +81,10 @@ public class FullSlipCashNoVatPdfForm extends EnjoyItext implements PdfFormServi
 		
 		table.addCell(setCellWB("เงินสด", getFont12Bold(), 4, Element.ALIGN_CENTER, 0));
 		
-		table.addCell(setCellWB("เลขที่ใบเสร็จ", getFont9Bold(), 3, Element.ALIGN_RIGHT, 0));
+		table.addCell(setCellWB("เลขที่", getFont9Bold(), 3, Element.ALIGN_RIGHT, 0));
 		table.addCell(setCellWB(getText(invoiceCashMaster, "invoiceCode"), getFont9(), 1, Element.ALIGN_LEFT, 0));
 		
-		table.addCell(setCellWB("วันที่ใบเสร็จ", getFont9Bold(), 3, Element.ALIGN_RIGHT, 0));
+		table.addCell(setCellWB("วันที่", getFont9Bold(), 3, Element.ALIGN_RIGHT, 0));
 		table.addCell(setCellWB(getText(invoiceCashMaster, "invoiceDate"), getFont9(), 1, Element.ALIGN_LEFT, 0));
 		
 		table.setWidthPercentage(100);
@@ -97,7 +97,7 @@ public class FullSlipCashNoVatPdfForm extends EnjoyItext implements PdfFormServi
 		PdfPTable 	table 				= new PdfPTable(1);
 		
 		table.addCell(setCellWB("ลูกค้า : " + getText(customerDetails, "cusName") + " " + getText(customerDetails, "cusSurname"), getFont9(), 1, Element.ALIGN_LEFT, 0));
-		table.addCell(setCellWB("ที่อยู่  : " + getText(customerDetails, "address"), getFont9(), 1, Element.ALIGN_LEFT, 0));
+//		table.addCell(setCellWB("ที่อยู่  : " + getText(customerDetails, "address"), getFont9(), 1, Element.ALIGN_LEFT, 0));
 		table.addCell(setCellWB("เลขประจำตัวผู้เสียภาษี : " + getText(customerDetails, "idNumber"), getFont9(), 1, Element.ALIGN_LEFT, 0));
 		
 		table.setWidthPercentage(100);
@@ -122,12 +122,12 @@ public class FullSlipCashNoVatPdfForm extends EnjoyItext implements PdfFormServi
 		
 		for(int i=0;i<invoiceCashDetailList.size();i++){
 			invoiceCashDetail = (JSONObject) invoiceCashDetailList.get(i);
-			table.addCell(setCell(String.valueOf((i+1)),   getFont8(), 1, 1, Element.ALIGN_CENTER));
-			table.addCell(setCell(getText(invoiceCashDetail, "productName"),   getFont8(), 1, 1, Element.ALIGN_LEFT));
-			table.addCell(setCell(getText(invoiceCashDetail, "quantity") + " " + getText(invoiceCashDetail, "unitName"),   getFont8(), 1, 1, Element.ALIGN_CENTER));
-			table.addCell(setCell(getText(invoiceCashDetail, "pricePerUnit"),   getFont8(), 1, 1, Element.ALIGN_RIGHT));
-			table.addCell(setCell(getText(invoiceCashDetail, "discount"),   getFont8(), 1, 1, Element.ALIGN_RIGHT));
-			table.addCell(setCell(getText(invoiceCashDetail, "price"),   getFont8(), 1, 1, Element.ALIGN_RIGHT));
+			table.addCell(setCellWB(String.valueOf((i+1)),   getFont8(), 1, Element.ALIGN_CENTER, 0));
+			table.addCell(setCellWB(getText(invoiceCashDetail, "productName"),   getFont8(), 1, Element.ALIGN_LEFT, 0));
+			table.addCell(setCellWB(getText(invoiceCashDetail, "quantity") + " " + getText(invoiceCashDetail, "unitName"),   getFont8(), 1, Element.ALIGN_CENTER, 0));
+			table.addCell(setCellWB(getText(invoiceCashDetail, "pricePerUnit"),   getFont8(), 1, Element.ALIGN_RIGHT, 0));
+			table.addCell(setCellWB(getText(invoiceCashDetail, "discount"),   getFont8(), 1, Element.ALIGN_RIGHT, 0));
+			table.addCell(setCellWB(getText(invoiceCashDetail, "price"),   getFont8(), 1, Element.ALIGN_RIGHT, 0));
 		}
 		
 		table.setHeaderRows(1);

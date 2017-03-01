@@ -27,7 +27,7 @@ public class SummarySaleByCustomerHeader extends PdfPageEventHelper {
 	
 	public void onStartPage(PdfWriter writer, Document document) {
 		try{
-			document.add(genHeader());
+			document.add(enjoyItext.genHeader(formDataObj, "รายงานประวัติการซื้อของลูกค้า"));
 			document.add(brLine());
 			document.add(genHeader1());
 			document.add(brLine());
@@ -37,27 +37,27 @@ public class SummarySaleByCustomerHeader extends PdfPageEventHelper {
 	    }
 	}
 	
-	private PdfPTable genHeader() throws DocumentException, MalformedURLException, IOException {
-		
-		PdfPTable 	table 			= new PdfPTable(1);
-		JSONObject 	jsonObjectMain  = this.formDataObj;
-		JSONObject  customerDetails	= (JSONObject) jsonObjectMain.get("customerDetails");
-		String		address			= "";
-		
-		address = " โทร." + enjoyItext.getText(customerDetails, "tel") 
-				+ " Fax." + enjoyItext.getText(customerDetails, "fax") 
-				+ " Email." + enjoyItext.getText(customerDetails, "email");
-		
-		table.addCell(enjoyItext.setCellWB(enjoyItext.getText(customerDetails, "fullName"), enjoyItext.getFont11Bold(), 1, Element.ALIGN_CENTER, 0));
-		table.addCell(enjoyItext.setCellWB(enjoyItext.getText(customerDetails, "address"), enjoyItext.getFont8(), 1, Element.ALIGN_CENTER, 0));
-		table.addCell(enjoyItext.setCellWB(address, enjoyItext.getFont8(), 1, Element.ALIGN_CENTER, 0));
-		table.addCell(enjoyItext.setCellWB("", enjoyItext.getFont8(), 1, Element.ALIGN_CENTER, 0));
-		table.addCell(enjoyItext.setCellWB("รายงานประวัติการซื้อของลูกค้า", enjoyItext.getFont10Bold(), 1, Element.ALIGN_CENTER, 0));
-		
-		table.setWidthPercentage(100);
-	
-		return table;
-	}
+//	private PdfPTable genHeader() throws DocumentException, MalformedURLException, IOException {
+//		
+//		PdfPTable 	table 			= new PdfPTable(1);
+//		JSONObject 	jsonObjectMain  = this.formDataObj;
+//		JSONObject  customerDetails	= (JSONObject) jsonObjectMain.get("customerDetails");
+//		String		address			= "";
+//		
+//		address = " โทร." + enjoyItext.getText(customerDetails, "tel") 
+//				+ " Fax." + enjoyItext.getText(customerDetails, "fax") 
+//				+ " Email." + enjoyItext.getText(customerDetails, "email");
+//		
+//		table.addCell(enjoyItext.setCellWB(enjoyItext.getText(customerDetails, "fullName"), enjoyItext.getFont11Bold(), 1, Element.ALIGN_CENTER, 0));
+//		table.addCell(enjoyItext.setCellWB(enjoyItext.getText(customerDetails, "address"), enjoyItext.getFont8(), 1, Element.ALIGN_CENTER, 0));
+//		table.addCell(enjoyItext.setCellWB(address, enjoyItext.getFont8(), 1, Element.ALIGN_CENTER, 0));
+//		table.addCell(enjoyItext.setCellWB("", enjoyItext.getFont8(), 1, Element.ALIGN_CENTER, 0));
+//		table.addCell(enjoyItext.setCellWB("รายงานประวัติการซื้อของลูกค้า", enjoyItext.getFont10Bold(), 1, Element.ALIGN_CENTER, 0));
+//		
+//		table.setWidthPercentage(100);
+//	
+//		return table;
+//	}
 	
 	private PdfPTable genHeader1() throws DocumentException, MalformedURLException, IOException {
 		

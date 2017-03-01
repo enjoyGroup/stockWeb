@@ -1,6 +1,7 @@
 package th.go.stock.app.enjoy.model;
 
 import java.io.Serializable;
+
 import javax.persistence.*;
 
 /**
@@ -11,26 +12,26 @@ import javax.persistence.*;
 public class ProductgroupPK implements Serializable {
 	//default serial version id, required for serializable classes.
 	private static final long serialVersionUID = 1L;
+	
+	private int productGroupCode;
 
-	private String productTypeCode;
-
-	private String productGroupCode;
+	private int productTypeCode;
 
 	private String tin;
 
 	public ProductgroupPK() {
 	}
-	public String getProductTypeCode() {
-		return this.productTypeCode;
-	}
-	public void setProductTypeCode(String productTypeCode) {
-		this.productTypeCode = productTypeCode;
-	}
-	public String getProductGroupCode() {
+	public int getProductGroupCode() {
 		return this.productGroupCode;
 	}
-	public void setProductGroupCode(String productGroupCode) {
+	public void setProductGroupCode(int productGroupCode) {
 		this.productGroupCode = productGroupCode;
+	}
+	public int getProductTypeCode() {
+		return this.productTypeCode;
+	}
+	public void setProductTypeCode(int productTypeCode) {
+		this.productTypeCode = productTypeCode;
 	}
 	public String getTin() {
 		return this.tin;
@@ -48,16 +49,16 @@ public class ProductgroupPK implements Serializable {
 		}
 		ProductgroupPK castOther = (ProductgroupPK)other;
 		return 
-			this.productTypeCode.equals(castOther.productTypeCode)
-			&& this.productGroupCode.equals(castOther.productGroupCode)
+			(this.productGroupCode == castOther.productGroupCode)
+			&& (this.productTypeCode == castOther.productTypeCode)
 			&& this.tin.equals(castOther.tin);
 	}
 
 	public int hashCode() {
 		final int prime = 31;
 		int hash = 17;
-		hash = hash * prime + this.productTypeCode.hashCode();
-		hash = hash * prime + this.productGroupCode.hashCode();
+		hash = hash * prime + this.productGroupCode;
+		hash = hash * prime + this.productTypeCode;
 		hash = hash * prime + this.tin.hashCode();
 		
 		return hash;

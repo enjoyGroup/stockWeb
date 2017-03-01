@@ -4,7 +4,7 @@
 				th.go.stock.app.enjoy.bean.InvoiceCashDetailBean,
 				th.go.stock.app.enjoy.bean.CustomerDetailsBean,
 				th.go.stock.app.enjoy.bean.ComboBean"%>
-<%@ page import="java.util.*"%>
+<%@ page import="java.util.*,org.apache.commons.lang3.StringEscapeUtils"%>
 <jsp:useBean id="invoiceCashMaintananceForm" class="th.go.stock.app.enjoy.form.InvoiceCashMaintananceForm" scope="session"/>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
@@ -325,7 +325,7 @@
 			var params				= "";
 			
 			try{
-				
+				gp_progressBarOn();
 				confirm("คุณแน่ใจว่าต้องการยกเลิกรายการนี้", function(){
 					params 	= "&pageAction=cancel&" + $('#frm').serialize();
 					
@@ -334,14 +334,12 @@
 			            type: "POST",
 			            url: gv_url,
 			            data: gv_service + params,
-			            beforeSend: gp_progressBarOn(),
+			            beforeSend: "",
 			            success: function(data){
 			            	var jsonObj 			= null;
 			            	var status				= null;
 			            	
 			            	try{
-			            		gp_progressBarOff();
-			            		//alert(data);
 			            		jsonObj = JSON.parse(data);
 			            		status	= jsonObj.status;
 			            		
@@ -349,9 +347,7 @@
 			            			alert("ยกเลิกเรียบร้อย", function() { 
 			            				var params = "invoiceCode=" + jsonObj.invoiceCode;
 			            				window.location = gv_url + "?service=" + $("#service").val() + "&pageAction=getDetail&" + params;
-					    		    });
-			            			//alert("ยกเลิกเรียบร้อย");
-			            			//window.location = gv_url + "?service=" + $("#service").val() + "&pageAction=getDetail&invoiceCode=" + jsonObj.invoiceCode;
+					    		    }, false);
 			            		}else{
 			            			alert(jsonObj.errMsg);
 			            			
@@ -361,7 +357,7 @@
 			            	}
 			            }
 			        });
-				});
+				}, function(){gp_progressBarOff();}, false);
 				
 			}catch(e){
 				alert("lp_cancel :: " + e);
@@ -496,27 +492,36 @@
 		                        
 		                      	//สินค้า
 		                      	newNodeTd2.align 			= "left";
-		                       	newNodeTd2.innerHTML        = '<input type="text" style="width: 100%" onblur="lp_getProductDetailByName(' + lv_maxSeq + ', this.value);" id="productName' + lv_maxSeq + '" name="productName" value="'+lv_productName+'" />'
-		                       								+ '<input type="hidden" id="productCode'+lv_maxSeq+'" name="productCode" value="'+lv_productCode+'" />';
+		                       	newNodeTd2.innerHTML        = '<input type="text" style="width: 100%" onblur="lp_getProductDetailByName(' + lv_maxSeq + ', this.value);" id="productName' + lv_maxSeq + '" name="productName" value="" />'
+		                       								+ '<input type="hidden" id="productCode'+lv_maxSeq+'" name="productCode" value="" />';
+                     			$("#productName" + lv_maxSeq).val(lv_productName);
+                  		        $("#productCode" + lv_maxSeq).val(lv_productCode);
 		                       	
 		                      	//เหลือในคลัง
-		                       	newNodeTd3.innerHTML        = '<input type="text" style="width: 100%;" class="input-disabled" readonly="readonly" id="inventory' + lv_maxSeq + '" name="inventory" value="'+lv_inventory+'" />';
+		                       	newNodeTd3.innerHTML        = '<input type="text" style="width: 100%;" class="input-disabled" readonly="readonly" id="inventory' + lv_maxSeq + '" name="inventory" value="" />';
+		                       	$("#inventory" + lv_maxSeq).val(lv_inventory);
 		                       	
 		                      	//ปริมาณ
-		                       	newNodeTd4.innerHTML        = '<input type="text" style="width: 100%"  onblur="gp_checkAmtOnly(this, 12);lp_getDiscount('+lv_maxSeq+');" class="moneyOnly" id="quantity' + lv_maxSeq + '" name="quantity" value="'+lv_quantity+'" />';
+		                       	newNodeTd4.innerHTML        = '<input type="text" style="width: 100%"  onblur="gp_checkAmtOnly(this, 12);lp_getDiscount('+lv_maxSeq+');" class="moneyOnly" id="quantity' + lv_maxSeq + '" name="quantity" value="" />';
+		                       	$("#quantity" + lv_maxSeq).val(lv_quantity);
 		                       	
 		                      	//หน่วย
-		                       	newNodeTd5.innerHTML        = '<input type="text" style="width: 100%;" id="unitName' + lv_maxSeq + '" class="input-disabled" readonly="readonly" name="unitName" value="'+lv_unitName+'" />'
-   															+ '<input type="hidden" id="unitCode'+lv_maxSeq+'" name="unitCode" value="'+lv_unitCode+'" />';
+		                       	newNodeTd5.innerHTML        = '<input type="text" style="width: 100%;" id="unitName' + lv_maxSeq + '" class="input-disabled" readonly="readonly" name="unitName" value="" />'
+   															+ '<input type="hidden" id="unitCode'+lv_maxSeq+'" name="unitCode" value="" />';
+   								$("#unitName" + lv_maxSeq).val(lv_unitName);
+   							   	$("#unitCode" + lv_maxSeq).val(lv_unitCode);
    								
 								//ราคาต่อหน่วย
-		                       	newNodeTd6.innerHTML        = '<input type="text" style="width: 100%"  onblur="gp_checkAmtOnly(this, 12);lp_calAmount('+lv_maxSeq+');" class="moneyOnly" id="pricePerUnit' + lv_maxSeq + '" name="pricePerUnit" value="'+lv_pricePerUnit+'" />';
+		                       	newNodeTd6.innerHTML        = '<input type="text" style="width: 100%"  onblur="gp_checkAmtOnly(this, 12);lp_calAmount('+lv_maxSeq+');" class="moneyOnly" id="pricePerUnit' + lv_maxSeq + '" name="pricePerUnit" value="" />';
+		                       	$("#pricePerUnit" + lv_maxSeq).val(lv_pricePerUnit);
 		                       	
 		                      	//ส่วนลด
-		                       	newNodeTd7.innerHTML        = '<input type="text" style="width: 100%"  onblur="gp_checkAmtOnly(this, 12);lp_calAmount('+lv_maxSeq+');" class="moneyOnly" id="discount' + lv_maxSeq + '" name="discount" value="'+lv_discount+'" />';
+		                       	newNodeTd7.innerHTML        = '<input type="text" style="width: 100%"  onblur="gp_checkAmtOnly(this, 12);lp_calAmount('+lv_maxSeq+');" class="moneyOnly" id="discount' + lv_maxSeq + '" name="discount" value="" />';
+		                       	$("#discount" + lv_maxSeq).val(lv_discount);
 		                       	
 		                      	//จำนวนเงิน
-		                       	newNodeTd8.innerHTML        = '<input type="text" style="width: 100%"  onblur="gp_checkAmtOnly(this, 12);lp_invoicePrice();lp_updateRecord('+lv_maxSeq+');" class="moneyOnly" id="price' + lv_maxSeq + '" name="price" value="0.00" />';
+		                       	newNodeTd8.innerHTML        = '<input type="text" style="width: 100%"  onblur="gp_checkAmtOnly(this, 12);lp_invoicePrice();lp_updateRecord('+lv_maxSeq+');" class="moneyOnly" id="price' + lv_maxSeq + '" name="price" value="" />';
+		                       	$("#price" + lv_maxSeq).val("0.00");
 		                       	
 		                      	//Action
 		                      	newNodeTd9.align 			= "center";
@@ -873,7 +878,8 @@
 						async:false,
 			            type: "POST",
 			            url: gv_url,
-			            data: gv_service + "&pageAction=getProductDetailByName&productName=" + obj.productName.trim(),
+			            //data: gv_service + "&pageAction=getProductDetailByName&productName=" + obj.productName.trim(),
+			            data: gv_service + "&pageAction=getProductDetailByCode&productCode=" + obj.productCode.trim(),
 			            beforeSend: "",
 			            success: function(data){
 			            	var jsonObj 			= null;
@@ -1142,13 +1148,13 @@
 					return;
 				}
 				
-				params = "&productCode=" + lv_productCodeDis + "&groupSalePrice=" + $("#groupSalePrice").val().trim();
+				params = "&productCodeDis=" + lv_productCodeDis + "&groupSalePrice=" + $("#groupSalePrice").val().trim();
 				
 				$.ajax({
 					async:false,
 		            type: "POST",
 		            url: gv_url,
-		            data: gv_service + "&pageAction=getProductDetailByCode" + params,
+		            data: gv_service + "&pageAction=getProductDetailByCodeDis" + params,
 		            beforeSend: "",
 		            success: function(data){
 		            	var jsonObj 			= null;
@@ -1397,7 +1403,7 @@
 								        				<%if(invoiceCashMaintananceForm.getPageMode().equals(invoiceCashMaintananceForm.NEW)){%>
 								        				<img alt="lookUp" title="lookUp" src="<%=imgURL%>/lookup.png" width="30px" height="30px" border="0" onclick="lp_lookUpCusDetail();" />
 				   										<%}%>
-								        				<span id="spanCusName" class="correct"><%=customerDetailsBean.getFullName()%></span>
+								        				<span id="spanCusName" class="correct"><%=StringEscapeUtils.escapeHtml4(customerDetailsBean.getFullName())%></span>
 								        			</td>
 					         					</tr>
 												<tr>
@@ -1409,7 +1415,7 @@
 								        					   id="saleName" 
 								        					   name='saleName' 
 								        					   onblur="getSaleNameDetail();"
-								        					   value="<%=invoiceCashMasterBean.getSaleName()%>"
+								        					   value="<%=StringEscapeUtils.escapeHtml4(invoiceCashMasterBean.getSaleName())%>"
 								        					   style="width: 220px;" />
 								        				<input type="hidden" id="saleUniqueId" name="saleUniqueId" value="<%=invoiceCashMasterBean.getSaleUniqueId()%>" />
 								        				<%if(invoiceCashMaintananceForm.getPageMode().equals(invoiceCashMaintananceForm.NEW)){%>
@@ -1511,7 +1517,7 @@
 															   id="productName<%=bean.getSeq()%>" 
 															   name="productName"
 															   onblur="lp_getProductDetailByName('<%=bean.getSeq()%>', this.value);"
-															   value="<%=bean.getProductName()%>" />
+															   value="<%=StringEscapeUtils.escapeHtml4(bean.getProductName())%>" />
 														<input type="hidden" id="productCode<%=bean.getSeq()%>" name="productCode" value="<%=bean.getProductCode()%>" />
 													</td>
 													<td align="left">
@@ -1539,7 +1545,7 @@
 															   name="unitName" 
 															   class="input-disabled"
 															   readonly="readonly"
-															   value="<%=bean.getUnitName()%>" />
+															   value="<%=StringEscapeUtils.escapeHtml4(bean.getUnitName())%>" />
 														<input type="hidden" id="unitCode<%=bean.getSeq()%>" name="unitCode" value="<%=bean.getUnitCode()%>" />
 													</td>
 													<td align="left">
@@ -1604,8 +1610,8 @@
 														<%=seq%>
 													</td>
 													<td align="left">
-														<%=bean.getProductName()%>
-														<input type="hidden" id="productName<%=bean.getSeq()%>" name="productName" value="<%=bean.getProductName()%>" />
+														<%=StringEscapeUtils.escapeHtml4(bean.getProductName())%>
+														<input type="hidden" id="productName<%=bean.getSeq()%>" name="productName" value="<%=StringEscapeUtils.escapeHtml4(bean.getProductName())%>" />
 														<input type="hidden" id="productCode<%=bean.getSeq()%>" name="productCode" value="<%=bean.getProductCode()%>" />
 													</td>
 													<td align="center">
@@ -1613,8 +1619,8 @@
 														<input type='hidden' id="quantity<%=bean.getSeq()%>" name='quantity' value="<%=bean.getQuantity() %>" />
 													</td>
 													<td align="center">
-														<%=bean.getUnitName()%>
-														<input type="hidden" id="unitName<%=bean.getSeq()%>" name="unitName" value="<%=bean.getUnitName()%>" />
+														<%=StringEscapeUtils.escapeHtml4(bean.getUnitName())%>
+														<input type="hidden" id="unitName<%=bean.getSeq()%>" name="unitName" value="<%=StringEscapeUtils.escapeHtml4(bean.getUnitName())%>" />
 														<input type="hidden" id="unitCode<%=bean.getSeq()%>" name="unitCode" value="<%=bean.getUnitCode()%>" />
 													</td>
 													<td align="right">

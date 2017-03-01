@@ -324,6 +324,8 @@ public class AdjustStockServlet extends EnjoyStandardSvc {
 		ProductmasterBean 			productmasterBean			= null;
 		ProductmasterBean 			productmasterBeanDb			= null;
 		List<AdjustStockBean> 		adjustStockList				= null;
+		int							hisCode						= 1;
+		boolean						chkFlag						= true;
 		
 		try{
 			obj 					= new JSONObject();
@@ -372,7 +374,15 @@ public class AdjustStockServlet extends EnjoyStandardSvc {
 				}
 				productQuanHistoryBean.setQuantityTotal(String.valueOf(bean.getQuantity()));
 				
-				productQuanHistoryDao.insert(productQuanHistoryBean);
+				/*Begin หา hisCode*/
+				if(chkFlag==true){
+					hisCode		= productQuanHistoryDao.genId(tin);
+					chkFlag  	= false;
+				}else{
+					hisCode++;
+				}
+				/*End หา hisCode*/
+				productQuanHistoryDao.insert(productQuanHistoryBean, hisCode);
 				/*End ส่วนประวัตเพิ่มลดสินค้า*/
 				
 				bean.setAdjustDate(EnjoyUtils.currDateThai());

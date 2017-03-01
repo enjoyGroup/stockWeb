@@ -1,7 +1,7 @@
 <%@ include file="/pages/include/checkLogin.jsp"%>
 <%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
 <%@ page import="th.go.stock.app.enjoy.bean.AdjustStockBean, th.go.stock.app.enjoy.bean.ComboBean"%>
-<%@ page import="java.util.*"%>
+<%@ page import="java.util.*,org.apache.commons.lang3.StringEscapeUtils"%>
 <jsp:useBean id="adjustStockHistoryForm" class="th.go.stock.app.enjoy.form.AdjustStockHistoryForm" scope="session"/>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
@@ -246,7 +246,7 @@
 						        					   size="25"
 						        					   maxlength="255" 
 						        					   onkeypress="return lp_enterToSearch(event);"
-						        					   value="<%=adjustStockBean.getProductName()%>" />
+						        					   value="<%=StringEscapeUtils.escapeHtml4(adjustStockBean.getProductName())%>" />
 						        				<input type="button" id="btnSearch" class='btn btn-primary padding-sm' style="margin-right:12px; padding-right:24px; padding-left:24px;" value='ค้นหา' />
 						        			</td>
 						        		</tr>
@@ -281,7 +281,7 @@
 													<%=bean.getQuanNew()%>
 												</td>
 												<td align="left">
-													<%=bean.getRemark()%>
+													<%=StringEscapeUtils.escapeHtml4(bean.getRemark())%>
 												</td>
 											</tr>
 											<% seq++;}%>

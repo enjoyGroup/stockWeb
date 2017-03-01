@@ -51,6 +51,7 @@ public class ManageProductGroupDao extends DaoControl{
 			columnList.add("productTypeCode");
 			columnList.add("productGroupCode");
 			columnList.add("tin");
+			columnList.add("productGroupCodeDis");
 			columnList.add("productGroupName");
 			columnList.add("productGroupStatus");
 			
@@ -62,6 +63,7 @@ public class ManageProductGroupDao extends DaoControl{
 				bean.setProductTypeCode		(EnjoyUtils.nullToStr(row.get("productTypeCode")));
 				bean.setProductGroupCode	(EnjoyUtils.nullToStr(row.get("productGroupCode")));
 				bean.setTin					(EnjoyUtils.nullToStr(row.get("tin")));
+				bean.setProductGroupCodeDis	(EnjoyUtils.nullToStr(row.get("productGroupCodeDis")));
 				bean.setProductGroupName	(EnjoyUtils.nullToStr(row.get("productGroupName")));
 				bean.setProductGroupStatus	(EnjoyUtils.nullToStr(row.get("productGroupStatus")));
 				bean.setSeq					(EnjoyUtils.nullToStr(seq));
@@ -95,13 +97,14 @@ public class ManageProductGroupDao extends DaoControl{
 			productgroup 	= new Productgroup();
 			pk				= new ProductgroupPK();
 			
-			pk.setProductTypeCode	(manageProductGroupBean.getProductTypeCode());
-			pk.setProductGroupCode	(manageProductGroupBean.getProductGroupCode());
+			pk.setProductTypeCode	(EnjoyUtils.parseInt(manageProductGroupBean.getProductTypeCode()));
+			pk.setProductGroupCode	(EnjoyUtils.parseInt(manageProductGroupBean.getProductGroupCode()));
 			pk.setTin				(manageProductGroupBean.getTin());
 			
 			productgroup.setId(pk);
-			productgroup.setProductGroupName(manageProductGroupBean.getProductGroupName());
-			productgroup.setProductGroupStatus(manageProductGroupBean.getProductGroupStatus());
+			productgroup.setProductGroupCodeDis	(manageProductGroupBean.getProductGroupCodeDis());
+			productgroup.setProductGroupName	(manageProductGroupBean.getProductGroupName());
+			productgroup.setProductGroupStatus	(manageProductGroupBean.getProductGroupStatus());
 			
 			insertData(productgroup);
 			
@@ -134,8 +137,8 @@ public class ManageProductGroupDao extends DaoControl{
 			query = createQuery(hql);
 			query.setParameter("productGroupName"	, manageProductGroupBean.getProductGroupName());
 			query.setParameter("productGroupStatus"	, manageProductGroupBean.getProductGroupStatus());
-			query.setParameter("productTypeCode"	, manageProductGroupBean.getProductTypeCode());
-			query.setParameter("productGroupCode"	, manageProductGroupBean.getProductGroupCode());
+			query.setParameter("productTypeCode"	, EnjoyUtils.parseInt(manageProductGroupBean.getProductTypeCode()));
+			query.setParameter("productGroupCode"	, EnjoyUtils.parseInt(manageProductGroupBean.getProductGroupCode()));
 			query.setParameter("tin"				, manageProductGroupBean.getTin());
 			
 			query.executeUpdate();
@@ -152,48 +155,48 @@ public class ManageProductGroupDao extends DaoControl{
 		}
 	}
 	
-	public int checkDupProductGroupCode(ManageProductGroupBean manageProductGroupBean) throws EnjoyException{
-		getLogger().info("[checkDupProductGroupCode][Begin]");
-		
-		String							hql						= null;
-		int 							result					= 0;
-		HashMap<String, Object>			param					= new HashMap<String, Object>();
-		List<Object>					resultList				= null;
-		
-		try{
-			hql				= "Select count(*) cou "
-							+ " from productgroup "
-							+ " where productTypeCode 			= :productTypeCode"
-									+ " and productGroupCode 	= :productGroupCode"
-									+ "	and tin					= :tin"
-									+ " and productGroupStatus 	= 'A'";
-			
-			//Criteria
-			param.put("productTypeCode"		, manageProductGroupBean.getProductTypeCode());
-			param.put("productGroupCode"	, manageProductGroupBean.getProductGroupCode());
-			param.put("tin"					, manageProductGroupBean.getTin());
-			
-			resultList = getResult(hql, param, "cou", Constants.INT_TYPE);
-			
-			if(resultList!=null && resultList.size() > 0){
-				result = EnjoyUtils.parseInt(resultList.get(0));
-			}
-			
-			getLogger().info("[checkDupProductGroupCode] result 			:: " + result);
-			
-			
-			
-		}catch(Exception e){
-			getLogger().info(e.getMessage());
-			throw new EnjoyException(e.getMessage());
-		}finally{
-			
-			hql		= null;
-			getLogger().info("[checkDupProductGroupCode][End]");
-		}
-		
-		return result;
-	}
+//	public int checkDupProductGroupCode(ManageProductGroupBean manageProductGroupBean) throws EnjoyException{
+//		getLogger().info("[checkDupProductGroupCode][Begin]");
+//		
+//		String							hql						= null;
+//		int 							result					= 0;
+//		HashMap<String, Object>			param					= new HashMap<String, Object>();
+//		List<Object>					resultList				= null;
+//		
+//		try{
+//			hql				= "Select count(*) cou "
+//							+ " from productgroup "
+//							+ " where productTypeCode 			= :productTypeCode"
+//									+ " and productGroupCodeDis = :productGroupCodeDis"
+//									+ "	and tin					= :tin"
+//									+ " and productGroupStatus 	= 'A'";
+//			
+//			//Criteria
+//			param.put("productTypeCode"		, manageProductGroupBean.getProductTypeCode());
+//			param.put("productGroupCodeDis"	, manageProductGroupBean.getProductGroupCodeDis());
+//			param.put("tin"					, manageProductGroupBean.getTin());
+//			
+//			resultList = getResult(hql, param, "cou", Constants.INT_TYPE);
+//			
+//			if(resultList!=null && resultList.size() > 0){
+//				result = EnjoyUtils.parseInt(resultList.get(0));
+//			}
+//			
+//			getLogger().info("[checkDupProductGroupCode] result 			:: " + result);
+//			
+//			
+//			
+//		}catch(Exception e){
+//			getLogger().info(e.getMessage());
+//			throw new EnjoyException(e.getMessage());
+//		}finally{
+//			
+//			hql		= null;
+//			getLogger().info("[checkDupProductGroupCode][End]");
+//		}
+//		
+//		return result;
+//	}
 	
 	public List<ComboBean> productGroupNameList(String productTypeName, String productGroupName, String tin, boolean flag){
 		getLogger().info("[productGroupNameList][Begin]");
@@ -323,6 +326,72 @@ public class ManageProductGroupDao extends DaoControl{
 		return productGroupCode;
 	}
 
-
+	public int genId(String tin, String productTypeCode) throws EnjoyException{
+		getLogger().info("[genId][Begin]");
+		
+		String							hql				= null;
+		int 							result			= 1;
+		HashMap<String, Object>			param			= new HashMap<String, Object>();
+		List<Object>					resultList		= null;
+		
+		try{
+			hql		= "select (max(productGroupCode) + 1) newId"
+					+ "	from productgroup "
+					+ "	where tin				= :tin"
+					+ "		and productTypeCode = :productTypeCode";
+			
+			//Criteria
+			param.put("tin"				, tin);
+			param.put("productTypeCode"	, productTypeCode);
+			
+			resultList = getResult(hql, param, "newId", Constants.INT_TYPE);
+			
+			if(resultList!=null && resultList.size() > 0){
+				result = EnjoyUtils.parseInt(resultList.get(0))==0?1:EnjoyUtils.parseInt(resultList.get(0));
+			}
+			
+			getLogger().info("[genId] newId 			:: " + result);
+			
+		}catch(Exception e){
+			getLogger().error(e);
+			throw new EnjoyException("genId error");
+		}finally{
+			hql									= null;
+			getLogger().info("[genId][End]");
+		}
+		
+		return result;
+	}
+	
+	public void cancelProductgroupByProductTypeCode(String productTypeCode, String tin) throws EnjoyException{
+		getLogger().info("[updateProductgroup][Begin]");
+		
+		String							hql									= null;
+		Query 							query 								= null;
+		
+		try{
+			hql				= "update Productgroup t set "
+							+ "		t.productGroupStatus 	= :productGroupStatus"
+							+ " where t.id.productTypeCode 		= :productTypeCode"
+							+ "		and t.id.tin				= :tin";
+			
+			query = createQuery(hql);
+			query.setParameter("productGroupStatus"	, "R");
+			query.setParameter("productTypeCode"	, EnjoyUtils.parseInt(productTypeCode));
+			query.setParameter("tin"				, tin);
+			
+			query.executeUpdate();
+			
+		}catch(Exception e){
+			e.printStackTrace();
+			getLogger().error(e);
+			throw new EnjoyException("Error updateProductgroup");
+		}finally{
+			
+			hql									= null;
+			query 								= null;
+			getLogger().info("[updateProductgroup][End]");
+		}
+	}
 	
 }

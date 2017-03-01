@@ -1,7 +1,7 @@
 <%@ include file="/pages/include/checkLogin.jsp"%>
 <%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
 <%@ page import="th.go.stock.app.enjoy.bean.ManageUnitTypeBean,th.go.stock.app.enjoy.bean.ComboBean"%>
-<%@ page import="java.util.*"%>
+<%@ page import="java.util.*,org.apache.commons.lang3.StringEscapeUtils"%>
 <jsp:useBean id="manageUnitTypeForm" class="th.go.stock.app.enjoy.form.ManageUnitTypeForm" scope="session"/>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
@@ -318,7 +318,7 @@
 															<%=seq%>
 														</td>
 														<td align="left">
-															<input type="text" style="width: 100%" maxlength="200" onblur="lp_updateRecord(<%=bean.getSeq()%>);" id="unitName<%=bean.getSeq()%>" name="unitName" value="<%=bean.getUnitName()%>" />
+															<input type="text" style="width: 100%" maxlength="200" onblur="lp_updateRecord(<%=bean.getSeq()%>);" id="unitName<%=bean.getSeq()%>" name="unitName" value="<%=StringEscapeUtils.escapeHtml4(bean.getUnitName())%>" />
 														</td>
 														<td align="center">
 															<img alt="ลบ" title="ลบ" src="<%=imgURL%>/wrong.png" width="24" height="24" border="0" onclick="lp_deleteRecord(this, '<%=bean.getSeq()%>');" />

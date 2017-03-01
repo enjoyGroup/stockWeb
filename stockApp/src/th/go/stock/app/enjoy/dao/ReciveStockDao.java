@@ -422,7 +422,7 @@ public class ReciveStockDao extends DaoControl{
 			id.setSeq		(EnjoyUtils.parseInt(reciveOrdeDetailBean.getSeqDb()));
 			
 			reciveordedetail.setId					(id);
-			reciveordedetail.setProductCode			(reciveOrdeDetailBean.getProductCode());
+			reciveordedetail.setProductCode			(EnjoyUtils.parseInt(reciveOrdeDetailBean.getProductCode()));
 			reciveordedetail.setQuantity			(EnjoyUtils.parseBigDecimal(reciveOrdeDetailBean.getQuantity()));
 			reciveordedetail.setPrice				(EnjoyUtils.parseBigDecimal(reciveOrdeDetailBean.getPrice()));
 			reciveordedetail.setDiscountRate		(EnjoyUtils.parseBigDecimal(reciveOrdeDetailBean.getDiscountRate()));

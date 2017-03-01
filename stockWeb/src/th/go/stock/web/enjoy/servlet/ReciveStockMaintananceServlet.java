@@ -301,6 +301,8 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 		ProductmasterBean 			productmasterBean			= null;
 		ProductmasterBean 			productmasterBeanDb			= null;
 		boolean						chkFlag						= true;
+		int							hisCode						= 1;
+		boolean						chkHisCodeFlag				= true;
 		
 		try{
 			pageMode 					= EnjoyUtil.nullToStr(request.getParameter("pageMode"));
@@ -470,7 +472,15 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 						productQuanHistoryBean.setQuantityMinus("0.00");
 						productQuanHistoryBean.setQuantityTotal(String.valueOf(quantity));
 						
-						productQuanHistoryDao.insert(productQuanHistoryBean);
+						/*Begin หา hisCode*/
+						if(chkHisCodeFlag==true){
+							hisCode			= productQuanHistoryDao.genId(tin);
+							chkHisCodeFlag  = false;
+						}else{
+							hisCode++;
+						}
+						/*End หา hisCode*/
+						productQuanHistoryDao.insert(productQuanHistoryBean, hisCode);
 						/*End ส่วนประวัตเพิ่มลดสินค้า*/
 						
 					}else if(currReciveStatus.equals("3") && reciveStatus.equals("4")){
@@ -513,7 +523,15 @@ public class ReciveStockMaintananceServlet extends EnjoyStandardSvc {
 						productQuanHistoryBean.setQuantityMinus(beanTemp.getQuantity());
 						productQuanHistoryBean.setQuantityTotal(String.valueOf(quantity));
 						
-						productQuanHistoryDao.insert(productQuanHistoryBean);
+						/*Begin หา hisCode*/
+						if(chkHisCodeFlag==true){
+							hisCode			= productQuanHistoryDao.genId(tin);
+							chkHisCodeFlag  = false;
+						}else{
+							hisCode++;
+						}
+						/*End หา hisCode*/
+						productQuanHistoryDao.insert(productQuanHistoryBean, hisCode);
 						/*End ส่วนประวัตเพิ่มลดสินค้า*/
 					}
 				}

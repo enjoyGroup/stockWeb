@@ -449,7 +449,7 @@ public class InvoiceCreditDao extends DaoControl{
 			id.setSeq			(EnjoyUtils.parseInt(invoiceCreditDetailBean.getSeqDb()));
 			
 			invoicecreditdetail.setId				(id);
-			invoicecreditdetail.setProductCode		(invoiceCreditDetailBean.getProductCode());
+			invoicecreditdetail.setProductCode		(EnjoyUtils.parseInt(invoiceCreditDetailBean.getProductCode()));
 			invoicecreditdetail.setQuantity			(EnjoyUtils.parseBigDecimal(invoiceCreditDetailBean.getQuantity()));
 			invoicecreditdetail.setPricePerUnit		(EnjoyUtils.parseBigDecimal(invoiceCreditDetailBean.getPricePerUnit()));
 			invoicecreditdetail.setDiscount			(EnjoyUtils.parseBigDecimal(invoiceCreditDetailBean.getDiscount()));

@@ -3,8 +3,9 @@ package th.go.stock.app.enjoy.dao;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
-
 import org.hibernate.Query;
 
 import th.go.stock.app.enjoy.bean.ComboBean;
@@ -43,9 +44,10 @@ public class ProductDetailsDao extends DaoControl{
 		try{	
 			hql					= "select a.*, b.productTypeName, c.productGroupName "
 								+ "	from productmaster a"
-								+ "		inner join productype b on b.productTypeCode = a.productType and b.tin = a.tin"
-								+ "		inner join productgroup c on c.productTypeCode 	= a.productType and c.productGroupCode = a.productGroup and c.tin = a.tin"
-								+ "	where a.tin	= :tin";
+								+ "		inner join productype b on b.productTypeCode = a.productType and b.tin = a.tin and b.productTypeStatus = 'A'"
+								+ "		inner join productgroup c on c.productTypeCode 	= a.productType and c.productGroupCode = a.productGroup and c.tin = a.tin and c.productGroupStatus = 'A'"
+								+ "	where a.tin	= :tin"
+								+ "		and a.productStatus = 'A'";
 			
 			//Criteria
 			param.put("tin"	, productDetailsBean.getTin());
@@ -66,6 +68,7 @@ public class ProductDetailsDao extends DaoControl{
 			//Column select
 			columnList.add("productCode");
 			columnList.add("tin");
+			columnList.add("productCodeDis");
 			columnList.add("productType");
 			columnList.add("productGroup");
 			columnList.add("productName");
@@ -79,6 +82,7 @@ public class ProductDetailsDao extends DaoControl{
 			columnList.add("salePrice5");
 			columnList.add("productTypeName");
 			columnList.add("productGroupName");
+			columnList.add("productStatus");
 			
 			resultList = getResult(hql, param, columnList);
 			
@@ -87,6 +91,7 @@ public class ProductDetailsDao extends DaoControl{
 				
 				bean.setProductCode				(EnjoyUtils.nullToStr(row.get("productCode")));
 				bean.setTin						(EnjoyUtils.nullToStr(row.get("tin")));
+				bean.setProductCodeDis			(EnjoyUtils.nullToStr(row.get("productCodeDis")));
 				bean.setProductTypeCode			(EnjoyUtils.nullToStr(row.get("productType")));
 				bean.setProductGroupCode		(EnjoyUtils.nullToStr(row.get("productGroup")));
 				bean.setProductName				(EnjoyUtils.nullToStr(row.get("productName")));
@@ -102,6 +107,7 @@ public class ProductDetailsDao extends DaoControl{
 				bean.setProductGroupName		(EnjoyUtils.nullToStr(row.get("productGroupName")));
 				bean.setChkBoxSeq				(String.valueOf(chkBoxSeq));
 				bean.setSeqDis					(String.valueOf(seqDis++));
+				bean.setProductStatus			(EnjoyUtils.nullToStr(row.get("productStatus")));
 				
 				productDetailsList.add(bean);
 				chkBoxSeq++;
@@ -120,7 +126,7 @@ public class ProductDetailsDao extends DaoControl{
 		
 	}
 	
-	public ProductmasterBean getProductDetail(ProductmasterBean 		productDetailsBean) throws EnjoyException{
+	public ProductmasterBean getProductDetail(ProductmasterBean productDetailsBean) throws EnjoyException{
 		getLogger().info("[getProductDetail][Begin]");
 		
 		String							hql						= null;
@@ -132,20 +138,22 @@ public class ProductDetailsDao extends DaoControl{
 		try{		
 			hql		= "select a.*, b.productTypeName, c.productGroupName, d.unitName, e.quantity"
 					+ "	from productmaster a"
-					+ "		inner join productype b on b.productTypeCode = a.productType and b.tin = a.tin"
-					+ "		inner join productgroup c on c.productTypeCode 	= a.productType and c.productGroupCode = a.productGroup and c.tin = a.tin"
-					+ " 	inner join unittype d on d.unitCode = a.unitCode and d.tin = a.tin"
+					+ "		inner join productype b on b.productTypeCode = a.productType and b.tin = a.tin and b.productTypeStatus = 'A'"
+					+ "		inner join productgroup c on c.productTypeCode 	= a.productType and c.productGroupCode = a.productGroup and c.tin = a.tin and c.productGroupStatus = 'A'"
+					+ " 	inner join unittype d on d.unitCode = a.unitCode and d.tin = a.tin and d.unitStatus = 'A'"
 					+ " 	left join productquantity e on e.productCode = a.productCode and e.tin = a.tin"
 					+ "	where a.productCode		= :productCode"
-					+ " 	and a.tin			= :tin";
+					+ " 	and a.tin			= :tin"
+					+ "		and a.productStatus	= 'A'";
 			
 			//Criteria
-			param.put("productCode"	, productDetailsBean.getProductCode());
+			param.put("productCode"	, EnjoyUtils.parseInt(productDetailsBean.getProductCode()));
 			param.put("tin"			, productDetailsBean.getTin());
 			
 			//Column select
 			columnList.add("productCode");
 			columnList.add("tin");
+			columnList.add("productCodeDis");
 			columnList.add("productType");
 			columnList.add("productGroup");
 			columnList.add("productName");
@@ -161,6 +169,7 @@ public class ProductDetailsDao extends DaoControl{
 			columnList.add("productGroupName");
 			columnList.add("unitName");
 			columnList.add("quantity");
+			columnList.add("productStatus");
 			
 			resultList = getResult(hql, param, columnList);
 			
@@ -170,6 +179,7 @@ public class ProductDetailsDao extends DaoControl{
 					
 					bean.setProductCode				(EnjoyUtils.nullToStr(row.get("productCode")));
 					bean.setTin						(EnjoyUtils.nullToStr(row.get("tin")));
+					bean.setProductCodeDis			(EnjoyUtils.nullToStr(row.get("productCodeDis")));
 					bean.setProductTypeCode			(EnjoyUtils.nullToStr(row.get("productType")));
 					bean.setProductGroupCode		(EnjoyUtils.nullToStr(row.get("productGroup")));
 					bean.setProductName				(EnjoyUtils.nullToStr(row.get("productName")));
@@ -185,6 +195,7 @@ public class ProductDetailsDao extends DaoControl{
 					bean.setProductGroupName		(EnjoyUtils.nullToStr(row.get("productGroupName")));
 					bean.setUnitName				(EnjoyUtils.nullToStr(row.get("unitName")));
 					bean.setQuantity				(EnjoyUtils.convertFloatToDisplay(row.get("quantity"), 2));
+					bean.setProductStatus			(EnjoyUtils.nullToStr(row.get("productStatus")));
 					
 				}	
 			}
@@ -212,12 +223,13 @@ public class ProductDetailsDao extends DaoControl{
 		
 		try{
 			
-			id.setProductCode	(productmasterBean.getProductCode());
+			id.setProductCode	(EnjoyUtils.parseInt(productmasterBean.getProductCode()));
 			id.setTin			(productmasterBean.getTin());
 			
 			productmaster.setId				(id);
-			productmaster.setProductType	(productmasterBean.getProductTypeCode());
-			productmaster.setProductGroup	(productmasterBean.getProductGroupCode());
+			productmaster.setProductCodeDis	(productmasterBean.getProductCodeDis());
+			productmaster.setProductType	(EnjoyUtils.parseInt(productmasterBean.getProductTypeCode()));
+			productmaster.setProductGroup	(EnjoyUtils.parseInt(productmasterBean.getProductGroupCode()));
 			productmaster.setProductName	(productmasterBean.getProductName());
 			productmaster.setUnitCode		(EnjoyUtils.parseInt(productmasterBean.getUnitCode()));
 			productmaster.setMinQuan		(EnjoyUtils.parseBigDecimal(productmasterBean.getMinQuan()));
@@ -227,6 +239,7 @@ public class ProductDetailsDao extends DaoControl{
 			productmaster.setSalePrice3		(EnjoyUtils.parseBigDecimal(productmasterBean.getSalePrice3()));
 			productmaster.setSalePrice4		(EnjoyUtils.parseBigDecimal(productmasterBean.getSalePrice4()));
 			productmaster.setSalePrice5		(EnjoyUtils.parseBigDecimal(productmasterBean.getSalePrice5()));
+			productmaster.setProductStatus	(productmasterBean.getProductStatus());
 			
 			insertData(productmaster);
 			
@@ -248,7 +261,8 @@ public class ProductDetailsDao extends DaoControl{
 		Query 							query 								= null;
 		
 		try{
-			hql				= "update  Productmaster t set t.productType 	= :productType"
+			hql				= "update  Productmaster t set t.productCodeDis = :productCodeDis"
+												+ ", t.productType			= :productType"
 												+ ", t.productGroup			= :productGroup"
 												+ ", t.productName			= :productName"
 												+ ", t.unitCode				= :unitCode"
@@ -263,8 +277,9 @@ public class ProductDetailsDao extends DaoControl{
 										+ "		and t.id.tin		= :tin";
 			
 			query = createQuery(hql);
-			query.setParameter("productType"		, productmasterBean.getProductTypeCode());
-			query.setParameter("productGroup"		, productmasterBean.getProductGroupCode());
+			query.setParameter("productCodeDis"		, productmasterBean.getProductCodeDis());
+			query.setParameter("productType"		, EnjoyUtils.parseInt(productmasterBean.getProductTypeCode()));
+			query.setParameter("productGroup"		, EnjoyUtils.parseInt(productmasterBean.getProductGroupCode()));
 			query.setParameter("productName"		, productmasterBean.getProductName());
 			query.setParameter("unitCode"			, EnjoyUtils.parseInt(productmasterBean.getUnitCode()));
 			query.setParameter("minQuan"			, EnjoyUtils.parseBigDecimal(productmasterBean.getMinQuan()));
@@ -274,7 +289,7 @@ public class ProductDetailsDao extends DaoControl{
 			query.setParameter("salePrice3"			, EnjoyUtils.parseBigDecimal(productmasterBean.getSalePrice3()));
 			query.setParameter("salePrice4"			, EnjoyUtils.parseBigDecimal(productmasterBean.getSalePrice4()));
 			query.setParameter("salePrice5"			, EnjoyUtils.parseBigDecimal(productmasterBean.getSalePrice5()));
-			query.setParameter("productCode"		, productmasterBean.getProductCode());
+			query.setParameter("productCode"		, EnjoyUtils.parseInt(productmasterBean.getProductCode()));
 			query.setParameter("tin"				, productmasterBean.getTin());
 			
 			query.executeUpdate();
@@ -291,7 +306,7 @@ public class ProductDetailsDao extends DaoControl{
 		}
 	}
 	
-	public int checkDupProductCode(String productCode, String tin) throws EnjoyException{
+	public int checkDupProductCode(String productCodeDis, String tin, String productCode, String pageMode) throws EnjoyException{
 		getLogger().info("[checkDupProductCode][Begin]");
 		
 		String							hql				= null;
@@ -302,12 +317,18 @@ public class ProductDetailsDao extends DaoControl{
 		try{
 			hql		= "select count(*) cou "
 					+ "	from productmaster "
-					+ "	where productCode 	= :productCode"
-					+ "		and tin 		= :tin";
+					+ "	where productCodeDis 	= :productCodeDis"
+					+ "		and tin 			= :tin"
+					+ "		and productStatus	= 'A'";
 			
 			//Criteria
-			param.put("productCode"	, productCode);
-			param.put("tin"			, tin);
+			param.put("productCodeDis"	, productCodeDis);
+			param.put("tin"				, tin);
+			
+			if(pageMode.equals(ProductDetailsMaintananceForm.EDIT)){
+				hql += " and productCode <> :productCode";
+				param.put("productCode"	, EnjoyUtils.parseInt(productCode));
+			}
 			
 			resultList = getResult(hql, param, "cou", Constants.INT_TYPE);
 			
@@ -339,8 +360,9 @@ public class ProductDetailsDao extends DaoControl{
 		try{
 			hql	= "select count(*) cou "
 				+ "	from productmaster "
-				+ "	where productName 	= :productName"
-				+ "		and tin 		= :tin";
+				+ "	where productName 		= :productName"
+				+ "		and tin 			= :tin"
+				+ "		and productStatus	= 'A'";
 			
 			//Criteria
 			param.put("productName"	, productName);
@@ -348,7 +370,7 @@ public class ProductDetailsDao extends DaoControl{
 			
 			if(pageMode.equals(ProductDetailsMaintananceForm.EDIT)){
 				hql += " and productCode <> :productCode";
-				param.put("productCode"	, productCode);
+				param.put("productCode"	, EnjoyUtils.parseInt(productCode));
 			}
 			
 			resultList = getResult(hql, param, "cou", Constants.INT_TYPE);
@@ -412,11 +434,13 @@ public class ProductDetailsDao extends DaoControl{
 					hql 	= "select productGroupCode "
 							+ "	from productgroup "
 							+ "	where productTypeCode 		= :productTypeCode"
+							+ "		and productGroupName	= :productGroupName"
 							+ "		and tin					= :tin"
 							+ "		and productGroupStatus 	= 'A'";
 					
 					//Criteria
 					param.put("productTypeCode"	, productTypeCode);
+					param.put("productGroupName", productGroupName);
 					param.put("tin"				, tin);
 					
 					listObj = getResult(hql, param, "productGroupCode", Constants.STRING_TYPE);
@@ -440,6 +464,7 @@ public class ProductDetailsDao extends DaoControl{
 		    			+ " where productType 		= :productTypeCode"
 		    			+ " 	and productGroup 	= :productGroupCode"
 		    			+ " 	and tin 			= :tin"
+		    			+ "		and productStatus	= 'A'"
 		    			+ " 	and productName LIKE CONCAT(:productName, '%')"
 		    			+ " order by productName asc limit 10";
 		    	
@@ -452,21 +477,25 @@ public class ProductDetailsDao extends DaoControl{
 		    }else{
 		    	if(flag==true){
 		    		hql = "select productCode, productName"
-			    		+ " from productmaster where tin = :tin";
+			    		+ " from productmaster t"
+			    		+ "		inner join productype a on t.productType = a.productTypeCode and t.tin = a.tin and a.productTypeStatus = 'A'"
+			    		+ "		inner join productgroup b on t.productType = b.productTypeCode and t.productGroup = b.productGroupCode and t.tin = b.tin and b.productGroupStatus = 'A'"
+			    		+ "	where t.tin 			= :tin"
+			    		+ "		and t.productStatus	= 'A'";
 		    		
 		    		param.put("tin"				, tin);
 		    		
 		    		if(productTypeCode!=null){
-		    			hql+= " and productType 	= :productTypeCode";
+		    			hql+= " and t.productType 	= :productTypeCode";
 		    			param.put("productTypeCode"	, productTypeCode);
 		    		}
 		    		if(productGroupCode!=null){
-		    			hql+= " and productGroup 	= :productGroupCode";
+		    			hql+= " and t.productGroup 	= :productGroupCode";
 		    			param.put("productGroupCode", productGroupCode);
 		    		}
 		    		
-		    		hql += " and productName LIKE CONCAT(:productName, '%')";
-		    		hql += " order by productName asc limit 10";
+		    		hql += " and t.productName LIKE CONCAT(:productName, '%')";
+		    		hql += " order by t.productName asc limit 10";
 		    		
 		    		param.put("productName"		, productName);
 		    		
@@ -515,12 +544,12 @@ public class ProductDetailsDao extends DaoControl{
 		try{	
 			hql					= "select * "
 								+ "	from productdetail"
-								+ "	where productCode 	= :productCode"
-								+ "		and tin 		= :tin"
+								+ "	where productCode 		= :productCode"
+								+ "		and tin 			= :tin"
 								+ "	order by seq asc";
 			
 			//Criteria
-			param.put("productCode"	, productdetailBean.getProductCode());
+			param.put("productCode"	, EnjoyUtils.parseInt(productdetailBean.getProductCode()));
 			param.put("tin"			, productdetailBean.getTin());
 			
 			//Column select
@@ -569,7 +598,7 @@ public class ProductDetailsDao extends DaoControl{
 		ProductdetailPK 		id 					= new ProductdetailPK();
 		
 		try{
-			id.setProductCode	(productdetailBean.getProductCode());
+			id.setProductCode	(EnjoyUtils.parseInt(productdetailBean.getProductCode()));
 			id.setTin			(productdetailBean.getTin());
 			id.setSeq			(EnjoyUtils.parseInt(productdetailBean.getSeqDb()));
 			
@@ -604,10 +633,10 @@ public class ProductDetailsDao extends DaoControl{
 							+ "		and t.id.tin		= :tin";
 			
 			query = createQuery(hql);
-			query.setParameter("productCode", productCode);
+			query.setParameter("productCode", EnjoyUtils.parseInt(productCode));
 			query.setParameter("tin"		, tin);
 			
-			query.executeUpdate();			
+			query.executeUpdate();
 		}catch(Exception e){
 			e.printStackTrace();
 			getLogger().error(e);
@@ -633,11 +662,12 @@ public class ProductDetailsDao extends DaoControl{
 		try{		
 			hql		= "select a.*, b.productTypeName, c.productGroupName, d.unitName"
 					+ "	from productmaster a"
-					+ "		inner join productype b ON b.productTypeCode = a.productType and b.tin	= a.tin"
-					+ "		inner join productgroup c on c.productTypeCode = a.productType and c.productGroupCode = a.productGroup and c.tin	= a.tin"
-					+ " 	inner JOIN unittype d on d.unitCode = a.unitCode and d.tin= a.tin "
+					+ "		inner join productype b ON b.productTypeCode = a.productType and b.tin	= a.tin and b.productTypeStatus = 'A'"
+					+ "		inner join productgroup c on c.productTypeCode = a.productType and c.productGroupCode = a.productGroup and c.tin = a.tin and c.productGroupStatus = 'A'"
+					+ " 	inner JOIN unittype d on d.unitCode = a.unitCode and d.tin= a.tin and d.unitStatus = 'A'"
 					+ " where a.productName		= :productName"
-					+ "		and a.tin			= :tin";
+					+ "		and a.tin			= :tin"
+					+ "		and a.productStatus	= 'A'";
 			
 			//Criteria
 			param.put("productName"	, productName);
@@ -720,7 +750,7 @@ public class ProductDetailsDao extends DaoControl{
 					+ "		LIMIT 1";
 			
 			//Criteria
-			param.put("productCode"	, productCode);
+			param.put("productCode"	, EnjoyUtils.parseInt(productCode));
 			param.put("quantity"	, quantity);
 			param.put("startDate"	, invoiceDate);
 			param.put("expDate"		, invoiceDate);
@@ -760,14 +790,15 @@ public class ProductDetailsDao extends DaoControl{
 		try{	
 			hql					= "select a.*, b.productTypeName, c.productGroupName, d.unitName, e.quantity"
 								+ "	from productmaster a"
-								+ "		inner join productype b on b.productTypeCode = a.productType and b.tin = a.tin"
-								+ "		inner join productgroup c on c.productTypeCode 	= a.productType and c.productGroupCode = a.productGroup and c.tin = a.tin"
-								+ "		inner join unittype d on d.unitCode = a.unitCode and d.tin = a.tin"
+								+ "		inner join productype b on b.productTypeCode = a.productType and b.tin = a.tin and b.productTypeStatus = 'A'"
+								+ "		inner join productgroup c on c.productTypeCode 	= a.productType and c.productGroupCode = a.productGroup and c.tin = a.tin and c.productGroupStatus = 'A'"
+								+ "		inner join unittype d on d.unitCode = a.unitCode and d.tin = a.tin and d.unitStatus = 'A'"
 								+ "		left join productquantity e on e.productCode = a.productCode and e.tin = a.tin"
 								+ "	where a.tin					= :tin"
 								+ "		and b.productTypeName 	= :productTypeName"
 								+ "		and c.productGroupName 	= :productGroupName"
-								+ "		and d.unitName			= :unitName";
+								+ "		and d.unitName			= :unitName"
+								+ "		and a.productStatus		= 'A'";
 			
 			//Criteria
 			param.put("tin"				, productDetailsBean.getTin());
@@ -777,6 +808,7 @@ public class ProductDetailsDao extends DaoControl{
 			
 			//Column select
 			columnList.add("productCode");
+			columnList.add("productCodeDis");
 			columnList.add("tin");
 			columnList.add("productType");
 			columnList.add("productGroup");
@@ -792,6 +824,7 @@ public class ProductDetailsDao extends DaoControl{
 			columnList.add("productTypeName");
 			columnList.add("productGroupName");
 			columnList.add("quantity");
+			columnList.add("productStatus");
 			
 			resultList = getResult(hql, param, columnList);
 			
@@ -799,6 +832,7 @@ public class ProductDetailsDao extends DaoControl{
 				bean 	= new ProductmasterBean();
 				
 				bean.setProductCode				(EnjoyUtils.nullToStr(row.get("productCode")));
+				bean.setProductCodeDis			(EnjoyUtils.nullToStr(row.get("productCodeDis")));
 				bean.setTin						(EnjoyUtils.nullToStr(row.get("tin")));
 				bean.setProductTypeCode			(EnjoyUtils.nullToStr(row.get("productType")));
 				bean.setProductGroupCode		(EnjoyUtils.nullToStr(row.get("productGroup")));
@@ -814,6 +848,7 @@ public class ProductDetailsDao extends DaoControl{
 				bean.setProductTypeName			(EnjoyUtils.nullToStr(row.get("productTypeName")));
 				bean.setProductGroupName		(EnjoyUtils.nullToStr(row.get("productGroupName")));
 				bean.setQuantity				(EnjoyUtils.convertFloatToDisplay(row.get("quantity"), 2));
+				bean.setProductStatus			(EnjoyUtils.nullToStr(row.get("productStatus")));
 				
 				productDetailsList.add(bean);
 			}	
@@ -828,6 +863,187 @@ public class ProductDetailsDao extends DaoControl{
 		}
 		
 		return productDetailsList;
+		
+	}
+	
+	public int genId(String tin) throws EnjoyException{
+		getLogger().info("[genId][Begin]");
+		
+		String							hql				= null;
+		int 							result			= 1;
+		HashMap<String, Object>			param			= new HashMap<String, Object>();
+		List<Object>					resultList		= null;
+		
+		try{
+			hql		= "select (max(productCode) + 1) newId"
+					+ "	from productmaster "
+					+ "	where tin		= :tin";
+			
+			//Criteria
+			param.put("tin"		, tin);
+			
+			resultList = getResult(hql, param, "newId", Constants.INT_TYPE);
+			
+			if(resultList!=null && resultList.size() > 0){
+				result = EnjoyUtils.parseInt(resultList.get(0))==0?1:EnjoyUtils.parseInt(resultList.get(0));
+			}
+			
+			getLogger().info("[genId] newId 			:: " + result);
+			
+		}catch(Exception e){
+			getLogger().error(e);
+			throw new EnjoyException("genId error");
+		}finally{
+			hql									= null;
+			getLogger().info("[genId][End]");
+		}
+		
+		return result;
+	}
+	
+	public void cancelProductmaster(String tin, String productType, String productGroup, String productCode) throws EnjoyException{
+		getLogger().info("[cancelProductmaster][Begin]");
+		
+		String							hql			= null;
+		Query 							query 		= null;
+		LinkedHashMap<String, Object>	param 		= new LinkedHashMap<String, Object>();
+		
+		try{
+			hql				= "update  Productmaster t set t.productStatus = :productStatus"
+										+ " where t.id.tin		= :tin";
+			
+			param.put("productStatus"	, "R");
+			param.put("tin"				, tin);
+			
+			if(!"".equals(productType)){
+				hql += " and t.productType = :productType";
+				param.put("productType", EnjoyUtils.parseInt(productType));
+			}
+			
+			if(!"".equals(productGroup)){
+				hql += " and t.productGroup = :productGroup";
+				param.put("productGroup", EnjoyUtils.parseInt(productGroup));
+			}
+			
+			if(!"".equals(productCode)){
+				hql += " and t.id.productCode = :productCode";
+				param.put("productCode", EnjoyUtils.parseInt(productCode));
+			}
+			
+			getLogger().info("[cancelProductmaster] hql :: " + hql);
+			
+			query = createQuery(hql);
+			
+			Iterator<String> it = param.keySet().iterator();
+	        while(it.hasNext()){
+	            String key		= it.next();
+	            Object value	= param.get(key);
+	            
+	            getLogger().info("[cancelProductmaster] " + key + " :: " + value);
+	            
+	            query.setParameter(key			, value);
+	        }
+			
+			int rows = query.executeUpdate();
+			
+			getLogger().info("[cancelProductmaster] rows :: " + rows);
+			
+		}catch(Exception e){
+			e.printStackTrace();
+			getLogger().error(e);
+			throw new EnjoyException("Error cancelProductmaster");
+		}finally{
+			
+			hql									= null;
+			query 								= null;
+			getLogger().info("[cancelProductmaster][End]");
+		}
+	}
+	
+	public ProductmasterBean getProductDetailByProductCodeDis(String tin, String productCodeDis) throws EnjoyException{
+		getLogger().info("[getProductDetailByProductCodeDis][Begin]");
+		
+		String							hql						= null;
+		ProductmasterBean				bean					= null;
+		HashMap<String, Object>			param					= new HashMap<String, Object>();
+		List<String>					columnList				= new ArrayList<String>();
+		List<HashMap<String, Object>>	resultList				= null;
+		
+		try{		
+			hql		= "select a.*, b.productTypeName, c.productGroupName, d.unitName, e.quantity"
+					+ "	from productmaster a"
+					+ "		inner join productype b on b.productTypeCode = a.productType and b.tin = a.tin and b.productTypeStatus = 'A'"
+					+ "		inner join productgroup c on c.productTypeCode 	= a.productType and c.productGroupCode = a.productGroup and c.tin = a.tin and c.productGroupStatus = 'A'"
+					+ " 	inner join unittype d on d.unitCode = a.unitCode and d.tin = a.tin and d.unitStatus = 'A'"
+					+ " 	left join productquantity e on e.productCode = a.productCode and e.tin = a.tin"
+					+ "	where a.productCodeDis	= :productCodeDis"
+					+ " 	and a.tin			= :tin"
+					+ "		and a.productStatus	= 'A'";
+			
+			//Criteria
+			param.put("productCodeDis"	, productCodeDis);
+			param.put("tin"				, tin);
+			
+			//Column select
+			columnList.add("productCode");
+			columnList.add("tin");
+			columnList.add("productCodeDis");
+			columnList.add("productType");
+			columnList.add("productGroup");
+			columnList.add("productName");
+			columnList.add("unitCode");
+			columnList.add("minQuan");
+			columnList.add("costPrice");
+			columnList.add("salePrice1");
+			columnList.add("salePrice2");
+			columnList.add("salePrice3");
+			columnList.add("salePrice4");
+			columnList.add("salePrice5");
+			columnList.add("productTypeName");
+			columnList.add("productGroupName");
+			columnList.add("unitName");
+			columnList.add("quantity");
+			columnList.add("productStatus");
+			
+			resultList = getResult(hql, param, columnList);
+			
+			if(resultList.size()==1){
+				for(HashMap<String, Object> row:resultList){
+					bean 	= new ProductmasterBean();
+					
+					bean.setProductCode				(EnjoyUtils.nullToStr(row.get("productCode")));
+					bean.setTin						(EnjoyUtils.nullToStr(row.get("tin")));
+					bean.setProductCodeDis			(EnjoyUtils.nullToStr(row.get("productCodeDis")));
+					bean.setProductTypeCode			(EnjoyUtils.nullToStr(row.get("productType")));
+					bean.setProductGroupCode		(EnjoyUtils.nullToStr(row.get("productGroup")));
+					bean.setProductName				(EnjoyUtils.nullToStr(row.get("productName")));
+					bean.setUnitCode				(EnjoyUtils.nullToStr(row.get("unitCode")));
+					bean.setMinQuan					(EnjoyUtils.convertFloatToDisplay(row.get("minQuan"), 2));
+					bean.setCostPrice				(EnjoyUtils.convertFloatToDisplay(row.get("costPrice"), 2));
+					bean.setSalePrice1				(EnjoyUtils.convertFloatToDisplay(row.get("salePrice1"), 2));
+					bean.setSalePrice2				(EnjoyUtils.convertFloatToDisplay(row.get("salePrice2"), 2));
+					bean.setSalePrice3				(EnjoyUtils.convertFloatToDisplay(row.get("salePrice3"), 2));
+					bean.setSalePrice4				(EnjoyUtils.convertFloatToDisplay(row.get("salePrice4"), 2));
+					bean.setSalePrice5				(EnjoyUtils.convertFloatToDisplay(row.get("salePrice5"), 2));
+					bean.setProductTypeName			(EnjoyUtils.nullToStr(row.get("productTypeName")));
+					bean.setProductGroupName		(EnjoyUtils.nullToStr(row.get("productGroupName")));
+					bean.setUnitName				(EnjoyUtils.nullToStr(row.get("unitName")));
+					bean.setQuantity				(EnjoyUtils.convertFloatToDisplay(row.get("quantity"), 2));
+					bean.setProductStatus			(EnjoyUtils.nullToStr(row.get("productStatus")));
+					
+				}	
+			}
+			
+		}catch(Exception e){
+			getLogger().error(e);
+			e.printStackTrace();
+			throw new EnjoyException("error getProductDetailByProductCodeDis");
+		}finally{
+			hql						= null;
+			getLogger().info("[getProductDetailByProductCodeDis][End]");
+		}
+		
+		return bean;
 		
 	}
 
