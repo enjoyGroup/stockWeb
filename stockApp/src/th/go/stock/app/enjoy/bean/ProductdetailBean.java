@@ -13,7 +13,7 @@ public class ProductdetailBean {
 	private String startDate;
 	private String expDate;
 	private String tin;
-	
+	private String availPageFlag;
 	
 	public ProductdetailBean(){
 		this.productCode 	= "";
@@ -25,6 +25,7 @@ public class ProductdetailBean {
 		this.startDate 		= "";
 		this.expDate 		= "";
 		this.tin			= "";
+		this.availPageFlag	= "";
 	}
 
 
@@ -115,6 +116,16 @@ public class ProductdetailBean {
 
 	public void setTin(String tin) {
 		this.tin = tin;
+	}
+
+
+	public String getAvailPageFlag() {
+		return availPageFlag;
+	}
+
+
+	public void setAvailPageFlag(String availPageFlag) {
+		this.availPageFlag = availPageFlag;
 	}
 
 }

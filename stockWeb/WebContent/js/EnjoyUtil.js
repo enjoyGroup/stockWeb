@@ -978,11 +978,11 @@ window.alert = function(message, successCallback, autoIndicator){
 		//event.preventDefault();
 };
 
-window.confirm = function(message, successCallback, nonSuccessCallback, autoIndicator){
+window.confirm = function(message, successCallback, nonSuccessCallback, autoIndicator, w, h){
 	
-	if(autoIndicator == undefined ){
-        autoIndicator = true;
-    }
+	if(autoIndicator == undefined )autoIndicator = true;
+	if(w == undefined )w = 400;
+    if(h == undefined )h = 175;
 	
     if(autoIndicator){
     	gp_progressBarOn();
@@ -992,8 +992,8 @@ window.confirm = function(message, successCallback, nonSuccessCallback, autoIndi
 	    .html("<p>" + message + "</p>")
 	    .dialog({
 	      autoOpen: true,
-	      height: 175,
-	      width: 400,
+	      height: h,
+	      width: w,
 	      show: {
 	        effect: "slide",
 	        direction: "down",

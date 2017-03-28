@@ -147,13 +147,13 @@
 		
 		function lp_validate(){
 			var la_validate             = new Array( "invoiceDate:วันที่ขาย");
-		    var lv_return				= true;
 		    var la_productName			= null;
 		    var la_productCode			= null;
 		    var la_inventory			= null;
 		    var la_quantity				= null;
 		    var lv_inventory			= 0.00;
 		    var lv_quantity				= 0.00;
+		    var lv_notEnough			= "";
 		    
 			try{
 				la_productName		= document.getElementsByName("productName");
@@ -216,22 +216,37 @@
 							
 							lv_inventory = gp_parseFloat(la_inventory[i].value) - gp_parseFloat(la_quantity[i].value);
 							if(lv_inventory < 0){
-								alert(la_productName[i].value + "เหลือไม่เพียงพอจำหน่าย", function() { 
+								if(lv_notEnough==""){
+									lv_notEnough += "-&nbsp;" + la_productName[i].value;
+								}else{
+									lv_notEnough += "<br/>-&nbsp;" + la_productName[i].value;
+								}
+								
+								/*alert(la_productName[i].value + "เหลือไม่เพียงพอจำหน่าย", function() { 
 									la_productName[i].focus();
 				    		    });
-								return false;
+								return false;*/
 							}
 						}
 					}
 				}
 				/*End Check รายการสินค้า*/
 				
+				gp_progressBarOn();
+				if(lv_notEnough!=""){
+					confirm("<b>สินค้าเหลือไม่เพียงพอจำหน่าย คุณต้องการทำรายการต่อ ?</b><br/>" + lv_notEnough
+							, function(){lp_save();}
+							, function(){gp_progressBarOff();}
+							, false
+							, 400
+							, 300);
+				}else{
+					lp_save();
+				}
+				
 			}catch(e){
 				alert("lp_validate :: " + e);
-				return false;
 			}
-			
-			return lv_return;
 		}
 		
 		function lp_setModeEdit(){
@@ -276,9 +291,9 @@
 			
 			try{
 				
-				if(!lp_validate()){
+				/*if(!lp_validate()){
 					return;
-				}
+				}*/
 				
 				params 	= "pageAction=save&" + $('#frm').serialize();
 				
@@ -287,13 +302,12 @@
 		            type: "POST",
 		            url: gv_url,
 		            data: params,
-		            beforeSend: gp_progressBarOn(),
+		            beforeSend: "",
 		            success: function(data){
 		            	var jsonObj 			= null;
 		            	var status				= null;
 		            	
 		            	try{
-		            		//gp_progressBarOff();
 		            		
 		            		jsonObj = JSON.parse(data);
 		            		status	= jsonObj.status;
@@ -302,9 +316,7 @@
 		            			alert("บันทึกเรียบร้อย", function() { 
 		            				var params = "invoiceCode=" + jsonObj.invoiceCode;
 		            				window.location = gv_url + "?service=" + $("#service").val() + "&pageAction=getDetail&" + params;
-				    		    });
-		            			//alert("บันทึกเรียบร้อย");//alert(jsonObj.invoiceCode);
-		            			//window.location = gv_url + "?service=" + $("#service").val() + "&pageAction=getDetail&invoiceCode=" + jsonObj.invoiceCode;
+				    		    }, false);
 		            		}else{
 		            			alert(jsonObj.errMsg);
 		            			
@@ -1731,7 +1743,7 @@
 								        			<td align="right">
 								        				<br/>
 								        				<%if(invoiceCashMaintananceForm.getPageMode().equals(invoiceCashMaintananceForm.NEW)){%>
-								        				<input type="button" id="btnSave" class="btn btn-sm btn-warning" value='บันทึก' onclick="lp_save();" />&nbsp;&nbsp;&nbsp;
+								        				<input type="button" id="btnSave" class="btn btn-sm btn-warning" value='บันทึก' onclick="lp_validate();" />&nbsp;&nbsp;&nbsp;
 				   										<input type="button" id="btnReset" onclick="lp_reset();" class="btn btn-sm btn-danger" value='เริ่มใหม่' />
 				   										<%}else{%>
 				   											<%if(invoiceCashMaintananceForm.getUpdateCredit().equals("Y")){ %>

@@ -559,6 +559,7 @@ public class ProductDetailsDao extends DaoControl{
 			columnList.add("discountRate");
 			columnList.add("startDate");
 			columnList.add("expDate");
+			columnList.add("availPageFlag");
 			
 			resultList = getResult(hql, param, columnList);
 
@@ -571,6 +572,7 @@ public class ProductDetailsDao extends DaoControl{
 				bean.setDiscountRate		(EnjoyUtils.convertFloatToDisplay(row.get("discountRate"), 2));
 				bean.setStartDate			(EnjoyUtils.dateToThaiDisplay(row.get("startDate")));
 				bean.setExpDate				(EnjoyUtils.dateToThaiDisplay(row.get("expDate")));
+				bean.setAvailPageFlag		(EnjoyUtils.nullToStr(row.get("availPageFlag")));
 				bean.setSeq					(String.valueOf(seq));
 				
 				productdetailList.add(bean);
@@ -607,6 +609,7 @@ public class ProductDetailsDao extends DaoControl{
 			productdetail.setDiscountRate		(EnjoyUtils.parseBigDecimal(productdetailBean.getDiscountRate()));
 			productdetail.setStartDate			(EnjoyUtils.dateToThaiDB(productdetailBean.getStartDate()));
 			productdetail.setExpDate			(EnjoyUtils.dateToThaiDB(productdetailBean.getExpDate()));
+			productdetail.setAvailPageFlag		(productdetailBean.getAvailPageFlag());
 			
 			insertData(productdetail);
 			
@@ -728,7 +731,7 @@ public class ProductDetailsDao extends DaoControl{
 		
 	}
 	
-	public String getQuanDiscount(String productCode, String quantity, String invoiceDate, String tin) throws EnjoyException{
+	public String getQuanDiscount(String productCode, String quantity, String invoiceDate, String tin, String availPageFlag) throws EnjoyException{
 		getLogger().info("[getQuanDiscount][Begin]");
 		
 		String							hql					= null;
@@ -746,15 +749,17 @@ public class ProductDetailsDao extends DaoControl{
 					+ "			and startDate 		<= :startDate"
 					+ "			and (expDate is null or expDate = '' or expDate >= :expDate)"
 					+ "			and tin				= :tin"
-					+ "		order by quanDiscount ASC, startDate DESC"
+					+ "			and availPageFlag	in ('AL', :availPageFlag)"
+					+ "		order by quanDiscount DESC, startDate DESC"
 					+ "		LIMIT 1";
 			
 			//Criteria
-			param.put("productCode"	, EnjoyUtils.parseInt(productCode));
-			param.put("quantity"	, quantity);
-			param.put("startDate"	, invoiceDate);
-			param.put("expDate"		, invoiceDate);
-			param.put("tin"			, tin);
+			param.put("productCode"		, EnjoyUtils.parseInt(productCode));
+			param.put("quantity"		, quantity);
+			param.put("startDate"		, invoiceDate);
+			param.put("expDate"			, invoiceDate);
+			param.put("tin"				, tin);
+			param.put("availPageFlag"	, availPageFlag);
 
 			resultList = getResult(hql, param, "discountRate", Constants.STRING_TYPE);
 			

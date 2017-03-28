@@ -1,6 +1,5 @@
 package th.go.stock.app.enjoy.pdf;
 
-import java.awt.Color;
 import java.io.IOException;
 import java.net.MalformedURLException;
 
@@ -15,12 +14,10 @@ import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.Element;
 import com.lowagie.text.Image;
-import com.lowagie.text.Rectangle;
 import com.lowagie.text.pdf.Barcode128;
 import com.lowagie.text.pdf.BaseFont;
 import com.lowagie.text.pdf.PdfContentByte;
 import com.lowagie.text.pdf.PdfPTable;
-import com.lowagie.text.pdf.PdfTemplate;
 import com.lowagie.text.pdf.PdfWriter;
 
 public class ProductBarcodePdfForm extends EnjoyItext implements PdfFormService {
@@ -105,14 +102,14 @@ public class ProductBarcodePdfForm extends EnjoyItext implements PdfFormService 
 						System.out.println("[genDetail] productName 	:: " + productName);
 						
 						subTab1 		= new PdfPTable(subW1);
-						subTab1.addCell(setCellWB(productName, getFont6Bold(), 1, Element.ALIGN_CENTER, 0));
+						subTab1.addCell(setCellWB(productName, getFont7Bold(), 1, Element.ALIGN_CENTER, 0));
 						
 						code128 		= new Barcode128();
 						code128.setCode(productCodeDis);
 						
 						code128.setTextAlignment(Element.ALIGN_CENTER);
 						code128.setFont(bfComic);
-						code128.setSize(6);
+						code128.setSize(7);
 						code128.setBarHeight(barcodeH);
 				        code128.setX(barcodeW);
 						barCode = code128.createImageWithBarcode(cb, null, null);
@@ -152,14 +149,14 @@ public class ProductBarcodePdfForm extends EnjoyItext implements PdfFormService 
 					System.out.println("[genDetail] productName 	:: " + productName);
 					
 					subTab1 		= new PdfPTable(subW1);
-					subTab1.addCell(setCellWB(productName, getFont6Bold(), 1, Element.ALIGN_CENTER, 0));
+					subTab1.addCell(setCellWB(productName, getFont7Bold(), 1, Element.ALIGN_CENTER, 0));
 					
 					code128 		= new Barcode128();
 					code128.setCode(productCodeDis);
 					
 					code128.setTextAlignment(Element.ALIGN_CENTER);
 					code128.setFont(bfComic);
-					code128.setSize(6);
+					code128.setSize(7);
 					code128.setBarHeight(barcodeH);
 			        code128.setX(barcodeW);
 			        

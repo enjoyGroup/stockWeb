@@ -11,6 +11,8 @@ import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
 
 public class ExcelField {
+	private static final EnjoyLogger logger = EnjoyLogger.getLogger(ExcelField.class);
+	
 	private String value;
 	private String condition;
 	private String errorMessage;
@@ -40,6 +42,7 @@ public class ExcelField {
 			Cell cell = row.getCell((short) _column);
 			// logger.info("ExcelField Input Column No " + _column + " = " +
 			// cell);
+			
 			if (_pattern == "date" && (!cell.toString().equals(""))) {
 				// Excel Date
 				try {
@@ -54,6 +57,11 @@ public class ExcelField {
 				setValue(strDate);
 			} else if (Pattern.matches(_pattern, cell.toString())) {
 				if (cell.getCellType() == HSSFCell.CELL_TYPE_NUMERIC) {
+					
+					setValue(convertDoubleToBigDecimal(
+							cell.getNumericCellValue()).toString());
+				}else if (cell.getCellType() == HSSFCell.CELL_TYPE_FORMULA) {
+					
 					setValue(convertDoubleToBigDecimal(
 							cell.getNumericCellValue()).toString());
 				} else {

@@ -714,9 +714,12 @@ public class MultiManageProductServlet extends EnjoyStandardSvc {
 			    		
 			    		logger.info("[lp_uploadFile] numberOfSheets :: " + numberOfSheets);
 			    		
-						for (int i = 0; i < numberOfSheets; i++) {
-							sheetName = wb.getSheetName(i);
-							sheet     = wb.getSheetAt(i);
+			    		if(numberOfSheets > 0){
+//							for (int i = 0; i < numberOfSheets; i++) {
+//								sheetName = wb.getSheetName(i);
+//								sheet     = wb.getSheetAt(i);
+			    			sheetName = wb.getSheetName(0);
+							sheet     = wb.getSheetAt(0);
 							rowArray  = ExcelUtil.getAllRows(sheet);
 							
 							logger.info("[lp_uploadFile] sheetName :: " + sheetName);
@@ -764,7 +767,8 @@ public class MultiManageProductServlet extends EnjoyStandardSvc {
 								
 								jSONArray.add(objDetail);
 							}
-						}
+//							}
+			    		}
 			    		
 						del = uploadedFile.delete();
 						logger.info("[lp_uploadFile] del :: " + del);

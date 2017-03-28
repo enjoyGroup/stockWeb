@@ -8,7 +8,7 @@
 <%
 	String 						pageMode 			= productDetailsMaintananceForm.getPageMode();
 	ProductmasterBean 			productmasterBean 	= productDetailsMaintananceForm.getProductmasterBean();
-	//List<ComboBean> 			statusCombo 		= productDetailsMaintananceForm.getStatusCombo();
+	List<ComboBean> 			availPageFlagCombo 	= productDetailsMaintananceForm.getAvailPageFlagCombo();
 	String						titlePage			= productDetailsMaintananceForm.getTitlePage();
 	List<ProductdetailBean> 	productdetailList	= productDetailsMaintananceForm.getProductdetailList();
 %>
@@ -412,6 +412,8 @@
 		    var newNodeTd4 						= null;
 		    var newNodeTd5 						= null;
 		    var newNodeTd6 						= null;
+		    var newNodeTd7 						= null;
+		    var lv_availPageFlag				= "";
 			
 			try{
 				
@@ -440,6 +442,7 @@
 		                        newNodeTd4      = newNodeTr.insertCell(3);
 		                        newNodeTd5      = newNodeTr.insertCell(4);
 		                        newNodeTd6      = newNodeTr.insertCell(5);
+		                        newNodeTd7      = newNodeTr.insertCell(6);
 		                        
 		                        //ลำดับ
 		                        newNodeTd1.align 			= "center";
@@ -457,9 +460,17 @@
 		                      	//วันที่มีผล
 		                       	newNodeTd5.innerHTML        = '<input type="text" style="width: 100px;"  onchange="gp_checkDate(this);lp_updateRecord('+lv_maxSeq+');" class="dateFormat" id="expDate' + lv_maxSeq + '"  placeholder="DD/MM/YYYY" name="expDate" value="" />';
 		                       	
+		                       	//สำหรับการซื้อขาย
+		                       	$.each(JSON.parse($("#availPageFlagJsonString").val()), function(idx, obj) {
+		                       		lv_availPageFlag += '<option value="'+obj.id+'">'+obj.desc+'</option>';
+		            			});
+		                       	newNodeTd6.align 			= "left";
+		                       	newNodeTd6.innerHTML        = '<select id="availPageFlag'+lv_maxSeq+'" name="availPageFlag" onchange="lp_updateRecord('+lv_maxSeq+');">'
+		                       								+ lv_availPageFlag
+		                       								+ '</select>';
 		                      	//Action
-		                      	newNodeTd6.align 			= "center";
-		                       	newNodeTd6.innerHTML        = '<img alt="ลบ" title="ลบ" src="<%=imgURL%>/wrong.png" width="24" height="24" border="0" onclick="lp_deleteRecord(this, \'' + lv_maxSeq + '\');" />'
+		                      	newNodeTd7.align 			= "center";
+		                       	newNodeTd7.innerHTML        = '<img alt="ลบ" title="ลบ" src="<%=imgURL%>/wrong.png" width="24" height="24" border="0" onclick="lp_deleteRecord(this, \'' + lv_maxSeq + '\');" />'
 															+ '<input type="hidden" id="seq'+lv_maxSeq+'" name="seq" value="'+lv_maxSeq+'" />';
 		                        
 								lo_seqTemp.value  = lv_maxSeq;
@@ -533,6 +544,7 @@
 			var discountRate			= null;
 			var startDate				= null;
 			var expDate					= null;
+			var availPageFlag			= null;
 			
 			try{
 				
@@ -540,12 +552,14 @@
 				discountRate 	= document.getElementById("discountRate" + av_val).value;
 				startDate 		= document.getElementById("startDate" + av_val).value;
 				expDate 		= document.getElementById("expDate" + av_val).value;
+				availPageFlag 	= document.getElementById("availPageFlag" + av_val).value;
 				
 				params 	= gv_service + "&pageAction=updateRecord&seq=" + av_val 
-															 + "&quanDiscount=" + quanDiscount 
-															 + "&discountRate=" + discountRate
-															 + "&startDate=" 	+ startDate
-															 + "&expDate=" 		+ expDate;
+															 + "&quanDiscount=" 	+ quanDiscount 
+															 + "&discountRate=" 	+ discountRate
+															 + "&startDate=" 		+ startDate
+															 + "&expDate=" 			+ expDate
+															 + "&availPageFlag=" 	+ availPageFlag;
 				
 				$.ajax({
 					async:false,
@@ -583,6 +597,7 @@
 		<input type="hidden" id="service" 	name="service" value="servlet.ProductDetailsMaintananceServlet" />
 		<input type="hidden" id="pageMode" 	name="pageMode" value="<%=pageMode%>" />
 		<input type="hidden" id="seqTemp" name="seqTemp" value="<%=productDetailsMaintananceForm.getSeqTemp()%>" />
+		<input type="hidden" id="availPageFlagJsonString" name="availPageFlagJsonString" value="<%=StringEscapeUtils.escapeHtml4(productDetailsMaintananceForm.getAvailPageFlagJsonString())%>" />
 		<div id="menu" style="width: 100%;background: black;">
 			<%@ include file="/pages/menu/menu.jsp"%>
 		</div>
@@ -780,10 +795,11 @@
 								        <table class="table sim-panel-result-table" id="resultData">
 											<tr height="26px;">
 												<th  style="text-align: center;" width="5%" ><B>ลำดับ</B></th>
-												<th  style="text-align: center;" width="20%"><B>ปริมาณที่ซื้อ</B></th>
-												<th  style="text-align: center;" width="20%"><B>ลดจำนวนเงิน(%)</B></th>
-												<th  style="text-align: center;" width="20%"><B>วันที่มีผล</B></th>
-												<th  style="text-align: center;" width="20%"><B>วันที่สิ้นสุด</B></th>
+												<th  style="text-align: center;" width="16%"><B>ปริมาณที่ซื้อ</B></th>
+												<th  style="text-align: center;" width="16%"><B>ลดจำนวนเงิน(%)</B></th>
+												<th  style="text-align: center;" width="16%"><B>วันที่มีผล</B></th>
+												<th  style="text-align: center;" width="16%"><B>วันที่สิ้นสุด</B></th>
+												<th  style="text-align: center;" width="16%"><B>สำหรับการซื้อขาย</B></th>
 												<th style="text-align: center;" width="15%">Action</th>
 											</tr> 
 											<%
@@ -833,6 +849,13 @@
 							        					   value="<%=bean.getExpDate() %>" 
 							        					   style="width: 100px;" />
 												</td>
+												<td align="left">
+													<select id="availPageFlag<%=bean.getSeq()%>" name="availPageFlag" onchange="lp_updateRecord(<%=bean.getSeq()%>);">
+														<%for(ComboBean vo:availPageFlagCombo){%>
+														<option <%if(vo.getCode().equals(bean.getAvailPageFlag())){%>selected<%}%> value="<%=vo.getCode()%>"><%=vo.getDesc()%></option>
+														<%}%>
+													</select>
+												</td>
 												<td align="center">
 													<img alt="ลบ" title="ลบ" src="<%=imgURL%>/wrong.png" width="24" height="24" border="0" onclick="lp_deleteRecord(this, '<%=bean.getSeq()%>');" />
 													<input type="hidden" id="seq<%=bean.getSeq()%>" name="seq" value="<%=bean.getSeq()%>" />
@@ -840,7 +863,7 @@
 											</tr>
 											<% seq++;}}%>
 											<tr>
-												<td colspan="5">&nbsp;</td>
+												<td colspan="6">&nbsp;</td>
 												<td align="center">
 													<img alt="เพิ่ม" title="เพิ่ม" src="<%=imgURL%>/Add.png" width="24" height="24" border="0" onclick="lp_newRecord(this);" />
 												</td>

@@ -21,15 +21,19 @@ public class ProductDetailsMaintananceForm {
 	private String						titlePage;
 	private List<ProductdetailBean> 	productdetailList;
 	private String						seqTemp;
+	private List<ComboBean> 			availPageFlagCombo;
+	private String						availPageFlagJsonString;
 	
 	public ProductDetailsMaintananceForm(){
-		this.productmasterBean 		= new ProductmasterBean();
-		this.statusCombo			= new ArrayList<ComboBean>();
-		this.errMsg					= "";
-		this.pageMode				= NEW;
-		this.titlePage				= "";
-		this.productdetailList		= new ArrayList<ProductdetailBean>();
-		this.seqTemp				= "0";
+		this.productmasterBean 			= new ProductmasterBean();
+		this.statusCombo				= new ArrayList<ComboBean>();
+		this.errMsg						= "";
+		this.pageMode					= NEW;
+		this.titlePage					= "";
+		this.productdetailList			= new ArrayList<ProductdetailBean>();
+		this.seqTemp					= "0";
+		this.availPageFlagCombo			= new ArrayList<ComboBean>();
+		this.availPageFlagJsonString	= "";
 	}
 
 	public ProductmasterBean getProductmasterBean() {
@@ -86,5 +90,21 @@ public class ProductDetailsMaintananceForm {
 
 	public void setSeqTemp(String seqTemp) {
 		this.seqTemp = seqTemp;
+	}
+
+	public List<ComboBean> getAvailPageFlagCombo() {
+		return availPageFlagCombo;
+	}
+
+	public void setAvailPageFlagCombo(List<ComboBean> availPageFlagCombo) {
+		this.availPageFlagCombo = availPageFlagCombo;
+	}
+
+	public String getAvailPageFlagJsonString() {
+		return availPageFlagJsonString;
+	}
+
+	public void setAvailPageFlagJsonString(String availPageFlagJsonString) {
+		this.availPageFlagJsonString = availPageFlagJsonString;
 	}
 }

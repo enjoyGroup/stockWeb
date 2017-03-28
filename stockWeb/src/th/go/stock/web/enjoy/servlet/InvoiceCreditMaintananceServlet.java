@@ -51,7 +51,8 @@ public class InvoiceCreditMaintananceServlet extends EnjoyStandardSvc {
 	static final long serialVersionUID = 1L;
 	private static final EnjoyLogger logger = EnjoyLogger.getLogger(InvoiceCreditMaintananceServlet.class);
 	
-    private static final String 	FORM_NAME 				= "invoiceCreditMaintananceForm";
+    private static final String 	FORM_NAME 			= "invoiceCreditMaintananceForm";
+    private static final String 	CREDIT 				= "CR";
     
     private EnjoyUtil               		enjoyUtil                   = null;
     private HttpServletRequest          	request                     = null;
@@ -752,7 +753,7 @@ public class InvoiceCreditMaintananceServlet extends EnjoyStandardSvc {
 				   pricePerUnit = productmasterBean.getSalePrice1();
 			   }
 			   
-			   discount = this.productDetailsDao.getQuanDiscount(productmasterBean.getProductCode(), quantity, invoiceDate, tin);
+			   discount = this.productDetailsDao.getQuanDiscount(productmasterBean.getProductCode(), quantity, invoiceDate, tin, CREDIT);
 			   
 			   obj.put("productCode"	,productmasterBean.getProductCode());
 			   obj.put("productName"	,productmasterBean.getProductName());
@@ -974,7 +975,7 @@ public class InvoiceCreditMaintananceServlet extends EnjoyStandardSvc {
 				   pricePerUnit = productmasterBeanDb.getSalePrice1();
 			   }
 			   
-			   discount = this.productDetailsDao.getQuanDiscount(productmasterBean.getProductCode(), quantity, invoiceDate, tin);
+			   discount = this.productDetailsDao.getQuanDiscount(productmasterBean.getProductCode(), quantity, invoiceDate, tin, CREDIT);
 			   
 			   obj.put("productCode"	,productmasterBeanDb.getProductCode());
 			   obj.put("productName"	,productmasterBeanDb.getProductName());
@@ -1030,7 +1031,7 @@ public class InvoiceCreditMaintananceServlet extends EnjoyStandardSvc {
 			invoiceDate		= EnjoyUtils.nullToStr(this.request.getParameter("invoiceDate"));
 			tin				= this.userBean.getTin();
 			
-			discount = this.productDetailsDao.getQuanDiscount(productCode, quantity, invoiceDate, tin);
+			discount = this.productDetailsDao.getQuanDiscount(productCode, quantity, invoiceDate, tin, CREDIT);
 			
 			obj.put("discount"	,discount);
 			obj.put(STATUS		,SUCCESS);
@@ -1416,7 +1417,7 @@ public class InvoiceCreditMaintananceServlet extends EnjoyStandardSvc {
 				   pricePerUnit = productmasterBeanDb.getSalePrice1();
 			   }
 			   
-			   discount = this.productDetailsDao.getQuanDiscount(productmasterBeanDb.getProductCode(), quantity, invoiceDate, tin);
+			   discount = this.productDetailsDao.getQuanDiscount(productmasterBeanDb.getProductCode(), quantity, invoiceDate, tin, CREDIT);
 			   
 			   obj.put("productCode"	,productmasterBeanDb.getProductCode());
 			   obj.put("productName"	,productmasterBeanDb.getProductName());

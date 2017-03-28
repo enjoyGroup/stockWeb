@@ -1,7 +1,9 @@
 package th.go.stock.app.enjoy.model;
 
 import java.io.Serializable;
+
 import javax.persistence.*;
+
 import java.math.BigDecimal;
 
 
@@ -16,6 +18,8 @@ public class Productdetail implements Serializable {
 
 	@EmbeddedId
 	private ProductdetailPK id;
+	
+	private String availPageFlag;
 
 	private BigDecimal discountRate;
 
@@ -66,6 +70,14 @@ public class Productdetail implements Serializable {
 
 	public void setStartDate(String startDate) {
 		this.startDate = startDate;
+	}
+
+	public String getAvailPageFlag() {
+		return availPageFlag;
+	}
+
+	public void setAvailPageFlag(String availPageFlag) {
+		this.availPageFlag = availPageFlag;
 	}
 
 }
